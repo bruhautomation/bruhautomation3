@@ -12,9 +12,51 @@
 	--sl-color-accent-high: #0a2e52;
 }
 
-/* Hero title in accent color */
+/* ─── Hero refinements ─── */
+
+/* Tighten the hero section — less vertical bulk */
+.hero {
+	padding-block: 3rem 1rem;
+}
+.hero > .stack {
+	gap: 1rem;
+}
+
+/* Accent-colored title at a readable, modern size */
 .hero h1 {
 	color: var(--sl-color-accent);
+	font-size: clamp(2rem, 5vw, 2.75rem);
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+}
+
+/* Subdued, shorter tagline */
+.hero .tagline {
+	font-size: clamp(1rem, 2.5vw, 1.2rem);
+	color: var(--sl-color-gray-2);
+	max-width: 52ch;
+}
+
+/* Compact action buttons */
+.hero .sl-flex.actions {
+	gap: 0.75rem;
+	margin-top: 0.25rem;
+}
+
+/* ─── Landing-page body ─── */
+
+/* Tighter heading spacing below hero */
+.sl-markdown-content h2:first-child {
+	margin-top: 1rem;
+}
+
+/* Card grid polish */
+.sl-link-card {
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.sl-link-card:hover {
+	border-color: var(--sl-color-accent);
+	box-shadow: 0 2px 12px rgba(30, 144, 255, 0.12);
 }
 
 /* Tone down the prev/next pagination link titles (Starlight default is 2xl) */
