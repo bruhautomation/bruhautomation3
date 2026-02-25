@@ -5,7 +5,7 @@ interface Props {
   color?: string;
 }
 
-const { src, height = '400px', color = '#4A9FD9' } = Astro.props;
+const { src, height = '400px', color = '#1e90ff' } = Astro.props;
 ---
 
 <div class="stl-viewer-container">
@@ -26,7 +26,7 @@ const { src, height = '400px', color = '#4A9FD9' } = Astro.props;
     if (container.querySelector('canvas')) return;
 
     const src = container.dataset.stlSrc;
-    const color = container.dataset.stlColor || '#4A9FD9';
+    const color = container.dataset.stlColor || '#1e90ff';
     if (!src) return;
 
     container.innerHTML = '';

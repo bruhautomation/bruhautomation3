@@ -1,15 +1,15 @@
 /* BRUH Automation — Brand accent + minor tweaks */
 
 :root {
-	--sl-color-accent-low: #0a1f33;
-	--sl-color-accent: #4A9FD9;
-	--sl-color-accent-high: #b8ddf5;
+	--sl-color-accent-low: #0b2844;
+	--sl-color-accent: #1e90ff;
+	--sl-color-accent-high: #b3d9ff;
 }
 
 :root[data-theme='light'] {
-	--sl-color-accent-low: #ddedf9;
-	--sl-color-accent: #2a7ab5;
-	--sl-color-accent-high: #0e3a5c;
+	--sl-color-accent-low: #cce4ff;
+	--sl-color-accent: #1e90ff;
+	--sl-color-accent-high: #0a2e52;
 }
 
 /* Hero title in accent color */
