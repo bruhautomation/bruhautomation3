@@ -1,7 +1,14 @@
 {
-  "name": "bruhautomation3",
+  "name": "bruhautomation",
+  "description": "BRUH Automation docs site — DIY smart home, maker, and lab projects",
+  "author": "Ben <brusche@gmail.com>",
+  "homepage": "https://bruhautomation.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bruhautomation/bruhautomation3.git"
+  },
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
