@@ -1,0 +1,79 @@
+/* BRUH Automation — Brand accent + minor tweaks */
+
+:root {
+	--sl-color-accent-low: #0a1f33;
+	--sl-color-accent: #4A9FD9;
+	--sl-color-accent-high: #b8ddf5;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #ddedf9;
+	--sl-color-accent: #2a7ab5;
+	--sl-color-accent-high: #0e3a5c;
+}
+
+/* Hero title in accent color */
+.hero h1 {
+	color: var(--sl-color-accent);
+}
+
+/* Tone down the prev/next pagination link titles (Starlight default is 2xl) */
+.pagination-links .link-title {
+	font-size: var(--sl-text-lg);
+}
+
+/* Image grids — consistent sizing */
+.image-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1rem;
+	margin: 1.5rem 0;
+}
+.image-grid > * {
+	margin: 0;
+	min-width: 0;
+}
+.image-grid img {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+	border-radius: 8px;
+	cursor: zoom-in;
+}
+.image-grid picture {
+	display: block;
+}
+.image-grid figure {
+	margin: 0;
+}
+.image-grid figcaption {
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+	text-align: center;
+	margin-top: 0.5rem;
+}
+
+/* Responsive video embeds */
+.video-embed {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	height: 0;
+	overflow: hidden;
+	margin: 1.5rem 0;
+	border-radius: 8px;
+}
+.video-embed iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+/* Standalone iframes (YouTube shorts, vertical videos) */
+iframe {
+	max-width: 100%;
+	border-radius: 8px;
+	margin: 1.5rem 0;
+}

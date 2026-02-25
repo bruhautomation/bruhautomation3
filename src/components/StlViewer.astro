@@ -1,0 +1,153 @@
+---
+interface Props {
+  src: string;
+  height?: string;
+  color?: string;
+}
+
+const { src, height = '400px', color = '#4A9FD9' } = Astro.props;
+---
+
+<div class="stl-viewer-container">
+  <div class="stl-viewer" style={`height: ${height};`} data-stl-src={src} data-stl-color={color}>
+    <div class="stl-loading">Loading 3D model…</div>
+  </div>
+  <div class="stl-controls">
+    Drag to rotate · Scroll to zoom · Right-click to pan
+  </div>
+</div>
+
+<script>
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+
+  function initViewer(container: HTMLElement) {
+    if (container.querySelector('canvas')) return;
+
+    const src = container.dataset.stlSrc;
+    const color = container.dataset.stlColor || '#4A9FD9';
+    if (!src) return;
+
+    container.innerHTML = '';
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (width === 0 || height === 0) return;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight1.position.set(1, 1, 1);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+    dirLight2.position.set(-1, -0.5, -1);
+    scene.add(dirLight2);
+
+    const loader = new STLLoader();
+    loader.load(
+      src,
+      (geometry) => {
+        const material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(color),
+          specular: 0x222222,
+          shininess: 40,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        geometry.computeBoundingBox();
+        const center = new THREE.Vector3();
+        geometry.boundingBox!.getCenter(center);
+        mesh.position.sub(center);
+
+        const size = new THREE.Vector3();
+        geometry.boundingBox!.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 100 / maxDim;
+        mesh.scale.set(scale, scale, scale);
+
+        scene.add(mesh);
+
+        camera.position.set(80, 80, 80);
+        camera.lookAt(0, 0, 0);
+        controls.update();
+      },
+      undefined,
+      (err) => {
+        container.innerHTML =
+          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:red;">Failed to load 3D model</div>';
+        console.error('STL load error:', err);
+      }
+    );
+
+    const grid = new THREE.GridHelper(200, 20, 0x444444, 0x333333);
+    grid.position.y = -50;
+    scene.add(grid);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    new ResizeObserver(() => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }).observe(container);
+  }
+
+  function initAllViewers() {
+    document.querySelectorAll<HTMLElement>('.stl-viewer[data-stl-src]').forEach(initViewer);
+  }
+
+  // Astro scripts with no is:inline are bundled and deferred
+  initAllViewers();
+  document.addEventListener('astro:page-load', initAllViewers);
+</script>
+
+<style>
+  .stl-viewer-container {
+    margin: 1.5rem 0;
+  }
+  .stl-viewer {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--sl-color-gray-5);
+    overflow: hidden;
+    position: relative;
+    background: var(--sl-color-gray-6);
+  }
+  .stl-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+  }
+  .stl-controls {
+    text-align: center;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    margin-top: 0.5rem;
+  }
+</style>

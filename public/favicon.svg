@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Rounded square background -->
+  <rect width="128" height="128" rx="28" fill="#1e90ff"/>
+  <!-- B Lettermark with antenna motif -->
+  <g transform="translate(64, 64)">
+    <!-- Main vertical bar of B -->
+    <rect x="-12" y="-32" width="10" height="64" fill="white" rx="2"/>
+    <!-- Top bump of B -->
+    <circle cx="8" cy="-20" r="14" fill="white"/>
+    <!-- Bottom bump of B -->
+    <circle cx="8" cy="18" r="14" fill="white"/>
+    <!-- Antenna stem (small vertical line above) -->
+    <rect x="-3" y="-48" width="6" height="14" fill="white" rx="3"/>
+    <!-- Antenna signal waves -->
+    <circle cx="0" cy="-54" r="4" fill="none" stroke="white" stroke-width="1.5"/>
+    <circle cx="0" cy="-54" r="7" fill="none" stroke="white" stroke-width="1.5"/>
+  </g>
+</svg>

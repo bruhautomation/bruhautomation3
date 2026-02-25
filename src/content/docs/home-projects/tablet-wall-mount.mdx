@@ -1,0 +1,99 @@
+---
+title: Tablet Wall Mount
+description: Cutting holes in walls sucks, so I made a universal mount so I never have to do it again.
+---
+
+import { Image } from 'astro:assets';
+import StlViewer from '../../../components/StlViewer.astro';
+import tabletFront from '../../../assets/images/tablet-front.png';
+import tabletSide from '../../../assets/images/tablet-side.png';
+import tabletInstalled from '../../../assets/images/tablet-installed.jpg';
+
+## Background
+
+There are *many* wall-mount tablet options, but I couldn't find one that was right for me. I wanted:
+
+- A magnetic base (so the tablet could be easily removable)
+- USB charging (with a captive cable)
+- Standard fit/finish (only cutting standard-sized holes in my wall)
+- Universal tablet support
+- Simple and clean aesthetic (so my wife doesn't hate me, and I can leave it when I move)
+- Ideally off-the-shelf (but I did make a 3D printed variant too)
+
+After a bunch of prototyping, I landed on something I liked, designed around a keystone jack plate.
+
+## Material List
+
+- 1-gang, low-voltage [mounting bracket](https://amzn.to/45JdMwA)
+- [1-gang, 2-port keystone jack plate](https://amzn.to/45Nwvaj) **AND** [blank keystone jack inserts](https://amzn.to/45LbXiV) (or 3D print — see below)
+- [32.8mm × 7.6mm 40lb magnet](https://amzn.to/3PfIfLB)
+- [Stick-on metal plate](https://amzn.to/45Ofsoy)
+- AC USB charger (I used this [low-profile one](https://amzn.to/3PeoQL9))
+- Charging cable (I used a [right-angle USB-C cable](https://amzn.to/4875qQY))
+
+## Concept
+
+[View 3D model on Autodesk](https://a360.co/3OQe1ig) | [Download files below](#make-your-own)
+
+<div class="image-grid">
+  <figure>
+    <Image src={tabletFront} alt="Tablet mount front" />
+    <figcaption>Front view</figcaption>
+  </figure>
+  <figure>
+    <Image src={tabletSide} alt="Tablet mount side" />
+    <figcaption>Side view</figcaption>
+  </figure>
+  <figure>
+    <Image src={tabletInstalled} alt="Tablet mount installed" />
+    <figcaption>Installed</figcaption>
+  </figure>
+</div>
+
+## Installation
+
+### Find the Right Spot
+
+Where you install your tablet will determine if this is an easy or hard project. Assuming you plan to route the cable in the wall, find a spot that shares the same stud cavity with an outlet. At least in the US, studs are normally 16 inches apart, and outlets are attached to the stud either on the left or right side. Use a stud finder and find a spot where you have a clear shot without any studs or firebreaks in the way. Interior walls generally aren't insulated, which makes pulling wires easier.
+
+:::caution
+Probably don't cut holes in your wall unless you know what you're doing.
+:::
+
+### Install the Low Voltage Bracket
+
+Using a pencil, trace the interior outline of the low-voltage bracket onto the wall. I installed mine about 55 inches off the floor, but it's up to you. Use a [drywall saw](https://www.amazon.com/IRWIN-Tools-Standard-Drywall-2014102/dp/B000B3EGN8) or your favorite tool to cut out the hole. Push in the low-voltage bracket and tighten the screws to extend the winglets and secure the plate.
+
+### Install Keystone Plate
+
+#### For the Off-The-Shelf Variant
+
+Details coming soon — in the meantime, the 3D model files and assembly guide are available in the [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files).
+
+#### For the 3D Print Variant
+
+Details coming soon — in the meantime, the 3D model files and assembly guide are available in the [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files).
+
+## A Bezel if You Please
+
+I don't use these, but I'm including it in case others find it useful. I helped my parents replace their old Crestron CT-1000 touch panels, and they wanted the new tablets to have a similar form factor. It's a long saga that's worth its own write-up one day (for the 7 people on this planet it would be relevant for). I detoured through Nextion displays and custom HMIs, but nothing passed my kludge test.
+
+Where I landed was to use ancient VIZIO XR6M10 tablets. I used a dual-gang low-voltage bracket which was installed directly into the CT-1000 housing with smaller screws. I installed a [USB buck-boost step down](https://www.amazon.com/gp/product/B07JHH294R) and wired it directly to the old CT-1000 power supply wires. I 3D-printed a dual-gang keystone jack plate and made these bezels. It works like a champ and was extremely cheap.
+
+## Make Your Own
+
+I added .stl and .step files to my [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files) if you want to make your own. Feel free to remix to suit your preferences, tablet variant, etc.
+
+### 3D Model Preview
+
+<StlViewer src="/models/tablet-wall-mount/keystone_plate_1_gang.stl" />
+
+:::tip[Share Your Build!]
+If you make your own version of this project, consider sharing your work with the BRUH community! You can submit model files directly on GitHub or by using [this form](https://forms.gle/GxvsmNHUxF5VCNAZ8). I'll try to maintain this page with updates, attributions, and alternative models.
+:::
+
+## A Note on My UI
+
+I have spent so many hours working with dashboards and custom UI elements that I broke myself. I hate fighting UI elements now. Call me lame, but I think the best UI is universal and does what it needs to, doesn't break, and is easy to adjust on the fly.
+
+My wall-mounted tablets land directly on my Home Assistant dashboard via the HA app. I use the custom [Google Photos](https://github.com/daanoz/ha-google-photos) and [WallPanel](https://github.com/j-a-n/lovelace-wallpanel) Add-Ons to serve photos as a dynamic wallpaper when the tablets are idle. It works great and has been super solid.
