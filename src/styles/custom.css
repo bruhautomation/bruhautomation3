@@ -135,7 +135,24 @@
 	border: 0;
 }
 
-/* Standalone iframes (YouTube shorts, vertical videos) */
+/* Responsive YouTube embeds — override hardcoded width/height */
+.sl-markdown-content iframe[src*="youtube"] {
+	width: 100%;
+	max-width: 560px;
+	height: auto;
+	aspect-ratio: 16 / 9;
+	border: 0;
+	border-radius: 8px;
+	margin: 1.5rem 0;
+}
+
+/* Vertical videos (YouTube Shorts) — narrower with portrait ratio */
+.sl-markdown-content iframe[width="315"][height="560"] {
+	max-width: 315px;
+	aspect-ratio: 9 / 16;
+}
+
+/* Non-YouTube iframes */
 iframe {
 	max-width: 100%;
 	border-radius: 8px;
