@@ -10,6 +10,9 @@ export default defineConfig({
 		starlight({
 			plugins: [starlightImageZoom()],
 			title: 'BRUH Automation',
+			components: {
+				ThemeSelect: './src/components/ThemeToggle.astro',
+			},
 			logo: {
 				dark: './src/assets/bruh-logo-light.svg',
 				light: './src/assets/bruh-logo-dark.svg',
