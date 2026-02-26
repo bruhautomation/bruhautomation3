@@ -59,6 +59,28 @@
 	box-shadow: 0 2px 12px rgba(30, 144, 255, 0.12);
 }
 
+/* Circular hero headshot — matches bruhautomation.io style */
+[data-page-type="splash"] .hero img {
+	border-radius: 50%;
+	width: 200px;
+	height: 200px;
+	object-fit: cover;
+	border: 4px solid var(--sl-color-accent);
+	box-shadow: 0 4px 24px rgba(74, 159, 217, 0.25);
+}
+
+/* Center the splash hero content */
+[data-page-type="splash"] .hero {
+	text-align: center;
+	padding-block: 3rem;
+}
+
+/* Constrain splash page content width for readability */
+[data-page-type="splash"] .sl-container {
+	max-width: 65ch;
+	margin-inline: auto;
+}
+
 /* Tone down the prev/next pagination link titles (Starlight default is 2xl) */
 .pagination-links .link-title {
 	font-size: var(--sl-text-lg);
