@@ -87,7 +87,7 @@ export default defineConfig({
 				{
 					label: 'Welcome',
 					items: [
-						{ label: 'Home', slug: 'index' },
+						{ label: 'Home', link: '/' },
 						{ label: 'Project List', slug: 'project-list' },
 						{ label: 'Smart Home Fundamentals', slug: 'smart-home-fundamentals' },
 					],

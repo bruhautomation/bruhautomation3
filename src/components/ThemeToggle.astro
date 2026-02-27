@@ -1,85 +1,163 @@
 ---
-// Replaces Starlight's default ThemeSelect dropdown with a simple sun/moon toggle.
-// Cycles: dark → light → dark (no "auto" — respects system preference on first load).
+// Three-position theme toggle: Light | Auto | Dark
+// Replaces Starlight's default ThemeSelect dropdown.
+// Stores 'light', 'auto', or 'dark' in localStorage under 'starlight-theme'.
 ---
 
 <starlight-theme-toggle>
-	<button aria-label="Toggle theme">
-		<svg class="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-			<circle cx="12" cy="12" r="5"/>
-			<line x1="12" y1="1" x2="12" y2="3"/>
-			<line x1="12" y1="21" x2="12" y2="23"/>
-			<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-			<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-			<line x1="1" y1="12" x2="3" y2="12"/>
-			<line x1="21" y1="12" x2="23" y2="12"/>
-			<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-			<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-		</svg>
-		<svg class="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-			<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-		</svg>
-	</button>
+	<div class="toggle-track">
+		<button data-theme-value="light" aria-label="Light theme" title="Light">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<circle cx="12" cy="12" r="5"/>
+				<line x1="12" y1="1" x2="12" y2="3"/>
+				<line x1="12" y1="21" x2="12" y2="23"/>
+				<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+				<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+				<line x1="1" y1="12" x2="3" y2="12"/>
+				<line x1="21" y1="12" x2="23" y2="12"/>
+				<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+				<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+			</svg>
+		</button>
+		<button data-theme-value="auto" aria-label="System theme" title="Auto">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+				<line x1="8" y1="21" x2="16" y2="21"/>
+				<line x1="12" y1="17" x2="12" y2="21"/>
+			</svg>
+		</button>
+		<button data-theme-value="dark" aria-label="Dark theme" title="Dark">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+			</svg>
+		</button>
+		<div class="toggle-indicator"></div>
+	</div>
 </starlight-theme-toggle>
 
 <style>
+	.toggle-track {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		background: var(--sl-color-gray-6, #232326);
+		border-radius: 9999px;
+		padding: 3px;
+	}
+
 	button {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 2rem;
-		height: 2rem;
+		width: 28px;
+		height: 28px;
 		padding: 0;
 		border: none;
 		border-radius: 50%;
 		background: transparent;
-		color: var(--sl-color-gray-2);
+		color: var(--sl-color-gray-3, #a0a0a0);
 		cursor: pointer;
 		transition: color 0.2s ease;
 	}
+
 	button:hover {
-		color: var(--sl-color-accent);
+		color: var(--sl-color-gray-1, #e0e0e0);
 	}
-	/* In dark mode: show sun (click to go light). In light mode: show moon (click to go dark). */
-	:global([data-theme='dark']) .sun { display: block; }
-	:global([data-theme='dark']) .moon { display: none; }
-	:global([data-theme='light']) .sun { display: none; }
-	:global([data-theme='light']) .moon { display: block; }
-	/* Fallback for auto/initial: show sun */
-	.sun { display: block; }
-	.moon { display: none; }
+
+	button[aria-pressed='true'] {
+		color: #fff;
+	}
+
+	.toggle-indicator {
+		position: absolute;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: var(--sl-color-accent, #1e90ff);
+		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		top: 3px;
+		left: 3px;
+	}
+
+	.toggle-indicator[data-pos='0'] {
+		transform: translateX(0);
+	}
+	.toggle-indicator[data-pos='1'] {
+		transform: translateX(28px);
+	}
+	.toggle-indicator[data-pos='2'] {
+		transform: translateX(56px);
+	}
 </style>
 
 <script>
 	class StarlightThemeToggle extends HTMLElement {
 		constructor() {
 			super();
+			const buttons = this.querySelectorAll('button');
+			const indicator = this.querySelector('.toggle-indicator');
+			if (!buttons.length || !indicator) return;
 
-			const btn = this.querySelector('button');
-			if (!btn) return;
+			const stored =
+				typeof localStorage !== 'undefined'
+					? localStorage.getItem('starlight-theme')
+					: null;
+			const initial =
+				stored === 'light' || stored === 'dark' ? stored : 'auto';
 
-			// Determine initial theme
-			const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('starlight-theme') : null;
-			const current = stored === 'light' || stored === 'dark'
-				? stored
-				: (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+			this.updateUI(initial, indicator, buttons);
 
-			this.setTheme(current);
-
-			btn.addEventListener('click', () => {
-				const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-				this.setTheme(next);
+			buttons.forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const value = btn.getAttribute('data-theme-value');
+					if (value) this.applyTheme(value, indicator, buttons);
+				});
 			});
 		}
 
-		setTheme(theme: string) {
-			document.documentElement.dataset.theme = theme;
+		updateUI(
+			theme: string,
+			indicator: Element,
+			buttons: NodeListOf<Element>,
+		) {
+			const posMap: Record<string, string> = {
+				light: '0',
+				auto: '1',
+				dark: '2',
+			};
+			indicator.setAttribute('data-pos', posMap[theme] || '1');
+			buttons.forEach((btn) => {
+				btn.setAttribute(
+					'aria-pressed',
+					btn.getAttribute('data-theme-value') === theme
+						? 'true'
+						: 'false',
+				);
+			});
+		}
+
+		applyTheme(
+			theme: string,
+			indicator: Element,
+			buttons: NodeListOf<Element>,
+		) {
+			this.updateUI(theme, indicator, buttons);
+			let resolved = theme;
+			if (theme === 'auto') {
+				resolved = matchMedia('(prefers-color-scheme: light)').matches
+					? 'light'
+					: 'dark';
+			}
+			document.documentElement.dataset.theme = resolved;
 			if (typeof localStorage !== 'undefined') {
 				localStorage.setItem('starlight-theme', theme);
 			}
-			// Sync Starlight's built-in pickers if they exist
-			if (typeof StarlightThemeProvider !== 'undefined') {
+			try {
 				StarlightThemeProvider.updatePickers(theme);
+			} catch (_) {
+				/* provider may not exist on custom pages */
 			}
 		}
 	}
