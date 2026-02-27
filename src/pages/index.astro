@@ -282,7 +282,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					box-shadow 0.3s ease,
 					border-color 0.3s ease;
 				z-index: 2;
-				animation: float 6s ease-in-out infinite;
+				animation: float 10s ease-in-out infinite;
 			}
 			.orbit-card:hover {
 				transform: scale(1.05) !important;
@@ -313,40 +313,40 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 
 			/* Positions for 6 cards around the hero */
 			.orbit-card:nth-child(1) {
-				top: 8%;
-				left: 3%;
-				rotate: -3deg;
+				top: 12%;
+				left: 12%;
+				rotate: -2deg;
 				animation-delay: 0s;
 			}
 			.orbit-card:nth-child(2) {
-				top: 5%;
-				right: 3%;
-				rotate: 2deg;
-				animation-delay: -1s;
+				top: 10%;
+				right: 12%;
+				rotate: 1.5deg;
+				animation-delay: -1.5s;
 			}
 			.orbit-card:nth-child(3) {
 				top: 42%;
-				left: -1%;
-				rotate: -2deg;
-				animation-delay: -2s;
-			}
-			.orbit-card:nth-child(4) {
-				top: 38%;
-				right: -1%;
-				rotate: 3deg;
+				left: 6%;
+				rotate: -1.5deg;
 				animation-delay: -3s;
 			}
-			.orbit-card:nth-child(5) {
-				bottom: 8%;
-				left: 5%;
+			.orbit-card:nth-child(4) {
+				top: 40%;
+				right: 6%;
 				rotate: 2deg;
-				animation-delay: -4s;
+				animation-delay: -4.5s;
+			}
+			.orbit-card:nth-child(5) {
+				bottom: 12%;
+				left: 14%;
+				rotate: 1deg;
+				animation-delay: -2s;
 			}
 			.orbit-card:nth-child(6) {
-				bottom: 5%;
-				right: 5%;
-				rotate: -2deg;
-				animation-delay: -5s;
+				bottom: 10%;
+				right: 14%;
+				rotate: -1.5deg;
+				animation-delay: -3.5s;
 			}
 
 			@keyframes float {
@@ -355,7 +355,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					translate: 0 0;
 				}
 				50% {
-					translate: 0 -8px;
+					translate: 0 -4px;
 				}
 			}
 
