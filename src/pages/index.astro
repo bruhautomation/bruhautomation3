@@ -51,6 +51,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			:root {
 				--bg: #0b0d14;
 				--bg-card: rgba(255, 255, 255, 0.04);
+				--bg-card-solid: #14161e;
 				--border: rgba(255, 255, 255, 0.08);
 				--text: #e4e4e7;
 				--text-muted: #8b8b97;
@@ -63,6 +64,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			[data-theme='light'] {
 				--bg: #fafafa;
 				--bg-card: rgba(0, 0, 0, 0.03);
+				--bg-card-solid: #f0f0f2;
 				--border: rgba(0, 0, 0, 0.08);
 				--text: #18181b;
 				--text-muted: #71717a;
@@ -92,17 +94,13 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				z-index: 100;
 				display: flex;
 				align-items: center;
-				justify-content: space-between;
+				justify-content: flex-end;
 				max-width: 1100px;
 				width: 100%;
 				margin: 0 auto;
 				padding: 1rem 1.5rem;
 				backdrop-filter: blur(12px);
 				-webkit-backdrop-filter: blur(12px);
-			}
-			.nav-logo img {
-				height: 28px;
-				width: auto;
 			}
 			.nav-right {
 				display: flex;
@@ -143,12 +141,18 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				color: var(--text-muted);
 				cursor: pointer;
 				transition: color 0.2s;
+				font-family: var(--font);
 			}
 			.theme-toggle button:hover {
 				color: var(--text);
 			}
 			.theme-toggle button[aria-pressed='true'] {
 				color: #fff;
+			}
+			.auto-label {
+				font-size: 14px;
+				font-weight: 700;
+				line-height: 1;
 			}
 			.toggle-pill {
 				position: absolute;
@@ -174,17 +178,19 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				flex-direction: column;
 				align-items: center;
 				text-align: center;
-				padding: 6rem 1.5rem 4rem;
-				overflow: hidden;
+				padding: 4rem 1.5rem 4rem;
+				min-height: 85vh;
+				justify-content: center;
+				overflow: visible;
 			}
 			.hero::before {
 				content: '';
 				position: absolute;
-				top: 0;
+				top: 50%;
 				left: 50%;
-				transform: translateX(-50%);
-				width: min(700px, 100vw);
-				height: 500px;
+				transform: translate(-50%, -50%);
+				width: min(800px, 120vw);
+				height: 600px;
 				background: radial-gradient(
 					ellipse,
 					var(--accent-glow),
@@ -194,7 +200,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			}
 			.hero-logo {
 				position: relative;
-				width: min(420px, 80vw);
+				width: min(380px, 75vw);
 				height: auto;
 				margin-bottom: 2rem;
 			}
@@ -202,9 +208,10 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				position: relative;
 				font-size: clamp(2.2rem, 5.5vw, 3.5rem);
 				font-weight: 700;
-				line-height: 1.1;
+				line-height: 1.2;
 				letter-spacing: -0.03em;
 				max-width: 16ch;
+				padding-bottom: 0.1em;
 				background: linear-gradient(
 					135deg,
 					var(--text) 0%,
@@ -214,7 +221,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				-webkit-text-fill-color: transparent;
 				background-clip: text;
 			}
-			.hero p {
+			.hero-tagline {
 				position: relative;
 				margin-top: 1.25rem;
 				font-size: clamp(1rem, 2vw, 1.15rem);
@@ -260,6 +267,96 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			.btn-outline:hover {
 				border-color: var(--accent);
 				color: var(--accent);
+			}
+
+			/* ── Orbit cards (floating project cards around hero) ── */
+			.orbit-card {
+				position: absolute;
+				width: 180px;
+				background: var(--bg-card-solid);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				overflow: hidden;
+				transition:
+					transform 0.3s ease,
+					box-shadow 0.3s ease,
+					border-color 0.3s ease;
+				z-index: 2;
+				animation: float 6s ease-in-out infinite;
+			}
+			.orbit-card:hover {
+				transform: scale(1.05) !important;
+				border-color: var(--accent);
+				box-shadow: 0 8px 32px var(--accent-glow);
+				z-index: 10;
+			}
+			.orbit-card img {
+				width: 100%;
+				height: 90px;
+				object-fit: cover;
+				display: block;
+			}
+			.orbit-card-body {
+				padding: 0.6rem 0.75rem;
+			}
+			.orbit-card-title {
+				font-size: 0.75rem;
+				font-weight: 600;
+				line-height: 1.2;
+				margin-bottom: 0.2rem;
+			}
+			.orbit-card-desc {
+				font-size: 0.65rem;
+				color: var(--text-muted);
+				line-height: 1.3;
+			}
+
+			/* Positions for 6 cards around the hero */
+			.orbit-card:nth-child(1) {
+				top: 8%;
+				left: 3%;
+				rotate: -3deg;
+				animation-delay: 0s;
+			}
+			.orbit-card:nth-child(2) {
+				top: 5%;
+				right: 3%;
+				rotate: 2deg;
+				animation-delay: -1s;
+			}
+			.orbit-card:nth-child(3) {
+				top: 42%;
+				left: -1%;
+				rotate: -2deg;
+				animation-delay: -2s;
+			}
+			.orbit-card:nth-child(4) {
+				top: 38%;
+				right: -1%;
+				rotate: 3deg;
+				animation-delay: -3s;
+			}
+			.orbit-card:nth-child(5) {
+				bottom: 8%;
+				left: 5%;
+				rotate: 2deg;
+				animation-delay: -4s;
+			}
+			.orbit-card:nth-child(6) {
+				bottom: 5%;
+				right: 5%;
+				rotate: -2deg;
+				animation-delay: -5s;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					translate: 0 0;
+				}
+				50% {
+					translate: 0 -8px;
+				}
 			}
 
 			/* ── Stats ── */
@@ -355,9 +452,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				align-items: center;
 				gap: 0.35rem;
 			}
-			.cat-link:hover {
-				gap: 0.55rem;
-			}
 			.cat-link svg {
 				transition: transform 0.15s;
 			}
@@ -396,7 +490,22 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			}
 
 			/* ── Responsive ── */
+			@media (max-width: 900px) {
+				.orbit-card {
+					width: 140px;
+				}
+				.orbit-card img {
+					height: 70px;
+				}
+				.orbit-card:nth-child(3),
+				.orbit-card:nth-child(4) {
+					display: none;
+				}
+			}
 			@media (max-width: 640px) {
+				.orbit-card {
+					display: none;
+				}
 				.stats {
 					grid-template-columns: repeat(2, 1fr);
 				}
@@ -404,40 +513,30 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					grid-template-columns: 1fr;
 				}
 				.hero {
-					padding: 4rem 1.25rem 3rem;
-				}
-				.nav-link.hide-mobile {
-					display: none;
+					padding: 3rem 1.25rem 3rem;
+					min-height: auto;
 				}
 			}
 		</style>
 	</head>
 
 	<body>
-		<!-- Nav -->
+		<!-- Nav — no logo here since the hero has it -->
 		<nav>
-			<a href="/" class="nav-logo">
-				<img
-					class="logo-for-dark"
-					src={logoLight.src}
-					alt="BRUH Automation"
-				/>
-				<img
-					class="logo-for-light"
-					src={logoDark.src}
-					alt="BRUH Automation"
-				/>
-			</a>
 			<div class="nav-right">
 				<a href="/project-list/" class="nav-link">Docs</a>
 				<a
 					href="https://www.youtube.com/@BRUHAutomation"
-					class="nav-link hide-mobile"
+					class="nav-link"
 					target="_blank"
 					rel="noopener">YouTube</a
 				>
 				<div class="theme-toggle" id="theme-toggle">
-					<button data-value="light" aria-label="Light theme" title="Light">
+					<button
+						data-value="light"
+						aria-label="Light theme"
+						title="Light"
+					>
 						<svg
 							width="16"
 							height="16"
@@ -451,7 +550,8 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 							<circle cx="12" cy="12" r="5"></circle>
 							<line x1="12" y1="1" x2="12" y2="3"></line>
 							<line x1="12" y1="21" x2="12" y2="23"></line>
-							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"
+							></line>
 							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"
 							></line>
 							<line x1="1" y1="12" x2="3" y2="12"></line>
@@ -462,24 +562,18 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 							></line>
 						</svg>
 					</button>
-					<button data-value="auto" aria-label="System theme" title="Auto">
-						<svg
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<rect x="2" y="3" width="20" height="14" rx="2" ry="2"
-							></rect>
-							<line x1="8" y1="21" x2="16" y2="21"></line>
-							<line x1="12" y1="17" x2="12" y2="21"></line>
-						</svg>
+					<button
+						data-value="auto"
+						aria-label="System theme"
+						title="Auto"
+					>
+						<span class="auto-label">A</span>
 					</button>
-					<button data-value="dark" aria-label="Dark theme" title="Dark">
+					<button
+						data-value="dark"
+						aria-label="Dark theme"
+						title="Dark"
+					>
 						<svg
 							width="16"
 							height="16"
@@ -503,6 +597,110 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 		<main>
 			<!-- Hero -->
 			<section class="hero">
+				<!-- Floating project cards -->
+				<a
+					href="/smart-home-projects/smart-candlet/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/candlet/smart-candlet-concept.png"
+						alt="Smart Candlet"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Smart Candlet</div>
+						<div class="orbit-card-desc">
+							Arc-ignition smart candle
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/beautiful-childproof-doorknob/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/doorknob/doorknob-childproof-concept-v2.png"
+						alt="Childproof Doorknob"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Childproof Doorknob</div>
+						<div class="orbit-card-desc">
+							Beautiful & 3D printable
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/tablet-wall-mount/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/tablet-wall-mount/tablet-mount-install.png"
+						alt="Tablet Wall Mount"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Tablet Wall Mount</div>
+						<div class="orbit-card-desc">
+							Flush keystone mount
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/smart-home-projects/irrigation-system/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/smart-home/laser-turret-concept.png"
+						alt="Laser Turret"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Laser Turret</div>
+						<div class="orbit-card-desc">
+							Cat-entertaining IoT device
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/smart-home-fundamentals/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/smart-home/crestron-control-panel.png"
+						alt="Smart Home Fundamentals"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Fundamentals</div>
+						<div class="orbit-card-desc">
+							Smart home basics guide
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/beautiful-childproof-doorknob/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/doorknob/doorknob-alt-angle-1.jpg"
+						alt="Doorknob Detail"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">3D Printed Parts</div>
+						<div class="orbit-card-desc">
+							Download &amp; print today
+						</div>
+					</div>
+				</a>
+
+				<!-- Center content -->
 				<img
 					class="hero-logo logo-for-dark"
 					src={logoLight.src}
@@ -514,7 +712,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					alt="BRUH Automation"
 				/>
 				<h1>Home Automation for Everyone</h1>
-				<p>
+				<p class="hero-tagline">
 					Open-source smart home projects, maker builds, and lab tools
 					— with 3D print files you can download and start building
 					today.
