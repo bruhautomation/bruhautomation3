@@ -93,19 +93,13 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Smart Home',
+					label: 'Home Projects',
 					collapsed: true,
 					items: [
 						{ label: 'Irrigation System', slug: 'smart-home-projects/irrigation-system' },
 						{ label: 'Smart Candle', slug: 'smart-home-projects/smart-candlet' },
 						{ label: 'Hype Button', slug: 'smart-home-projects/hype-button' },
 						{ label: 'BRUH Playhouse', slug: 'smart-home-projects/bruh-playhouse' },
-					],
-				},
-				{
-					label: 'Home Projects',
-					collapsed: true,
-					items: [
 						{ label: 'Tablet Wall Mount', slug: 'home-projects/tablet-wall-mount' },
 						{ label: 'Childproof Doorknob', slug: 'home-projects/beautiful-childproof-doorknob' },
 						{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
@@ -144,7 +138,7 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'BRUH Claude',
+					label: 'Home Assistant',
 					collapsed: true,
 					items: [
 						{ label: 'Overview', slug: 'bruh-claude' },
