@@ -1,15 +1,15 @@
 ---
-title: Smart Candlet
+title: Smart Candle
 description: A WiFi-controlled, auto-igniting, auto-extinguishing candle built with ESPHome and an arc lighter.
 banner:
   content: |
     Don't build this. It's a bad idea.
 ---
 
-A WiFi-connected candle that can ignite and extinguish itself on command, controlled through Home Assistant. It uses an arc lighter for ignition and a diaphragm pump to blow itself out — no manual intervention required.
+A WiFi-connected candle that ignites and extinguishes itself on command via Home Assistant. Arc lighter for ignition, diaphragm pump for blowout.
 
 :::danger
-This project involves high voltage and open flame. Don't build this unless you really know what you're doing.
+This involves high voltage and open flame. Proceed at your own risk.
 :::
 
 ## Choosing a Candle
@@ -60,4 +60,4 @@ See the [ESPHome YAML on GitHub](https://github.com/bruhautomation/BRUH-CAD-File
 
 I added a physical power switch between the battery and ESP32. The candle has to be manually armed before it can be remotely ignited — it can't accidentally turn on from a stray automation or API call.
 
-<iframe width="315" height="560" src="https://www.youtube.com/embed/AcJ1OWoMghA" title="Smart Candlet Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="315" height="560" src="https://www.youtube.com/embed/AcJ1OWoMghA" title="Smart Candle Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

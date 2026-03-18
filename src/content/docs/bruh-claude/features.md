@@ -3,7 +3,7 @@ title: Features & Usage
 description: Everything you can do with BRUH Claude — from the interactive terminal to voice-controlled AI.
 ---
 
-BRUH Claude is built around one idea: Claude should understand your Home Assistant instance the way you do. Here's everything it can do.
+Everything BRUH Claude can do — from the interactive terminal to voice control and automation-triggered tasks.
 
 ## Interactive Terminal
 

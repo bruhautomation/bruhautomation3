@@ -97,7 +97,7 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{ label: 'Irrigation System', slug: 'smart-home-projects/irrigation-system' },
-						{ label: 'Smart Candlet', slug: 'smart-home-projects/smart-candlet' },
+						{ label: 'Smart Candle', slug: 'smart-home-projects/smart-candlet' },
 						{ label: 'Hype Button', slug: 'smart-home-projects/hype-button' },
 						{ label: 'BRUH Playhouse', slug: 'smart-home-projects/bruh-playhouse' },
 					],

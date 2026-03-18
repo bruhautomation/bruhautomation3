@@ -6,7 +6,7 @@ description: Complete project directory — smart home, home, and lab automation
 ## Smart Home
 
 - [Irrigation System](/smart-home-projects/irrigation-system/) — 1500ft automated irrigation
-- [Smart Candlet](/smart-home-projects/smart-candlet/) — WiFi-controlled auto-igniting candle
+- [Smart Candle](/smart-home-projects/smart-candlet/) — WiFi-controlled auto-igniting candle
 - [Hype Button](/smart-home-projects/hype-button/) — celebration scene trigger
 - [BRUH Playhouse](/smart-home-projects/bruh-playhouse/) — connected outdoor playhouse
 
