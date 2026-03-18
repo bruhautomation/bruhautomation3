@@ -141,3 +141,33 @@ iframe {
 	border-radius: 8px;
 	margin: 1.5rem 0;
 }
+
+/* ─── BRUH Claude product page ─── */
+
+/* Feature cards on BRUH Claude landing page — tighter, more polished */
+[data-page-type="splash"] .card {
+	border: 1px solid rgba(30, 144, 255, 0.15);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+[data-page-type="splash"] .card:hover {
+	border-color: var(--sl-color-accent);
+	box-shadow: 0 4px 20px rgba(30, 144, 255, 0.15);
+	transform: translateY(-2px);
+}
+
+/* Code blocks inside splash pages — terminal-like appearance */
+[data-page-type="splash"] pre {
+	border: 1px solid rgba(30, 144, 255, 0.2);
+	border-radius: 8px;
+}
+
+/* SVG architecture diagrams — responsive with subtle border */
+[data-page-type="splash"] img[src*=".svg"] {
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 8px;
+}
+
+/* BRUH Claude splash: remove max-width constraint for wider layout */
+[data-page-slug="bruh-claude"] .sl-container {
+	max-width: 80ch;
+}

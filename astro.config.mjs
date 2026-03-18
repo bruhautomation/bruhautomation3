@@ -139,6 +139,18 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'BRUH Claude',
+					items: [
+						{ label: 'Overview', slug: 'bruh-claude' },
+						{ label: 'Installation', slug: 'bruh-claude/installation' },
+						{ label: 'Features & Usage', slug: 'bruh-claude/features' },
+						{ label: 'Configuration', slug: 'bruh-claude/configuration' },
+						{ label: 'CLI Tools', slug: 'bruh-claude/cli-tools' },
+						{ label: 'Integrations', slug: 'bruh-claude/integrations' },
+						{ label: 'Architecture', slug: 'bruh-claude/architecture' },
+					],
+				},
+				{
 					label: 'Changelog',
 					slug: 'changelog',
 				},

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="460" rx="12" fill="url(#bg3)"/>
+  <text x="400" y="34" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="600">MCP Server — Available Tools</text>
+
+  <!-- Claude Code center -->
+  <rect x="290" y="55" width="220" height="50" rx="25" fill="#f0883e" fill-opacity="0.2" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="400" y="85" text-anchor="middle" fill="#f0883e" font-size="14" font-weight="600">Claude Code + MCP Server</text>
+
+  <!-- Entity & State tools -->
+  <rect x="30" y="135" width="230" height="130" rx="10" fill="#1e90ff" fill-opacity="0.1" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="145" y="158" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">Entity &amp; State</text>
+  <text x="50" y="180" fill="#c9d1d9" font-size="11">get_entity_state</text>
+  <text x="50" y="200" fill="#c9d1d9" font-size="11">get_all_states</text>
+  <text x="50" y="220" fill="#c9d1d9" font-size="11">get_device_registry</text>
+  <text x="50" y="240" fill="#c9d1d9" font-size="11">get_logbook</text>
+
+  <!-- Service & Control tools -->
+  <rect x="285" y="135" width="230" height="130" rx="10" fill="#3fb950" fill-opacity="0.1" stroke="#3fb950" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="400" y="158" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="600">Service &amp; Control</text>
+  <text x="305" y="180" fill="#c9d1d9" font-size="11">call_service</text>
+  <text x="305" y="200" fill="#c9d1d9" font-size="11">fire_event</text>
+  <text x="305" y="220" fill="#c9d1d9" font-size="11">reload_config</text>
+  <text x="305" y="240" fill="#c9d1d9" font-size="11">get_services</text>
+
+  <!-- Debugging tools -->
+  <rect x="540" y="135" width="230" height="130" rx="10" fill="#a371f7" fill-opacity="0.1" stroke="#a371f7" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="655" y="158" text-anchor="middle" fill="#a371f7" font-size="12" font-weight="600">Debugging &amp; Info</text>
+  <text x="560" y="180" fill="#c9d1d9" font-size="11">get_automation_trace</text>
+  <text x="560" y="200" fill="#c9d1d9" font-size="11">get_error_log</text>
+  <text x="560" y="220" fill="#c9d1d9" font-size="11">render_template</text>
+  <text x="560" y="240" fill="#c9d1d9" font-size="11">get_ha_config</text>
+
+  <!-- System tools -->
+  <rect x="160" y="295" width="230" height="90" rx="10" fill="#f0883e" fill-opacity="0.1" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="275" y="318" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="600">System</text>
+  <text x="180" y="340" fill="#c9d1d9" font-size="11">get_supervisor_info</text>
+  <text x="180" y="360" fill="#c9d1d9" font-size="11">get_automations</text>
+
+  <!-- Automation tools -->
+  <rect x="415" y="295" width="230" height="90" rx="10" fill="#1e90ff" fill-opacity="0.1" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="530" y="318" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">Automation</text>
+  <text x="435" y="340" fill="#c9d1d9" font-size="11">get_automations</text>
+  <text x="435" y="360" fill="#c9d1d9" font-size="11">get_automation_trace</text>
+
+  <!-- Connection lines -->
+  <line x1="350" y1="105" x2="145" y2="133" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="400" y1="105" x2="400" y2="133" stroke="#3fb950" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="450" y1="105" x2="655" y2="133" stroke="#a371f7" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="370" y1="105" x2="275" y2="293" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="430" y1="105" x2="530" y2="293" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
+
+  <!-- Bottom info -->
+  <rect x="80" y="410" width="640" height="36" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="400" y="433" text-anchor="middle" fill="#8b949e" font-size="11">All tools communicate via the Supervisor API at http://supervisor/core/api using SUPERVISOR_TOKEN</text>
+</svg>

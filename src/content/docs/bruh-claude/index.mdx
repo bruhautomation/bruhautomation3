@@ -1,0 +1,90 @@
+---
+title: BRUH Claude
+description: An AI-powered Home Assistant add-on that brings Claude Code directly into your smart home — with native API access, voice integration, and autonomous automation.
+template: splash
+hero:
+  tagline: Claude Code meets Home Assistant. Ask questions, debug automations, control devices, and automate your smart home — all from a terminal inside HA.
+  actions:
+    - text: Get Started
+      link: /bruh-claude/installation/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/bruhautomation/BRUH-HA-Apps
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What is BRUH Claude?
+
+BRUH Claude Terminal is a Home Assistant add-on that gives you a full Claude Code environment inside your HA instance — with native access to the Home Assistant API, automatic config backups, and deep integrations that let Claude act as a conversation agent or run tasks triggered by your automations.
+
+It's not just a terminal. It's an AI assistant that *understands* your smart home.
+
+<CardGrid>
+  <Card title="Native HA API Access" icon="setting">
+    A built-in MCP server gives Claude real-time access to your entities, services, automations, and logs — no manual API setup required.
+  </Card>
+  <Card title="Voice & Text Assistant" icon="comment-alt">
+    Use Claude as a conversation agent in Home Assistant Assist. Ask it questions, give it commands, or have it troubleshoot problems — by voice or text.
+  </Card>
+  <Card title="Automation-Triggered Tasks" icon="rocket">
+    Trigger Claude tasks from any HA automation. Morning briefings, error log analysis, config audits — all on autopilot.
+  </Card>
+  <Card title="Git-Based Config Backup" icon="document">
+    Automatic git versioning of your `/config` directory with configurable intervals, manual snapshots, and single-file restore.
+  </Card>
+  <Card title="Auto-Generated Context" icon="information">
+    On startup, BRUH Claude scans your HA installation and generates a `CLAUDE.md` file so Claude immediately understands your setup.
+  </Card>
+  <Card title="Persistent Environment" icon="laptop">
+    Install APK and pip packages that survive container restarts. Your tools are always ready when you are.
+  </Card>
+</CardGrid>
+
+## How It Works
+
+BRUH Claude runs as a Home Assistant add-on container with three main layers:
+
+<div style="margin: 2rem 0;">
+  <img src="/images/bruh-claude/architecture-overview.svg" alt="BRUH Claude Architecture Overview" style="width: 100%; border-radius: 8px;" />
+</div>
+
+The **Web Terminal** (ttyd + tmux) gives you an interactive Claude Code session. The **MCP Server** connects Claude to the HA Supervisor API with 14 purpose-built tools. And the **IPC Listeners** bridge Claude to HA's conversation agents and automation system using a file-based messaging protocol.
+
+## Quick Example
+
+Here's what working with BRUH Claude looks like. Just open the terminal and ask:
+
+```
+> Help me debug why my living room motion automation isn't triggering
+
+I'll investigate this for you. Let me check the automation and related entities.
+
+✓ Found automation "Living Room Motion Lights" (automation.living_room_motion_lights)
+✓ Automation is enabled, last triggered 3 days ago
+✓ Checking entity: binary_sensor.living_room_motion — state: "unavailable"
+
+The issue is clear: your motion sensor (binary_sensor.living_room_motion) is showing
+"unavailable", which means the automation's trigger will never fire.
+
+This usually means:
+1. The sensor has lost connectivity (battery dead, out of range)
+2. The integration providing it needs to be reloaded
+
+Would you like me to check the device registry for more details on this sensor?
+```
+
+Claude doesn't just read your config files — it queries live entity states, checks automation traces, and cross-references the device registry to give you real answers.
+
+## Explore the Docs
+
+<CardGrid>
+  <LinkCard title="Installation" description="Add the repository, install the add-on, and authenticate in under 5 minutes." href="/bruh-claude/installation/" />
+  <LinkCard title="Features & Usage" description="Everything you can do with BRUH Claude — from the terminal to voice control." href="/bruh-claude/features/" />
+  <LinkCard title="Configuration" description="Every option explained, with recommended settings for common setups." href="/bruh-claude/configuration/" />
+  <LinkCard title="CLI Tools" description="Built-in commands for logs, backups, reloads, and package management." href="/bruh-claude/cli-tools/" />
+  <LinkCard title="Integrations" description="Set up Assist voice control and automation-triggered tasks." href="/bruh-claude/integrations/" />
+  <LinkCard title="Architecture" description="Technical deep-dive into the MCP server, IPC bridge, and container design." href="/bruh-claude/architecture/" />
+</CardGrid>
