@@ -1,6 +1,6 @@
 ---
-title: Beautiful Childproof Doorknob
-description: I upgraded my doorknobs and had kids, so I made a better child-proof cover.
+title: Childproof Doorknob
+description: A low-profile, 3D printed child-proof cover for Schlage Bowery doorknobs.
 ---
 
 import { Image } from 'astro:assets';
@@ -14,23 +14,13 @@ import doorknobDetail3 from '../../../assets/images/doorknob-detail-3.jpg';
 import doorknobCover from '../../../assets/images/doorknob-cover.jpg';
 import doorknobPrototypes from '../../../assets/images/doorknob-prototypes.jpg';
 
-## A Story
+## The Problem
 
-Maybe it's just me, but I love well-made hardware — That "ku-thunk" of a vintage car door. The smooth "thwack" of a perfectly aligned deadbolt sliding into place. That's my jam.
+I replaced all the doorknobs in my house with [Schlage Bowery](https://amzn.to/467wrSB) knobs — then had kids. Every child-proof cover I could find was a plastic clamshell that looked terrible on nice hardware. So I designed my own.
 
-So, of course, I spent an entire weekend swapping out perfectly functional doorknobs in my house. Forget sports cars or cool sneakers; my flex is high-quality door hardware.
+## The Knob
 
-After spiraling down the rabbit hole of doorknob reviews (yes, they exist), I found it — a modern yet timeless design, clean lines, and a solid feel. It's the little black dress of the doorknob world. Perfection.
-
-As I marveled at the metallic beauty of my 26th doorknob replacement, my two-year-old flopped through the door like [Julius the Snake](https://www.youtube.com/watch?v=Bxc_55ur-J4). My wife, in pursuit, reminded me, "You know these need to be child-proofed, right?"
-
-*Panic.* Visions filled my mind of white globs of plastic hanging on my doorknobs like some malignant marshmallow. Surely, these knobs deserve better than some plebian clamshell eyesore. Desperately, I scoured the web for an elegant solution and found nothing. So, I did what any self-respecting wanna-be maker would do — I made my own.
-
-## The Knob In Question
-
-If this needs clarification, I really like the [Schlage Bowery](https://amzn.to/467wrSB) doorknob. It comes in a lot of colors and configurations. In my case, I went [Matte Black with the Greyson Trim](https://amzn.to/3r8wOh0).
-
-These door knobs are "screwless". The base installs like a standard doorknob; the trim piece is snapped into place, and then the doorknob clips onto the stem.
+The Schlage Bowery comes in a lot of finishes and configurations. I went with [Matte Black with the Greyson Trim](https://amzn.to/3r8wOh0). The knobs are "screwless" — the base screws in, the trim piece snaps on, and the knob clips onto the stem.
 
 <div class="image-grid">
   <figure>
@@ -47,7 +37,9 @@ These door knobs are "screwless". The base installs like a standard doorknob; th
   </figure>
 </div>
 
-An ordinary child-proof doorknob acts like a slip ring you squeeze down on or poke your fingers through when turning the knob. Typically, these clamp over the door knob with a clam shell. Since the Bowery door knob clips into the stem, I made a slip ring that goes behind the knob before installation and is held captive when the knob clicks into place. I modeled and 3D printed a low-profile cover that's hardly noticeable from the front and matches the finish.
+## The Design
+
+Standard child-proof covers act like a slip ring — you squeeze down on the outer shell to grip the knob and turn it. Since the Bowery clips onto the stem, I designed a slip ring that goes behind the knob before installation and is held captive when the knob clicks into place. The cover is low-profile and barely visible from the front.
 
 <Image src={doorknobCover} alt="Insert knob into cover before installation" />
 
@@ -63,22 +55,18 @@ An ordinary child-proof doorknob acts like a slip ring you squeeze down on or po
   </figure>
 </div>
 
-## 3D Printing
+## Printing
 
-I had the best result using my MSLA 3D printer ([Elegoo Mars](https://amzn.to/3r8xZge)), but these are easily printed on a traditional FDM/FFF 3D printer. In my testing, the [water-soluble resin](https://amzn.to/453EP4R) I used was the right balance of rigid but not hard enough to scratch the door knob. It was also an exact color match, and the surface finish was ready-to-go right off the printer.
+Best results came from an MSLA printer ([Elegoo Mars](https://amzn.to/3r8xZge)), but FDM works fine too. I used [water-soluble resin](https://amzn.to/453EP4R) which was rigid enough to function without being hard enough to scratch the knob. It also happened to be an exact color match, and the surface finish was good right off the print bed.
 
 <Image src={doorknobPrototypes} alt="Prototypes" />
 
 ## Make Your Own
 
-I added .stl and .step files to my [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/child_proof_door_knob). Feel free to remix to suit your preferences, door knob model, and/or printer tolerances.
+STL and STEP files are in the [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/child_proof_door_knob). Feel free to remix for your knob model and printer tolerances.
 
 [View 3D model on Autodesk](https://a360.co/44T0XOZ) | [Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/child_proof_door_knob)
 
 ### 3D Model Preview
 
 <StlViewer src="/models/doorknob/bruh_schlage_bowery_child_proof_door_knob.stl" />
-
-:::tip[Share Your Build!]
-If you make your own version of this project, consider sharing your work with the BRUH community! You can submit model files directly on GitHub or by using [this form](https://forms.gle/GxvsmNHUxF5VCNAZ8). I'll try to maintain this page with updates, attributions, and alternative door knob models.
-:::

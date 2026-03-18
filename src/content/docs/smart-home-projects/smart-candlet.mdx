@@ -1,78 +1,63 @@
 ---
 title: Smart Candlet
-description: A wifi-connected, auto-igniting, auto-extinguishing candle built with ESPHome and an arc lighter. Terrible idea, great execution.
+description: A WiFi-controlled, auto-igniting, auto-extinguishing candle built with ESPHome and an arc lighter.
 banner:
   content: |
-    🔥 Don't build this. It's definitely a bad idea.
+    Don't build this. It's a bad idea.
 ---
 
-*Imagine this* — You've just returned home from a romantic dinner, and love is in the air. As you gently push open the door, you're greeted by the warm glow of softly burning candles, casting a cozy ambiance. The room is inviting, there's definitely fire in the air — and the best part? There's no need to extinguish the candles before bed. Welcome to the future with a wifi-connected, auto-igniting, auto-extinguishing candle.
-
-... reality called, and my wife was **not hot** for this idea. Let me tell you about my game-changing candle and how it can change your house into a pile of ash.
+A WiFi-connected candle that can ignite and extinguish itself on command, controlled through Home Assistant. It uses an arc lighter for ignition and a diaphragm pump to blow itself out — no manual intervention required.
 
 :::danger
-Don't build this. It's *definitely* a bad idea.
+This project involves high voltage and open flame. Don't build this unless you really know what you're doing.
 :::
 
 ## Choosing a Candle
 
-One of the first problems I encountered working on this project was that a candle moves around a lot. And not just on the surfaces the candle is on, but the candle's ignition point moves relative to its base as the wick burns down. You can't just strap a lighter on a candle and call it a day.
+Standard wax candles are a poor fit for automation because the wick position changes as the candle burns down. You can't just aim a lighter at a fixed point and call it done.
 
-As my *feature-creep-addled* mind started planning out a vision-assisted, high-powered laser on a motorized base, I decided it would be best to return to this problem after I had a more basic proof-of-concept. For this first prototype, I designed my system around an oil-filled candle with a fixed wick.
+For this prototype, I used an oil-filled candle with a fixed wick — the ignition point stays consistent relative to the base, which made everything much simpler.
 
 ## Ignition
 
-My inspiration for lighting the candle was a lighter. Electricity is easy to control, so I figured using a high-voltage arc across the wick should do the trick. I designed a test rig that looked like it belonged on an electric chair and started dorking around.
+I tested three different methods before finding one that worked reliably:
 
-Next, I tried an off-the-shelf [high-voltage generator](https://amzn.to/46dsRGO). It was loud enough to wake the dead and it immediately blew apart the wick. Turns out that arc lighters work slightly differently than tasers. Generally, [arc lighters](https://amzn.to/3sY6EOD) use higher frequency, lower powered pulses compared to a stun gun. Interestingly, the purple arc on an arc lighter is actually cooler than the bright blue arc on a stun gun, but the higher frequency pulses on the arc lighter transfer heat more efficiently into an object.
-
-After many failed attempts, I landed on a USB rechargeable arc lighter. I took it apart, soldered wires onto the button, and used an opto-isolated relay to control it.
+- **Resistance wire** — [32AWG Kanthal A1](https://amzn.to/3LvWkn8) heated up but was inconsistent and burned out quickly.
+- **High voltage generator** — A [5V buck boost](https://amzn.to/3sZZnh4) was extremely loud and immediately destroyed the wick. Turns out stun guns and arc lighters work very differently — arc lighters use higher frequency, lower power pulses that transfer heat more efficiently.
+- **Arc lighter** — A USB rechargeable [arc lighter](https://www.amazon.com/dp/B09YPZK854) with opto-isolated relay control. This is what worked.
 
 :::note
-High-voltage modules need to be electrically isolated from the rest of your control circuitry. Otherwise, there will be a lot of unexpected resets and such on your microcontroller.
+High-voltage modules need to be electrically isolated from your control circuitry. Otherwise you'll get random resets on the microcontroller.
 :::
-
-I tested three different ignition methods before landing on one that worked:
-
-- **Resistance wire** — [32AWG Kanthal A1 wire](https://amzn.to/3LvWkn8) heated up but was inconsistent and burned out quickly.
-- **High voltage** — A [5V buck boost](https://amzn.to/3sZZnh4) generator was loud enough to wake the dead and immediately blew apart the wick.
-- **Arc lighter** — A USB rechargeable [arc lighter](https://www.amazon.com/dp/B09YPZK854) with opto-isolated relay control. This one stuck.
 
 <img src="/images/candlet/candle-arc-ignition.gif" alt="Candle ignition test with arc lighter" style="max-width: 400px; border-radius: 8px;" />
 
-## Blowing It Out
+## Extinguishing
 
-I wanted this candle to get blown out, not snuffed out. After testing several options, I landed on a [5v diaphragm pump](https://www.amazon.com/NW-5V-6VDC-Miniature-Vacuum-100KPa/dp/B078H8V563). It has both an inlet and an outlet. My thought was that I could position tubes on either side of the flame and simultaneously blow and suck the fire out. I used copper tubes connected to the pump with a few pieces of silicone tubing.
+I went with a [5V diaphragm pump](https://www.amazon.com/NW-5V-6VDC-Miniature-Vacuum-100KPa/dp/B078H8V563) — it has both an inlet and an outlet, so I positioned copper tubes on either side of the flame to simultaneously blow and suck the fire out.
 
-The beautiful thing about using the copper tubes is that they can be the conductors for the arc lighter without any additional hardware.
+The copper tubes double as the arc lighter conductors, so there's no additional hardware needed for ignition.
 
-![Blowing out fire](/images/candlet/candle-arc-ignition.gif)
+## Build
 
-## Building It
+The controller is an ESP32 running ESPHome. Here's the parts list:
 
-To control and automate everything, I used an ESPhome with an ESP32. Here's my parts list. It's all very standard. I used an ESP32 with a built-in LCD (the LCD is st7789v) since that's what I was playing with then. It's completely underutilized though, and these days I prefer a standard [ESP32 with a screw-terminal breakout board](https://amzn.to/45UUzIv).
+### Parts
 
-### Parts List
-
-- ESP32 ([one I used](https://amzn.to/3t2FTZm)) or these days, [this one](https://amzn.to/45UUzIv)
-- [Battery module](https://www.amazon.com/gp/product/B06XCXPY86)
-- [18650 battery](https://amzn.to/3LvB2Gt) with [clip](https://www.amazon.com/gp/product/B00LSG5BKO)
-- Normally open (NO) [16mm toggle button](https://www.amazon.com/ARTGEAR-Stainless-Latching-12V-24V-Waterproof/dp/B07QSTLFM1) and a few [momentary buttons](https://www.amazon.com/gp/product/B07KX144DT)
+- ESP32 ([one I used](https://amzn.to/3t2FTZm)) — these days I'd use a [screw-terminal breakout](https://amzn.to/45UUzIv)
+- [Battery module](https://www.amazon.com/gp/product/B06XCXPY86) + [18650 battery](https://amzn.to/3LvB2Gt) with [clip](https://www.amazon.com/gp/product/B00LSG5BKO)
+- NO [16mm toggle button](https://www.amazon.com/ARTGEAR/dp/B07KX144DT) (power) + [momentary buttons](https://www.amazon.com/gp/product/B07KX144DT) (ignite/extinguish)
 - [Relay board](https://amzn.to/48nCtR6) or [single relays](https://amzn.to/3PwALnY)
 - [Arc lighter](https://amzn.to/3sY6EOD)
 - [Diaphragm pump](https://amzn.to/3PIcYTg)
-- [Copper tube](https://amzn.to/3RsNtXs), [silicone tubing](https://amzn.to/44YBIeb), random wood, and a 3D-printed base
+- [Copper tube](https://amzn.to/3RsNtXs) + [silicone tubing](https://amzn.to/44YBIeb) + 3D-printed base
 
-### ESPhome Code
+### Code
 
-See the [ESPhome YAML on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/blob/main/bruh_smart_candle/bruh-candle.yaml).
+See the [ESPHome YAML on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/blob/main/bruh_smart_candle/bruh-candle.yaml).
 
-I wanted the candle battery-powered, so I used an off-the-shelf lipo charger module and an 18650 battery. Again, with my feature creep, I think adding a Peltier element (like those [BioLite stoves](https://amzn.to/44V4P21)) would be neat. Seems like with the right combo of low-voltage ESP module and heat sync, you could have a self-charging candle. But given the crappy time I had building a bottle warmer/cooler, I'm not keen to try any time soon.
+### Safety
 
-Another thing I added was a power button that breaks the connection between the battery and ESP32. That guarantees that I can't accidentally turn the candle on remotely and requires me to "arm" the candle before remote ignition. Makes it feel a lot less sketchy. I added a few manual momentary buttons to ignite and extinguish the candle when I'm in front of it.
+I added a physical power switch between the battery and ESP32. The candle has to be manually armed before it can be remotely ignited — it can't accidentally turn on from a stray automation or API call.
 
 <iframe width="315" height="560" src="https://www.youtube.com/embed/AcJ1OWoMghA" title="Smart Candlet Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-## Conclusion
-
-This candle did work pretty well. It's surprisingly reliable, and the manual power switch does make me feel pretty safe. Think I should build a V2?

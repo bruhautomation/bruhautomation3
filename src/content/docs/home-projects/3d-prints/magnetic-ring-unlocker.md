@@ -1,10 +1,10 @@
 ---
-title: Magnetic Ring Unlocker for Childproof Latches
-description: Magnetic ring to unlock childproof latches — DIY parental gate solution
+title: Magnetic Ring Unlocker
+description: A magnetic ring for quickly unlocking childproof cabinet and gate latches.
 ---
 
-This magnetic ring lets you quickly unlock childproof latches without the frustration—perfect for gates and cabinets you need easy access to.
+A magnetic ring for quickly unlocking childproof latches on gates and cabinets.
 
 :::note
-Content coming soon — design files and build guide coming soon.
+Design files and build guide coming soon.
 :::

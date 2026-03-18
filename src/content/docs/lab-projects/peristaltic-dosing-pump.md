@@ -1,10 +1,10 @@
 ---
 title: Peristaltic Dosing Pump
-description: Custom peristaltic dosing pump for lab automation — biotech equipment
+description: A custom peristaltic pump for precise, automated reagent dosing.
 ---
 
-I built a custom peristaltic pump to precisely dose reagents in the lab. Much cheaper than buying commercial equipment.
+A custom-built peristaltic pump for precise reagent dosing — significantly cheaper than commercial alternatives.
 
 :::note
-Content coming soon — component list and assembly guide coming soon.
+Component list and assembly guide coming soon.
 :::

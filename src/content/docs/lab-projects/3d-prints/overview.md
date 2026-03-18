@@ -1,9 +1,7 @@
 ---
-title: 3D Prints from the Lab
-description: 3D printed lab tools and accessories — biotech maker solutions
+title: 3D Prints — Lab
+description: Custom 3D printed tools and accessories for the lab.
 ---
-
-A collection of custom-designed 3D printed tools and accessories built to make lab work easier, faster, and more organized.
 
 - [10mL Syringe Puller](/lab-projects/3d-prints/10ml-syringe-puller/)
 - [15mL Tube Megarack](/lab-projects/3d-prints/15ml-tube-megarack/)

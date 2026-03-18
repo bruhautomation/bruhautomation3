@@ -1,10 +1,10 @@
 ---
 title: Irrigation System
-description: 1500ft smart irrigation system — DIY automated watering for gardens
+description: A 1500ft automated irrigation system for garden beds and raised planters.
 ---
 
-What started as a simple gardening experiment turned into a full-blown automated irrigation system. Turns out, planning a garden is harder than I thought.
+A 1500ft automated irrigation system built around ESPHome and Home Assistant, covering garden beds and raised planters with zone-based scheduling and moisture-sensor feedback.
 
 :::note
-Content coming soon — setup guide and component list coming soon.
+Build guide and component list coming soon.
 :::

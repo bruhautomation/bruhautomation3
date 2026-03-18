@@ -1,26 +1,26 @@
 ---
 title: Smart Home Fundamentals
-description: Five fundamentals for the ideal smart home
+description: Five principles for building a smart home that actually works long-term
 ---
 
-Let's be real: most houses today are about as smart as the drywall they're made of. But it doesn't have to be that way. Anyone can build an affordable, secure, and genuinely useful home automation system.
+These are the principles I follow when building out my home automation setup. They're opinionated, but they've saved me from a lot of headaches over the years.
 
-## Devices should be locally controlled, not just through the cloud
+## Local control over cloud
 
-It's crazy that most of today's connected devices rely on cloud services. Even if two devices are connected to the same local network, many manufacturers have opted to route all communications through their third-party servers. Not only does this introduce security vulnerabilities, but it cripples your house in the event of an internet outage. *Essential home automation devices must be locally controllable.*
+Most connected devices route everything through third-party servers — even when two devices are on the same network. That introduces security concerns, adds latency, and means your house stops working when the internet goes down. Any device that handles something important should work locally.
 
-## Expensive doesn't mean better
+## Price doesn't equal quality
 
-Just because something costs more doesn't make it the right choice. Some of the best automation solutions I've built cost a fraction of the off-the-shelf alternatives.
+Some of the best automation solutions I've built cost a fraction of the off-the-shelf alternatives. Expensive gear isn't always the right choice, especially when a $5 ESP32 can outperform a $50 commercial product.
 
-## Devices should be easily removable
+## Easy to remove
 
-Some may disagree, but I feel strongly that Home Automation systems should be reasonably easy to remove (e.g., not require significant structural/electrical changes). Smart home technology evolves quickly, and the last thing you want is an unsellable house full of poorly aging electronics. *The easier your devices are to remove/replace/upgrade, the better.*
+Smart home technology evolves fast. Systems should be reasonably easy to remove without requiring significant structural or electrical changes. The easier your devices are to swap out, the less likely you are to get stuck with obsolete hardware.
 
-## Your system should be flexible
+## Flexible and upgradeable
 
-Home automation systems continuously evolve, and I've never met anyone who didn't want to expand their system once installed. It's essential to choose a flexible and upgradable platform. This is especially important when choosing a hub (the device/software that connects all other devices). Some ecosystems have very limited support for 3rd party components. Others (like [Home Assistant](https://www.home-assistant.io/)) support an incredible number of devices natively and provide tools to implement just about anything else. *The more flexible your hub is, the easier your home will be to automate.*
+I've never met anyone who didn't want to expand their system once it was installed. The hub you choose matters — some ecosystems have very limited third-party support, while others like [Home Assistant](https://www.home-assistant.io/) support thousands of devices natively and provide tools to implement just about anything else.
 
-## Smart homes should be transferable to the next homeowner
+## Transferable to the next owner
 
-You probably won't live in the same house forever. So, while your super-tricked-out custom smart home is hella cool, it will ultimately degrade the value of your house if the next buyer can't figure out what you did. *As you build out your system, don't forget that it should be "transferable" to the next owner.* Being organized, keeping solid documentation, using clear labels, minimizing hacks and workarounds, and keeping things as straightforward as possible are essential.
+You probably won't live in the same house forever. A heavily customized smart home can actually hurt resale value if the next buyer can't figure out what you did. Good documentation, clear labels, and minimal hacks go a long way toward making a system that someone else can actually maintain.

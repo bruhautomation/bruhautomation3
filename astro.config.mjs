@@ -30,7 +30,7 @@ export default defineConfig({
 					tag: 'meta',
 					attrs: {
 						name: 'description',
-						content: 'Home Automation for Everyone — DIY smart home, maker, and lab projects by Ben.',
+						content: 'Smart home, maker, and lab projects by Ben — open-source designs, 3D print files, and build guides.',
 					},
 				},
 				{
@@ -88,12 +88,13 @@ export default defineConfig({
 					label: 'Welcome',
 					items: [
 						{ label: 'Home', link: '/' },
-						{ label: 'Project List', slug: 'project-list' },
+						{ label: 'Projects', slug: 'project-list' },
 						{ label: 'Smart Home Fundamentals', slug: 'smart-home-fundamentals' },
 					],
 				},
 				{
-					label: 'Smart Home Projects',
+					label: 'Smart Home',
+					collapsed: true,
 					items: [
 						{ label: 'Irrigation System', slug: 'smart-home-projects/irrigation-system' },
 						{ label: 'Smart Candlet', slug: 'smart-home-projects/smart-candlet' },
@@ -103,12 +104,14 @@ export default defineConfig({
 				},
 				{
 					label: 'Home Projects',
+					collapsed: true,
 					items: [
 						{ label: 'Tablet Wall Mount', slug: 'home-projects/tablet-wall-mount' },
 						{ label: 'Childproof Doorknob', slug: 'home-projects/beautiful-childproof-doorknob' },
 						{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
 						{
 							label: '3D Prints',
+							collapsed: true,
 							items: [
 								{ label: 'Overview', slug: 'home-projects/3d-prints/overview' },
 								{ label: 'Couch Cupholder', slug: 'home-projects/3d-prints/couch-cupholder' },
@@ -119,6 +122,7 @@ export default defineConfig({
 				},
 				{
 					label: 'Lab Projects',
+					collapsed: true,
 					items: [
 						{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
 						{ label: 'Peristaltic Dosing Pump', slug: 'lab-projects/peristaltic-dosing-pump' },
@@ -126,6 +130,7 @@ export default defineConfig({
 						{ label: '96-Well Plate Inverter', slug: 'lab-projects/96-well-plate-inverter' },
 						{
 							label: '3D Prints',
+							collapsed: true,
 							items: [
 								{ label: 'Overview', slug: 'lab-projects/3d-prints/overview' },
 								{ label: '10mL Syringe Puller', slug: 'lab-projects/3d-prints/10ml-syringe-puller' },
@@ -140,6 +145,7 @@ export default defineConfig({
 				},
 				{
 					label: 'BRUH Claude',
+					collapsed: true,
 					items: [
 						{ label: 'Overview', slug: 'bruh-claude' },
 						{ label: 'Installation', slug: 'bruh-claude/installation' },

@@ -1,37 +1,26 @@
 ---
-title: BRUH Project List
-description: Complete project directory — smart home, maker, and lab automation
+title: Project List
+description: Complete project directory — smart home, home, and lab automation
 ---
 
-![BRUH Animation](https://i.makeagif.com/media/6-16-2021/ldSzfr.gif)
+## Smart Home
 
-## Smart Home Projects
+- [Irrigation System](/smart-home-projects/irrigation-system/) — 1500ft automated irrigation
+- [Smart Candlet](/smart-home-projects/smart-candlet/) — WiFi-controlled auto-igniting candle
+- [Hype Button](/smart-home-projects/hype-button/) — celebration scene trigger
+- [BRUH Playhouse](/smart-home-projects/bruh-playhouse/) — connected outdoor playhouse
 
-> Connected home automation projects built with ESPhome and Home Assistant
+## Home
 
-- [Irrigation System](/smart-home-projects/irrigation-system/) — 1500ft smart irrigation
-- [Smart Candlet](/smart-home-projects/smart-candlet/) — WiFi-enabled smart candles
-- [Hype Button](/smart-home-projects/hype-button/) — celebrate with automation
-- [BRUH Playhouse](/smart-home-projects/bruh-playhouse/) — smart outdoor play space
-- Holiday Lights *(coming soon)*
-- DIY Smart Blinds *(coming soon)*
+- [Tablet Wall Mount](/home-projects/tablet-wall-mount/) — flush magnetic tablet mount
+- [Childproof Doorknob](/home-projects/beautiful-childproof-doorknob/) — 3D printed cover for Schlage Bowery knobs
+- [LED Light for Lawnmower](/home-projects/led-light-for-lawnmower/) — aftermarket LED upgrade
+- [3D Prints](/home-projects/3d-prints/) — practical prints for around the house
 
-## Home Projects
-
-> Hardware and maker projects for around the house—practical, useful, and hopefully cool
-
-- [Tablet Wall Mount](/home-projects/tablet-wall-mount/) — universal magnetic tablet mount
-- [Beautiful Childproof Doorknob](/home-projects/beautiful-childproof-doorknob/) — aesthetically pleasing baby gate solution
-- [LED Light for Lawnmower](/home-projects/led-light-for-lawnmower/) — mow after dark
-- [3D Prints Around the Home](/home-projects/3d-prints/) — collection of home printing projects
-- Board and Batten Accent Wall *(coming soon)*
-
-## Lab Projects
-
-> Biotech automation and DIY lab equipment designed to make work in the lab easier
+## Lab
 
 - [Cellcube Bioreactor Controller](/lab-projects/cellcube-bioreactor-controller/) — custom bioreactor automation
-- [Peristaltic Dosing Pump](/lab-projects/peristaltic-dosing-pump/) — precise automated dosing
+- [Peristaltic Dosing Pump](/lab-projects/peristaltic-dosing-pump/) — precision reagent dosing
 - [50mL Tube Mixer](/lab-projects/50ml-tube-mixer/) — motorized sample mixing
 - [96-Well Plate Inverter](/lab-projects/96-well-plate-inverter/) — automated plate handling
-- [3D Prints from the Lab](/lab-projects/3d-prints/) — collection of lab tools and accessories
+- [3D Prints](/lab-projects/3d-prints/) — custom lab tools and accessories

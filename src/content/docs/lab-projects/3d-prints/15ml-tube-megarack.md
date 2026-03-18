@@ -1,10 +1,10 @@
 ---
 title: 15mL Tube Megarack
-description: 3D printed mega rack for 15mL tubes — lab storage solution
+description: An oversized 3D printed rack for holding large quantities of 15mL tubes.
 ---
 
-When you need to hold *all the tubes*, this oversized rack is your friend. Prints in one go and holds way more than you'd expect.
+An oversized tube rack for when standard racks aren't enough. Prints in one piece.
 
 :::note
-Content coming soon — 3D files available in the GitHub repo.
+3D files coming soon.
 :::

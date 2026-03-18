@@ -1,10 +1,10 @@
 ---
 title: 96-Well Plate Inverter
-description: 96-well plate inverter for biotech labs — automated plate handling
+description: A mechanical device for inverting 96-well plates without spilling.
 ---
 
-A simple mechanical device for inverting 96-well plates without spilling anything. Saves time and your sanity.
+A simple mechanical device for inverting 96-well plates without spilling contents.
 
 :::note
-Content coming soon — design files and usage guide coming soon.
+Design files and usage guide coming soon.
 :::

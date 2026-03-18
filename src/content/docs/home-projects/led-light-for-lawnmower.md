@@ -1,10 +1,10 @@
 ---
 title: LED Light for Lawnmower
-description: LED lights for lawnmower — DIY lighting upgrade for yard work
+description: An aftermarket LED lighting upgrade for mowing after sunset.
 ---
 
-Tired of mowing when it gets dark? I added some LED lights to my lawnmower so I could keep cutting even after sunset.
+An LED lighting upgrade for mowing after dark — mounted to the front of the mower deck.
 
 :::note
-Content coming soon — check back for build details and design files.
+Build details and design files coming soon.
 :::

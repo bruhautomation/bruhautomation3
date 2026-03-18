@@ -1,10 +1,10 @@
 ---
 title: UV Flashlight
-description: UV flashlight for labs — DIY handheld UV light source
+description: A portable, 3D printed UV light source for lab use.
 ---
 
-A portable UV light source for the lab. Useful for visualizing gels, checking for contamination, and looking cool while you work.
+A portable UV light source for gel visualization, contamination checks, and general lab use.
 
 :::note
-Content coming soon — BOM and assembly details coming soon.
+BOM and assembly details coming soon.
 :::

@@ -1,10 +1,10 @@
 ---
 title: Hype Button
-description: Smart hype button for your smart home — celebrate with automation
+description: A physical button that triggers celebratory Home Assistant scenes.
 ---
 
-Every house needs a button to get hyped. Mine plays celebratory music, flashes lights, and generally makes a scene whenever I press it.
+A physical button wired into Home Assistant that triggers a celebration scene — music, flashing lights, the whole thing.
 
 :::note
-Content coming soon — build details and firmware coming soon.
+Build details and firmware coming soon.
 :::

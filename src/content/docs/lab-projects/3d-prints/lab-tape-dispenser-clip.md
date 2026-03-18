@@ -1,8 +1,8 @@
 ---
 title: Lab Tape Dispenser Clip
-description: Lab tape dispenser clip — magnetic or adhesive mount for bench
+description: A magnetic or adhesive bench-mounted clip for lab tape dispensers.
 ---
 
-A clip to keep your lab tape dispenser within arm's reach on your bench—no more hunting around for tape when you need it.
+A clip to keep your lab tape dispenser within reach on the bench — mounts with a magnet or adhesive.
 
 [View 3D model on Autodesk](https://a360.co/3ZqWbY2)
