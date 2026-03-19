@@ -1,0 +1,25 @@
+---
+title: Neopixel LED Strip
+description: ESP8266 addressable RGB LED strip controller with effects and WiFi integration.
+---
+
+Control addressable WS2812B/NeoPixel RGB LED strips with smooth animations and full Home Assistant integration. Choose from 10 built-in effects or set custom colors and brightness.
+
+## How It Works
+
+A NodeMCU v2 (ESP8266) drives the LED strip via DMA, allowing smooth animations without blocking the processor. The LED data line connects to GPIO3 (RX pin), and the entire strip is addressable—animate individual LEDs or the whole string with effects like rainbow, fireworks, twinkle, and more.
+
+## Hardware
+
+- **Board:** NodeMCU v2 (ESP8266)
+- **LED Strip:** WS2812B NeoPixel (24 LEDs, GRB format)
+- **Data Pin:** GPIO3 (RX)
+- **Power:** 5V to the LED strip (separate PSU recommended for longer runs)
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/neopixel-strip).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/neopixel-strip)

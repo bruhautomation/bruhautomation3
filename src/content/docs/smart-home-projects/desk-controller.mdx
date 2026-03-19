@@ -1,0 +1,25 @@
+---
+title: Desk Controller
+description: Electric standing desk height controller with custom UART sensor.
+---
+
+Smart controller for electric standing desks, reading desk height via a custom UART sensor and providing remote up/down control through Home Assistant. Monitor height in real-time and move to preset positions.
+
+## How It Works
+
+A custom UART sensor decodes the desk controller's height output while relays simulate button presses for up/down commands. The ESP32 reads the current height and accepts commands from Home Assistant, with relay interlock preventing simultaneous up/down movement.
+
+## Hardware
+
+- **Board:** ESP32 (NodeMCU-32S)
+- **Height Sensor:** Custom UART sensor (GPIO16 RX, GPIO17 TX at 9600 baud)
+- **Control Relays:** Two GPIO relays for up/down commands (GPIO18, GPIO19)
+- **Integration:** Connects to desk's existing control circuit
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/desk-controller).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/desk-controller)

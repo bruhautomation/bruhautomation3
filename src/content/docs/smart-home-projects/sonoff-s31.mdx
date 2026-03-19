@@ -1,0 +1,27 @@
+---
+title: Sonoff S31
+description: Smart plug with real-time power monitoring and relay control.
+---
+
+Sonoff S31 smart plug with integrated CSE7766 power metering for real-time current, voltage, and wattage monitoring. Control your plugged-in devices remotely and track energy consumption via Home Assistant.
+
+## How It Works
+
+The S31 is a standard outlet plug with built-in ESP8266, relay, and power meter. The CSE7766 chip measures voltage, current, and power consumption via UART. A physical button toggles the relay locally, while Home Assistant provides remote control and energy tracking. The status LED shows relay state.
+
+## Hardware
+
+- **Board:** ESP8266 (esp01_1m, 1MB flash)
+- **Power Meter:** CSE7766 (UART at 4800 baud, even parity)
+- **Relay:** 16A AC rated (GPIO12)
+- **LED:** Status indicator (GPIO13)
+- **Button:** Physical control (GPIO0)
+- **Ranges:** 85-260V AC, 0-16A, 0-3680W
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sonoff-s31).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sonoff-s31)

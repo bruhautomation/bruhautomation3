@@ -1,0 +1,25 @@
+---
+title: Nightlight
+description: Monochromatic or RGB LED nightlight with PWM dimming and pulse effects.
+---
+
+Simple, elegant LED nightlight with smooth PWM brightness control and customizable pulse effects. Available in monochromatic white or full RGB color variants.
+
+## How It Works
+
+The nightlight uses LEDC PWM on an ESP32 to provide flicker-free brightness control. Pulse effects create a gentle breathing motion, perfect for bedside or accent lighting. Multiple effect modes let you customize the ambiance.
+
+## Hardware
+
+- **Board:** ESP32 (NodeMCU-32S)
+- **Output:** LEDC PWM on GPIO32 (monochromatic white LED)
+- **Frequency:** 1220 Hz (above audible range, no whining)
+- **RGB Variant:** Same board, three PWM outputs for separate R, G, B channels
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/nightlight).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/nightlight)

@@ -1,0 +1,32 @@
+---
+title: 7-Segment Display
+description: MAX7219-based 8-digit 7-segment display showing Home Assistant data.
+---
+
+import StlViewer from '../../../components/StlViewer.astro';
+
+Wall-mounted 8-digit 7-segment display driven by MAX7219. Display real-time data from Home Assistant—subscriber counts, sensor readings, temperatures, or any numeric value you want to see at a glance.
+
+## How It Works
+
+The MAX7219 handles the multiplexing of the 7-segment display digits via SPI. An ESP32 fetches data from Home Assistant (like YouTube subscriber count or temperature) and updates the display using ESPHome's lambda display function. Brightness is adjustable in 16 steps.
+
+## Hardware
+
+- **Board:** ESP32 (NodeMCU-32S)
+- **Display Driver:** MAX7219 (SPI interface)
+- **Display:** 8-digit 7-segment common cathode
+- **SPI Pins:** CLK (GPIO21), MOSI/Data (GPIO22), CS (GPIO23)
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/7-segment-display).
+
+## 3D Model Preview
+
+<StlViewer src="/models/7-segment-display/esp32_7seg_body.stl" />
+<StlViewer src="/models/7-segment-display/esp32_7seg_back.stl" />
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/7-segment-display)

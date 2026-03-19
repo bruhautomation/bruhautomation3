@@ -1,0 +1,25 @@
+---
+title: BLE Hub
+description: Bluetooth Low Energy tracker and proxy for Home Assistant.
+---
+
+Bluetooth Low Energy (BLE) hub for tracking iBeacon devices and proxying BLE signals to Home Assistant. Enable presence detection, device tracking, and integration with non-WiFi BLE peripherals.
+
+## How It Works
+
+The ESP32's integrated BLE radio continuously scans for nearby BLE devices. The hub can track specific iBeacon devices by their UUID and measure signal strength (RSSI) for distance estimation. It also acts as a Bluetooth proxy, relaying other BLE device data to Home Assistant for further automation and tracking.
+
+## Hardware
+
+- **Board:** ESP32 (ESP32-Dev)
+- **BLE Radio:** Integrated dual-mode (Bluetooth Classic + BLE)
+- **Range:** 30-50 meters indoors (varies by environment)
+- **No additional components needed**
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/ble-hub).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/ble-hub)

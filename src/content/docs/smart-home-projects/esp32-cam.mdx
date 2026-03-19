@@ -1,0 +1,27 @@
+---
+title: ESP32-CAM
+description: OV2640 camera with OLED display and PIR motion detection.
+---
+
+Compact ESP32-CAM module with integrated OV2640 camera, SSD1306 OLED display for status, and PIR motion detection. Stream live video to Home Assistant and capture snapshots on motion.
+
+## How It Works
+
+The AI-Thinker ESP32-CAM module combines a camera, I2C OLED display, and motion sensor on a tiny board. ESPHome configures the camera for live streaming and on-demand snapshots while displaying status on the OLED. The PIR sensor triggers automations when motion is detected.
+
+## Hardware
+
+- **Board:** ESP32 with integrated OV2640 camera
+- **Camera:** 640×480 JPEG compression
+- **Display:** SSD1306 OLED 128×64 (I2C)
+- **Motion Sensor:** PIR on GPIO33
+- **Button:** GPIO34 for manual input
+- **Power:** USB or 5V input (requires good supply—spikes to 500mA)
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/esp32-cam).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/esp32-cam)

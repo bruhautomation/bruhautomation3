@@ -1,0 +1,26 @@
+---
+title: Sonoff RF Bridge
+description: 433MHz RF bridge for learning and transmitting wireless codes.
+---
+
+Sonoff RF Bridge with 433MHz transceiver for learning RF remote codes and transmitting commands, enabling control of older wireless devices from Home Assistant without modifying the original devices.
+
+## How It Works
+
+The RF Bridge learns codes from wireless remotes by listening on 433MHz, capturing the RF signal pattern (sync, low, high, and data bytes). These codes can then be retransmitted on demand via Home Assistant service calls, allowing the bridge to act as a universal remote for any OOK (On-Off Keying) compatible device.
+
+## Hardware
+
+- **Board:** ESP8266 (esp01_1m, 1MB flash)
+- **RF Module:** 433MHz transmitter/receiver (full duplex)
+- **Protocol:** EV1527 and compatible OOK formats
+- **Communication:** UART from RF module to ESP8266
+- **Range:** 30-50 meters depending on antenna and environment
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sonoff-rf-bridge).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sonoff-rf-bridge)

@@ -1,0 +1,27 @@
+---
+title: BRUH Playhouse
+description: An outdoor playhouse with Home Assistant-controlled lights, sounds, and interactive features.
+---
+
+An outdoor playhouse for kids with Home Assistant-controlled lights, DFPlayer audio, servo-driven animated features, and multiple input controls (buttons, joystick, rotary encoder). A complete interactive entertainment system.
+
+## How It Works
+
+An ESP32 controls multiple playhouse subsystems: the DFPlayer Mini streams sound effects and music via UART, addressable LED strips provide lighting effects, PCA9685 servo controller manages animated mechanisms, and multiple input devices allow kids to trigger actions. Everything integrates with Home Assistant for automation and remote control.
+
+## Hardware
+
+- **Board:** ESP32
+- **Audio:** DFPlayer Mini (UART via GPIO16/17 at 9600 baud)
+- **Servos:** PCA9685 servo controller (I2C) for animated features
+- **LEDs:** Addressable LED strips (WS2812B via GPIO)
+- **Inputs:** Multiple buttons, joystick, rotary encoder
+- **Power:** 5V supply for playhouse system
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/playhouse).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/playhouse)

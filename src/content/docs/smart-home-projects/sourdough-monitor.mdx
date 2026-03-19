@@ -1,0 +1,26 @@
+---
+title: Sourdough Monitor
+description: Smart jar with TFT display showing fermentation history, temperature, and humidity.
+---
+
+Smart fermentation monitor for sourdough starters, featuring a TFT display with historical temperature graphs, real-time humidity and pressure readings, and Home Assistant integration.
+
+## How It Works
+
+An ESP32-S3 with octal PSRAM monitors temperature, humidity, and pressure inside a jar with a TFT screen. The PSRAM buffers 48 historical data points for graphing fermentation trends over time. The display updates with temperature-coded color zones (cold, ideal, warm, hot) to show fermentation progress at a glance.
+
+## Hardware
+
+- **Board:** ESP32-S3 with octal PSRAM
+- **Display:** TFT screen with PWM backlight control
+- **Sensors:** Temperature, humidity, pressure (BME280 or similar)
+- **Storage:** 48-point history buffer in PSRAM (80 MHz)
+- **WiFi:** Syncs with Home Assistant
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sourdough-monitor).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sourdough-monitor)

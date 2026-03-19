@@ -1,0 +1,26 @@
+---
+title: Sound Machine
+description: MP3 sound player with DFPlayer Mini module and Home Assistant integration.
+---
+
+Standalone MP3 audio player powered by the DFPlayer Mini, which handles MP3 decoding and amplification. Play sounds from a microSD card via Home Assistant automations or manual triggers.
+
+## How It Works
+
+A DFPlayer Mini module interfaces with the ESP32 over UART (9600 baud). Upload MP3 files to a FAT32-formatted microSD card, then use Home Assistant services to play tracks by number, adjust volume, or control playback. The DFPlayer includes built-in amplification, so you only need a speaker and microSD card.
+
+## Hardware
+
+- **Board:** ESP32 (NodeMCU-32S)
+- **Audio Module:** DFPlayer Mini (MP3 decoder and amplifier)
+- **Storage:** microSD card (FAT32 format)
+- **Speaker:** 3W 4Ω or similar
+- **UART:** GPIO16 (RX), GPIO17 (TX) at 9600 baud
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sound-machine).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/BRUH-CAD-Files/tree/main/smart-home/sound-machine)
