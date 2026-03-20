@@ -282,7 +282,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					box-shadow 0.3s ease,
 					border-color 0.3s ease;
 				z-index: 2;
-				
 			}
 			.orbit-card:hover {
 				transform: scale(1.05) !important;
@@ -336,6 +335,8 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				bottom: 10%;
 				right: 20%;
 			}
+
+			
 
 			/* ── Stats ── */
 			.stats {
@@ -570,21 +571,108 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 		<main>
 			<!-- Hero -->
 			<section class="hero">
-				<!-- Hidden pool of project cards — JS picks 6 random ones -->
-				<div id="card-pool" style="display:none;">
-					<a href="/smart-home-projects/smart-candlet/" data-img="/images/candlet/smart-candlet-concept.png" data-title="Smart Candle" data-desc="Arc-ignition smart candle"></a>
-					<a href="/home-projects/beautiful-childproof-doorknob/" data-img="/images/doorknob/doorknob-childproof-concept-v2.png" data-title="Childproof Doorknob" data-desc="3D printed cover"></a>
-					<a href="/home-projects/tablet-wall-mount/" data-img="/images/tablet-wall-mount/tablet-mount-install.png" data-title="Tablet Wall Mount" data-desc="Flush keystone mount"></a>
-					<a href="/smart-home-projects/irrigation-system/" data-img="/images/smart-home/laser-turret-concept.png" data-title="Irrigation System" data-desc="1500ft automated"></a>
-					<a href="/smart-home-fundamentals/" data-img="/images/smart-home/crestron-control-panel.png" data-title="Fundamentals" data-desc="Smart home basics"></a>
-					<a href="/home-projects/beautiful-childproof-doorknob/" data-img="/images/doorknob/doorknob-alt-angle-1.jpg" data-title="Doorknob Detail" data-desc="Barely visible cover"></a>
-					<a href="/home-projects/tablet-wall-mount/" data-img="/images/tablet-wall-mount/tablet-mount-side-profile.png" data-title="Side Profile" data-desc="Flush wall integration"></a>
-					<a href="/home-projects/beautiful-childproof-doorknob/" data-img="/images/doorknob/doorknob-childproof-concept.png" data-title="3D Printed Parts" data-desc="Download and print"></a>
-					<a href="/bruh-claude/" data-img="/images/bruh-claude/architecture-overview.svg" data-title="BRUH Claude" data-desc="AI for Home Assistant"></a>
-					<a href="/home-projects/3d-prints/couch-cupholder/" data-img="/images/doorknob/doorknob-alt-angle-5.jpg" data-title="Maker Builds" data-desc="Practical 3D prints"></a>
-					<a href="/smart-home-projects/smart-candlet/" data-img="/images/smart-home/smart-home-fundamentals-banner.png" data-title="Connected Home" data-desc="ESPHome + HA"></a>
-					<a href="/lab-projects/cellcube-bioreactor-controller/" data-img="/images/peltier-bottle-warmer-prototype.jpg" data-title="Lab Automation" data-desc="Bioreactor controller"></a>
-				</div>
+				<!-- Floating project cards -->
+				<a
+					href="/smart-home-projects/smart-candlet/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/candlet/smart-candlet-concept.png"
+						alt="Smart Candle"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Smart Candle</div>
+						<div class="orbit-card-desc">
+							Arc-ignition smart candle
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/beautiful-childproof-doorknob/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/doorknob/doorknob-childproof-concept-v2.png"
+						alt="Childproof Doorknob"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Childproof Doorknob</div>
+						<div class="orbit-card-desc">
+							Beautiful & 3D printable
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/tablet-wall-mount/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/tablet-wall-mount/tablet-mount-install.png"
+						alt="Tablet Wall Mount"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Tablet Wall Mount</div>
+						<div class="orbit-card-desc">
+							Flush keystone mount
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/smart-home-projects/irrigation-system/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/smart-home/laser-turret-concept.png"
+						alt="Laser Turret"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Laser Turret</div>
+						<div class="orbit-card-desc">
+							Cat-entertaining IoT device
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/smart-home-fundamentals/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/smart-home/crestron-control-panel.png"
+						alt="Smart Home Fundamentals"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">Fundamentals</div>
+						<div class="orbit-card-desc">
+							Smart home basics guide
+						</div>
+					</div>
+				</a>
+
+				<a
+					href="/home-projects/beautiful-childproof-doorknob/"
+					class="orbit-card"
+				>
+					<img
+						src="/images/doorknob/doorknob-alt-angle-1.jpg"
+						alt="Doorknob Detail"
+						loading="lazy"
+					/>
+					<div class="orbit-card-body">
+						<div class="orbit-card-title">3D Printed Parts</div>
+						<div class="orbit-card-desc">
+							Download &amp; print today
+						</div>
+					</div>
+				</a>
 
 				<!-- Center content -->
 				<img
@@ -696,38 +784,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				rel="noopener">GitHub</a
 			>
 		</footer>
-
-		<script is:inline>
-			// Pick 6 random project cards from the hidden pool and insert into the hero
-			(function () {
-				var pool = document.getElementById('card-pool');
-				var hero = document.querySelector('.hero');
-				if (!pool || !hero) return;
-				var items = Array.from(pool.children);
-				// Fisher-Yates shuffle
-				for (var i = items.length - 1; i > 0; i--) {
-					var j = Math.floor(Math.random() * (i + 1));
-					var t = items[i]; items[i] = items[j]; items[j] = t;
-				}
-				// Take first 6, build orbit cards, insert before the first child of hero
-				var first = hero.querySelector('.hero-logo, img');
-				for (var k = 0; k < 6 && k < items.length; k++) {
-					var d = items[k];
-					var card = document.createElement('a');
-					card.href = d.getAttribute('href');
-					card.className = 'orbit-card';
-					card.innerHTML =
-						'<img src="' + d.dataset.img + '" alt="' + d.dataset.title + '" loading="lazy">' +
-						'<div class="orbit-card-body">' +
-						'<div class="orbit-card-title">' + d.dataset.title + '</div>' +
-						'<div class="orbit-card-desc">' + d.dataset.desc + '</div>' +
-						'</div>';
-					hero.insertBefore(card, first);
-				}
-				// Remove the hidden pool
-				pool.remove();
-			})();
-		</script>
 
 		<script is:inline>
 			// Theme toggle logic for the landing page
