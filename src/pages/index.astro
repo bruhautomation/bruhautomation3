@@ -269,75 +269,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				color: var(--accent);
 			}
 
-			/* ── Orbit cards (floating project cards around hero) ── */
-			.orbit-card {
-				position: absolute;
-				width: 180px;
-				background: var(--bg-card-solid);
-				border: 1px solid var(--border);
-				border-radius: 12px;
-				overflow: hidden;
-				transition:
-					transform 0.3s ease,
-					box-shadow 0.3s ease,
-					border-color 0.3s ease;
-				z-index: 2;
-			}
-			.orbit-card:hover {
-				transform: scale(1.05) !important;
-				border-color: var(--accent);
-				box-shadow: 0 8px 32px var(--accent-glow);
-				z-index: 10;
-			}
-			.orbit-card img {
-				width: 100%;
-				height: 90px;
-				object-fit: cover;
-				display: block;
-			}
-			.orbit-card-body {
-				padding: 0.6rem 0.75rem;
-			}
-			.orbit-card-title {
-				font-size: 0.75rem;
-				font-weight: 600;
-				line-height: 1.2;
-				margin-bottom: 0.2rem;
-			}
-			.orbit-card-desc {
-				font-size: 0.65rem;
-				color: var(--text-muted);
-				line-height: 1.3;
-			}
-
-			/* Positions for 6 cards orbiting the hero logo */
-			.orbit-card:nth-child(1) {
-				top: 28%;
-				left: 18%;
-			}
-			.orbit-card:nth-child(2) {
-				top: 26%;
-				right: 18%;
-			}
-			.orbit-card:nth-child(3) {
-				top: 48%;
-				left: 14%;
-			}
-			.orbit-card:nth-child(4) {
-				top: 46%;
-				right: 14%;
-			}
-			.orbit-card:nth-child(5) {
-				bottom: 12%;
-				left: 20%;
-			}
-			.orbit-card:nth-child(6) {
-				bottom: 10%;
-				right: 20%;
-			}
-
-			
-
 			/* ── Stats ── */
 			.stats {
 				display: grid;
@@ -469,11 +400,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			}
 
 			/* ── Responsive ── */
-			@media (max-width: 1400px) {
-				.orbit-card {
-					display: none;
-				}
-			}
 			@media (max-width: 900px) {
 				.categories {
 					grid-template-columns: repeat(2, 1fr);
@@ -571,109 +497,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 		<main>
 			<!-- Hero -->
 			<section class="hero">
-				<!-- Floating project cards -->
-				<a
-					href="/smart-home-projects/smart-candlet/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/candlet/smart-candlet-concept.png"
-						alt="Smart Candle"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Smart Candle</div>
-						<div class="orbit-card-desc">
-							Arc-ignition smart candle
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/beautiful-childproof-doorknob/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/doorknob/doorknob-childproof-concept-v2.png"
-						alt="Childproof Doorknob"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Childproof Doorknob</div>
-						<div class="orbit-card-desc">
-							Beautiful & 3D printable
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/tablet-wall-mount/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/tablet-wall-mount/tablet-mount-install.png"
-						alt="Tablet Wall Mount"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Tablet Wall Mount</div>
-						<div class="orbit-card-desc">
-							Flush keystone mount
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/smart-home-projects/irrigation-system/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/smart-home/laser-turret-concept.png"
-						alt="Laser Turret"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Laser Turret</div>
-						<div class="orbit-card-desc">
-							Cat-entertaining IoT device
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/smart-home-fundamentals/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/smart-home/crestron-control-panel.png"
-						alt="Smart Home Fundamentals"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Fundamentals</div>
-						<div class="orbit-card-desc">
-							Smart home basics guide
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/beautiful-childproof-doorknob/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/doorknob/doorknob-alt-angle-1.jpg"
-						alt="Doorknob Detail"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">3D Printed Parts</div>
-						<div class="orbit-card-desc">
-							Download &amp; print today
-						</div>
-					</div>
-				</a>
-
 				<!-- Center content -->
 				<img
 					class="hero-logo logo-for-dark"
