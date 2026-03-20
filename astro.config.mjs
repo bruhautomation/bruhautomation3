@@ -93,7 +93,7 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Smart Home Projects',
+					label: 'Smart Home',
 					collapsed: true,
 					items: [
 						{ label: 'BRUH Playhouse', slug: 'smart-home-projects/bruh-playhouse' },
@@ -103,25 +103,18 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Home Projects',
+					label: 'Maker',
 					collapsed: true,
 					items: [
 						{ label: 'Childproof Doorknob', slug: 'home-projects/beautiful-childproof-doorknob' },
+						{ label: 'Couch Cupholder', slug: 'home-projects/3d-prints/couch-cupholder' },
 						{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
+						{ label: 'Magnetic Ring Unlocker', slug: 'home-projects/3d-prints/magnetic-ring-unlocker' },
 						{ label: 'Tablet Wall Mount', slug: 'home-projects/tablet-wall-mount' },
-						{
-							label: '3D Prints',
-							collapsed: true,
-							items: [
-								{ label: 'Overview', slug: 'home-projects/3d-prints/overview' },
-								{ label: 'Couch Cupholder', slug: 'home-projects/3d-prints/couch-cupholder' },
-								{ label: 'Magnetic Ring Unlocker', slug: 'home-projects/3d-prints/magnetic-ring-unlocker' },
-							],
-						},
 					],
 				},
 				{
-					label: 'Lab Projects',
+					label: 'Lab',
 					collapsed: true,
 					items: [
 						{ label: '10mL Syringe Puller', slug: 'lab-projects/3d-prints/10ml-syringe-puller' },
@@ -129,31 +122,29 @@ export default defineConfig({
 						{ label: '50mL Tube Mixer', slug: 'lab-projects/50ml-tube-mixer' },
 						{ label: '96-Well Plate Inverter', slug: 'lab-projects/96-well-plate-inverter' },
 						{ label: 'BSC Bottle Holder', slug: 'lab-projects/3d-prints/bsc-bottle-holder' },
-						{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
 						{ label: 'CEDEX BioHT Tube Rack', slug: 'lab-projects/3d-prints/tube-rack-for-cedex-bioht' },
+						{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
 						{ label: 'Peristaltic Dosing Pump', slug: 'lab-projects/peristaltic-dosing-pump' },
 						{ label: 'Tape Dispenser Clip', slug: 'lab-projects/3d-prints/lab-tape-dispenser-clip' },
 						{ label: 'UV Flashlight', slug: 'lab-projects/3d-prints/uv-flashlight' },
-						{
-							label: '3D Prints',
-							collapsed: true,
-							items: [
-								{ label: 'Overview', slug: 'lab-projects/3d-prints/overview' },
-							],
-						},
 					],
 				},
 				{
-					label: 'Home Assistant',
+					label: 'Apps',
 					collapsed: true,
 					items: [
-						{ label: 'Overview', slug: 'bruh-claude' },
-						{ label: 'Installation', slug: 'bruh-claude/installation' },
-						{ label: 'Features & Usage', slug: 'bruh-claude/features' },
-						{ label: 'Configuration', slug: 'bruh-claude/configuration' },
-						{ label: 'CLI Tools', slug: 'bruh-claude/cli-tools' },
-						{ label: 'Integrations', slug: 'bruh-claude/integrations' },
-						{ label: 'Architecture', slug: 'bruh-claude/architecture' },
+						{
+							label: 'BRUH Claude',
+							items: [
+								{ label: 'Overview', slug: 'bruh-claude' },
+								{ label: 'Installation', slug: 'bruh-claude/installation' },
+								{ label: 'Features & Usage', slug: 'bruh-claude/features' },
+								{ label: 'Configuration', slug: 'bruh-claude/configuration' },
+								{ label: 'CLI Tools', slug: 'bruh-claude/cli-tools' },
+								{ label: 'Integrations', slug: 'bruh-claude/integrations' },
+								{ label: 'Architecture', slug: 'bruh-claude/architecture' },
+							],
+						},
 					],
 				},
 				{
