@@ -178,9 +178,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				flex-direction: column;
 				align-items: center;
 				text-align: center;
-				padding: 4rem 1.5rem 4rem;
-				min-height: 85vh;
-				justify-content: center;
+				padding: 4rem 1.5rem 3rem;
 				overflow: visible;
 			}
 			.hero::before {
@@ -269,94 +267,48 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				color: var(--accent);
 			}
 
-			/* ── Orbit cards (floating project cards around hero) ── */
-			.orbit-card {
-				position: absolute;
-				width: 180px;
+			/* ── Project cards grid (below hero) ── */
+			.project-cards {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1rem;
+				max-width: 900px;
+				width: 100%;
+				margin: 0 auto;
+				padding: 0 1.5rem 4rem;
+			}
+			.project-card {
 				background: var(--bg-card-solid);
 				border: 1px solid var(--border);
 				border-radius: 12px;
 				overflow: hidden;
 				transition:
-					transform 0.3s ease,
-					box-shadow 0.3s ease,
-					border-color 0.3s ease;
-				z-index: 2;
-				animation: float 10s ease-in-out infinite;
+					border-color 0.2s ease,
+					box-shadow 0.2s ease;
 			}
-			.orbit-card:hover {
-				transform: scale(1.05) !important;
+			.project-card:hover {
 				border-color: var(--accent);
-				box-shadow: 0 8px 32px var(--accent-glow);
-				z-index: 10;
+				box-shadow: 0 4px 20px var(--accent-glow);
 			}
-			.orbit-card img {
+			.project-card img {
 				width: 100%;
-				height: 90px;
+				height: 120px;
 				object-fit: cover;
 				display: block;
 			}
-			.orbit-card-body {
-				padding: 0.6rem 0.75rem;
+			.project-card-body {
+				padding: 0.75rem 1rem;
 			}
-			.orbit-card-title {
-				font-size: 0.75rem;
+			.project-card-title {
+				font-size: 0.85rem;
 				font-weight: 600;
-				line-height: 1.2;
-				margin-bottom: 0.2rem;
-			}
-			.orbit-card-desc {
-				font-size: 0.65rem;
-				color: var(--text-muted);
 				line-height: 1.3;
+				margin-bottom: 0.25rem;
 			}
-
-			/* Positions for 6 cards orbiting the hero logo */
-			.orbit-card:nth-child(1) {
-				top: 28%;
-				left: 18%;
-				rotate: -2deg;
-				animation-delay: 0s;
-			}
-			.orbit-card:nth-child(2) {
-				top: 26%;
-				right: 18%;
-				rotate: 1.5deg;
-				animation-delay: -1.5s;
-			}
-			.orbit-card:nth-child(3) {
-				top: 48%;
-				left: 14%;
-				rotate: -1.5deg;
-				animation-delay: -3s;
-			}
-			.orbit-card:nth-child(4) {
-				top: 46%;
-				right: 14%;
-				rotate: 2deg;
-				animation-delay: -4.5s;
-			}
-			.orbit-card:nth-child(5) {
-				bottom: 12%;
-				left: 20%;
-				rotate: 1deg;
-				animation-delay: -2s;
-			}
-			.orbit-card:nth-child(6) {
-				bottom: 10%;
-				right: 20%;
-				rotate: -1.5deg;
-				animation-delay: -3.5s;
-			}
-
-			@keyframes float {
-				0%,
-				100% {
-					translate: 0 0;
-				}
-				50% {
-					translate: 0 -4px;
-				}
+			.project-card-desc {
+				font-size: 0.75rem;
+				color: var(--text-muted);
+				line-height: 1.4;
 			}
 
 			/* ── Stats ── */
@@ -398,12 +350,12 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 
 			/* ── Categories ── */
 			.categories {
-				max-width: 900px;
+				max-width: 1000px;
 				width: 100%;
 				margin: 0 auto;
 				padding: 0 1.5rem 5rem;
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(4, 1fr);
 				gap: 1.25rem;
 			}
 			.cat-card {
@@ -490,12 +442,20 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			}
 
 			/* ── Responsive ── */
-			@media (max-width: 1400px) {
-				.orbit-card {
-					display: none;
+			@media (max-width: 768px) {
+				.project-cards {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+			@media (max-width: 900px) {
+				.categories {
+					grid-template-columns: repeat(2, 1fr);
 				}
 			}
 			@media (max-width: 640px) {
+				.project-cards {
+					grid-template-columns: 1fr;
+				}
 				.stats {
 					grid-template-columns: repeat(2, 1fr);
 				}
@@ -587,110 +547,6 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 		<main>
 			<!-- Hero -->
 			<section class="hero">
-				<!-- Floating project cards -->
-				<a
-					href="/smart-home-projects/smart-candlet/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/candlet/smart-candlet-concept.png"
-						alt="Smart Candle"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Smart Candle</div>
-						<div class="orbit-card-desc">
-							Arc-ignition smart candle
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/beautiful-childproof-doorknob/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/doorknob/doorknob-childproof-concept-v2.png"
-						alt="Childproof Doorknob"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Childproof Doorknob</div>
-						<div class="orbit-card-desc">
-							Beautiful & 3D printable
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/tablet-wall-mount/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/tablet-wall-mount/tablet-mount-install.png"
-						alt="Tablet Wall Mount"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Tablet Wall Mount</div>
-						<div class="orbit-card-desc">
-							Flush keystone mount
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/smart-home-projects/irrigation-system/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/smart-home/laser-turret-concept.png"
-						alt="Laser Turret"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Laser Turret</div>
-						<div class="orbit-card-desc">
-							Cat-entertaining IoT device
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/smart-home-fundamentals/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/smart-home/crestron-control-panel.png"
-						alt="Smart Home Fundamentals"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">Fundamentals</div>
-						<div class="orbit-card-desc">
-							Smart home basics guide
-						</div>
-					</div>
-				</a>
-
-				<a
-					href="/home-projects/beautiful-childproof-doorknob/"
-					class="orbit-card"
-				>
-					<img
-						src="/images/doorknob/doorknob-alt-angle-1.jpg"
-						alt="Doorknob Detail"
-						loading="lazy"
-					/>
-					<div class="orbit-card-body">
-						<div class="orbit-card-title">3D Printed Parts</div>
-						<div class="orbit-card-desc">
-							Download &amp; print today
-						</div>
-					</div>
-				</a>
-
-				<!-- Center content -->
 				<img
 					class="hero-logo logo-for-dark"
 					src={logoLight.src}
@@ -743,6 +599,9 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				</div>
 			</section>
 
+			<!-- Project cards — randomized on each visit -->
+			<section class="project-cards" id="project-cards"></section>
+
 			<!-- Stats -->
 			<section class="stats">
 				<div class="stat">
@@ -767,126 +626,54 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			<section class="categories">
 				<a href="/smart-home-projects/smart-candlet/" class="cat-card">
 					<div class="cat-icon">
-						<svg
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path
-								d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"
-							></path>
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+							<path d="M9 16.5a4 4 0 0 1 6 0"></path>
+							<path d="M7.5 13.5a7 7 0 0 1 9 0"></path>
+							<circle cx="12" cy="19" r="0.5"></circle>
 						</svg>
 					</div>
 					<h3>Smart Home</h3>
-					<p>
-						Connected devices powered by ESPHome and Home Assistant.
-						Irrigation controllers, smart candles, and more.
-					</p>
-					<span class="cat-link"
-						>Explore
-						<svg
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-						>
-							<line x1="5" y1="12" x2="19" y2="12"></line>
-							<polyline points="12 5 19 12 12 19"></polyline>
-						</svg>
-					</span>
+					<p>Connected devices powered by ESPHome and Home Assistant.</p>
+					<span class="cat-link">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
 				</a>
 
-				<a
-					href="/home-projects/beautiful-childproof-doorknob/"
-					class="cat-card"
-				>
+				<a href="/home-projects/beautiful-childproof-doorknob/" class="cat-card">
 					<div class="cat-icon">
-						<svg
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path
-								d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-							></path>
-							<polyline points="9 22 9 12 15 12 15 22"
-							></polyline>
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
 						</svg>
 					</div>
-					<h3>Home Projects</h3>
-					<p>
-						3D prints, mods, and practical builds for around the
-						house. Doorknobs, tablet mounts, and cupholders.
-					</p>
-					<span class="cat-link"
-						>Explore
-						<svg
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-						>
-							<line x1="5" y1="12" x2="19" y2="12"></line>
-							<polyline points="12 5 19 12 12 19"></polyline>
-						</svg>
-					</span>
+					<h3>Maker</h3>
+					<p>3D prints, mods, and practical builds for around the house.</p>
+					<span class="cat-link">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
 				</a>
 
-				<a
-					href="/lab-projects/cellcube-bioreactor-controller/"
-					class="cat-card"
-				>
+				<a href="/lab-projects/cellcube-bioreactor-controller/" class="cat-card">
 					<div class="cat-icon">
-						<svg
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path
-								d="M9 3h6v6l3 9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2l3-9V3z"
-							></path>
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M9 3h6v6l3 9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2l3-9V3z"></path>
 							<line x1="8" y1="3" x2="16" y2="3"></line>
 							<path d="M10 15h4"></path>
 						</svg>
 					</div>
-					<h3>Lab Projects</h3>
-					<p>
-						Biotech lab automation and 3D-printed accessories.
-						Bioreactor controllers, dosing pumps, and tube racks.
-					</p>
-					<span class="cat-link"
-						>Explore
-						<svg
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-						>
-							<line x1="5" y1="12" x2="19" y2="12"></line>
-							<polyline points="12 5 19 12 12 19"></polyline>
+					<h3>Lab</h3>
+					<p>Biotech lab automation and 3D-printed accessories.</p>
+					<span class="cat-link">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+				</a>
+
+				<a href="/bruh-claude/" class="cat-card">
+					<div class="cat-icon">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="3" width="7" height="7" rx="1"></rect>
+							<rect x="14" y="3" width="7" height="7" rx="1"></rect>
+							<rect x="3" y="14" width="7" height="7" rx="1"></rect>
+							<rect x="14" y="14" width="7" height="7" rx="1"></rect>
 						</svg>
-					</span>
+					</div>
+					<h3>Apps</h3>
+					<p>Software projects — BRUH Claude, and more coming soon.</p>
+					<span class="cat-link">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
 				</a>
 			</section>
 		</main>
@@ -899,6 +686,52 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				rel="noopener">GitHub</a
 			>
 		</footer>
+
+		<script is:inline>
+			// Randomize project cards on each page load
+			(function () {
+				var allProjects = [
+					{ href: '/smart-home-projects/smart-candlet/', img: '/images/candlet/smart-candlet-concept.png', title: 'Smart Candle', desc: 'Arc-ignition smart candle' },
+					{ href: '/home-projects/beautiful-childproof-doorknob/', img: '/images/doorknob/doorknob-childproof-concept-v2.png', title: 'Childproof Doorknob', desc: '3D printed cover' },
+					{ href: '/home-projects/tablet-wall-mount/', img: '/images/tablet-wall-mount/tablet-mount-install.png', title: 'Tablet Wall Mount', desc: 'Flush keystone mount' },
+					{ href: '/smart-home-projects/irrigation-system/', img: '/images/smart-home/laser-turret-concept.png', title: 'Irrigation System', desc: '1500ft automated irrigation' },
+					{ href: '/smart-home-fundamentals/', img: '/images/smart-home/crestron-control-panel.png', title: 'Smart Home Fundamentals', desc: 'Core principles' },
+					{ href: '/home-projects/beautiful-childproof-doorknob/', img: '/images/doorknob/doorknob-alt-angle-1.jpg', title: 'Doorknob Detail', desc: 'Barely visible cover' },
+					{ href: '/home-projects/tablet-wall-mount/', img: '/images/tablet-wall-mount/tablet-mount-side-profile.png', title: 'Tablet Side Profile', desc: 'Flush wall integration' },
+					{ href: '/home-projects/beautiful-childproof-doorknob/', img: '/images/doorknob/doorknob-childproof-concept.png', title: '3D Printed Parts', desc: 'Download and print' },
+					{ href: '/lab-projects/cellcube-bioreactor-controller/', img: '/images/peltier-bottle-warmer-prototype.jpg', title: 'Lab Automation', desc: 'Bioreactor controller' },
+					{ href: '/bruh-claude/', img: '/images/bruh-claude/architecture-overview.svg', title: 'BRUH Claude', desc: 'AI for Home Assistant' },
+					{ href: '/smart-home-projects/smart-candlet/', img: '/images/smart-home/smart-home-fundamentals-banner.png', title: 'Connected Home', desc: 'ESPHome + Home Assistant' },
+					{ href: '/home-projects/3d-prints/couch-cupholder/', img: '/images/doorknob/doorknob-alt-angle-5.jpg', title: 'Maker Builds', desc: 'Practical 3D prints' },
+				];
+
+				// Fisher-Yates shuffle
+				for (var i = allProjects.length - 1; i > 0; i--) {
+					var j = Math.floor(Math.random() * (i + 1));
+					var tmp = allProjects[i];
+					allProjects[i] = allProjects[j];
+					allProjects[j] = tmp;
+				}
+
+				var container = document.getElementById('project-cards');
+				if (!container) return;
+
+				var count = 6;
+				for (var k = 0; k < count && k < allProjects.length; k++) {
+					var p = allProjects[k];
+					var card = document.createElement('a');
+					card.href = p.href;
+					card.className = 'project-card';
+					card.innerHTML =
+						'<img src="' + p.img + '" alt="' + p.title + '" loading="lazy" />' +
+						'<div class="project-card-body">' +
+						'<div class="project-card-title">' + p.title + '</div>' +
+						'<div class="project-card-desc">' + p.desc + '</div>' +
+						'</div>';
+					container.appendChild(card);
+				}
+			})();
+		</script>
 
 		<script is:inline>
 			// Theme toggle logic for the landing page
