@@ -9,7 +9,8 @@ description: Install BRUH Claude Terminal, restart HA once, sign in, and ask Cla
 
 - **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor)
 - An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option since Claude Code authenticates via OAuth and uses your subscription. An API key works too if you'd rather pay per token.
-- An **amd64** or **aarch64** device
+- A **modern 64-bit HA host** (any Pi 4/5, x86 NUC, or generic 64-bit server). Older 32-bit ARM boards (Pi 3 and earlier) aren't supported.
+- ~**1 GB of free RAM** beyond what HA itself uses.
 
 ## 1. Add the repository
 

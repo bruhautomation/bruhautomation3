@@ -8,8 +8,8 @@ Five minutes from zero to a running Minecraft server.
 ## Prerequisites
 
 - **Home Assistant OS** or **Supervised**
-- **amd64** or **aarch64** host
-- ~**2 GB RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
+- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java 21 is required, which doesn't run on older 32-bit ARM hardware.
+- ~**2 GB free RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
 
 ## 1. Add the repository
 
