@@ -166,6 +166,34 @@ Each profile is a full server root at `/config/minecraft-worlds/<name>/` with it
 **Per-profile:** world files, `server.properties`, plugins folder, ops/whitelist/bans, backup history.
 **Shared across profiles:** all add-on options (difficulty, gamemode, memory_mb, motd, the `plugins:` URL list), RCON password.
 
+## Offline mode
+
+Since 1.3.0, the server starts even when the HA host has no internet — provided it's been online at least once to cache the jars.
+
+**How it's detected:** at boot, the add-on hits `https://api.papermc.io/v2/` with a 5-second timeout. Reachable = online; otherwise the add-on logs a banner and runs in offline mode for the rest of the session.
+
+**What gets skipped when offline:**
+
+- Server-jar resolution / re-download — the existing `server.jar` is reused as-is.
+- Plugin URL fetches in the `plugins:` list — whatever's already in `plugins/` keeps loading.
+- Geyser / Floodgate auto-updates — cached jars are reused.
+
+**What still happens offline:**
+
+- `server.properties` is re-rendered from add-on options.
+- Geyser config (auth-type, MTU, MOTD) is patched on every boot — those edits don't need network.
+- `initial_ops`, world / backup / panel / RCON, all HA integration plumbing — fully functional.
+
+**First-ever boot still needs internet** (there's nothing cached to fall back to). The add-on will log a clear actionable error if you try to start offline with no cached jar:
+
+```
+[download-server] ERROR: offline mode and no cached server.jar exists
+[download-server]   Connect to the internet once so the initial jar can be downloaded;
+[download-server]   subsequent boots will continue to work offline.
+```
+
+There's no config option for this — the behaviour kicks in automatically based on network reachability.
+
 ## Panel tabs
 
 | Tab | What it does |
