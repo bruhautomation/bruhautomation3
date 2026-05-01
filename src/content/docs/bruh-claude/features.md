@@ -43,6 +43,32 @@ tmux attach -t debug             # Reattach to a session
 
 This is useful for running long background tasks while keeping your main terminal free.
 
+### Using the Terminal on iOS / Android
+
+The web terminal auto-detects touch devices and shows an on-screen toolbar above the software keyboard with the keys iOS doesn't give you out of the box.
+
+| Key | Sends | Notes |
+|-----|-------|-------|
+| `ESC` | `␛` | Claude Code's interrupt / close-menu key. Highlighted in orange. |
+| `Tab` | `\t` | Tab-complete in the shell; navigate Claude Code menus. |
+| `Ctrl` | (sticky) | Tap once to arm, then tap any letter to send the control code. Tap `Ctrl` again to cancel. |
+| `↑ ↓ ← →` | arrow keys | Shell history / cursor movement. |
+| <code>&#124;</code> `/` `~` `-` | literal | Characters iOS hides two taps deep. |
+| `^C` | `Ctrl-C` | One-tap interrupt. |
+| `Paste` | clipboard | Pastes via the Web Clipboard API (iOS will ask for permission the first time). |
+| `×` | hide toolbar | Reconnect to the session to bring it back. |
+
+**Tips:**
+
+- **Add to Home Screen** on iOS gives a full-screen launcher without Safari's browser chrome. The toolbar sits right above the home-indicator safe area.
+- **Bluetooth keyboard:** all real keys work — ESC, Ctrl, Option, arrows. Tap `×` to hide the on-screen toolbar if you don't need it.
+- **Disable the feature:** flip `enable_mobile_ui` to `false` in the add-on config to fall back to ttyd's stock UI.
+
+**Voice dictation:** iOS voice dictation used to duplicate words in the terminal. The mobile UI now turns off autocorrect/autocapitalize/spellcheck on xterm's hidden textarea and swallows the extra `input` event iOS fires after `compositionend`. If you still see doubled words:
+
+1. **Settings → Accessibility → Voice Control** — make sure it's **off**. Voice Control + keyboard Dictation together causes iOS itself to submit speech twice.
+2. **Settings → General → Keyboard** — turn off **Auto-Correction**, **Check Spelling**, and **Predictive**.
+
 ## Native HA API Access (MCP Server)
 
 The built-in MCP (Model Context Protocol) server is what makes BRUH Claude fundamentally different from running Claude Code on a regular machine. It provides Claude with 14 purpose-built tools that connect directly to the Home Assistant Supervisor API.

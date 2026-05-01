@@ -143,6 +143,7 @@ export default defineConfig({
 								{ label: 'CLI Tools', slug: 'bruh-claude/cli-tools' },
 								{ label: 'Integrations', slug: 'bruh-claude/integrations' },
 								{ label: 'Architecture', slug: 'bruh-claude/architecture' },
+								{ label: 'Troubleshooting', slug: 'bruh-claude/troubleshooting' },
 							],
 						},
 						{
