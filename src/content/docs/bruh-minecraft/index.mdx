@@ -1,71 +1,76 @@
 ---
 title: BRUH Minecraft Server
-description: A rock-solid Minecraft Java Edition server add-on for Home Assistant — with a full ingress panel, Bedrock cross-play, git-versioned worlds, RCON, and deep HA integration.
+description: A Minecraft server that lives inside Home Assistant. Bedrock cross-play, git-versioned worlds, RCON, plugins, and a full panel — zero VPS required.
 template: splash
 hero:
-  tagline: Run Paper, Purpur, Folia, Vanilla, Fabric, or Forge inside Home Assistant. Cross-play with Bedrock. Manage everything from a panel in the HA sidebar.
+  tagline: A production Minecraft server running inside Home Assistant — with Bedrock cross-play, world version control, and a panel in your sidebar.
+  image:
+    file: ../../../assets/bruh-logo-dark.svg
   actions:
-    - text: Get Started
-      link: /bruh-minecraft/installation/
+    - text: Quick Start
+      link: /bruh-minecraft/quickstart/
       icon: right-arrow
-    - text: View on GitHub
+    - text: Configuration Reference
+      link: /bruh-minecraft/reference/
+      icon: open-book
+      variant: minimal
+    - text: GitHub
       link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bruh-minecraft-server
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## What is BRUH Minecraft Server?
+## What it is
 
-BRUH Minecraft Server is a Home Assistant add-on that runs a production-grade Minecraft server inside your HA installation — with a full management panel, automatic world backups, RCON, plugin management, Bedrock cross-play, and a first-class HA integration that exposes your server as sensors, buttons, and services.
+A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper, Purpur, Folia, Vanilla, Fabric, or Forge — with a management panel in your HA sidebar. No VPS. No proxy jars. No Microsoft account required when you don't want one.
 
-No separate VPS. No proxy jars. No Microsoft account required (when you don't want it). It just works on the box you already trust to run your house.
+![BRUH Minecraft management panel](/images/bruh-minecraft/panel-dashboard.png)
+
+## What you get
 
 <CardGrid>
-  <Card title="Any Server, Any Version" icon="rocket">
-    Paper, Purpur, Folia, Vanilla, Fabric, or Forge. Pin a version or track `LATEST` / `SNAPSHOT` — the add-on resolves and caches the right jar on every boot.
+  <Card title="Bedrock cross-play" icon="phone">
+    iOS, Android, Switch, Xbox, PS, Win10/11. Auto-installs Geyser + Floodgate. LAN auto-discovery in the **Friends** tab.
   </Card>
-  <Card title="Bedrock Cross-Play" icon="phone">
-    iOS, Android, Switch, Xbox, PS, and Win10/11 join on UDP:19132 via auto-installed Geyser + Floodgate. LAN auto-discovery in the **Friends** tab.
+  <Card title="No-Xbox family mode" icon="approve-check">
+    Flip `online_mode: false` and the addon silently fixes everything downstream. Kids without Microsoft accounts join in seconds.
   </Card>
-  <Card title="Ingress Management Panel" icon="setting">
-    Live console, players, server properties, plugins, backups, and multi-world switcher — all inside the HA sidebar. Mobile-responsive.
+  <Card title="Any flavour, any version" icon="rocket">
+    Paper, Purpur, Folia, Vanilla, Fabric, Forge. `LATEST`, `SNAPSHOT`, or pinned. Cached so restarts are instant.
   </Card>
-  <Card title="Git-Versioned Worlds" icon="document">
-    Every world snapshot committed to a git repo. Restore any previous state with one click. Or use tar.gz archive backups if you prefer.
+  <Card title="Git-versioned worlds" icon="document">
+    Snapshots on a schedule, one-click restore, full history. Or tar.gz archives if you prefer.
   </Card>
-  <Card title="No-Xbox Family Mode" icon="approve-check">
-    Flip `online_mode: false` and the add-on silently fixes every downstream setting so Java *and* Bedrock kids can join without an Xbox sign-in.
+  <Card title="Multi-world profiles" icon="random">
+    Switch between a creative sandbox and a hard survival world with one click. Each profile has its own world, plugins, and ops list.
   </Card>
-  <Card title="Deep HA Integration" icon="puzzle">
-    12 sensors, 2 binary sensors, 4 buttons, 13 services, plus a `notify.bruh_minecraft_broadcast` platform — auto-discovered on first boot.
+  <Card title="Deep HA integration" icon="puzzle">
+    12 sensors, 4 buttons, 13 services. Auto-stop when idle. Backup before risky commands. Notify in-game from any automation.
   </Card>
 </CardGrid>
 
-## How It Works
+## The panel
 
-The add-on bundles five things into one container:
+A tab for everything you'd want to do without SSHing in:
 
-- **Java 21 JVM** with Aikar G1GC tuning, configurable memory, and rate-limited crash auto-restart.
-- **Server jar manager** that downloads the right Paper / Purpur / Folia / Vanilla / Fabric / Forge build and caches it under `/data/server-cache/`.
-- **Ingress panel** (Python + SSE) for live monitoring and admin actions.
-- **RCON client** for in-game commands (loopback-only, auto-generated 32-char password).
-- **Bridge to Home Assistant** — a file-based IPC layer at `/config/.bruh_minecraft/` plus an auto-deployed custom integration.
+![Panel tabs](/images/bruh-minecraft/panel-tabs.png)
 
-## Quick Example
+- **Dashboard** — status, uptime, memory, TPS, online players
+- **Console** — live colour-coded log + RCON command bar
+- **Players** — op, kick, ban, whitelist with one click
+- **Server Properties** — live editor with RCON apply
+- **Plugins** — install by URL, delete, list
+- **Backups** — git snapshots and archives, one-click restore
+- **Worlds** — switch between profiles
+
+## A taste
 
 ```yaml
-# Nightly backup at 4 AM
+# Auto-stop when nobody's playing for 30 minutes
 automation:
-  - alias: Minecraft - nightly backup
-    trigger: { platform: time, at: "04:00:00" }
-    action:
-      service: bruh_minecraft.backup_now
-
-# Auto-stop when nobody's playing
-automation:
-  - alias: Minecraft - auto-stop on idle
+  - alias: Minecraft - auto-stop when idle
     trigger:
       platform: numeric_state
       entity_id: sensor.bruh_minecraft_players_online
@@ -73,17 +78,21 @@ automation:
       for: "00:30:00"
     action:
       service: bruh_minecraft.stop_server
+
+# Snapshot before any risky world edit
+script:
+  safe_fill:
+    sequence:
+      - service: bruh_minecraft.backup_now
+      - service: bruh_minecraft.rcon_command
+        data: { command: "fill ~-10 ~ ~-10 ~10 ~ ~10 minecraft:stone" }
 ```
 
-Or just say *"tell everyone dinner is ready"* through Assist and it'll hit `bruh_minecraft.say` for you (when you have [BRUH Claude](/bruh-claude/) installed).
+## Up and running
 
-## Explore the Docs
+1. Add the **BRUH HA Apps** repository in HA.
+2. Install **BRUH Minecraft Server**.
+3. Set `eula: true` in the **Configuration** tab.
+4. Click **Start** and connect on Java `:25565` or Bedrock `:19132`.
 
-<CardGrid>
-  <LinkCard title="Installation" description="Add the repo, install, accept the EULA, and connect your first player in under 5 minutes." href="/bruh-minecraft/installation/" />
-  <LinkCard title="Features & Usage" description="Cross-play, multi-world profiles, OPs and cheats, plugins, backups, mobile UX, and offline mode." href="/bruh-minecraft/features/" />
-  <LinkCard title="Configuration" description="Every option explained — gameplay, JVM, RCON, backups, Bedrock, plugins. Includes recommended presets." href="/bruh-minecraft/configuration/" />
-  <LinkCard title="Management Panel" description="A guided tour of the dashboard, console, players, server-properties, plugins, backups, and worlds tabs." href="/bruh-minecraft/panel/" />
-  <LinkCard title="HA Integration" description="Sensors, services, automation recipes, and the IPC bridge that powers them." href="/bruh-minecraft/integrations/" />
-  <LinkCard title="Troubleshooting" description="iOS Bedrock hangs, plugin install failures, OOM crashes, port conflicts, and other common issues." href="/bruh-minecraft/troubleshooting/" />
-</CardGrid>
+[Full Quick Start →](/bruh-minecraft/quickstart/)
