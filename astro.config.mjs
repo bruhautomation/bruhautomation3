@@ -145,6 +145,18 @@ export default defineConfig({
 								{ label: 'Architecture', slug: 'bruh-claude/architecture' },
 							],
 						},
+						{
+							label: 'BRUH Minecraft Server',
+							items: [
+								{ label: 'Overview', slug: 'bruh-minecraft' },
+								{ label: 'Installation', slug: 'bruh-minecraft/installation' },
+								{ label: 'Features & Usage', slug: 'bruh-minecraft/features' },
+								{ label: 'Configuration', slug: 'bruh-minecraft/configuration' },
+								{ label: 'Management Panel', slug: 'bruh-minecraft/panel' },
+								{ label: 'HA Integration', slug: 'bruh-minecraft/integrations' },
+								{ label: 'Troubleshooting', slug: 'bruh-minecraft/troubleshooting' },
+							],
+						},
 					],
 				},
 				{
