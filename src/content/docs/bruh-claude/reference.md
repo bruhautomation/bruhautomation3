@@ -1,6 +1,6 @@
 ---
 title: Reference
-description: Every BRUH Claude configuration option, service, sensor, CLI tool, and MCP capability — in one place.
+description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Claude Terminal add-on — in one place.
 ---
 
 Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Claude Terminal → Configuration**.

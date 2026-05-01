@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Install BRUH Claude, restart HA once, log in, and ask Claude something about your house.
+description: Install BRUH Claude Terminal, restart HA once, sign in, and ask Claude something about your house.
 ---
 
 5 minutes from zero to a working AI assistant in your Home Assistant.
@@ -8,7 +8,7 @@ description: Install BRUH Claude, restart HA once, log in, and ask Claude someth
 ## Prerequisites
 
 - **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor)
-- An **Anthropic account** (Claude Code uses OAuth)
+- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option since Claude Code authenticates via OAuth and uses your subscription. An API key works too if you'd rather pay per token.
 - An **amd64** or **aarch64** device
 
 ## 1. Add the repository
@@ -37,9 +37,15 @@ You'll see a persistent notification when a restart is needed (after this first 
 
 After the restart, HA will discover the integration automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, token usage sensors, and the `bruh_claude.send_prompt` / `bruh_claude.run_task` services.
 
-## 5. Authenticate with Anthropic
+## 5. Sign in with Anthropic
 
-Open the **BRUH Claude** entry in the HA sidebar and complete the OAuth login in the terminal. Credentials are stored in the add-on's persistent volume — they survive restarts.
+Open the **BRUH Claude** entry in the HA sidebar and complete the OAuth login in the terminal.
+
+:::tip[Use your Claude subscription]
+Claude Code authenticates via OAuth, so a **Claude Pro** or **Max** subscription covers your usage — no per-token API billing for everyday use. You can also sign in with an API key if you prefer.
+:::
+
+Credentials are stored in the add-on's persistent volume — they survive restarts.
 
 ## Try it
 
