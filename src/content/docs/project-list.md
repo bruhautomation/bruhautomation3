@@ -34,3 +34,4 @@ description: Complete project directory
 ## Apps
 
 - [BRUH Claude](/bruh-claude/) — AI-powered Home Assistant add-on with Claude Code, native API access, and voice integration
+- [BRUH Minecraft Server](/bruh-minecraft/) — Minecraft Java Edition server with Bedrock cross-play, ingress panel, git-versioned worlds, and deep HA integration
