@@ -3,7 +3,7 @@ title: BRUH Claude
 description: Claude Code, native to Home Assistant. Ask, automate, and debug your smart home in plain English.
 template: splash
 hero:
-  tagline: An AI that lives inside your Home Assistant — debugging automations, controlling devices, and answering questions about your house in plain English.
+  tagline: Claude Code, living inside your Home Assistant. Voice assistant, automation engine, debugger, and config backup — all in one add-on.
   image:
     file: ../../../assets/bruh-logo-dark.svg
   actions:
@@ -24,30 +24,24 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## What it is
 
-A Home Assistant add-on that runs **Claude Code** inside HA, with built-in access to your entities, services, automations, and logs. Open a terminal in your sidebar, ask a question, and Claude actually knows your setup.
+A Home Assistant add-on that runs **Claude Code** inside HA — with native access to your entities, services, automations, traces, and logs. Open a terminal in your sidebar, ask a question, and Claude actually knows your setup.
 
 ![BRUH Claude terminal session](/images/bruh-claude/terminal-hero.png)
 
 ## What you can do
 
 <CardGrid>
-  <Card title="Ask anything about your house" icon="comment-alt">
-    *"Which automations haven't run in 30 days?"* *"Why didn't the morning routine fire today?"* — Claude queries live state, traces, and logs to give a real answer.
+  <Card title="Voice + text assistant" icon="comment-alt">
+    Pick **BRUH Claude** as your conversation agent in **Settings → Voice Assistants**. Ask via the HA app, a smart speaker, or a wall tablet — voice or text. Claude responds with real data, not canned phrases.
   </Card>
-  <Card title="Control devices in plain English" icon="rocket">
-    *"Turn off all the downstairs lights."* *"Set the bedroom to 68°."* Works as an Assist conversation agent for voice and text.
+  <Card title="Trigger Claude from automations" icon="rocket">
+    The `bruh_claude.run_task` service runs Claude in the background with an optional notification when done. Morning briefings, error-log digests, config audits — all hands-free.
   </Card>
-  <Card title="Debug automations" icon="error">
-    Claude reads automation traces, cross-references entity state, and tells you exactly why something fired — or didn't.
+  <Card title="Debug your automations" icon="error">
+    Claude reads automation traces, cross-references entity state, and tells you *exactly* why something fired — or didn't. No more grepping `home-assistant.log`.
   </Card>
-  <Card title="Run tasks on a schedule" icon="setting">
-    Trigger Claude from any HA automation. Morning briefings, error log digests, config audits — all hands-free.
-  </Card>
-  <Card title="Auto-versioned config" icon="document">
-    Git-based snapshots of `/config` every 30 minutes. One-click restore on any file.
-  </Card>
-  <Card title="Token usage in HA" icon="approve-check">
-    Real Anthropic API token counts as HA sensors. Build dashboards. Set alerts.
+  <Card title="Just… ask anything" icon="information">
+    *"Which automations haven't run in 30 days?"* *"What's my biggest energy draw right now?"* *"Render this template."* Live state, real answers.
   </Card>
 </CardGrid>
 
@@ -75,6 +69,45 @@ Found 4:
 
 Want me to disable the unused ones?
 ```
+
+## Built for Home Assistant
+
+What makes BRUH Claude fundamentally different from running Claude Code on a regular machine:
+
+<CardGrid>
+  <Card title="Live HA awareness (MCP server)" icon="puzzle">
+    A built-in MCP server gives Claude **14 purpose-built tools** — entity states, service calls, automation traces, templates, logs, config reload. No manual API setup.
+  </Card>
+  <Card title="Auto-generated context" icon="information">
+    On every boot, BRUH Claude regenerates `/config/CLAUDE.md` — a snapshot of your entities by domain, automation list with last-triggered times, installed integrations, and your file tree. Claude reads it at the start of every session.
+  </Card>
+  <Card title="Token usage as HA sensors" icon="approve-check">
+    Real values from the Anthropic API — not estimates. 7 sensors (session, today, weekly, all-time, weekly session count) with reset timestamps. Build dashboards, set budget alerts.
+  </Card>
+  <Card title="Git-based config backup" icon="document">
+    Auto-commit `/config` every 30 minutes (configurable). `ha-backup` for manual snapshots. Single-file restore from any commit. Sensible `.gitignore` excludes secrets.
+  </Card>
+  <Card title="CLI shortcuts" icon="seti:powershell">
+    `ha-reload automations`, `ha-log core -f`, `ha-backup history`, `ha-context-gen`, `persist-install pip pandas` — the operations you'd otherwise SSH for, in your sidebar.
+  </Card>
+  <Card title="Persistent environment" icon="seti:python">
+    APK and pip packages survive container rebuilds. Configure via add-on options or `persist-install` — your tools are always there.
+  </Card>
+</CardGrid>
+
+## Token usage sensors
+
+Track real API spend in HA without scraping a dashboard.
+
+| Sensor | What it tracks |
+|--------|----------------|
+| `sensor.bruh_claude_session_total_tokens` | Current Claude session |
+| `sensor.bruh_claude_today_total_tokens` | Today (resets at midnight) |
+| `sensor.bruh_claude_weekly_total_tokens` | This week (Mon–Sun) |
+| `sensor.bruh_claude_weekly_sessions` | Distinct sessions this week |
+| `sensor.bruh_claude_all_time_total_tokens` | Lifetime |
+
+Plus session input/output split sensors and reset-time attributes. Updated every 30 seconds.
 
 ## Up and running in 5 minutes
 
