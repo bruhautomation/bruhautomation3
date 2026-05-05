@@ -97,10 +97,11 @@ Tick a checkbox in the **Configuration** tab and the add-on resolves the latest 
 | `install_worldguard` | WorldGuard | Region protection |
 | `install_coreprotect` | CoreProtect | Anti-grief logging + rollback |
 | `install_multiverse_core` | Multiverse-Core | Multi-world support |
-| `install_dynmap` | Dynmap | Web-based 2D live map |
-| `install_bluemap` | BlueMap | 3D web live map (alternative to Dynmap) |
+| `install_griefprevention` | GriefPrevention | Golden-shovel claim protection |
+| `install_mcmmo` | mcMMO | RPG-style skills (Mining/Woodcutting/Swords) |
+| `install_chestsort` | ChestSort | Left-click outside chest = instantly sorted |
+| `install_veinminer` | VeinMiner | Break one ore → whole vein breaks |
 | `install_spark` | Spark | Server profiler |
-| `install_simple_voice_chat` | Simple Voice Chat | Proximity in-game voice (port `24454/udp` already exposed) |
 
 Toggling a checkbox **off** does NOT remove the jar — delete it from the panel's **Plugins** tab to remove.
 
