@@ -82,6 +82,32 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 
 ### Plugins
 
+Two ways to install plugins, mix and match freely.
+
+#### One-click popular plugins (1.4.0+)
+
+Tick a checkbox in the **Configuration** tab and the add-on resolves the latest Paper-compatible jar via the [Modrinth](https://modrinth.com) API on every boot. Bukkit-API only — Paper / Purpur / Folia.
+
+| Checkbox | Plugin | What it does |
+|----------|--------|--------------|
+| `install_essentialsx` | EssentialsX | Homes, warps, kits, `/tpa`, `/repair`, basics |
+| `install_essentialsx_chat` | EssentialsXChat | Chat formatting (companion to EssentialsX) |
+| `install_luckperms` | LuckPerms | Modern permissions plugin |
+| `install_worldedit` | WorldEdit | In-game block editing |
+| `install_worldguard` | WorldGuard | Region protection |
+| `install_coreprotect` | CoreProtect | Anti-grief logging + rollback |
+| `install_multiverse_core` | Multiverse-Core | Multi-world support |
+| `install_dynmap` | Dynmap | Web-based 2D live map |
+| `install_bluemap` | BlueMap | 3D web live map (alternative to Dynmap) |
+| `install_spark` | Spark | Server profiler |
+| `install_simple_voice_chat` | Simple Voice Chat | Proximity in-game voice (port `24454/udp` already exposed) |
+
+Toggling a checkbox **off** does NOT remove the jar — delete it from the panel's **Plugins** tab to remove.
+
+#### Custom URL list
+
+For anything not in the curated set:
+
 ```yaml
 plugins:
   - url: https://example.com/Essentials.jar
@@ -94,6 +120,15 @@ Loaded for `paper` / `purpur` / `folia`. Bad URLs are skipped with a warning, ne
 :::tip
 GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is named *exactly* `X.jar`. Versioned filenames like `NickNamer-5.15.0.jar` need a pinned URL.
 :::
+
+#### Where to browse for more plugins
+
+| Marketplace | Notes |
+|-------------|-------|
+| [Modrinth](https://modrinth.com/plugins) | The cleanest source for direct download URLs. Used by the one-click checkboxes. |
+| [Hangar](https://hangar.papermc.io) | PaperMC's official marketplace. ViaVersion, ViaBackwards, ViaRewind, ProtocolLib, PlaceholderAPI live here. |
+| [SpigotMC](https://www.spigotmc.org/resources/categories/spigot.4/) | The original Bukkit-plugin marketplace. Some plugins are still SpigotMC-only. |
+| [BukkitDev](https://dev.bukkit.org/bukkit-plugins) | Older but still hosts a few classics. |
 
 ### Other
 
