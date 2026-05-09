@@ -3,13 +3,19 @@ import {
   CATEGORIES,
   COMMANDS,
   UNLOCK_PRESETS,
-  COMMON_BLOCKS,
-  COMMON_ITEMS,
-  COMMON_ENTITIES,
-  COMMON_EFFECTS,
-  COMMON_ENCHANTS,
   GAMERULES,
 } from '../../data/minecraft-commands';
+import {
+  BLOCKS,
+  ITEMS,
+  ENTITIES,
+  EFFECTS,
+  ENCHANTS,
+  BLOCK_CATEGORIES,
+  ITEM_CATEGORIES,
+  ENTITY_CATEGORIES,
+  CHAT_COLORS,
+} from '../../data/minecraft-registry';
 import logoLight from '../../assets/bruh-logo-light.svg';
 import logoDark from '../../assets/bruh-logo-dark.svg';
 
@@ -17,16 +23,21 @@ const dataPayload = JSON.stringify({
   CATEGORIES,
   COMMANDS,
   UNLOCK_PRESETS,
-  COMMON_BLOCKS,
-  COMMON_ITEMS,
-  COMMON_ENTITIES,
-  COMMON_EFFECTS,
-  COMMON_ENCHANTS,
+  BLOCKS,
+  ITEMS,
+  ENTITIES,
+  EFFECTS,
+  ENCHANTS,
+  BLOCK_CATEGORIES,
+  ITEM_CATEGORIES,
+  ENTITY_CATEGORIES,
+  CHAT_COLORS,
   GAMERULES,
 });
 
 const totalCommands = COMMANDS.length;
 const totalCategories = CATEGORIES.length;
+const totalRegistry = BLOCKS.length + ITEMS.length + ENTITIES.length;
 ---
 
 <!doctype html>
@@ -37,14 +48,14 @@ const totalCategories = CATEGORIES.length;
     <title>Minecraft Command Generator — BRUH Automation</title>
     <meta
       name="description"
-      content="Build any Minecraft console command for the BRUH Minecraft Server add-on. Vanilla + EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, and ViaVersion — point, click, copy."
+      content="Build any Minecraft console command for the BRUH Minecraft Server add-on. Vanilla + EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, ViaVersion. Visual block / item / entity picker with the full vanilla 1.20+ registry."
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="BRUH Automation" />
     <meta property="og:title" content="Minecraft Command Generator" />
     <meta
       property="og:description"
-      content="Click-to-build console commands for the BRUH Minecraft add-on. Every supported plugin, every permission, copy to clipboard."
+      content="Click-to-build console commands for the BRUH Minecraft add-on. Visual block/item picker, rich-text builder, multi-block patterns, copy to clipboard."
     />
     <meta property="og:image" content="/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -54,14 +65,8 @@ const totalCategories = CATEGORIES.length;
     <script is:inline>
       (function () {
         var s = localStorage.getItem('starlight-theme');
-        var t =
-          s === 'light'
-            ? 'light'
-            : s === 'dark'
-              ? 'dark'
-              : matchMedia('(prefers-color-scheme: light)').matches
-                ? 'light'
-                : 'dark';
+        var t = s === 'light' ? 'light' : s === 'dark' ? 'dark'
+          : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         document.documentElement.dataset.theme = t;
       })();
     </script>
@@ -70,41 +75,48 @@ const totalCategories = CATEGORIES.length;
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
       :root {
-        --bg: #0b0d14;
-        --bg-elev: #11141d;
-        --bg-card: rgba(255, 255, 255, 0.04);
-        --bg-card-solid: #14161e;
-        --bg-input: rgba(255, 255, 255, 0.05);
-        --bg-input-focus: rgba(30, 144, 255, 0.08);
+        --bg: #0a0c14;
+        --bg-elev: #0f121b;
+        --bg-card: rgba(255, 255, 255, 0.035);
+        --bg-card-hover: rgba(255, 255, 255, 0.06);
+        --bg-card-solid: #14171f;
+        --bg-input: rgba(255, 255, 255, 0.045);
+        --bg-input-focus: rgba(30, 144, 255, 0.1);
         --border: rgba(255, 255, 255, 0.08);
         --border-strong: rgba(255, 255, 255, 0.16);
-        --text: #e4e4e7;
-        --text-muted: #8b8b97;
-        --text-faint: #5a5a66;
+        --border-accent: rgba(30, 144, 255, 0.4);
+        --text: #e8e8eb;
+        --text-muted: #8a8a96;
+        --text-faint: #5e5e69;
         --accent: #1e90ff;
         --accent-2: #00d4ff;
         --accent-glow: rgba(30, 144, 255, 0.18);
+        --accent-glow-strong: rgba(30, 144, 255, 0.32);
         --success: #22c55e;
         --warning: #f59e0b;
         --danger: #ef4444;
-        --code-bg: #0a0c12;
-        --code-border: rgba(30, 144, 255, 0.18);
+        --code-bg: linear-gradient(180deg, #0a0c12 0%, #07090f 100%);
+        --code-border: rgba(30, 144, 255, 0.2);
         --code-text: #e6e9ef;
         --code-cmd: #ffd166;
         --code-arg-required: #ef4444;
         --code-arg-filled: #5eead4;
         --radius: 14px;
+        --radius-lg: 18px;
         --radius-sm: 8px;
         --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        --shadow-glow: 0 0 0 1px var(--border-accent), 0 8px 32px var(--accent-glow);
         --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
       }
 
       [data-theme='light'] {
-        --bg: #fafafa;
+        --bg: #f7f7fa;
         --bg-elev: #ffffff;
         --bg-card: rgba(0, 0, 0, 0.025);
-        --bg-card-solid: #f4f4f5;
+        --bg-card-hover: rgba(0, 0, 0, 0.05);
+        --bg-card-solid: #f1f1f4;
         --bg-input: rgba(0, 0, 0, 0.03);
         --bg-input-focus: rgba(30, 144, 255, 0.08);
         --border: rgba(0, 0, 0, 0.08);
@@ -113,9 +125,11 @@ const totalCategories = CATEGORIES.length;
         --text-muted: #6b6b72;
         --text-faint: #a1a1aa;
         --accent-glow: rgba(30, 144, 255, 0.1);
-        --code-bg: #1a1d27;
+        --accent-glow-strong: rgba(30, 144, 255, 0.18);
+        --code-bg: linear-gradient(180deg, #1a1d27 0%, #14171f 100%);
         --code-text: #e6e9ef;
         --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.18);
       }
 
       html { background: var(--bg); color: var(--text); font-family: var(--font); scroll-behavior: smooth; }
@@ -129,19 +143,29 @@ const totalCategories = CATEGORIES.length;
       ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
       ::-webkit-scrollbar-thumb:hover { background: var(--accent); background-clip: padding-box; border: 2px solid transparent; }
 
+      /* Ambient backdrop gradient */
+      body::before {
+        content: '';
+        position: fixed; inset: 0; z-index: -1;
+        background:
+          radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-glow), transparent 60%),
+          radial-gradient(ellipse 40% 30% at 80% 30%, rgba(0, 212, 255, 0.06), transparent 60%);
+        pointer-events: none;
+      }
+
       /* ── Top nav ── */
       nav {
         position: sticky; top: 0; z-index: 100;
         display: flex; align-items: center; justify-content: space-between;
-        max-width: 1400px; width: 100%; margin: 0 auto;
+        max-width: 1500px; width: 100%; margin: 0 auto;
         padding: 1rem 1.5rem;
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       }
       .nav-left { display: flex; align-items: center; gap: 1rem; }
       .nav-back {
-        display: inline-flex; align-items: center; gap: 0.4rem;
+        display: inline-flex; align-items: center; gap: 0.5rem;
         font-size: 0.9rem; color: var(--text-muted);
-        padding: 0.4rem 0.7rem; border-radius: 9999px;
+        padding: 0.45rem 0.8rem; border-radius: 9999px;
         transition: background 0.15s, color 0.15s;
       }
       .nav-back:hover { color: var(--text); background: var(--bg-card); }
@@ -180,16 +204,9 @@ const totalCategories = CATEGORIES.length;
       /* ── Hero ── */
       .hero {
         position: relative;
-        max-width: 1400px; width: 100%; margin: 0 auto;
-        padding: 2.5rem 1.5rem 1.5rem;
+        max-width: 1500px; width: 100%; margin: 0 auto;
+        padding: 2.5rem 1.5rem 1.75rem;
         text-align: center;
-      }
-      .hero::before {
-        content: '';
-        position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
-        width: min(700px, 100vw); height: 400px;
-        background: radial-gradient(ellipse, var(--accent-glow), transparent 70%);
-        pointer-events: none; z-index: -1;
       }
       .hero-eyebrow {
         display: inline-flex; align-items: center; gap: 0.5rem;
@@ -197,8 +214,10 @@ const totalCategories = CATEGORIES.length;
         background: var(--bg-card); border: 1px solid var(--border);
         font-size: 0.78rem; color: var(--text-muted); font-weight: 500;
         margin-bottom: 1rem;
+        backdrop-filter: blur(8px);
       }
-      .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+      .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2.4s ease-in-out infinite; }
+      @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.9); } }
       .hero h1 {
         font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 700; line-height: 1.1;
         letter-spacing: -0.03em; padding-bottom: 0.1em;
@@ -213,17 +232,18 @@ const totalCategories = CATEGORIES.length;
         display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem;
         margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);
       }
-      .hero-meta strong { color: var(--accent); font-weight: 600; }
+      .hero-meta strong { color: var(--accent); font-weight: 700; }
 
       /* ── Tip card ── */
       .tip {
-        max-width: 1400px; width: 100%; margin: 0 auto 1.5rem;
+        max-width: 1500px; width: 100%; margin: 0 auto 1.5rem;
         padding: 0 1.5rem;
       }
       .tip-inner {
         display: flex; gap: 0.85rem; align-items: flex-start;
         background: var(--bg-card); border: 1px solid var(--border);
         border-radius: var(--radius); padding: 1rem 1.25rem;
+        backdrop-filter: blur(8px);
       }
       .tip-icon {
         flex-shrink: 0; width: 32px; height: 32px;
@@ -240,7 +260,7 @@ const totalCategories = CATEGORIES.length;
 
       /* ── Layout ── */
       .layout {
-        max-width: 1400px; width: 100%; margin: 0 auto;
+        max-width: 1500px; width: 100%; margin: 0 auto;
         padding: 0 1.5rem 4rem;
         display: grid;
         grid-template-columns: 220px 320px 1fr;
@@ -254,6 +274,7 @@ const totalCategories = CATEGORIES.length;
         border-radius: var(--radius); padding: 0.6rem;
         position: sticky; top: 5rem;
         max-height: calc(100vh - 6rem); overflow-y: auto;
+        backdrop-filter: blur(8px);
       }
       .rail-section-label {
         font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
@@ -267,11 +288,10 @@ const totalCategories = CATEGORIES.length;
         font-size: 0.88rem; font-weight: 500; text-align: left;
         transition: background 0.15s, color 0.15s;
       }
-      .cat-btn:hover { background: var(--bg-card); color: var(--text); }
+      .cat-btn:hover { background: var(--bg-card-hover); color: var(--text); }
       .cat-btn[aria-pressed='true'] {
         background: var(--accent-glow); color: var(--accent);
       }
-      .cat-btn[aria-pressed='true'] .cat-btn-count { color: var(--accent); }
       .cat-btn-icon {
         flex-shrink: 0; width: 22px; height: 22px;
         display: flex; align-items: center; justify-content: center;
@@ -283,13 +303,14 @@ const totalCategories = CATEGORIES.length;
         color: var(--text-faint); padding: 0.1em 0.5em;
         border-radius: 9999px; background: var(--bg-card-solid);
       }
-      .cat-btn[aria-pressed='true'] .cat-btn-count { background: rgba(30, 144, 255, 0.2); }
+      .cat-btn[aria-pressed='true'] .cat-btn-count { background: rgba(30, 144, 255, 0.2); color: var(--accent); }
 
       /* ── Command list ── */
       .commands {
         background: var(--bg-card); border: 1px solid var(--border);
         border-radius: var(--radius); display: flex; flex-direction: column;
         overflow: hidden; min-height: 0;
+        backdrop-filter: blur(8px);
       }
       .search-wrap {
         position: relative; padding: 0.85rem;
@@ -318,9 +339,9 @@ const totalCategories = CATEGORIES.length;
         display: block; width: 100%; padding: 0.65rem 0.75rem;
         border: 1px solid transparent; background: transparent;
         border-radius: var(--radius-sm); color: var(--text);
-        text-align: left; transition: background 0.15s, border-color 0.15s, transform 0.1s;
+        text-align: left; transition: background 0.15s, border-color 0.15s;
       }
-      .cmd-item:hover { background: var(--bg-card); }
+      .cmd-item:hover { background: var(--bg-card-hover); }
       .cmd-item[aria-pressed='true'] {
         background: var(--accent-glow); border-color: rgba(30, 144, 255, 0.3);
       }
@@ -345,6 +366,7 @@ const totalCategories = CATEGORIES.length;
         border-radius: var(--radius); padding: 1.5rem;
         display: flex; flex-direction: column; gap: 1.25rem;
         min-height: 0;
+        backdrop-filter: blur(8px);
       }
       .builder-header {
         display: flex; flex-direction: column; gap: 0.4rem;
@@ -372,6 +394,10 @@ const totalCategories = CATEGORIES.length;
         background: var(--bg-card-solid); padding: 0.1em 0.4em;
         border-radius: 4px; border: 1px solid var(--border);
       }
+      .builder-notes {
+        font-size: 0.83rem; color: var(--text-muted); margin-top: 0.5rem;
+        font-style: italic; line-height: 1.5;
+      }
 
       /* ── Args form ── */
       .args { display: flex; flex-direction: column; gap: 0.95rem; }
@@ -385,7 +411,10 @@ const totalCategories = CATEGORIES.length;
         display: flex; align-items: center; gap: 0.5rem;
         font-size: 0.82rem; font-weight: 600; color: var(--text);
       }
-      .arg-required { color: var(--danger); font-weight: 700; }
+      .arg-required {
+        color: var(--danger); font-weight: 700; font-size: 0.7rem;
+        line-height: 1;
+      }
       .arg-type {
         font-family: var(--font-mono); font-size: 0.7rem;
         color: var(--text-faint); padding: 0.1em 0.5em;
@@ -407,8 +436,241 @@ const totalCategories = CATEGORIES.length;
       .arg-hint { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
       .arg-mono { font-family: var(--font-mono); font-size: 0.85rem; }
 
-      /* datalist suggestion select hybrids */
-      .arg-input[list] { background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%, var(--text-muted) 60%, transparent 60%, transparent 70%, var(--text-muted) 70%, var(--text-muted) 80%, transparent 80%); background-position: calc(100% - 12px) center; background-size: 10px 10px; background-repeat: no-repeat; padding-right: 2rem; }
+      /* ── Picker button (replaces datalist for blocks/items/entities/effects/enchants) ── */
+      .picker-btn {
+        display: flex; align-items: center; gap: 0.65rem; width: 100%;
+        padding: 0.55rem 0.7rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        color: var(--text); font-size: 0.9rem; text-align: left;
+        transition: border-color 0.15s, background 0.15s;
+        cursor: pointer;
+      }
+      .picker-btn:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
+      .picker-btn:focus-visible { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+      .picker-swatch {
+        flex-shrink: 0; width: 28px; height: 28px; border-radius: 6px;
+        background: var(--swatch-color, #5e5e69);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.18), inset 0 -1.5px 0 rgba(0, 0, 0, 0.18);
+        position: relative;
+      }
+      .picker-swatch.empty {
+        background: repeating-conic-gradient(var(--bg-card-solid) 0% 25%, transparent 0% 50%);
+        background-size: 12px 12px; box-shadow: inset 0 0 0 1px var(--border);
+      }
+      .picker-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; overflow: hidden; }
+      .picker-label { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .picker-id { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .picker-arrow { flex-shrink: 0; color: var(--text-faint); transition: transform 0.15s, color 0.15s; }
+      .picker-btn:hover .picker-arrow { color: var(--accent); transform: translateX(2px); }
+
+      /* ── Modal picker ── */
+      .modal-overlay {
+        position: fixed; inset: 0; z-index: 200;
+        background: rgba(5, 7, 13, 0.75);
+        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        display: flex; align-items: center; justify-content: center;
+        padding: 1.5rem;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.18s ease;
+      }
+      .modal-overlay.open { opacity: 1; pointer-events: auto; }
+      .modal {
+        position: relative;
+        width: min(900px, 100%); max-height: min(720px, 90vh);
+        background: var(--bg-elev); border: 1px solid var(--border-strong);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+        display: grid; grid-template-rows: auto 1fr;
+        overflow: hidden;
+        transform: translateY(8px) scale(0.985);
+        transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+      .modal-head {
+        display: grid; grid-template-columns: 1fr auto;
+        align-items: center; gap: 1rem;
+        padding: 1.1rem 1.4rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-title-row { display: flex; flex-direction: column; gap: 0.15rem; }
+      .modal-title { font-size: 1.05rem; font-weight: 700; }
+      .modal-sub { font-size: 0.82rem; color: var(--text-muted); }
+      .modal-close {
+        width: 36px; height: 36px; border-radius: 50%;
+        border: none; background: var(--bg-card);
+        color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+      }
+      .modal-close:hover { background: var(--bg-card-hover); color: var(--text); }
+      .modal-close:active { transform: scale(0.94); }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        min-height: 0; overflow: hidden;
+      }
+      .modal-cats {
+        padding: 0.65rem; overflow-y: auto;
+        border-right: 1px solid var(--border);
+        display: flex; flex-direction: column; gap: 0.15rem;
+      }
+      .modal-main {
+        display: flex; flex-direction: column; min-height: 0;
+      }
+      .modal-search-wrap {
+        position: relative; padding: 0.85rem 1rem 0.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-search-wrap svg {
+        position: absolute; left: 1.7rem; top: 50%; transform: translateY(-25%);
+        color: var(--text-faint); pointer-events: none;
+      }
+      .modal-search {
+        width: 100%; padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+        background: var(--bg-input); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); color: var(--text); font-size: 0.92rem;
+      }
+      .modal-search:focus { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+      .modal-grid {
+        flex: 1; overflow-y: auto; padding: 0.6rem;
+        display: grid; gap: 0.4rem;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        align-content: start;
+      }
+      .modal-tile {
+        display: flex; align-items: center; gap: 0.55rem;
+        padding: 0.5rem 0.55rem; border: 1px solid transparent;
+        background: transparent; border-radius: var(--radius-sm);
+        text-align: left; color: var(--text);
+        transition: background 0.12s, border-color 0.12s;
+        cursor: pointer; min-width: 0;
+      }
+      .modal-tile:hover { background: var(--bg-card-hover); border-color: var(--border-strong); }
+      .modal-tile:focus-visible { outline: none; border-color: var(--accent); background: var(--accent-glow); }
+      .modal-tile.selected { background: var(--accent-glow); border-color: var(--border-accent); }
+      .modal-swatch {
+        flex-shrink: 0; width: 32px; height: 32px; border-radius: 6px;
+        background: var(--swatch-color);
+        box-shadow:
+          inset 0 0 0 1px rgba(0, 0, 0, 0.45),
+          inset 0 2px 0 rgba(255, 255, 255, 0.18),
+          inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+      }
+      .modal-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.05rem; }
+      .modal-meta-label { font-size: 0.83rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .modal-meta-id { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .modal-empty {
+        grid-column: 1 / -1; padding: 3rem 1rem; text-align: center;
+        color: var(--text-muted); font-size: 0.9rem;
+      }
+      .modal-foot {
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 1rem; padding: 0.7rem 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.78rem; color: var(--text-muted);
+      }
+      .modal-foot-kbd {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+      }
+      .modal-foot-kbd kbd {
+        font-family: var(--font-mono); font-size: 0.7rem;
+        padding: 0.1em 0.4em; background: var(--bg-card-solid);
+        border: 1px solid var(--border); border-radius: 4px;
+        color: var(--text);
+      }
+
+      /* ── Specialized builder controls ── */
+      .builder-tabs {
+        display: inline-flex; padding: 3px; background: var(--bg-card-solid);
+        border: 1px solid var(--border); border-radius: 9999px;
+        margin-bottom: 0.6rem;
+      }
+      .builder-tab {
+        padding: 0.35rem 0.85rem; border: none; background: transparent;
+        border-radius: 9999px; color: var(--text-muted);
+        font-size: 0.78rem; font-weight: 600; transition: all 0.15s;
+      }
+      .builder-tab:hover { color: var(--text); }
+      .builder-tab[aria-pressed='true'] {
+        background: var(--accent); color: #fff;
+      }
+
+      /* Rich text builder */
+      .rt-segment {
+        display: grid; grid-template-columns: 1fr; gap: 0.5rem;
+        padding: 0.85rem; background: var(--bg-card-solid);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+      }
+      .rt-segment + .rt-segment { margin-top: 0.5rem; }
+      .rt-segment-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+      .rt-segment-text {
+        flex: 1; min-width: 200px;
+        padding: 0.45rem 0.6rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 6px;
+        color: var(--text); font-size: 0.9rem;
+      }
+      .rt-segment-text:focus { outline: none; border-color: var(--accent); }
+      .rt-color-grid {
+        display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.25rem;
+      }
+      .rt-color-btn {
+        width: 100%; aspect-ratio: 1 / 1; border-radius: 6px;
+        border: 2px solid transparent; cursor: pointer;
+        transition: border-color 0.15s, transform 0.1s;
+        position: relative;
+      }
+      .rt-color-btn:hover { transform: scale(1.08); }
+      .rt-color-btn[aria-pressed='true'] {
+        border-color: var(--accent); box-shadow: 0 0 0 2px var(--bg-elev), 0 0 0 4px var(--accent);
+      }
+      .rt-format-row {
+        display: flex; gap: 0.3rem; flex-wrap: wrap;
+      }
+      .rt-format-btn {
+        padding: 0.35rem 0.65rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 6px;
+        color: var(--text-muted); font-size: 0.8rem;
+        font-weight: 600; transition: all 0.12s;
+      }
+      .rt-format-btn:hover { color: var(--text); border-color: var(--border-strong); }
+      .rt-format-btn[aria-pressed='true'] {
+        background: var(--accent-glow); color: var(--accent);
+        border-color: var(--border-accent);
+      }
+      .rt-actions {
+        display: flex; gap: 0.4rem; flex-wrap: wrap;
+      }
+      .rt-add-btn {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.45rem 0.8rem; background: var(--accent-glow);
+        border: 1px dashed var(--border-accent); border-radius: 6px;
+        color: var(--accent); font-size: 0.82rem; font-weight: 600;
+        transition: all 0.12s;
+      }
+      .rt-add-btn:hover { background: var(--accent-glow-strong); }
+      .rt-rm-btn {
+        padding: 0.3rem 0.55rem; background: transparent;
+        border: 1px solid var(--border); border-radius: 6px;
+        color: var(--text-faint); font-size: 0.74rem;
+      }
+      .rt-rm-btn:hover { color: var(--danger); border-color: var(--danger); }
+      .rt-preview {
+        padding: 0.7rem 0.85rem; background: var(--code-bg);
+        border-radius: 6px; font-family: var(--font-mono); font-size: 0.86rem;
+        color: var(--code-text); min-height: 1.8em;
+        word-break: break-word;
+      }
+
+      /* WE pattern builder */
+      .pattern-row {
+        display: grid; grid-template-columns: 1fr 90px 36px;
+        gap: 0.4rem; align-items: center;
+      }
+      .pattern-row + .pattern-row { margin-top: 0.4rem; }
+      .pattern-weight {
+        padding: 0.45rem 0.5rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 6px;
+        color: var(--text); font-size: 0.85rem; text-align: center;
+        font-family: var(--font-mono);
+      }
 
       /* ── Preview ── */
       .preview {
@@ -419,13 +681,36 @@ const totalCategories = CATEGORIES.length;
         font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
         color: var(--text-faint); text-transform: uppercase;
       }
-      .preview-box {
-        position: relative; padding: 1.1rem 3.5rem 1.1rem 1.1rem;
-        background: var(--code-bg); border: 1px solid var(--code-border);
-        border-radius: var(--radius); color: var(--code-text);
-        font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.5;
-        word-break: break-word; white-space: pre-wrap;
+      .preview-window {
+        position: relative;
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: var(--radius);
+        overflow: hidden;
         box-shadow: var(--shadow);
+      }
+      .preview-titlebar {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.55rem 0.85rem;
+        background: rgba(255, 255, 255, 0.025);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .preview-dot {
+        width: 11px; height: 11px; border-radius: 50%;
+      }
+      .preview-dot.r { background: #ff5f56; }
+      .preview-dot.y { background: #ffbd2e; }
+      .preview-dot.g { background: #27c93f; }
+      .preview-titlebar-text {
+        margin-left: auto; font-family: var(--font-mono);
+        font-size: 0.72rem; color: rgba(255, 255, 255, 0.45);
+      }
+      .preview-box {
+        padding: 1.1rem 3.5rem 1.1rem 1.1rem;
+        color: var(--code-text);
+        font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.55;
+        word-break: break-word; white-space: pre-wrap;
+        position: relative;
       }
       .preview-cmd { color: var(--code-cmd); font-weight: 700; }
       .preview-arg-required {
@@ -438,34 +723,16 @@ const totalCategories = CATEGORIES.length;
       .copy-btn {
         position: absolute; top: 0.75rem; right: 0.75rem;
         display: inline-flex; align-items: center; gap: 0.35rem;
-        padding: 0.45rem 0.75rem; background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: var(--radius-sm); color: #fff;
+        padding: 0.45rem 0.75rem; background: rgba(30, 144, 255, 0.18);
+        border: 1px solid rgba(30, 144, 255, 0.3);
+        border-radius: var(--radius-sm); color: #b9d8ff;
         font-size: 0.8rem; font-weight: 600; font-family: var(--font);
-        transition: background 0.15s, transform 0.1s;
+        transition: background 0.15s, transform 0.1s, color 0.15s;
       }
-      .copy-btn:hover { background: rgba(30, 144, 255, 0.25); border-color: rgba(30, 144, 255, 0.4); }
+      .copy-btn:hover { background: rgba(30, 144, 255, 0.32); color: #fff; }
       .copy-btn:active { transform: scale(0.96); }
       .copy-btn.success { background: rgba(34, 197, 94, 0.25); border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
       .copy-btn.error { background: rgba(239, 68, 68, 0.25); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
-
-      .preview-warning {
-        font-size: 0.8rem; color: var(--warning);
-        display: flex; align-items: center; gap: 0.4rem;
-      }
-
-      .actions {
-        display: flex; flex-wrap: wrap; gap: 0.5rem;
-      }
-      .btn-secondary {
-        display: inline-flex; align-items: center; gap: 0.4rem;
-        padding: 0.45rem 0.85rem; background: var(--bg-card-solid);
-        border: 1px solid var(--border); border-radius: var(--radius-sm);
-        color: var(--text-muted); font-size: 0.82rem; font-weight: 500;
-        transition: color 0.15s, border-color 0.15s;
-      }
-      .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); }
-      .btn-secondary svg { flex-shrink: 0; }
 
       .lp-helper {
         background: var(--bg-card-solid); border: 1px solid var(--border);
@@ -490,6 +757,15 @@ const totalCategories = CATEGORIES.length;
         word-break: break-all;
       }
 
+      .btn-secondary {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        padding: 0.45rem 0.85rem; background: var(--bg-card-solid);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        color: var(--text-muted); font-size: 0.82rem; font-weight: 500;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); }
+
       /* ── Empty builder ── */
       .builder-empty {
         text-align: center; padding: 4rem 2rem; color: var(--text-muted);
@@ -502,7 +778,7 @@ const totalCategories = CATEGORIES.length;
 
       /* ── Unlock presets section ── */
       .presets-section {
-        max-width: 1400px; width: 100%; margin: 0 auto;
+        max-width: 1500px; width: 100%; margin: 0 auto;
         padding: 1rem 1.5rem 4rem;
       }
       .presets-header { margin-bottom: 1.25rem; }
@@ -533,6 +809,7 @@ const totalCategories = CATEGORIES.length;
         border-radius: var(--radius); padding: 1.25rem; display: flex;
         flex-direction: column; gap: 0.6rem;
         transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+        backdrop-filter: blur(8px);
       }
       .preset-card:hover {
         border-color: var(--accent); box-shadow: 0 4px 24px var(--accent-glow);
@@ -550,7 +827,7 @@ const totalCategories = CATEGORIES.length;
         color: var(--accent); font-size: 0.82rem; font-weight: 600;
         transition: background 0.15s;
       }
-      .preset-copy:hover { background: rgba(30, 144, 255, 0.2); }
+      .preset-copy:hover { background: var(--accent-glow-strong); }
       .preset-copy.success { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.4); color: var(--success); }
 
       /* ── Footer ── */
@@ -585,7 +862,6 @@ const totalCategories = CATEGORIES.length;
         }
         .rail {
           position: static; max-height: none; padding: 0.5rem;
-          display: flex; flex-direction: column;
         }
         .rail-section-label { display: none; }
         .rail-cats {
@@ -593,6 +869,13 @@ const totalCategories = CATEGORIES.length;
           gap: 0.4rem;
         }
         .commands { max-height: 50vh; }
+        .modal-body { grid-template-columns: 1fr; }
+        .modal-cats {
+          flex-direction: row; overflow-x: auto;
+          border-right: none; border-bottom: 1px solid var(--border);
+          padding: 0.5rem;
+        }
+        .modal-cats .cat-btn { flex-shrink: 0; }
       }
       @media (max-width: 640px) {
         .hero { padding: 2rem 1rem 1rem; }
@@ -602,6 +885,7 @@ const totalCategories = CATEGORIES.length;
         .builder { padding: 1.1rem; }
         .nav-right { gap: 0.85rem; }
         .nav-link { display: none; }
+        .modal { max-height: 100vh; border-radius: 0; }
       }
     </style>
   </head>
@@ -650,17 +934,18 @@ const totalCategories = CATEGORIES.length;
 
     <main>
       <section class="hero">
-        <span class="hero-eyebrow"><span class="dot"></span>Click to build · Copy to clipboard</span>
+        <span class="hero-eyebrow"><span class="dot"></span>Click to build · Visual picker · Copy to clipboard</span>
         <h1>Minecraft Command Generator</h1>
         <p>
           Build any console command for your BRUH Minecraft Server. Vanilla Java Edition plus
-          every plugin the add-on ships with — point, click, copy, paste into the Console tab,
-          RCON, or in-game.
+          every plugin the add-on ships with — a visual block / item / entity picker, rich-text
+          builders, and one-click LuckPerms unlocks.
         </p>
         <div class="hero-meta">
           <span><strong>{totalCommands}</strong> commands</span>
-          <span><strong>{totalCategories}</strong> plugins / categories</span>
-          <span><strong>14</strong> auto-installable plugins covered</span>
+          <span><strong>{totalCategories}</strong> plugins</span>
+          <span><strong>{totalRegistry}</strong> blocks · items · mobs</span>
+          <span><strong>14</strong> plugins covered</span>
         </div>
       </section>
 
@@ -734,10 +1019,45 @@ const totalCategories = CATEGORIES.length;
       <a href="/bruh-minecraft/">Back to add-on</a>
     </footer>
 
+    <!-- Modal picker -->
+    <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal" role="document">
+        <header class="modal-head">
+          <div class="modal-title-row">
+            <div class="modal-title" id="modal-title">Pick a block</div>
+            <div class="modal-sub" id="modal-sub">Click a tile to insert it.</div>
+          </div>
+          <button class="modal-close" id="modal-close" aria-label="Close picker">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <aside class="modal-cats" id="modal-cats"></aside>
+          <div class="modal-main">
+            <div class="modal-search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input class="modal-search" id="modal-search" type="search" placeholder="Search by name or ID…" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="modal-grid" id="modal-grid"></div>
+            <div class="modal-foot">
+              <span id="modal-count">0 results</span>
+              <span class="modal-foot-kbd"><kbd>Esc</kbd> close</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script is:inline>
-      // ───────── Theme toggle (mirrors index.astro) ─────────
+      // ───────── Theme toggle ─────────
       (function () {
         var toggle = document.getElementById('theme-toggle');
         var pill = document.getElementById('toggle-pill');
@@ -754,10 +1074,7 @@ const totalCategories = CATEGORIES.length;
           var posMap = { light: '0', auto: '1', dark: '2' };
           pill.setAttribute('data-pos', posMap[theme] || '1');
           toggle.querySelectorAll('button').forEach(function (b) {
-            b.setAttribute(
-              'aria-pressed',
-              b.getAttribute('data-value') === theme ? 'true' : 'false'
-            );
+            b.setAttribute('aria-pressed', b.getAttribute('data-value') === theme ? 'true' : 'false');
           });
         }
         function apply(theme) {
@@ -777,36 +1094,30 @@ const totalCategories = CATEGORIES.length;
       (function () {
         const payload = JSON.parse(document.body.getAttribute('data-payload'));
         const {
-          CATEGORIES,
-          COMMANDS,
-          UNLOCK_PRESETS,
-          COMMON_BLOCKS,
-          COMMON_ITEMS,
-          COMMON_ENTITIES,
-          COMMON_EFFECTS,
-          COMMON_ENCHANTS,
-          GAMERULES,
+          CATEGORIES, COMMANDS, UNLOCK_PRESETS,
+          BLOCKS, ITEMS, ENTITIES, EFFECTS, ENCHANTS,
+          BLOCK_CATEGORIES, ITEM_CATEGORIES, ENTITY_CATEGORIES,
+          CHAT_COLORS, GAMERULES,
         } = payload;
 
-        const SUGGESTION_LISTS = {
-          block: COMMON_BLOCKS,
-          item: COMMON_ITEMS,
-          entity: COMMON_ENTITIES,
-          effect: COMMON_EFFECTS,
-          enchantment: COMMON_ENCHANTS,
-          gamerule: GAMERULES,
-          target: ['@s', '@p', '@a', '@r', '@e'],
-          player: [],
+        // Maps from registries
+        const REGISTRIES = {
+          block: { entries: BLOCKS, categories: BLOCK_CATEGORIES, title: 'Pick a block', sub: 'Vanilla Minecraft 1.20+ block registry.' },
+          item:  { entries: ITEMS, categories: ITEM_CATEGORIES, title: 'Pick an item', sub: 'Every vanilla item, including all blocks.' },
+          entity:{ entries: ENTITIES, categories: ENTITY_CATEGORIES, title: 'Pick an entity', sub: 'Spawnable mobs, vehicles, and projectiles.' },
+          effect:{ entries: EFFECTS, categories: [{ id: 'all', name: 'All effects', iconPath: '' }], title: 'Pick an effect', sub: 'Status effects.' },
+          enchantment:{ entries: ENCHANTS, categories: [{ id: 'all', name: 'All enchantments', iconPath: '' }], title: 'Pick an enchantment', sub: 'Available enchantments.' },
         };
-
-        const SVG_NS = 'http://www.w3.org/2000/svg';
 
         // ─── State ───
         const state = {
           activeCategory: 'all',
           activeCommandId: COMMANDS[0]?.id ?? null,
           search: '',
-          values: {},          // commandId -> { argKey: value }
+          values: {},
+          modes: {}, // commandId -> 'json' | 'rich' | 'pattern' | 'single' (specialized mode toggle)
+          richSegments: {}, // commandId-argKey -> [{ text, color, bold, italic, underlined, strikethrough, obfuscated }]
+          patternRows: {},  // commandId-argKey -> [{ block, weight }]
           lpUser: 'PlayerName',
           presetUser: 'YourUsername',
         };
@@ -819,26 +1130,28 @@ const totalCategories = CATEGORIES.length;
         const toastEl = document.getElementById('toast');
         const presetsGridEl = document.getElementById('presets-grid');
         const presetUserEl = document.getElementById('preset-user');
+        const modalEl = document.getElementById('modal');
+        const modalTitleEl = document.getElementById('modal-title');
+        const modalSubEl = document.getElementById('modal-sub');
+        const modalCatsEl = document.getElementById('modal-cats');
+        const modalGridEl = document.getElementById('modal-grid');
+        const modalSearchEl = document.getElementById('modal-search');
+        const modalCountEl = document.getElementById('modal-count');
+        const modalCloseEl = document.getElementById('modal-close');
 
-        // Categories with command counts
-        function commandCount(catId) {
-          return COMMANDS.filter((c) => c.category === catId).length;
-        }
+        // ─── Categories rail ───
+        function commandCount(catId) { return COMMANDS.filter((c) => c.category === catId).length; }
         function totalCount() { return COMMANDS.length; }
 
-        // ─── Render the categories rail ───
         function renderRail() {
           railEl.innerHTML = '';
-          const all = makeCatBtn({
-            id: 'all',
-            name: 'All commands',
-            iconPath: 'M4 6h16M4 12h16M4 18h12',
-          }, totalCount(), state.activeCategory === 'all');
-          railEl.appendChild(all);
-
+          railEl.appendChild(makeCatBtn(
+            { id: 'all', name: 'All commands', iconPath: 'M4 6h16M4 12h16M4 18h12' },
+            totalCount(),
+            state.activeCategory === 'all'
+          ));
           CATEGORIES.forEach((cat) => {
-            const btn = makeCatBtn(cat, commandCount(cat.id), state.activeCategory === cat.id);
-            railEl.appendChild(btn);
+            railEl.appendChild(makeCatBtn(cat, commandCount(cat.id), state.activeCategory === cat.id));
           });
         }
         function makeCatBtn(cat, count, active) {
@@ -863,7 +1176,7 @@ const totalCategories = CATEGORIES.length;
           return btn;
         }
 
-        // ─── Render command list ───
+        // ─── Command list ───
         function renderCommandList() {
           const search = state.search.trim().toLowerCase();
           let filtered = COMMANDS;
@@ -884,12 +1197,9 @@ const totalCategories = CATEGORIES.length;
             return;
           }
 
-          // group by category if showing all
           if (state.activeCategory === 'all') {
             const byCat = {};
-            filtered.forEach((c) => {
-              (byCat[c.category] = byCat[c.category] || []).push(c);
-            });
+            filtered.forEach((c) => { (byCat[c.category] = byCat[c.category] || []).push(c); });
             CATEGORIES.forEach((cat) => {
               const group = byCat[cat.id];
               if (!group) return;
@@ -919,7 +1229,109 @@ const totalCategories = CATEGORIES.length;
           return btn;
         }
 
-        // ─── Render builder ───
+        // ─── Modal picker ───
+        let modalState = { kind: 'block', category: 'all', search: '', onPick: null };
+
+        function openPicker(kind, currentValue, onPick) {
+          modalState.kind = kind;
+          modalState.category = 'all';
+          modalState.search = '';
+          modalState.onPick = onPick;
+          modalState.currentValue = currentValue || '';
+          const reg = REGISTRIES[kind];
+          if (!reg) return;
+          modalTitleEl.textContent = reg.title;
+          modalSubEl.textContent = reg.sub;
+          modalSearchEl.value = '';
+          renderModalCats();
+          renderModalGrid();
+          modalEl.classList.add('open');
+          modalEl.setAttribute('aria-hidden', 'false');
+          setTimeout(() => modalSearchEl.focus(), 60);
+        }
+        function closePicker() {
+          modalEl.classList.remove('open');
+          modalEl.setAttribute('aria-hidden', 'true');
+        }
+        modalCloseEl.addEventListener('click', closePicker);
+        modalEl.addEventListener('click', (e) => { if (e.target === modalEl) closePicker(); });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && modalEl.classList.contains('open')) closePicker();
+        });
+
+        function renderModalCats() {
+          const reg = REGISTRIES[modalState.kind];
+          modalCatsEl.innerHTML = '';
+          reg.categories.forEach((cat) => {
+            const total = cat.id === 'all'
+              ? reg.entries.length
+              : reg.entries.filter((e) => e.category === cat.id).length;
+            if (total === 0) return;
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.setAttribute('aria-pressed', modalState.category === cat.id ? 'true' : 'false');
+            btn.innerHTML =
+              `<span class="cat-btn-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${cat.iconPath || 'M4 6h16M4 12h16M4 18h12'}"></path></svg>
+              </span>
+              <span class="cat-btn-name">${escapeHtml(cat.name)}</span>
+              <span class="cat-btn-count">${total}</span>`;
+            btn.addEventListener('click', () => {
+              modalState.category = cat.id;
+              renderModalCats();
+              renderModalGrid();
+            });
+            modalCatsEl.appendChild(btn);
+          });
+        }
+        function renderModalGrid() {
+          const reg = REGISTRIES[modalState.kind];
+          const search = modalState.search.trim().toLowerCase();
+          let filtered = reg.entries;
+          if (modalState.category !== 'all') {
+            filtered = filtered.filter((e) => e.category === modalState.category);
+          }
+          if (search) {
+            filtered = filtered.filter((e) =>
+              e.label.toLowerCase().includes(search) ||
+              e.id.toLowerCase().includes(search) ||
+              (e.tags || []).some((t) => t.toLowerCase().includes(search))
+            );
+          }
+          // Cap grid to first 600 results for perf; show count of total.
+          const cap = 600;
+          const shown = filtered.slice(0, cap);
+          modalGridEl.innerHTML = '';
+          if (shown.length === 0) {
+            modalGridEl.innerHTML = `<div class="modal-empty">No matches.</div>`;
+          } else {
+            shown.forEach((entry) => {
+              const tile = document.createElement('button');
+              tile.className = 'modal-tile' + (entry.id === modalState.currentValue ? ' selected' : '');
+              tile.style.setProperty('--swatch-color', entry.color);
+              tile.innerHTML = `
+                <div class="modal-swatch"></div>
+                <div class="modal-meta">
+                  <div class="modal-meta-label">${escapeHtml(entry.label)}</div>
+                  <div class="modal-meta-id">${escapeHtml(entry.id)}</div>
+                </div>
+              `;
+              tile.addEventListener('click', () => {
+                if (modalState.onPick) modalState.onPick(entry.id);
+                closePicker();
+              });
+              modalGridEl.appendChild(tile);
+            });
+          }
+          modalCountEl.textContent =
+            filtered.length > cap ? `${cap}+ of ${filtered.length} (refine search)` : `${filtered.length} result${filtered.length === 1 ? '' : 's'}`;
+        }
+        modalSearchEl.addEventListener('input', () => {
+          modalState.search = modalSearchEl.value;
+          renderModalGrid();
+        });
+
+        // ─── Builder ───
         function renderBuilder() {
           const cmd = COMMANDS.find((c) => c.id === state.activeCommandId);
           if (!cmd) {
@@ -935,12 +1347,9 @@ const totalCategories = CATEGORIES.length;
             return;
           }
 
-          // ensure a value bag exists for this command
           if (!state.values[cmd.id]) {
             state.values[cmd.id] = {};
-            cmd.args.forEach((a) => {
-              if (a.default != null) state.values[cmd.id][a.key] = a.default;
-            });
+            cmd.args.forEach((a) => { if (a.default != null) state.values[cmd.id][a.key] = a.default; });
           }
           const vals = state.values[cmd.id];
           const cat = CATEGORIES.find((c) => c.id === cmd.category);
@@ -957,12 +1366,12 @@ const totalCategories = CATEGORIES.length;
             </div>
             <div class="builder-title">${escapeHtml(cmd.name)}</div>
             <div class="builder-desc">${escapeHtml(cmd.description)}</div>
-            ${cmd.permission || cmd.notes ? `
+            ${cmd.permission ? `
               <div class="builder-meta">
-                ${cmd.permission ? `<span>Permission <code>${escapeHtml(cmd.permission)}</code></span>` : ''}
+                <span>Permission <code>${escapeHtml(cmd.permission)}</code></span>
                 ${cat && cat.wiki ? `<span><a href="${cat.wiki}" target="_blank" rel="noopener" style="color:var(--accent)">Plugin docs ↗</a></span>` : ''}
               </div>` : ''}
-            ${cmd.notes ? `<div class="builder-meta" style="color:var(--text-muted);margin-top:0.5rem;font-style:italic">${escapeHtml(cmd.notes)}</div>` : ''}
+            ${cmd.notes ? `<div class="builder-notes">${escapeHtml(cmd.notes)}</div>` : ''}
           `;
           builderEl.appendChild(header);
 
@@ -975,26 +1384,26 @@ const totalCategories = CATEGORIES.length;
             empty.textContent = 'No arguments — this command runs as-is.';
             argsEl.appendChild(empty);
           } else {
-            cmd.args.forEach((arg) => {
-              argsEl.appendChild(makeArgField(cmd, arg, vals));
-            });
+            cmd.args.forEach((arg) => argsEl.appendChild(makeArgField(cmd, arg, vals)));
           }
           builderEl.appendChild(argsEl);
 
-          // Live preview + actions
+          // Preview
           const previewWrap = document.createElement('div');
           previewWrap.className = 'preview';
-          const previewLabel = document.createElement('div');
-          previewLabel.className = 'preview-label';
-          previewLabel.textContent = 'Preview';
-          previewWrap.appendChild(previewLabel);
+          previewWrap.innerHTML = `
+            <div class="preview-label">Preview</div>
+            <div class="preview-window">
+              <div class="preview-titlebar">
+                <span class="preview-dot r"></span>
+                <span class="preview-dot y"></span>
+                <span class="preview-dot g"></span>
+                <span class="preview-titlebar-text">BRUH Minecraft Console</span>
+              </div>
+              <div class="preview-box" id="preview-box"></div>
+            </div>
+          `;
 
-          const previewBox = document.createElement('div');
-          previewBox.className = 'preview-box';
-          previewBox.id = 'preview-box';
-          previewWrap.appendChild(previewBox);
-
-          // Permission helper (LuckPerms grant)
           if (cmd.permission) {
             const lp = document.createElement('div');
             lp.className = 'lp-helper';
@@ -1013,7 +1422,6 @@ const totalCategories = CATEGORIES.length;
               <div class="lp-helper-cmd" id="lp-cmd"></div>
             `;
             previewWrap.appendChild(lp);
-            // wire it up after appending
             setTimeout(() => {
               const userInput = lp.querySelector('#lp-user');
               const cmdEl = lp.querySelector('#lp-cmd');
@@ -1024,16 +1432,11 @@ const totalCategories = CATEGORIES.length;
                 cmdEl.textContent = `/lp user ${u} permission set ${cmd.permission} true`;
               };
               userInput.addEventListener('input', updateLp);
-              copyBtn.addEventListener('click', () => {
-                copyToClipboard(cmdEl.textContent, copyBtn, 'LuckPerms grant copied');
-              });
+              copyBtn.addEventListener('click', () => copyToClipboard(cmdEl.textContent, copyBtn, 'LuckPerms grant copied'));
               updateLp();
             }, 0);
           }
-
           builderEl.appendChild(previewWrap);
-
-          // Initial preview render
           updatePreview(cmd, vals);
         }
 
@@ -1043,8 +1446,6 @@ const totalCategories = CATEGORIES.length;
 
           const label = document.createElement('label');
           label.className = 'arg-label';
-          const labelId = 'arg-' + cmd.id + '-' + arg.key;
-          label.htmlFor = labelId;
           label.innerHTML = `
             <span>${escapeHtml(arg.label)}</span>
             ${arg.required ? '<span class="arg-required" title="Required">●</span>' : ''}
@@ -1052,9 +1453,48 @@ const totalCategories = CATEGORIES.length;
           `;
           wrap.appendChild(label);
 
+          // ── Specialized: rich-text builder for tellraw / title JSON args ──
+          const isRichTarget = arg.type === 'json' && (cmd.id === 'tellraw' || cmd.id === 'title');
+          if (isRichTarget) {
+            wrap.appendChild(buildRichTextField(cmd, arg, vals));
+            if (arg.hint) {
+              const hint = document.createElement('div');
+              hint.className = 'arg-hint';
+              hint.textContent = arg.hint;
+              wrap.appendChild(hint);
+            }
+            return wrap;
+          }
+
+          // ── Specialized: WorldEdit pattern builder for {pattern} args ──
+          const isPatternTarget = arg.type === 'block' && cmd.category === 'worldedit' && arg.key === 'pattern';
+          if (isPatternTarget) {
+            wrap.appendChild(buildPatternField(cmd, arg, vals));
+            if (arg.hint) {
+              const hint = document.createElement('div');
+              hint.className = 'arg-hint';
+              hint.textContent = arg.hint;
+              wrap.appendChild(hint);
+            }
+            return wrap;
+          }
+
+          // ── Visual picker for block / item / entity / effect / enchantment ──
+          const pickerKinds = ['block', 'item', 'entity', 'effect', 'enchantment'];
+          if (pickerKinds.includes(arg.type)) {
+            wrap.appendChild(buildPickerField(cmd, arg, vals));
+            if (arg.hint) {
+              const hint = document.createElement('div');
+              hint.className = 'arg-hint';
+              hint.textContent = arg.hint;
+              wrap.appendChild(hint);
+            }
+            return wrap;
+          }
+
+          // ── Fallback: standard inputs ──
           let input;
           const currentVal = vals[arg.key] ?? arg.default ?? '';
-
           if (arg.type === 'select') {
             input = document.createElement('select');
             input.className = 'arg-select';
@@ -1062,6 +1502,16 @@ const totalCategories = CATEGORIES.length;
               const o = document.createElement('option');
               o.value = opt;
               o.textContent = opt === '' ? '— none —' : opt;
+              if (opt === currentVal) o.selected = true;
+              input.appendChild(o);
+            });
+          } else if (arg.type === 'gamerule') {
+            input = document.createElement('select');
+            input.className = 'arg-select';
+            GAMERULES.forEach((opt) => {
+              const o = document.createElement('option');
+              o.value = opt;
+              o.textContent = opt;
               if (opt === currentVal) o.selected = true;
               input.appendChild(o);
             });
@@ -1080,14 +1530,12 @@ const totalCategories = CATEGORIES.length;
             if (arg.min != null) input.min = String(arg.min);
             if (arg.max != null) input.max = String(arg.max);
             if (arg.step != null) input.step = String(arg.step);
-            if (arg.type === 'block' || arg.type === 'item' || arg.type === 'entity' ||
-                arg.type === 'effect' || arg.type === 'enchantment' || arg.type === 'gamerule' ||
-                arg.type === 'target') {
+            if (arg.type === 'target' || arg.type === 'player') {
               const listId = 'datalist-' + cmd.id + '-' + arg.key;
               input.setAttribute('list', listId);
               const list = document.createElement('datalist');
               list.id = listId;
-              (SUGGESTION_LISTS[arg.type] || []).forEach((opt) => {
+              ['@s', '@p', '@a', '@r', '@e'].forEach((opt) => {
                 const o = document.createElement('option');
                 o.value = opt;
                 list.appendChild(o);
@@ -1096,15 +1544,8 @@ const totalCategories = CATEGORIES.length;
               input.classList.add('arg-mono');
             }
           }
-          input.id = labelId;
-          input.addEventListener('input', () => {
-            vals[arg.key] = input.value;
-            updatePreview(cmd, vals);
-          });
-          input.addEventListener('change', () => {
-            vals[arg.key] = input.value;
-            updatePreview(cmd, vals);
-          });
+          input.addEventListener('input', () => { vals[arg.key] = input.value; updatePreview(cmd, vals); });
+          input.addEventListener('change', () => { vals[arg.key] = input.value; updatePreview(cmd, vals); });
           wrap.appendChild(input);
 
           if (arg.hint) {
@@ -1113,34 +1554,426 @@ const totalCategories = CATEGORIES.length;
             hint.textContent = arg.hint;
             wrap.appendChild(hint);
           }
-
-          // store initial
           vals[arg.key] = currentVal;
           return wrap;
         }
 
-        // ─── Build the command string from template + values ───
+        // ─── Visual picker field ───
+        function buildPickerField(cmd, arg, vals) {
+          const currentVal = vals[arg.key] ?? arg.default ?? '';
+          vals[arg.key] = currentVal;
+          const reg = REGISTRIES[arg.type];
+          const found = reg ? reg.entries.find((e) => e.id === currentVal) : null;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'picker-btn';
+          renderPickerBtn(btn, currentVal, found);
+          btn.addEventListener('click', () => {
+            openPicker(arg.type, vals[arg.key] || '', (newId) => {
+              vals[arg.key] = newId;
+              const e = reg.entries.find((x) => x.id === newId);
+              renderPickerBtn(btn, newId, e);
+              updatePreview(cmd, vals);
+            });
+          });
+
+          // Allow direct paste/clear with a keyboard text field as backup
+          const small = document.createElement('input');
+          small.type = 'text';
+          small.className = 'arg-input arg-mono';
+          small.value = currentVal;
+          small.placeholder = arg.placeholder || `minecraft:…`;
+          small.style.marginTop = '0.35rem';
+          small.style.fontSize = '0.78rem';
+          small.style.padding = '0.35rem 0.55rem';
+          small.addEventListener('input', () => {
+            vals[arg.key] = small.value;
+            const e = reg.entries.find((x) => x.id === small.value);
+            renderPickerBtn(btn, small.value, e);
+            updatePreview(cmd, vals);
+          });
+
+          const wrap = document.createElement('div');
+          wrap.appendChild(btn);
+          wrap.appendChild(small);
+          return wrap;
+        }
+        function renderPickerBtn(btn, value, entry) {
+          const empty = !value;
+          const swatchColor = entry ? entry.color : 'var(--bg-card-solid)';
+          btn.style.setProperty('--swatch-color', swatchColor);
+          btn.innerHTML = `
+            <div class="picker-swatch ${empty ? 'empty' : ''}"></div>
+            <div class="picker-text">
+              <div class="picker-label">${escapeHtml(entry ? entry.label : (empty ? 'Click to browse…' : 'Custom ID'))}</div>
+              <div class="picker-id">${escapeHtml(value || 'minecraft:…')}</div>
+            </div>
+            <svg class="picker-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          `;
+        }
+
+        // ─── WorldEdit pattern builder ───
+        function buildPatternField(cmd, arg, vals) {
+          const wrap = document.createElement('div');
+          const key = cmd.id + '-' + arg.key;
+          const modeKey = cmd.id;
+          if (!state.modes[modeKey]) state.modes[modeKey] = 'single';
+
+          // Tabs
+          const tabs = document.createElement('div');
+          tabs.className = 'builder-tabs';
+          ['single', 'pattern'].forEach((m) => {
+            const t = document.createElement('button');
+            t.type = 'button'; t.className = 'builder-tab';
+            t.textContent = m === 'single' ? 'Single block' : 'Mixed pattern';
+            t.setAttribute('aria-pressed', state.modes[modeKey] === m ? 'true' : 'false');
+            t.addEventListener('click', () => {
+              state.modes[modeKey] = m;
+              renderBuilder();
+            });
+            tabs.appendChild(t);
+          });
+          wrap.appendChild(tabs);
+
+          if (state.modes[modeKey] === 'single') {
+            const fld = buildPickerField(cmd, { ...arg, type: 'block' }, vals);
+            wrap.appendChild(fld);
+            return wrap;
+          }
+
+          // Pattern mode
+          if (!state.patternRows[key]) {
+            // Seed with the current value if it looks like a pattern, else default to 2 rows.
+            const cur = vals[arg.key] || '';
+            if (cur.includes(',') || /\d+%/.test(cur)) {
+              state.patternRows[key] = cur.split(',').map((seg) => {
+                const m = seg.trim().match(/^(\d+)%(.+)$/);
+                if (m) return { block: m[2].trim(), weight: parseInt(m[1], 10) };
+                return { block: seg.trim(), weight: 50 };
+              });
+            } else {
+              state.patternRows[key] = [
+                { block: cur || 'minecraft:stone', weight: 50 },
+                { block: 'minecraft:cobblestone', weight: 50 },
+              ];
+            }
+          }
+          const rebuild = () => {
+            const rows = state.patternRows[key];
+            const total = rows.reduce((a, r) => a + (parseInt(r.weight, 10) || 0), 0) || 1;
+            const segs = rows
+              .filter((r) => r.block && r.block.trim())
+              .map((r) => `${Math.round(((parseInt(r.weight, 10) || 0) / total) * 100)}%${r.block.trim()}`);
+            vals[arg.key] = segs.join(',');
+            updatePreview(cmd, vals);
+          };
+
+          const list = document.createElement('div');
+          state.patternRows[key].forEach((row, idx) => {
+            const r = document.createElement('div');
+            r.className = 'pattern-row';
+
+            const pickBtn = document.createElement('button');
+            pickBtn.type = 'button';
+            pickBtn.className = 'picker-btn';
+            const reg = REGISTRIES.block;
+            const e = reg.entries.find((x) => x.id === row.block);
+            renderPickerBtn(pickBtn, row.block, e);
+            pickBtn.addEventListener('click', () => {
+              openPicker('block', row.block, (newId) => {
+                row.block = newId;
+                const e2 = reg.entries.find((x) => x.id === newId);
+                renderPickerBtn(pickBtn, newId, e2);
+                rebuild();
+              });
+            });
+            r.appendChild(pickBtn);
+
+            const w = document.createElement('input');
+            w.type = 'number';
+            w.className = 'pattern-weight';
+            w.min = '0'; w.max = '1000'; w.value = String(row.weight);
+            w.addEventListener('input', () => { row.weight = parseInt(w.value, 10) || 0; rebuild(); });
+            r.appendChild(w);
+
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'rt-rm-btn';
+            rm.title = 'Remove';
+            rm.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+            rm.addEventListener('click', () => {
+              state.patternRows[key].splice(idx, 1);
+              if (state.patternRows[key].length === 0) {
+                state.patternRows[key].push({ block: 'minecraft:stone', weight: 50 });
+              }
+              renderBuilder();
+            });
+            r.appendChild(rm);
+
+            list.appendChild(r);
+          });
+          wrap.appendChild(list);
+
+          const add = document.createElement('button');
+          add.type = 'button';
+          add.className = 'rt-add-btn';
+          add.style.marginTop = '0.5rem';
+          add.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add block to mix
+          `;
+          add.addEventListener('click', () => {
+            state.patternRows[key].push({ block: 'minecraft:stone', weight: 25 });
+            renderBuilder();
+          });
+          wrap.appendChild(add);
+
+          const hint = document.createElement('div');
+          hint.className = 'arg-hint';
+          hint.style.marginTop = '0.5rem';
+          hint.textContent = 'Weights are normalized to 100% automatically. WorldEdit syntax: 30%minecraft:stone,70%minecraft:cobblestone';
+          wrap.appendChild(hint);
+
+          rebuild();
+          return wrap;
+        }
+
+        // ─── Rich text builder (tellraw / title) ───
+        function buildRichTextField(cmd, arg, vals) {
+          const wrap = document.createElement('div');
+          const key = cmd.id + '-' + arg.key;
+          const modeKey = cmd.id + '-' + arg.key + '-mode';
+          if (!state.modes[modeKey]) state.modes[modeKey] = 'rich';
+
+          const tabs = document.createElement('div');
+          tabs.className = 'builder-tabs';
+          [['rich', 'Rich text'], ['json', 'Raw JSON']].forEach(([m, label]) => {
+            const t = document.createElement('button');
+            t.type = 'button'; t.className = 'builder-tab';
+            t.textContent = label;
+            t.setAttribute('aria-pressed', state.modes[modeKey] === m ? 'true' : 'false');
+            t.addEventListener('click', () => {
+              state.modes[modeKey] = m;
+              renderBuilder();
+            });
+            tabs.appendChild(t);
+          });
+          wrap.appendChild(tabs);
+
+          if (state.modes[modeKey] === 'json') {
+            const ta = document.createElement('textarea');
+            ta.className = 'arg-textarea'; ta.rows = 4;
+            ta.value = vals[arg.key] || arg.default || '';
+            ta.placeholder = arg.placeholder || '{"text":"Hello","color":"aqua"}';
+            ta.addEventListener('input', () => { vals[arg.key] = ta.value; updatePreview(cmd, vals); });
+            wrap.appendChild(ta);
+            return wrap;
+          }
+
+          // Rich mode
+          if (!state.richSegments[key]) {
+            // Try to seed from existing value
+            state.richSegments[key] = parseRichSegments(vals[arg.key] || arg.default || '');
+            if (state.richSegments[key].length === 0) {
+              state.richSegments[key] = [{ text: 'Hello, world!', color: 'aqua', bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false }];
+            }
+          }
+          const segments = state.richSegments[key];
+
+          const rebuild = () => {
+            vals[arg.key] = serializeRichSegments(segments);
+            updatePreview(cmd, vals);
+          };
+
+          segments.forEach((seg, idx) => {
+            wrap.appendChild(buildRichSegmentEditor(seg, idx, segments, rebuild));
+          });
+
+          const add = document.createElement('button');
+          add.type = 'button';
+          add.className = 'rt-add-btn';
+          add.style.marginTop = '0.5rem';
+          add.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add segment
+          `;
+          add.addEventListener('click', () => {
+            segments.push({ text: 'More text', color: 'white', bold: false, italic: false, underlined: false, strikethrough: false, obfuscated: false });
+            renderBuilder();
+          });
+          wrap.appendChild(add);
+
+          // Live preview of rendered chat
+          const livePrev = document.createElement('div');
+          livePrev.className = 'rt-preview';
+          livePrev.style.marginTop = '0.5rem';
+          livePrev.id = key + '-preview';
+          wrap.appendChild(livePrev);
+
+          rebuild();
+          updateRichLivePreview(key, segments);
+          return wrap;
+        }
+
+        function buildRichSegmentEditor(seg, idx, all, rebuild) {
+          const ed = document.createElement('div');
+          ed.className = 'rt-segment';
+
+          // text + remove
+          const row1 = document.createElement('div');
+          row1.className = 'rt-segment-row';
+          const txt = document.createElement('input');
+          txt.type = 'text'; txt.className = 'rt-segment-text';
+          txt.value = seg.text; txt.placeholder = 'Text';
+          txt.addEventListener('input', () => {
+            seg.text = txt.value; rebuild();
+            updateRichLivePreview(currentRichKey(), all);
+          });
+          row1.appendChild(txt);
+          if (all.length > 1) {
+            const rm = document.createElement('button');
+            rm.type = 'button'; rm.className = 'rt-rm-btn';
+            rm.textContent = 'Remove';
+            rm.addEventListener('click', () => {
+              all.splice(idx, 1);
+              renderBuilder();
+            });
+            row1.appendChild(rm);
+          }
+          ed.appendChild(row1);
+
+          // colors
+          const colors = document.createElement('div');
+          colors.className = 'rt-color-grid';
+          CHAT_COLORS.forEach((c) => {
+            const cb = document.createElement('button');
+            cb.type = 'button'; cb.className = 'rt-color-btn';
+            cb.style.background = c.hex;
+            cb.title = c.label;
+            cb.setAttribute('aria-pressed', seg.color === c.id ? 'true' : 'false');
+            cb.addEventListener('click', () => {
+              seg.color = c.id;
+              colors.querySelectorAll('.rt-color-btn').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+              cb.setAttribute('aria-pressed', 'true');
+              rebuild();
+              updateRichLivePreview(currentRichKey(), all);
+            });
+            colors.appendChild(cb);
+          });
+          ed.appendChild(colors);
+
+          // formatting
+          const fmts = document.createElement('div');
+          fmts.className = 'rt-format-row';
+          [
+            { key: 'bold', label: 'B', style: 'font-weight:700' },
+            { key: 'italic', label: 'I', style: 'font-style:italic' },
+            { key: 'underlined', label: 'U', style: 'text-decoration:underline' },
+            { key: 'strikethrough', label: 'S', style: 'text-decoration:line-through' },
+            { key: 'obfuscated', label: '?', style: 'letter-spacing:0.05em' },
+          ].forEach((f) => {
+            const b = document.createElement('button');
+            b.type = 'button'; b.className = 'rt-format-btn';
+            b.textContent = f.label;
+            b.style = f.style;
+            b.title = f.key.charAt(0).toUpperCase() + f.key.slice(1);
+            b.setAttribute('aria-pressed', seg[f.key] ? 'true' : 'false');
+            b.addEventListener('click', () => {
+              seg[f.key] = !seg[f.key];
+              b.setAttribute('aria-pressed', seg[f.key] ? 'true' : 'false');
+              rebuild();
+              updateRichLivePreview(currentRichKey(), all);
+            });
+            fmts.appendChild(b);
+          });
+          ed.appendChild(fmts);
+
+          return ed;
+        }
+
+        function currentRichKey() {
+          // Find any key with a -preview element currently in DOM
+          const cmd = COMMANDS.find((c) => c.id === state.activeCommandId);
+          if (!cmd) return '';
+          const arg = cmd.args.find((a) => a.type === 'json');
+          return arg ? cmd.id + '-' + arg.key : '';
+        }
+
+        function updateRichLivePreview(key, segments) {
+          const el = document.getElementById(key + '-preview');
+          if (!el) return;
+          const html = segments.map((s) => {
+            const colorMap = {};
+            CHAT_COLORS.forEach((c) => { colorMap[c.id] = c.hex; });
+            const style = [
+              s.color && `color:${colorMap[s.color] || '#fff'}`,
+              s.bold && 'font-weight:700',
+              s.italic && 'font-style:italic',
+              s.underlined && 'text-decoration:underline',
+              s.strikethrough && 'text-decoration:line-through',
+              s.obfuscated && 'letter-spacing:0.05em;filter:blur(0.5px)',
+            ].filter(Boolean).join(';');
+            return `<span style="${style}">${escapeHtml(s.text)}</span>`;
+          }).join('');
+          el.innerHTML = html || '<span class="preview-mute">(empty)</span>';
+        }
+
+        function serializeRichSegments(segments) {
+          if (segments.length === 0) return '""';
+          if (segments.length === 1) return JSON.stringify(toJsonComponent(segments[0]));
+          return JSON.stringify(segments.map(toJsonComponent));
+        }
+        function toJsonComponent(seg) {
+          const obj = { text: seg.text };
+          if (seg.color && seg.color !== 'white') obj.color = seg.color;
+          if (seg.bold) obj.bold = true;
+          if (seg.italic) obj.italic = true;
+          if (seg.underlined) obj.underlined = true;
+          if (seg.strikethrough) obj.strikethrough = true;
+          if (seg.obfuscated) obj.obfuscated = true;
+          return obj;
+        }
+        function parseRichSegments(s) {
+          try {
+            const parsed = JSON.parse(s);
+            const arr = Array.isArray(parsed) ? parsed : [parsed];
+            return arr.map((c) => ({
+              text: typeof c === 'string' ? c : (c.text || ''),
+              color: (c && c.color) || 'white',
+              bold: !!(c && c.bold),
+              italic: !!(c && c.italic),
+              underlined: !!(c && c.underlined),
+              strikethrough: !!(c && c.strikethrough),
+              obfuscated: !!(c && c.obfuscated),
+            }));
+          } catch {
+            return [];
+          }
+        }
+
+        // ─── Build the command string ───
         function buildCommand(cmd, vals) {
-          // Returns { plain, html, missingRequired }
           const tpl = cmd.template;
           const re = /\{(\w+)\}/g;
           let lastIndex = 0;
           let m;
           const segs = [];
           while ((m = re.exec(tpl)) !== null) {
-            if (m.index > lastIndex) {
-              segs.push({ type: 'static', text: tpl.slice(lastIndex, m.index) });
-            }
+            if (m.index > lastIndex) segs.push({ type: 'static', text: tpl.slice(lastIndex, m.index) });
             segs.push({ type: 'arg', key: m[1] });
             lastIndex = m.index + m[0].length;
           }
-          if (lastIndex < tpl.length) {
-            segs.push({ type: 'static', text: tpl.slice(lastIndex) });
-          }
+          if (lastIndex < tpl.length) segs.push({ type: 'static', text: tpl.slice(lastIndex) });
 
-          // Find the index of the last *filled* arg. Anything before it is
-          // positionally required even if marked optional, since Minecraft
-          // commands are positional and skipping a middle arg is invalid.
           const argSegs = segs.filter((s) => s.type === 'arg');
           let lastFilledArgIdx = -1;
           argSegs.forEach((s, i) => {
@@ -1149,35 +1982,19 @@ const totalCategories = CATEGORIES.length;
           });
           let argIdx = -1;
 
-          // Walk segments and produce output. For optional empty args we drop the
-          // preceding whitespace separator so we don't get double spaces.
           let plain = '';
           let html = '';
           let missingRequired = false;
-          let pendingSpace = ''; // whitespace from a static segment that may be skipped
-
-          // Helper to escape HTML in segments
+          let pendingSpace = '';
           const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
-
-          // Identify first non-whitespace segment as command name for highlighting
           let cmdNameDone = false;
 
-          segs.forEach((seg, i) => {
+          segs.forEach((seg) => {
             if (seg.type === 'static') {
               const s = seg.text;
-              // If the whole segment is whitespace, hold onto it; flush next time we emit.
-              if (/^\s+$/.test(s)) {
-                pendingSpace += s;
-                return;
-              }
-              // It contains non-whitespace (e.g. the leading slash + command). Flush pending space first.
-              if (pendingSpace) {
-                plain += pendingSpace;
-                html += esc(pendingSpace);
-                pendingSpace = '';
-              }
+              if (/^\s+$/.test(s)) { pendingSpace += s; return; }
+              if (pendingSpace) { plain += pendingSpace; html += esc(pendingSpace); pendingSpace = ''; }
               if (!cmdNameDone) {
-                // Find the command name (everything up to first whitespace) and color it.
                 const wsIdx = s.search(/\s/);
                 const name = wsIdx === -1 ? s : s.slice(0, wsIdx);
                 const rest = wsIdx === -1 ? '' : s.slice(wsIdx);
@@ -1185,11 +2002,9 @@ const totalCategories = CATEGORIES.length;
                 html += `<span class="preview-cmd">${esc(name)}</span>${esc(rest)}`;
                 cmdNameDone = true;
               } else {
-                plain += s;
-                html += esc(s);
+                plain += s; html += esc(s);
               }
             } else {
-              // arg segment
               argIdx++;
               const arg = cmd.args.find((a) => a.key === seg.key);
               const raw = (vals[seg.key] ?? '').toString();
@@ -1197,41 +2012,20 @@ const totalCategories = CATEGORIES.length;
               const positionallyNeeded = argIdx < lastFilledArgIdx;
               if (val === '') {
                 if ((arg && arg.required) || positionallyNeeded) {
-                  // emit a placeholder
-                  if (pendingSpace) {
-                    plain += pendingSpace;
-                    html += esc(pendingSpace);
-                    pendingSpace = '';
-                  }
+                  if (pendingSpace) { plain += pendingSpace; html += esc(pendingSpace); pendingSpace = ''; }
                   plain += `<${arg.label}>`;
                   html += `<span class="preview-arg-required">&lt;${esc(arg.label)}&gt;</span>`;
                   missingRequired = true;
                 } else {
-                  // optional & blank with nothing later — drop pending space too
                   pendingSpace = '';
                 }
               } else {
-                if (pendingSpace) {
-                  plain += pendingSpace;
-                  html += esc(pendingSpace);
-                  pendingSpace = '';
-                }
-                // if value contains spaces and command isn't /say/longtext-trailing,
-                // keep as-is — Minecraft commands generally accept the trailing string verbatim.
-                plain += val;
-                html += `<span class="preview-arg-filled">${esc(val)}</span>`;
+                if (pendingSpace) { plain += pendingSpace; html += esc(pendingSpace); pendingSpace = ''; }
+                plain += val; html += `<span class="preview-arg-filled">${esc(val)}</span>`;
               }
             }
           });
-          // Flush trailing pending space (only if something already emitted, otherwise drop)
-          if (pendingSpace && plain.length > 0) {
-            plain += pendingSpace.replace(/\s+$/, '');
-            // don't render trailing whitespace in html either
-          }
-
-          // Collapse any accidental double spaces (from skipped optional args mid-stream)
           plain = plain.replace(/\s{2,}/g, ' ').trim();
-
           return { plain, html, missingRequired };
         }
 
@@ -1239,7 +2033,6 @@ const totalCategories = CATEGORIES.length;
           const box = document.getElementById('preview-box');
           if (!box) return;
           const built = buildCommand(cmd, vals);
-
           box.innerHTML = `<span class="preview-content">${built.html || '<span class="preview-mute">(empty)</span>'}</span>`;
           const copy = document.createElement('button');
           copy.className = 'copy-btn';
@@ -1253,7 +2046,7 @@ const totalCategories = CATEGORIES.length;
           `;
           copy.addEventListener('click', () => {
             if (built.missingRequired) {
-              flashCopyBtn(copy, 'Fill required fields', false);
+              flashCopyBtn(copy, 'Fill required', false);
               showToast('Fill required fields first', 'error');
               return;
             }
@@ -1268,14 +2061,10 @@ const totalCategories = CATEGORIES.length;
           UNLOCK_PRESETS.forEach((p) => {
             const card = document.createElement('div');
             card.className = 'preset-card';
-            const cmdsText = p.commands.join('\n');
-            const cmdsHtml = p.commands
-              .map((c) => escapeHtml(c).replace(/\{USER\}/g, '<span class="preset-arg">{USER}</span>'))
-              .join('<br>');
             card.innerHTML = `
               <h3>${escapeHtml(p.name)}</h3>
               <p>${escapeHtml(p.description)}</p>
-              <div class="preset-cmds" data-template="${escapeAttr(cmdsText)}">${cmdsHtml}</div>
+              <div class="preset-cmds"></div>
               <div class="copy-row">
                 <button class="preset-copy" type="button">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1289,16 +2078,11 @@ const totalCategories = CATEGORIES.length;
             const cmdsEl = card.querySelector('.preset-cmds');
             const updateCmds = () => {
               const u = (presetUserEl.value || 'YourUsername').trim() || 'YourUsername';
-              cmdsEl.innerHTML = p.commands
-                .map((c) => escapeHtml(c.replace(/\{USER\}/g, u)))
-                .join('<br>');
+              cmdsEl.innerHTML = p.commands.map((c) => escapeHtml(c.replace(/\{USER\}/g, u))).join('<br>');
               cmdsEl.dataset.template = p.commands.map((c) => c.replace(/\{USER\}/g, u)).join('\n');
             };
             const btn = card.querySelector('.preset-copy');
-            btn.addEventListener('click', () => {
-              copyToClipboard(cmdsEl.dataset.template, btn, 'Unlock commands copied');
-            });
-            // Re-render on global username change
+            btn.addEventListener('click', () => copyToClipboard(cmdsEl.dataset.template, btn, 'Unlock commands copied'));
             card._update = updateCmds;
             updateCmds();
             presetsGridEl.appendChild(card);
@@ -1323,10 +2107,7 @@ const totalCategories = CATEGORIES.length;
           };
           if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(
-              () => {
-                flashCopyBtn(btn, 'Copied!', true);
-                showToast(successMsg || 'Copied', 'success');
-              },
+              () => { flashCopyBtn(btn, 'Copied!', true); showToast(successMsg || 'Copied', 'success'); },
               fallback
             );
           } else {
@@ -1374,7 +2155,6 @@ const totalCategories = CATEGORIES.length;
         });
 
         presetUserEl.addEventListener('input', () => {
-          // Re-render every preset card
           presetsGridEl.querySelectorAll('.preset-card').forEach((card) => {
             if (card._update) card._update();
           });
