@@ -420,6 +420,63 @@
     .tile-pillager{ background-color: #5e6e7e; }
     .tile-axolotl{ background-color: #f0a8c8; }
 
+    /* Generated color families — flat-color tiles for the bulk of the registry. */
+    .tile-mc-white       { background-color: #e8e8e8; }
+    .tile-mc-orange      { background-color: #e07a2a; }
+    .tile-mc-magenta     { background-color: #c74ebd; }
+    .tile-mc-light_blue  { background-color: #3ab3da; }
+    .tile-mc-yellow      { background-color: #f7c948; }
+    .tile-mc-lime        { background-color: #80c71f; }
+    .tile-mc-pink        { background-color: #f38baa; }
+    .tile-mc-gray        { background-color: #474f52; }
+    .tile-mc-light_gray  { background-color: #9d9d97; }
+    .tile-mc-cyan        { background-color: #169c9c; }
+    .tile-mc-purple      { background-color: #7a3a9a; }
+    .tile-mc-blue        { background-color: #3c44aa; }
+    .tile-mc-brown       { background-color: #835432; }
+    .tile-mc-green       { background-color: #5e7c16; }
+    .tile-mc-red         { background-color: #b02e26; }
+    .tile-mc-black       { background-color: #1d1d21; }
+
+    .tile-wood-oak       { background-color: #bb9a6a; }
+    .tile-wood-spruce    { background-color: #7e5d2d; }
+    .tile-wood-birch     { background-color: #dac9a3; }
+    .tile-wood-jungle    { background-color: #9b7250; }
+    .tile-wood-acacia    { background-color: #aa5d34; }
+    .tile-wood-dark_oak  { background-color: #3f2913; }
+    .tile-wood-mangrove  { background-color: #75351a; }
+    .tile-wood-cherry    { background-color: #e3b1a7; }
+    .tile-wood-bamboo    { background-color: #cbb74d; }
+    .tile-wood-crimson   { background-color: #681e3c; }
+    .tile-wood-warped    { background-color: #2c8e6f; }
+
+    .tile-log-oak        { background-color: #6e552c; }
+    .tile-log-spruce     { background-color: #3a2916; }
+    .tile-log-birch      { background-color: #dfdcc8; }
+    .tile-log-jungle     { background-color: #534b32; }
+    .tile-log-acacia     { background-color: #67645b; }
+    .tile-log-dark_oak   { background-color: #3a2913; }
+    .tile-log-mangrove   { background-color: #564143; }
+    .tile-log-cherry     { background-color: #5a3032; }
+
+    .tile-leaves-oak     { background-color: #48702e; }
+    .tile-leaves-spruce  { background-color: #465e2a; }
+    .tile-leaves-birch   { background-color: #80a755; }
+    .tile-leaves-jungle  { background-color: #469125; }
+    .tile-leaves-acacia  { background-color: #5a8a25; }
+    .tile-leaves-dark_oak{ background-color: #395824; }
+    .tile-leaves-mangrove{ background-color: #80a445; }
+    .tile-leaves-cherry  { background-color: #f47bcd; }
+
+    .tile-tier-wooden    { background-color: #bb9a6a; }
+    .tile-tier-stone     { background-color: #7e7e7e; }
+    .tile-tier-iron      { background-color: #dcdcdc; }
+    .tile-tier-golden    { background-color: #fcee4b; }
+    .tile-tier-diamond   { background-color: #5cdbd5; }
+    .tile-tier-netherite { background-color: #443a3c; }
+    .tile-tier-leather   { background-color: #7e3d24; }
+    .tile-tier-chainmail { background-color: #3d3d3d; }
+
     .picker-shroud{ position: fixed; inset: 0; background: rgba(5, 8, 11, 0.75); backdrop-filter: blur(8px); z-index: 100; display: grid; place-items: center; padding: 40px; }
     .picker{ width: min(900px, 96vw); height: min(680px, 90vh); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.02); display: flex; flex-direction: column; overflow: hidden; }
     .picker-hd{ display:flex; align-items:center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line-soft); }
@@ -653,6 +710,312 @@ const SELECTORS = [
 ];
 
 Object.assign(window, { PLUGINS, COMMANDS, BLOCKS, ITEMS, MOBS, EFFECTS, MC_COLORS, SELECTORS });
+  </script>
+
+  <script is:inline type="text/babel">
+// ── catalog-expansion: full vanilla 1.20+ block / item / mob registry ──
+;(function() {
+function tc(s) { return s.split('_').map(w => w[0].toUpperCase() + w.slice(1)).join(' '); }
+
+const DYE_COLORS = ['white','orange','magenta','light_blue','yellow','lime','pink','gray','light_gray','cyan','purple','blue','brown','green','red','black'];
+const ALL_WOODS = ['oak','spruce','birch','jungle','acacia','dark_oak','mangrove','cherry','bamboo','crimson','warped'];
+const TOOL_TIERS = ['wooden','stone','iron','golden','diamond','netherite'];
+const ARMOR_TIERS = ['leather','chainmail','iron','golden','diamond','netherite'];
+const has = (arr, id) => arr.some(x => x.id === id);
+
+// Colored block variants (16 dye colors × N variants) — wool, carpet, concrete,
+// concrete_powder, terracotta, glazed_terracotta, stained_glass, stained_glass_pane,
+// shulker_box, banner, candle, bed.
+DYE_COLORS.forEach(c => {
+  const cls = `tile-mc-${c}`;
+  ['wool','carpet','concrete','concrete_powder','terracotta','glazed_terracotta','stained_glass','stained_glass_pane'].forEach(t => {
+    const id = `${c}_${t}`;
+    if (has(BLOCKS, id)) return;
+    const woolPx = ['white','red','blue','yellow','green','orange','purple','black'];
+    BLOCKS.push({id, cat:'colored', cls: t === 'wool' && woolPx.includes(c) ? `tile-wool-${c}` : cls, name:`${tc(c)} ${tc(t)}`});
+  });
+  ['shulker_box'].forEach(t => { if (!has(BLOCKS, `${c}_${t}`)) BLOCKS.push({id:`${c}_${t}`, cat:'storage', cls, name:`${tc(c)} ${tc(t)}`}); });
+  ['banner','candle','bed'].forEach(t => { if (!has(BLOCKS, `${c}_${t}`)) BLOCKS.push({id:`${c}_${t}`, cat:'decoration', cls, name:`${tc(c)} ${tc(t)}`}); });
+  ITEMS.push({id:`${c}_dye`, cat:'materials', cls, name:`${tc(c)} Dye`});
+});
+[
+  ['terracotta','colored','tile-mc-orange'],['glass_pane','building','tile-glass'],
+  ['tinted_glass','building','tile-mc-black'],['shulker_box','storage','tile-mc-purple'],
+].forEach(([id,cat,cls]) => { if (!has(BLOCKS, id)) BLOCKS.push({id,cat,cls,name:tc(id)}); });
+
+// Wood family (overworld 8 + bamboo + nether 2) × log/planks/slab/stairs/etc.
+ALL_WOODS.forEach(w => {
+  const isNether = w === 'crimson' || w === 'warped';
+  const isBamboo = w === 'bamboo';
+  const plankCls = `tile-wood-${w}`;
+  const logCls = isBamboo ? `tile-wood-bamboo` : `tile-log-${w}`;
+  const leafCls = `tile-leaves-${w}`;
+  const stem = isNether ? 'stem' : (isBamboo ? 'block' : 'log');
+  const woody = isNether ? 'hyphae' : (isBamboo ? null : 'wood');
+  [
+    [stem, logCls, 'wood'], [`stripped_${stem}`, plankCls, 'wood'],
+    woody && [woody, logCls, 'wood'], woody && [`stripped_${woody}`, plankCls, 'wood'],
+    ['planks', plankCls, 'wood'],
+    ['slab', plankCls, 'wood'], ['stairs', plankCls, 'wood'],
+    ['fence', plankCls, 'wood'], ['fence_gate', plankCls, 'wood'],
+    ['door', plankCls, 'wood'], ['trapdoor', plankCls, 'wood'],
+    ['pressure_plate', plankCls, 'wood'], ['button', plankCls, 'wood'],
+    ['sign', plankCls, 'wood'], ['hanging_sign', plankCls, 'wood'],
+  ].filter(Boolean).forEach(([t, cls, cat]) => {
+    const id = `${w}_${t}`;
+    if (!has(BLOCKS, id)) BLOCKS.push({id, cat, cls, name:`${tc(w)} ${tc(t)}`});
+  });
+  if (!isNether && !isBamboo) {
+    if (!has(BLOCKS, `${w}_leaves`)) BLOCKS.push({id:`${w}_leaves`, cat:'plants', cls: leafCls, name:`${tc(w)} Leaves`});
+    if (!has(BLOCKS, `${w}_sapling`)) BLOCKS.push({id:`${w}_sapling`, cat:'plants', cls: leafCls, name:`${tc(w)} Sapling`});
+    ITEMS.push({id:`${w}_boat`, cat:'transport', cls: plankCls, name:`${tc(w)} Boat`});
+    ITEMS.push({id:`${w}_chest_boat`, cat:'transport', cls: plankCls, name:`${tc(w)} Boat with Chest`});
+  }
+});
+[
+  ['bamboo_mosaic','wood','tile-wood-bamboo'],['bamboo_mosaic_slab','wood','tile-wood-bamboo'],
+  ['bamboo_mosaic_stairs','wood','tile-wood-bamboo'],
+  ['crimson_fungus','plants','tile-mc-red'],['warped_fungus','plants','tile-mc-cyan'],
+  ['crimson_roots','plants','tile-mc-red'],['warped_roots','plants','tile-mc-cyan'],
+  ['crimson_nylium','nether','tile-mc-red'],['warped_nylium','nether','tile-mc-cyan'],
+  ['nether_wart_block','nether','tile-mc-red'],['warped_wart_block','nether','tile-mc-cyan'],
+].forEach(([id,cat,cls]) => { if (!has(BLOCKS, id)) BLOCKS.push({id,cat,cls,name:tc(id)}); });
+
+// Tools / armor by tier
+TOOL_TIERS.forEach(tier => {
+  ['sword','pickaxe','axe','shovel','hoe'].forEach(tool => {
+    const id = `${tier}_${tool}`;
+    if (!has(ITEMS, id)) ITEMS.push({id, cat: tool === 'sword' ? 'weapons' : 'tools', cls:`tile-tier-${tier}`, name:`${tc(tier)} ${tc(tool)}`});
+  });
+});
+ARMOR_TIERS.forEach(tier => {
+  ['helmet','chestplate','leggings','boots'].forEach(piece => {
+    const id = `${tier}_${piece}`;
+    if (!has(ITEMS, id)) ITEMS.push({id, cat:'armor', cls:`tile-tier-${tier}`, name:`${tc(tier)} ${tc(piece)}`});
+  });
+});
+[
+  ['shears','tools','tile-tier-iron'],['flint_and_steel','tools','tile-tier-iron'],
+  ['fishing_rod','tools','tile-wood-oak'],['carrot_on_a_stick','tools','tile-wood-oak'],
+  ['warped_fungus_on_a_stick','tools','tile-wood-warped'],['lead','tools','tile-wood-oak'],
+  ['name_tag','tools','tile-tier-leather'],['brush','tools','tile-wood-oak'],
+  ['compass','tools','tile-tier-iron'],['recovery_compass','tools','tile-mc-purple'],
+  ['clock','tools','tile-tier-golden'],['spyglass','tools','tile-mc-orange'],
+  ['bucket','tools','tile-tier-iron'],['water_bucket','tools','tile-water'],
+  ['lava_bucket','tools','tile-lava'],['milk_bucket','tools','tile-mc-white'],
+  ['powder_snow_bucket','tools','tile-mc-white'],['axolotl_bucket','tools','tile-mc-pink'],
+  ['cod_bucket','tools','tile-mc-light_gray'],['salmon_bucket','tools','tile-mc-pink'],
+  ['pufferfish_bucket','tools','tile-mc-yellow'],['tropical_fish_bucket','tools','tile-mc-orange'],
+  ['tadpole_bucket','tools','tile-mc-brown'],
+  ['book','tools','tile-mc-brown'],['writable_book','tools','tile-mc-brown'],
+  ['written_book','tools','tile-mc-brown'],['enchanted_book','tools','tile-mc-light_blue'],
+  ['paper','tools','tile-mc-white'],['map','tools','tile-mc-yellow'],['filled_map','tools','tile-mc-yellow'],
+  ['saddle','tools','tile-mc-brown'],['totem_of_undying','tools','tile-tier-golden'],
+  ['turtle_helmet','armor','tile-mc-green'],['wolf_armor','armor','tile-tier-netherite'],
+  ['elytra','armor','tile-mc-light_gray'],
+].forEach(([id,cat,cls]) => { if (!has(ITEMS, id)) ITEMS.push({id,cat,cls,name:tc(id)}); });
+['leather','iron','golden','diamond'].forEach(t => { if (!has(ITEMS, `${t}_horse_armor`)) ITEMS.push({id:`${t}_horse_armor`, cat:'armor', cls:`tile-tier-${t}`, name:`${tc(t)} Horse Armor`}); });
+
+// Weapons / projectiles
+[
+  ['bow','tile-wood-oak'],['crossbow','tile-wood-oak'],['arrow','tile-wood-oak'],
+  ['spectral_arrow','tile-mc-yellow'],['tipped_arrow','tile-mc-purple'],
+  ['shield','tile-wood-oak'],['trident','tile-mc-cyan'],['mace','tile-tier-netherite'],
+  ['snowball','tile-mc-white'],['egg','tile-mc-white'],
+  ['ender_pearl','tile-mc-cyan'],['ender_eye','tile-mc-green'],
+  ['fire_charge','tile-mc-orange'],['wind_charge','tile-mc-light_blue'],
+].forEach(([id,cls]) => { if (!has(ITEMS, id)) ITEMS.push({id, cat:'weapons', cls, name:tc(id)}); });
+
+// Food
+[
+  ['apple','red'],['carrot','orange'],['golden_carrot','yellow'],['potato','brown'],
+  ['baked_potato','brown'],['poisonous_potato','green'],['beetroot','red'],['beetroot_soup','red'],
+  ['mushroom_stew','brown'],['suspicious_stew','purple'],['rabbit_stew','brown'],
+  ['bread','yellow'],['cake','white'],['cookie','brown'],['pumpkin_pie','orange'],
+  ['melon_slice','red'],['glistering_melon_slice','yellow'],['sweet_berries','red'],
+  ['glow_berries','orange'],['chorus_fruit','purple'],['popped_chorus_fruit','purple'],
+  ['raw_beef','red'],['cooked_beef','brown'],['raw_porkchop','pink'],['cooked_porkchop','brown'],
+  ['raw_chicken','white'],['cooked_chicken','yellow'],['raw_mutton','red'],['cooked_mutton','brown'],
+  ['raw_rabbit','red'],['cooked_rabbit','brown'],['raw_cod','light_gray'],['cooked_cod','brown'],
+  ['raw_salmon','pink'],['cooked_salmon','brown'],['tropical_fish','orange'],['pufferfish','yellow'],
+  ['rotten_flesh','green'],['spider_eye','red'],['fermented_spider_eye','red'],
+  ['honey_bottle','yellow'],['dried_kelp','green'],['kelp','green'],['nautilus_shell','white'],
+  ['golden_apple','yellow'],['enchanted_golden_apple','yellow'],
+].forEach(([id,c]) => { if (!has(ITEMS, id)) ITEMS.push({id, cat:'food', cls:`tile-mc-${c}`, name:tc(id)}); });
+
+// Materials
+[
+  ['stick','tile-wood-oak'],['coal','tile-mc-black'],['charcoal','tile-mc-black'],
+  ['iron_ingot','tile-iron'],['gold_ingot','tile-gold'],['copper_ingot','tile-mc-orange'],
+  ['netherite_ingot','tile-tier-netherite'],['netherite_scrap','tile-tier-netherite'],
+  ['raw_iron','tile-mc-light_gray'],['raw_copper','tile-mc-orange'],['raw_gold','tile-mc-yellow'],
+  ['iron_nugget','tile-iron'],['gold_nugget','tile-gold'],
+  ['diamond','tile-diamond'],['emerald','tile-emerald'],['lapis_lazuli','tile-lapis'],
+  ['quartz','tile-mc-white'],['amethyst_shard','tile-mc-purple'],['echo_shard','tile-mc-cyan'],
+  ['flint','tile-mc-gray'],['leather','tile-mc-brown'],['rabbit_hide','tile-mc-brown'],
+  ['feather','tile-mc-white'],['bone','tile-mc-white'],['bone_meal','tile-mc-white'],
+  ['gunpowder','tile-mc-gray'],['blaze_powder','tile-mc-orange'],['blaze_rod','tile-mc-orange'],
+  ['ghast_tear','tile-mc-white'],['glowstone_dust','tile-mc-yellow'],['redstone','tile-redstone'],
+  ['glow_ink_sac','tile-mc-cyan'],['ink_sac','tile-mc-black'],
+  ['slime_ball','tile-mc-lime'],['magma_cream','tile-mc-orange'],['phantom_membrane','tile-mc-light_gray'],
+  ['rabbit_foot','tile-mc-pink'],['shulker_shell','tile-mc-purple'],['nether_star','tile-mc-white'],
+  ['heart_of_the_sea','tile-mc-cyan'],['turtle_scute','tile-mc-green'],['armadillo_scute','tile-mc-brown'],
+  ['honeycomb','tile-mc-yellow'],['clay_ball','tile-mc-light_gray'],
+  ['breeze_rod','tile-mc-light_blue'],['heavy_core','tile-mc-gray'],
+  ['trial_key','tile-mc-yellow'],['ominous_trial_key','tile-mc-purple'],
+  ['firework_rocket','tile-mc-white'],['firework_star','tile-mc-yellow'],
+  ['string','tile-mc-white'],['wheat','tile-mc-yellow'],['wheat_seeds','tile-mc-green'],
+  ['pumpkin_seeds','tile-mc-orange'],['melon_seeds','tile-mc-green'],['beetroot_seeds','tile-mc-red'],
+  ['torchflower_seeds','tile-mc-orange'],['pitcher_pod','tile-mc-purple'],
+  ['sugar','tile-mc-white'],['nether_wart','tile-mc-red'],['dragon_breath','tile-mc-purple'],
+].forEach(([id,cls]) => { if (!has(ITEMS, id)) ITEMS.push({id, cat:'materials', cls, name:tc(id)}); });
+
+// Music discs
+['13','cat','blocks','chirp','far','mall','mellohi','stal','strad','ward','11','wait','pigstep','otherside','relic','creator','5','precipice'].forEach(d =>
+  ITEMS.push({id:`music_disc_${d}`, cat:'music', cls:'tile-mc-black', name:`Music Disc — ${d}`})
+);
+
+// Spawn eggs (color-tinted, one per spawnable mob)
+const SPAWN_EGGS = {
+  zombie:'green', skeleton:'light_gray', creeper:'lime', spider:'black', enderman:'black',
+  witch:'purple', ghast:'white', blaze:'yellow', wither_skeleton:'gray',
+  cow:'brown', pig:'pink', sheep:'white', chicken:'white',
+  horse:'brown', donkey:'gray', mule:'brown', llama:'brown', trader_llama:'cyan',
+  rabbit:'brown', fox:'orange', wolf:'gray', cat:'white', ocelot:'yellow',
+  parrot:'lime', panda:'white', polar_bear:'white', mooshroom:'red',
+  axolotl:'pink', allay:'light_blue', frog:'lime', tadpole:'brown',
+  sniffer:'cyan', camel:'yellow', goat:'white', armadillo:'brown',
+  villager:'brown', wandering_trader:'light_blue', iron_golem:'light_gray', snow_golem:'white',
+  bee:'yellow', turtle:'green', strider:'red', hoglin:'pink', piglin:'pink', piglin_brute:'red',
+  warden:'cyan', pillager:'gray', vindicator:'gray', evoker:'white', vex:'purple', ravager:'brown',
+  drowned:'cyan', husk:'yellow', stray:'light_gray', phantom:'purple', shulker:'purple',
+  zombified_piglin:'pink', zombie_villager:'green', salmon:'pink', cod:'brown',
+  pufferfish:'yellow', tropical_fish:'pink', glow_squid:'cyan', squid:'blue',
+  guardian:'green', elder_guardian:'green', silverfish:'gray', endermite:'black',
+  slime:'lime', magma_cube:'orange', skeleton_horse:'light_gray', zombie_horse:'green',
+  illusioner:'cyan', breeze:'light_blue', bogged:'green', creaking:'gray',
+};
+Object.entries(SPAWN_EGGS).forEach(([m,c]) => ITEMS.push({id:`${m}_spawn_egg`, cat:'spawn_eggs', cls:`tile-mc-${c}`, name:`${tc(m)} Spawn Egg`}));
+
+// Potions / transport / misc
+['potion','splash_potion','lingering_potion','glass_bottle','experience_bottle'].forEach(p =>
+  ITEMS.push({id:p, cat:'potions', cls:'tile-mc-purple', name:tc(p)})
+);
+[
+  ['minecart','tile-tier-iron'],['chest_minecart','tile-wood-oak'],['hopper_minecart','tile-tier-iron'],
+  ['tnt_minecart','tile-tnt'],['furnace_minecart','tile-cobble'],['command_block_minecart','tile-mc-orange'],
+].forEach(([id,cls]) => ITEMS.push({id, cat:'transport', cls, name:tc(id)}));
+[
+  ['tnt','tile-tnt'],['end_crystal','tile-mc-purple'],['bundle','tile-mc-brown'],
+].forEach(([id,cls]) => { if (!has(ITEMS, id)) ITEMS.push({id, cat:'misc', cls, name:tc(id)}); });
+
+// More natural / stone / brick blocks
+[
+  ['gravel','natural','tile-mc-light_gray'],['clay','natural','tile-mc-light_gray'],
+  ['snow_block','natural','tile-mc-white'],['snow','natural','tile-mc-white'],
+  ['ice','natural','tile-mc-light_blue'],['packed_ice','natural','tile-mc-light_blue'],
+  ['blue_ice','natural','tile-mc-blue'],['mycelium','natural','tile-mc-purple'],
+  ['podzol','natural','tile-mc-brown'],['coarse_dirt','natural','tile-mc-brown'],
+  ['rooted_dirt','natural','tile-mc-brown'],['mud','natural','tile-mc-brown'],
+  ['packed_mud','natural','tile-mc-brown'],['moss_block','natural','tile-mc-green'],
+  ['moss_carpet','natural','tile-mc-green'],['amethyst_block','natural','tile-mc-purple'],
+  ['budding_amethyst','natural','tile-mc-purple'],['pointed_dripstone','natural','tile-mc-brown'],
+  ['dripstone_block','natural','tile-mc-brown'],['calcite','natural','tile-mc-white'],
+  ['tuff','natural','tile-mc-gray'],['deepslate','natural','tile-mc-gray'],
+  ['cobbled_deepslate','natural','tile-mc-gray'],['polished_deepslate','natural','tile-mc-gray'],
+  ['red_sand','natural','tile-mc-red'],['bedrock','natural','tile-mc-black'],
+  ['crying_obsidian','natural','tile-mc-purple'],
+].forEach(([id,cat,cls]) => { if (!has(BLOCKS, id)) BLOCKS.push({id,cat,cls,name:tc(id)}); });
+
+// Stone & brick variants
+['stone_bricks','mossy_stone_bricks','cracked_stone_bricks','chiseled_stone_bricks','smooth_stone',
+'polished_granite','polished_andesite','polished_diorite',
+'sandstone','smooth_sandstone','cut_sandstone','chiseled_sandstone',
+'red_sandstone','smooth_red_sandstone','cut_red_sandstone','chiseled_red_sandstone',
+'bricks','mud_bricks','prismarine','prismarine_bricks','dark_prismarine',
+'quartz_block','quartz_pillar','smooth_quartz','quartz_bricks','chiseled_quartz_block',
+'nether_bricks','red_nether_bricks','cracked_nether_bricks','chiseled_nether_bricks',
+'blackstone','polished_blackstone','polished_blackstone_bricks','cracked_polished_blackstone_bricks','gilded_blackstone',
+'end_stone','end_stone_bricks','purpur_block','purpur_pillar',
+'tuff_bricks','polished_tuff','deepslate_bricks','cracked_deepslate_bricks','deepslate_tiles',
+'cracked_deepslate_tiles','chiseled_deepslate'].forEach(b => {
+  if (!has(BLOCKS, b)) BLOCKS.push({id:b, cat:'stone', cls:'tile-stone', name:tc(b)});
+});
+['stone','cobblestone','mossy_cobblestone','granite','polished_granite','andesite','polished_andesite','diorite','polished_diorite','sandstone','smooth_sandstone','red_sandstone','smooth_red_sandstone','brick','mud_brick','prismarine','prismarine_brick','dark_prismarine','quartz','smooth_quartz','nether_brick','red_nether_brick','blackstone','polished_blackstone','polished_blackstone_brick','end_stone_brick','purpur','tuff','deepslate','cobbled_deepslate','polished_deepslate','deepslate_brick','deepslate_tile','stone_brick','mossy_stone_brick'].forEach(b => {
+  ['_slab','_stairs','_wall'].forEach(suf => {
+    const id = b + suf;
+    if (!has(BLOCKS, id)) BLOCKS.push({id, cat:'stone', cls:'tile-stone', name:tc(id)});
+  });
+});
+[
+  ['magma_block','nether','tile-mc-orange'],['soul_sand','nether','tile-mc-brown'],
+  ['soul_soil','nether','tile-mc-brown'],['basalt','nether','tile-mc-gray'],
+  ['polished_basalt','nether','tile-mc-gray'],['smooth_basalt','nether','tile-mc-gray'],
+  ['glowstone','lighting','tile-mc-yellow'],['shroomlight','lighting','tile-mc-orange'],
+].forEach(([id,cat,cls]) => { if (!has(BLOCKS, id)) BLOCKS.push({id,cat,cls,name:tc(id)}); });
+
+// Copper variants
+['','exposed_','weathered_','oxidized_','waxed_','waxed_exposed_','waxed_weathered_','waxed_oxidized_'].forEach(prefix => {
+  ['copper_block','cut_copper','cut_copper_slab','cut_copper_stairs','chiseled_copper','copper_grate','copper_door','copper_trapdoor','copper_bulb'].forEach(b => {
+    const id = prefix + b;
+    if (!has(BLOCKS, id)) BLOCKS.push({id, cat:'copper', cls:'tile-mc-orange', name:tc(id)});
+  });
+});
+
+// Plants & flowers
+['dandelion','poppy','blue_orchid','allium','azure_bluet','red_tulip','orange_tulip','white_tulip','pink_tulip','oxeye_daisy','cornflower','lily_of_the_valley','wither_rose','torchflower','pitcher_plant','sunflower','lilac','rose_bush','peony','pink_petals','azalea','flowering_azalea','tall_grass','fern','large_fern','dead_bush','lily_pad','seagrass','tall_seagrass','sea_pickle','vine','cave_vines','glow_lichen','hanging_roots','spore_blossom','big_dripleaf','small_dripleaf','cactus','sugar_cane','twisting_vines','weeping_vines','brown_mushroom','red_mushroom','carrots','potatoes','beetroots','melon','pumpkin','carved_pumpkin','jack_o_lantern','hay_block'].forEach(p => {
+  if (!has(BLOCKS, p)) {
+    const cls = p.includes('mushroom') ? 'tile-mc-red' : (p.includes('pumpkin') || p === 'jack_o_lantern' || p === 'hay_block' ? 'tile-mc-orange' : 'tile-mc-green');
+    BLOCKS.push({id: p, cat:'plants', cls, name:tc(p)});
+  }
+});
+
+// Redstone components
+['redstone_torch','redstone_lamp','lever','stone_button','stone_pressure_plate','heavy_weighted_pressure_plate','light_weighted_pressure_plate','observer','piston','sticky_piston','dispenser','dropper','hopper','repeater','comparator','daylight_detector','target','tripwire_hook','note_block','command_block','chain_command_block','repeating_command_block','structure_block','jigsaw','barrier','light','redstone_block'].forEach(r => {
+  if (!has(BLOCKS, r)) BLOCKS.push({id:r, cat:'redstone', cls: r.includes('redstone') ? 'tile-redstone' : 'tile-cobble', name:tc(r)});
+});
+
+// Storage / utility
+['chest','trapped_chest','ender_chest','barrel','decorated_pot','crafting_table','crafter','furnace','blast_furnace','smoker','enchanting_table','anvil','chipped_anvil','damaged_anvil','grindstone','stonecutter','cartography_table','fletching_table','loom','composter','lectern','smithing_table','brewing_stand','cauldron','beacon','conduit','lodestone','respawn_anchor','bell','lightning_rod','beehive','bee_nest','honey_block','honeycomb_block','sponge','wet_sponge','vault','trial_spawner','spawner','bookshelf','chiseled_bookshelf'].forEach(u => {
+  const cat = ['chest','trapped_chest','ender_chest','barrel','decorated_pot'].includes(u) ? 'storage' : 'utility';
+  if (!has(BLOCKS, u)) BLOCKS.push({id:u, cat, cls:'tile-wood-oak', name:tc(u)});
+});
+
+// Lighting / decoration
+['torch','soul_torch','lantern','soul_lantern','candle','sea_lantern','campfire','soul_campfire','end_rod','fire','soul_fire','ochre_froglight','verdant_froglight','pearlescent_froglight','jack_o_lantern'].forEach(l => {
+  if (!has(BLOCKS, l)) BLOCKS.push({id:l, cat:'lighting', cls: l.includes('soul') ? 'tile-mc-cyan' : 'tile-mc-yellow', name:tc(l)});
+});
+['painting','item_frame','glow_item_frame','flower_pot','armor_stand','scaffolding','chain','iron_bars','cobweb','slime_block','dragon_egg','suspicious_sand','suspicious_gravel','frogspawn','mangrove_roots','muddy_mangrove_roots','skeleton_skull','wither_skeleton_skull','zombie_head','creeper_head','dragon_head','piglin_head','player_head'].forEach(d => {
+  if (!has(BLOCKS, d)) BLOCKS.push({id:d, cat:'decoration', cls:'tile-mc-light_gray', name:tc(d)});
+});
+
+// Transport rails
+['rail','powered_rail','detector_rail','activator_rail'].forEach(r => {
+  if (!has(BLOCKS, r)) BLOCKS.push({id:r, cat:'transport', cls:'tile-tier-iron', name:tc(r)});
+});
+
+// End / nether portal
+[
+  ['end_portal_frame','end','tile-mc-green'],['end_portal','end','tile-mc-purple'],
+  ['end_gateway','end','tile-mc-purple'],['chorus_plant','end','tile-mc-purple'],
+  ['chorus_flower','end','tile-mc-purple'],['nether_portal','nether','tile-mc-purple'],
+  ['netherrack','nether','tile-netherrack'],
+].forEach(([id,cat,cls]) => { if (!has(BLOCKS, id)) BLOCKS.push({id,cat,cls,name:tc(id)}); });
+
+// Mobs — full vanilla 1.20+ entity catalog (added per-category to avoid
+// some bundler choking on the larger combined object literal).
+function pushMob(list, cat, cls) {
+  list.forEach(m => { if (!has(MOBS, m)) MOBS.push({id: m, cat: cat, cls: cls, name: tc(m)}); });
+}
+pushMob(['zombie_villager','husk','drowned','stray','bogged','wither_skeleton','cave_spider','endermite','silverfish','slime','magma_cube','witch','ghast','phantom','shulker','guardian','elder_guardian','piglin','piglin_brute','hoglin','zoglin','zombified_piglin','vex','vindicator','pillager','evoker','ravager','illusioner','warden','breeze','creaking'], 'hostile', 'tile-mc-red');
+pushMob(['mooshroom','horse','donkey','mule','llama','trader_llama','skeleton_horse','zombie_horse','wandering_trader','rabbit','fox','wolf','cat','ocelot','parrot','panda','polar_bear','allay','frog','tadpole','sniffer','camel','armadillo','goat','bee','turtle','strider'], 'passive', 'tile-mc-brown');
+pushMob(['cod','salmon','pufferfish','tropical_fish','squid','glow_squid','dolphin'], 'aquatic', 'tile-mc-blue');
+pushMob(['bat'], 'flying', 'tile-mc-gray');
+pushMob(['iron_golem','snow_golem'], 'utility', 'tile-iron');
+pushMob(['ender_dragon','wither'], 'boss', 'tile-mc-black');
+pushMob(['arrow','spectral_arrow','snowball','ender_pearl','eye_of_ender','fireball','small_fireball','dragon_fireball','wither_skull','llama_spit','shulker_bullet','wind_charge','breeze_wind_charge','fishing_bobber','experience_orb','experience_bottle','firework_rocket','lightning_bolt','tnt','falling_block','item','leash_knot','painting','area_effect_cloud','marker','interaction','display','text_display','item_display','block_display','evoker_fangs','ominous_item_spawner'], 'projectile', 'tile-mc-yellow');
+pushMob(['minecart','chest_minecart','hopper_minecart','furnace_minecart','tnt_minecart','command_block_minecart','boat','chest_boat'], 'vehicle', 'tile-tier-iron');
+})();
   </script>
 
   <script is:inline type="text/babel">
@@ -1775,6 +2138,480 @@ const EXTRA_COMMANDS = [
   { id:'cp_purge', plugin:'coreprotect', name:'/co purge', tag:'OP', desc:'Purge old data', kind:'schema', params:[ { id:'time', type:'text', label:'Older than', default:'30d', prefix:'t:' } ]},
   { id:'cp_undo', plugin:'coreprotect', name:'/co undo', tag:'OP', desc:'Undo your last rollback', kind:'schema', params:[] },
   { id:'cp_status', plugin:'coreprotect', name:'/co status', tag:'OP', desc:'Show plugin status', kind:'schema', params:[] },
+
+  // ── Vanilla — additional ────────────────────────────────────────────
+  { id:'enchant', plugin:'vanilla', name:'/enchant', tag:'OP', desc:'Add an enchantment to held item', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'enchantment', type:'seg', label:'Enchantment', options:['protection','fire_protection','feather_falling','blast_protection','projectile_protection','respiration','aqua_affinity','thorns','depth_strider','frost_walker','sharpness','smite','bane_of_arthropods','knockback','fire_aspect','looting','sweeping_edge','efficiency','silk_touch','unbreaking','fortune','power','punch','flame','infinity','luck_of_the_sea','lure','loyalty','impaling','riptide','channeling','multishot','quick_charge','piercing','mending','soul_speed','swift_sneak','density','breach','wind_burst'], default:'sharpness' },
+    { id:'level', type:'number', label:'Level', default:1, min:1, max:255 },
+  ]},
+  { id:'clear', plugin:'vanilla', name:'/clear', tag:'OP', desc:'Clear items from inventory', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target', optional:true },
+    { id:'item', type:'item', label:'Item filter', optional:true },
+    { id:'max', type:'number', label:'Max count', default:-1, min:-1, max:1000000, optional:true },
+  ]},
+  { id:'gamerule_extra', plugin:'vanilla', name:'/gamerule (extra)', tag:'OP', desc:'Set any gamerule by name', kind:'schema', params:[
+    { id:'rule', type:'text', label:'Rule', placeholder:'randomTickSpeed' },
+    { id:'value', type:'text', label:'Value', placeholder:'3 / true / false' },
+  ]},
+  { id:'scoreboard_obj_add', plugin:'vanilla', name:'/scoreboard objectives add', tag:'OP', desc:'Create a scoreboard objective', kind:'schema', params:[
+    { id:'name', type:'text', label:'Objective name' },
+    { id:'criteria', type:'text', label:'Criteria', default:'dummy' },
+    { id:'display', type:'text', label:'Display name', optional:true },
+  ]},
+  { id:'scoreboard_obj_remove', plugin:'vanilla', name:'/scoreboard objectives remove', tag:'OP', desc:'Remove a scoreboard objective', kind:'schema', params:[ { id:'name', type:'text', label:'Objective' } ]},
+  { id:'scoreboard_obj_setdisplay', plugin:'vanilla', name:'/scoreboard objectives setdisplay', tag:'OP', desc:'Show an objective in a slot', kind:'schema', params:[
+    { id:'slot', type:'seg', label:'Slot', options:['list','sidebar','belowName'], default:'sidebar' },
+    { id:'name', type:'text', label:'Objective' },
+  ]},
+  { id:'scoreboard_players_set', plugin:'vanilla', name:'/scoreboard players set', tag:'OP', desc:'Set a player score', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'objective', type:'text', label:'Objective' },
+    { id:'value', type:'number', label:'Value', default:0, min:-2147483648, max:2147483647 },
+  ]},
+  { id:'scoreboard_players_add', plugin:'vanilla', name:'/scoreboard players add', tag:'OP', desc:'Add to a player score', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'objective', type:'text', label:'Objective' },
+    { id:'amount', type:'number', label:'Amount', default:1, min:0, max:2147483647 },
+  ]},
+  { id:'team_add', plugin:'vanilla', name:'/team add', tag:'OP', desc:'Create a team', kind:'schema', params:[
+    { id:'name', type:'text', label:'Team name' },
+    { id:'display', type:'text', label:'Display', optional:true },
+  ]},
+  { id:'team_join', plugin:'vanilla', name:'/team join', tag:'OP', desc:'Add players to a team', kind:'schema', params:[
+    { id:'team', type:'text', label:'Team' },
+    { id:'target', type:'target', label:'Target' },
+  ]},
+  { id:'team_modify', plugin:'vanilla', name:'/team modify', tag:'OP', desc:'Modify a team option', kind:'schema', params:[
+    { id:'team', type:'text', label:'Team' },
+    { id:'option', type:'seg', label:'Option', options:['color','collisionRule','deathMessageVisibility','displayName','friendlyFire','nametagVisibility','prefix','seeFriendlyInvisibles','suffix'], default:'color' },
+    { id:'value', type:'text', label:'Value', placeholder:'red' },
+  ]},
+  { id:'tag_add', plugin:'vanilla', name:'/tag add', tag:'OP', desc:'Add an entity tag', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'tag', type:'text', label:'Tag' },
+  ]},
+  { id:'tag_remove', plugin:'vanilla', name:'/tag remove', tag:'OP', desc:'Remove an entity tag', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'tag', type:'text', label:'Tag' },
+  ]},
+  { id:'tag_list', plugin:'vanilla', name:'/tag list', tag:'OP', desc:'List entity tags', kind:'schema', params:[ { id:'target', type:'target', label:'Target' } ]},
+  { id:'recipe_give', plugin:'vanilla', name:'/recipe give', tag:'OP', desc:'Give a recipe to a player', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'recipe', type:'text', label:'Recipe', placeholder:'*', default:'*' },
+  ]},
+  { id:'recipe_take', plugin:'vanilla', name:'/recipe take', tag:'OP', desc:'Revoke a recipe from a player', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'recipe', type:'text', label:'Recipe', placeholder:'*', default:'*' },
+  ]},
+  { id:'datapack_list', plugin:'vanilla', name:'/datapack list', tag:'OP', desc:'List loaded datapacks', kind:'schema', params:[] },
+  { id:'datapack_enable', plugin:'vanilla', name:'/datapack enable', tag:'OP', desc:'Enable a datapack', kind:'schema', params:[ { id:'name', type:'text', label:'Name' } ]},
+  { id:'datapack_disable', plugin:'vanilla', name:'/datapack disable', tag:'OP', desc:'Disable a datapack', kind:'schema', params:[ { id:'name', type:'text', label:'Name' } ]},
+  { id:'forceload_add', plugin:'vanilla', name:'/forceload add', tag:'OP', desc:'Force-load chunks', kind:'schema', params:[
+    { id:'from', type:'coords', label:'From' }, { id:'to', type:'coords', label:'To', optional:true },
+  ]},
+  { id:'forceload_remove', plugin:'vanilla', name:'/forceload remove', tag:'OP', desc:'Stop force-loading chunks', kind:'schema', params:[
+    { id:'from', type:'coords', label:'From' }, { id:'to', type:'coords', label:'To', optional:true },
+  ]},
+  { id:'function', plugin:'vanilla', name:'/function', tag:'OP', desc:'Run a datapack function', kind:'schema', params:[ { id:'name', type:'text', label:'Function id', placeholder:'mypack:setup' } ]},
+  { id:'loot_give', plugin:'vanilla', name:'/loot give', tag:'OP', desc:'Give a loot table to a player', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'source', type:'seg', label:'Source', options:['fish','loot','kill','mine'], default:'loot' },
+    { id:'loot_table', type:'text', label:'Loot table', placeholder:'minecraft:chests/simple_dungeon' },
+  ]},
+  { id:'me', plugin:'vanilla', name:'/me', tag:'PLAYER', desc:'Action message in chat', kind:'schema', params:[ { id:'message', type:'multiline', label:'Action' } ]},
+  { id:'tellraw_extra', plugin:'vanilla', name:'/tellraw (raw)', tag:'OP', desc:'Tellraw with custom JSON', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'json', type:'multiline', label:'JSON', placeholder:'{"text":"Hello","color":"gold"}' },
+  ]},
+  { id:'banlist', plugin:'vanilla', name:'/banlist', tag:'OP', desc:'List banned players', kind:'schema', params:[ { id:'kind', type:'seg', label:'Kind', options:['players','ips'], default:'players', optional:true } ]},
+  { id:'banip', plugin:'vanilla', name:'/ban-ip', tag:'OP', desc:'Ban a player by IP', kind:'schema', params:[
+    { id:'address', type:'text', label:'Address or player' },
+    { id:'reason', type:'multiline', label:'Reason', optional:true },
+  ]},
+  { id:'pardonip', plugin:'vanilla', name:'/pardon-ip', tag:'OP', desc:'Unban an IP', kind:'schema', params:[ { id:'address', type:'text', label:'Address' } ]},
+  { id:'defaultgamemode', plugin:'vanilla', name:'/defaultgamemode', tag:'OP', desc:'Default mode for new players', kind:'schema', params:[
+    { id:'mode', type:'seg', label:'Mode', options:['survival','creative','adventure','spectator'], default:'survival' },
+  ]},
+  { id:'save_on', plugin:'vanilla', name:'/save-on', tag:'OP', desc:'Enable automatic saving', kind:'schema', params:[] },
+  { id:'save_off', plugin:'vanilla', name:'/save-off', tag:'OP', desc:'Disable automatic saving', kind:'schema', params:[] },
+  { id:'reload', plugin:'vanilla', name:'/reload', tag:'OP', desc:'Reload datapacks/config', kind:'schema', params:[] },
+  { id:'item_replace', plugin:'vanilla', name:'/item replace', tag:'OP', desc:'Replace an item in a slot', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'slot', type:'text', label:'Slot', placeholder:'weapon.mainhand', default:'weapon.mainhand' },
+    { id:'item', type:'item', label:'Item' },
+    { id:'count', type:'number', label:'Count', default:1, min:1, max:64, optional:true },
+  ]},
+  { id:'place_template', plugin:'vanilla', name:'/place template', tag:'OP', desc:'Place a structure template', kind:'schema', params:[
+    { id:'template', type:'text', label:'Template id' },
+    { id:'pos', type:'coords', label:'Position', optional:true },
+  ]},
+  { id:'place_feature', plugin:'vanilla', name:'/place feature', tag:'OP', desc:'Place a configured feature', kind:'schema', params:[
+    { id:'feature', type:'text', label:'Feature id' },
+    { id:'pos', type:'coords', label:'Position', optional:true },
+  ]},
+  { id:'place_jigsaw', plugin:'vanilla', name:'/place jigsaw', tag:'OP', desc:'Place a jigsaw structure', kind:'schema', params:[
+    { id:'pool', type:'text', label:'Template pool' },
+    { id:'target_jigsaw', type:'text', label:'Target jigsaw', default:'minecraft:bottom' },
+    { id:'depth', type:'number', label:'Max depth', default:1, min:1, max:20 },
+    { id:'pos', type:'coords', label:'Position', optional:true },
+  ]},
+  { id:'spectate', plugin:'vanilla', name:'/spectate', tag:'OP', desc:'Spectate an entity', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target', optional:true },
+    { id:'player', type:'target', label:'Player', optional:true },
+  ]},
+  { id:'ride_mount', plugin:'vanilla', name:'/ride mount', tag:'OP', desc:'Mount an entity', kind:'schema', params:[
+    { id:'target', type:'target', label:'Rider' },
+    { id:'vehicle', type:'target', label:'Vehicle' },
+  ]},
+  { id:'ride_dismount', plugin:'vanilla', name:'/ride dismount', tag:'OP', desc:'Dismount an entity', kind:'schema', params:[ { id:'target', type:'target', label:'Target' } ]},
+  { id:'damage', plugin:'vanilla', name:'/damage', tag:'OP', desc:'Apply damage to entities', kind:'schema', params:[
+    { id:'target', type:'target', label:'Target' },
+    { id:'amount', type:'number', label:'Amount', default:1, min:0, max:1000 },
+    { id:'type', type:'text', label:'Damage type', placeholder:'minecraft:generic', optional:true },
+  ]},
+  { id:'random_value', plugin:'vanilla', name:'/random value', tag:'OP', desc:'Generate a random value', kind:'schema', params:[
+    { id:'min', type:'number', label:'Min', default:0 },
+    { id:'max', type:'number', label:'Max', default:100 },
+  ]},
+  { id:'fillbiome', plugin:'vanilla', name:'/fillbiome', tag:'OP', desc:'Set the biome in a region', kind:'schema', params:[
+    { id:'from', type:'coords', label:'From' },
+    { id:'to', type:'coords', label:'To' },
+    { id:'biome', type:'text', label:'Biome', placeholder:'minecraft:plains', default:'minecraft:plains' },
+  ]},
+  { id:'tickrate', plugin:'vanilla', name:'/tick rate', tag:'OP', desc:'Set the server tick rate', kind:'schema', params:[
+    { id:'rate', type:'number', label:'Tick rate', default:20, min:1, max:10000 },
+  ]},
+  { id:'tickstep', plugin:'vanilla', name:'/tick step', tag:'OP', desc:'Step the server N ticks', kind:'schema', params:[
+    { id:'ticks', type:'number', label:'Ticks', default:1, min:1, max:1000000 },
+  ]},
+  { id:'tickfreeze', plugin:'vanilla', name:'/tick freeze', tag:'OP', desc:'Pause the tick clock', kind:'schema', params:[] },
+  { id:'tickunfreeze', plugin:'vanilla', name:'/tick unfreeze', tag:'OP', desc:'Resume the tick clock', kind:'schema', params:[] },
+  { id:'wb_add', plugin:'vanilla', name:'/worldborder add', tag:'OP', desc:'Grow the world border', kind:'schema', params:[
+    { id:'distance', type:'number', label:'Blocks', default:100, min:0, max:60000000 },
+    { id:'time', type:'number', label:'Seconds', default:0, min:0, max:1000000, optional:true },
+  ]},
+  { id:'wb_set', plugin:'vanilla', name:'/worldborder set', tag:'OP', desc:'Set the world border diameter', kind:'schema', params:[
+    { id:'distance', type:'number', label:'Diameter', default:60000000, min:1, max:60000000 },
+    { id:'time', type:'number', label:'Seconds', default:0, min:0, max:1000000, optional:true },
+  ]},
+  { id:'wb_center', plugin:'vanilla', name:'/worldborder center', tag:'OP', desc:'Re-center the world border', kind:'schema', params:[
+    { id:'x', type:'text', label:'X', default:'0' }, { id:'z', type:'text', label:'Z', default:'0' },
+  ]},
+
+  // ── EssentialsX — additional ────────────────────────────────────────
+  { id:'ess_balance', plugin:'essentials', name:'/balance', tag:'ESS', desc:'Show a player balance', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'ess_baltop', plugin:'essentials', name:'/baltop', tag:'ESS', desc:'Top balances', kind:'schema', params:[ { id:'page', type:'number', label:'Page', default:1, min:1, optional:true } ]},
+  { id:'ess_eco', plugin:'essentials', name:'/eco', tag:'ESS', desc:'Manage economy', kind:'schema', params:[
+    { id:'action', type:'seg', label:'Action', options:['give','take','set','reset'], default:'give' },
+    { id:'player', type:'text', label:'Player' },
+    { id:'amount', type:'number', label:'Amount', default:100, min:0, max:1000000000 },
+  ]},
+  { id:'ess_pay', plugin:'essentials', name:'/pay', tag:'ESS', desc:'Pay a player', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'amount', type:'number', label:'Amount', default:1, min:0, max:1000000000 },
+  ]},
+  { id:'ess_msg', plugin:'essentials', name:'/msg', tag:'ESS', desc:'Private message', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'message', type:'multiline', label:'Message' },
+  ]},
+  { id:'ess_r', plugin:'essentials', name:'/r', tag:'ESS', desc:'Reply to last message', kind:'schema', params:[ { id:'message', type:'multiline', label:'Message' } ]},
+  { id:'ess_mail_send', plugin:'essentials', name:'/mail send', tag:'ESS', desc:'Send mail to a player', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'message', type:'multiline', label:'Message' },
+  ]},
+  { id:'ess_mail_read', plugin:'essentials', name:'/mail read', tag:'ESS', desc:'Read your mail', kind:'schema', params:[] },
+  { id:'ess_mail_clear', plugin:'essentials', name:'/mail clear', tag:'ESS', desc:'Clear your inbox', kind:'schema', params:[] },
+  { id:'ess_mute', plugin:'essentials', name:'/mute', tag:'ESS', desc:'Mute a player', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'duration', type:'text', label:'Duration', optional:true, placeholder:'30m' },
+    { id:'reason', type:'multiline', label:'Reason', optional:true },
+  ]},
+  { id:'ess_unmute', plugin:'essentials', name:'/unmute', tag:'ESS', desc:'Unmute a player', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'ess_tempban', plugin:'essentials', name:'/tempban', tag:'ESS', desc:'Temporarily ban a player', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'duration', type:'text', label:'Duration', placeholder:'1d' },
+    { id:'reason', type:'multiline', label:'Reason', optional:true },
+  ]},
+  { id:'ess_kick', plugin:'essentials', name:'/kick', tag:'ESS', desc:'Kick a player', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'reason', type:'multiline', label:'Reason', optional:true },
+  ]},
+  { id:'ess_kickall', plugin:'essentials', name:'/kickall', tag:'ESS', desc:'Kick everyone except yourself', kind:'schema', params:[ { id:'reason', type:'multiline', label:'Reason', optional:true } ]},
+  { id:'ess_invsee', plugin:'essentials', name:'/invsee', tag:'ESS', desc:'View another player inventory', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'ess_clearinventory', plugin:'essentials', name:'/clearinventory', tag:'ESS', desc:'Clear inventory', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'ess_speed', plugin:'essentials', name:'/speed', tag:'ESS', desc:'Set walk/fly speed', kind:'schema', params:[
+    { id:'value', type:'number', label:'Speed', default:2, min:0, max:10 },
+    { id:'mode', type:'seg', label:'Mode', options:['walk','fly'], default:'walk', optional:true },
+    { id:'player', type:'text', label:'Player', optional:true },
+  ]},
+  { id:'ess_seen', plugin:'essentials', name:'/seen', tag:'ESS', desc:'Show last-seen info', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'ess_realname', plugin:'essentials', name:'/realname', tag:'ESS', desc:'Show a nickname owner', kind:'schema', params:[ { id:'nick', type:'text', label:'Nickname' } ]},
+  { id:'ess_skull', plugin:'essentials', name:'/skull', tag:'ESS', desc:'Spawn a player head', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'ess_lightning', plugin:'essentials', name:'/lightning', tag:'ESS', desc:'Strike with lightning', kind:'schema', params:[ { id:'target', type:'target', label:'Target', optional:true } ]},
+  { id:'ess_burn', plugin:'essentials', name:'/burn', tag:'ESS', desc:'Set a player on fire', kind:'schema', params:[
+    { id:'player', type:'text', label:'Player' },
+    { id:'seconds', type:'number', label:'Seconds', default:5, min:1, max:1000 },
+  ]},
+  { id:'ess_fireball', plugin:'essentials', name:'/fireball', tag:'ESS', desc:'Shoot a fireball', kind:'schema', params:[
+    { id:'kind', type:'seg', label:'Type', options:['small','large','witherskull','dragonfireball'], default:'small', optional:true },
+    { id:'speed', type:'number', label:'Speed', default:2, min:1, max:50, optional:true },
+  ]},
+  { id:'ess_socialspy', plugin:'essentials', name:'/socialspy', tag:'ESS', desc:'See others private messages', kind:'schema', params:[
+    { id:'state', type:'seg', label:'State', options:['on','off','toggle'], default:'toggle', optional:true },
+  ]},
+  { id:'ess_top', plugin:'essentials', name:'/top', tag:'ESS', desc:'Teleport to highest block', kind:'schema', params:[] },
+  { id:'ess_jump', plugin:'essentials', name:'/jump', tag:'ESS', desc:'Teleport to where you look', kind:'schema', params:[] },
+  { id:'ess_tppos', plugin:'essentials', name:'/tppos', tag:'ESS', desc:'Teleport to coordinates', kind:'schema', params:[
+    { id:'pos', type:'coords', label:'Position' },
+    { id:'world', type:'text', label:'World', optional:true },
+  ]},
+  { id:'ess_tpall', plugin:'essentials', name:'/tpall', tag:'ESS', desc:'Teleport everyone to you', kind:'schema', params:[] },
+  { id:'ess_tphere_force', plugin:'essentials', name:'/tphere', tag:'ESS', desc:'Force a player to teleport to you', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'ess_god_player', plugin:'essentials', name:'/god', tag:'ESS', desc:'Toggle god mode', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'ess_heal_all', plugin:'essentials', name:'/heal', tag:'ESS', desc:'Heal a player or yourself', kind:'schema', params:[ { id:'target', type:'target', label:'Target', optional:true } ]},
+  { id:'ess_feed_all', plugin:'essentials', name:'/feed', tag:'ESS', desc:'Feed a player or yourself', kind:'schema', params:[ { id:'target', type:'target', label:'Target', optional:true } ]},
+  { id:'ess_fly_player', plugin:'essentials', name:'/fly', tag:'ESS', desc:'Toggle flight', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'ess_thunder', plugin:'essentials', name:'/thunder', tag:'ESS', desc:'Toggle storm', kind:'schema', params:[
+    { id:'state', type:'seg', label:'State', options:['true','false'], default:'true' },
+  ]},
+  { id:'ess_world', plugin:'essentials', name:'/world', tag:'ESS', desc:'Switch world', kind:'schema', params:[ { id:'name', type:'text', label:'World' } ]},
+  { id:'ess_help', plugin:'essentials', name:'/help', tag:'ESS', desc:'Show command help', kind:'schema', params:[ { id:'topic', type:'text', label:'Topic', optional:true } ]},
+  { id:'ess_helpop', plugin:'essentials', name:'/helpop', tag:'ESS', desc:'Message online ops', kind:'schema', params:[ { id:'message', type:'multiline', label:'Message' } ]},
+  { id:'ess_powertool', plugin:'essentials', name:'/powertool', tag:'ESS', desc:'Bind a command to held item', kind:'schema', params:[ { id:'command', type:'multiline', label:'Command', placeholder:'say hi {player}' } ]},
+  { id:'ess_book', plugin:'essentials', name:'/book', tag:'ESS', desc:'Edit/copy held book', kind:'schema', params:[
+    { id:'action', type:'seg', label:'Action', options:['unsign','copy','title','author'], default:'unsign', optional:true },
+    { id:'arg', type:'text', label:'Arg', optional:true },
+  ]},
+  { id:'ess_rules', plugin:'essentials', name:'/rules', tag:'ESS', desc:'Show server rules', kind:'schema', params:[] },
+  { id:'ess_motd', plugin:'essentials', name:'/motd', tag:'ESS', desc:'Show the MOTD', kind:'schema', params:[] },
+  { id:'ess_dispose', plugin:'essentials', name:'/dispose', tag:'ESS', desc:'Open a one-shot trash window', kind:'schema', params:[] },
+  { id:'ess_condense', plugin:'essentials', name:'/condense', tag:'ESS', desc:'Condense items into blocks', kind:'schema', params:[] },
+  { id:'ess_recipe', plugin:'essentials', name:'/recipe', tag:'ESS', desc:'Show a recipe', kind:'schema', params:[ { id:'item', type:'item', label:'Item' } ]},
+  { id:'ess_itemdb', plugin:'essentials', name:'/itemdb', tag:'ESS', desc:'Look up an item id', kind:'schema', params:[ { id:'item', type:'item', label:'Item' } ]},
+  { id:'ess_essentials_reload', plugin:'essentials', name:'/essentials reload', tag:'ESS', desc:'Reload Essentials configs', kind:'schema', params:[] },
+  { id:'ess_setspawn', plugin:'essentials', name:'/setspawn', tag:'ESS', desc:'Set the server spawn at your location', kind:'schema', params:[] },
+  { id:'ess_spawn', plugin:'essentials', name:'/spawn', tag:'ESS', desc:'Teleport to spawn', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+
+  // ── WorldEdit — additional ──────────────────────────────────────────
+  { id:'we_outline', plugin:'worldedit', name:'//outline', tag:'WE', desc:'Build a hollow outline (faces) of selection', kind:'schema', params:[ { id:'block', type:'block', label:'Block', default:'stone' } ]},
+  { id:'we_faces', plugin:'worldedit', name:'//faces', tag:'WE', desc:'Build the faces of selection', kind:'schema', params:[ { id:'block', type:'block', label:'Block', default:'stone' } ]},
+  { id:'we_hcyl', plugin:'worldedit', name:'//hcyl', tag:'WE', desc:'Generate a hollow cylinder', kind:'schema', params:[
+    { id:'block', type:'block', label:'Block', default:'stone' },
+    { id:'radius', type:'number', label:'Radius', default:5, min:1, max:200 },
+    { id:'height', type:'number', label:'Height', default:1, min:1, max:512 },
+  ]},
+  { id:'we_hsphere', plugin:'worldedit', name:'//hsphere', tag:'WE', desc:'Generate a hollow sphere', kind:'schema', params:[
+    { id:'block', type:'block', label:'Block', default:'stone' },
+    { id:'radius', type:'number', label:'Radius', default:5, min:1, max:100 },
+  ]},
+  { id:'we_hpyramid', plugin:'worldedit', name:'//hpyramid', tag:'WE', desc:'Generate a hollow pyramid', kind:'schema', params:[
+    { id:'block', type:'block', label:'Block', default:'sandstone' },
+    { id:'size', type:'number', label:'Size', default:5, min:1, max:64 },
+  ]},
+  { id:'we_drain', plugin:'worldedit', name:'//drain', tag:'WE', desc:'Drain liquid around you', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100 } ]},
+  { id:'we_fixwater', plugin:'worldedit', name:'//fixwater', tag:'WE', desc:'Fix nearby water', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100 } ]},
+  { id:'we_fixlava', plugin:'worldedit', name:'//fixlava', tag:'WE', desc:'Fix nearby lava', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100 } ]},
+  { id:'we_snow', plugin:'worldedit', name:'//snow', tag:'WE', desc:'Add snow layer', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100 } ]},
+  { id:'we_thaw', plugin:'worldedit', name:'//thaw', tag:'WE', desc:'Melt nearby snow & ice', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100 } ]},
+  { id:'we_ex', plugin:'worldedit', name:'//ex', tag:'WE', desc:'Extinguish nearby fire', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:10, min:1, max:100, optional:true } ]},
+  { id:'we_butcher', plugin:'worldedit', name:'//butcher', tag:'WE', desc:'Kill nearby mobs', kind:'schema', params:[ { id:'radius', type:'number', label:'Radius', default:20, min:1, max:1000, optional:true } ]},
+  { id:'we_remove', plugin:'worldedit', name:'//remove', tag:'WE', desc:'Remove nearby entities by type', kind:'schema', params:[
+    { id:'type', type:'seg', label:'Type', options:['arrows','items','painting','itemframes','boats','minecarts','tnt','xp'], default:'items' },
+    { id:'radius', type:'number', label:'Radius', default:20, min:1, max:1000 },
+  ]},
+  { id:'we_replacenear', plugin:'worldedit', name:'//replacenear', tag:'WE', desc:'Replace blocks near you', kind:'schema', params:[
+    { id:'radius', type:'number', label:'Radius', default:10, min:1, max:200 },
+    { id:'from', type:'text', label:'From', default:'stone' },
+    { id:'to', type:'text', label:'To', default:'cobblestone' },
+  ]},
+  { id:'we_forest', plugin:'worldedit', name:'//forest', tag:'WE', desc:'Place trees in selection', kind:'schema', params:[
+    { id:'type', type:'seg', label:'Type', options:['oak','redwood','tallredwood','birch','jungle','jungle_bush','dark_oak','acacia','mangrove','cherry','warped','crimson'], default:'oak' },
+    { id:'size', type:'number', label:'Density', default:10, min:1, max:100, optional:true },
+    { id:'rate', type:'number', label:'Rate', default:80, min:1, max:100, optional:true },
+  ]},
+  { id:'we_hollow', plugin:'worldedit', name:'//hollow', tag:'WE', desc:'Hollow out the selection', kind:'schema', params:[
+    { id:'thickness', type:'number', label:'Thickness', default:1, min:1, max:30, optional:true },
+  ]},
+  { id:'we_setbiome', plugin:'worldedit', name:'//setbiome', tag:'WE', desc:'Set biome of selection', kind:'schema', params:[
+    { id:'biome', type:'text', label:'Biome', placeholder:'minecraft:plains', default:'minecraft:plains' },
+  ]},
+  { id:'we_chunk', plugin:'worldedit', name:'//chunk', tag:'WE', desc:'Select the chunk you stand in', kind:'schema', params:[] },
+  { id:'we_size', plugin:'worldedit', name:'//size', tag:'WE', desc:'Print selection size', kind:'schema', params:[] },
+  { id:'we_thru', plugin:'worldedit', name:'/thru', tag:'WE', desc:'Pass through walls you face', kind:'schema', params:[] },
+  { id:'we_up', plugin:'worldedit', name:'/up', tag:'WE', desc:'Teleport upward', kind:'schema', params:[ { id:'distance', type:'number', label:'Distance', default:5, min:1, max:256 } ]},
+  { id:'we_jumpto', plugin:'worldedit', name:'/jumpto', tag:'WE', desc:'Jump to where you look', kind:'schema', params:[] },
+  { id:'we_ascend', plugin:'worldedit', name:'/ascend', tag:'WE', desc:'Ascend levels', kind:'schema', params:[ { id:'levels', type:'number', label:'Levels', default:1, min:1, max:50, optional:true } ]},
+  { id:'we_descend', plugin:'worldedit', name:'/descend', tag:'WE', desc:'Descend levels', kind:'schema', params:[ { id:'levels', type:'number', label:'Levels', default:1, min:1, max:50, optional:true } ]},
+  { id:'we_brush_sphere', plugin:'worldedit', name:'/brush sphere', tag:'WE', desc:'Bind sphere brush to held item', kind:'schema', params:[
+    { id:'block', type:'block', label:'Block', default:'stone' },
+    { id:'radius', type:'number', label:'Radius', default:3, min:1, max:50 },
+  ]},
+  { id:'we_brush_cyl', plugin:'worldedit', name:'/brush cylinder', tag:'WE', desc:'Bind cylinder brush', kind:'schema', params:[
+    { id:'block', type:'block', label:'Block', default:'stone' },
+    { id:'radius', type:'number', label:'Radius', default:3, min:1, max:50 },
+    { id:'height', type:'number', label:'Height', default:1, min:1, max:50 },
+  ]},
+  { id:'we_brush_smooth', plugin:'worldedit', name:'/brush smooth', tag:'WE', desc:'Bind smooth brush', kind:'schema', params:[
+    { id:'radius', type:'number', label:'Radius', default:3, min:1, max:50 },
+    { id:'iterations', type:'number', label:'Iterations', default:4, min:1, max:32 },
+  ]},
+  { id:'we_brush_none', plugin:'worldedit', name:'/brush none', tag:'WE', desc:'Unbind held brush', kind:'schema', params:[] },
+  { id:'we_mask', plugin:'worldedit', name:'/mask', tag:'WE', desc:'Set brush mask', kind:'schema', params:[ { id:'mask', type:'text', label:'Mask', placeholder:'#solid', optional:true } ]},
+  { id:'we_gmask', plugin:'worldedit', name:'/gmask', tag:'WE', desc:'Set the global mask', kind:'schema', params:[ { id:'mask', type:'text', label:'Mask', placeholder:'#solid', optional:true } ]},
+  { id:'we_history_clear', plugin:'worldedit', name:'/clearhistory', tag:'WE', desc:'Clear edit history', kind:'schema', params:[] },
+  { id:'we_schem_save', plugin:'worldedit', name:'//schem save', tag:'WE', desc:'Save selection to a schematic', kind:'schema', params:[ { id:'name', type:'text', label:'Name', placeholder:'mybuild' } ]},
+  { id:'we_schem_load', plugin:'worldedit', name:'//schem load', tag:'WE', desc:'Load a schematic into clipboard', kind:'schema', params:[ { id:'name', type:'text', label:'Name' } ]},
+  { id:'we_schem_list', plugin:'worldedit', name:'//schem list', tag:'WE', desc:'List schematics', kind:'schema', params:[] },
+  { id:'we_schem_delete', plugin:'worldedit', name:'//schem delete', tag:'WE', desc:'Delete a schematic', kind:'schema', params:[ { id:'name', type:'text', label:'Name' } ]},
+
+  // ── WorldGuard — additional ─────────────────────────────────────────
+  { id:'wg_select', plugin:'worldguard', name:'/rg select', tag:'OP', desc:'Re-select an existing region', kind:'schema', params:[ { id:'name', type:'text', label:'Region' } ]},
+  { id:'wg_setpriority2', plugin:'worldguard', name:'/rg setpriority', tag:'OP', desc:'Set region priority (alt)', kind:'schema', params:[
+    { id:'name', type:'text', label:'Region' }, { id:'priority', type:'number', label:'Priority', default:0 },
+  ]},
+  { id:'wg_setparent', plugin:'worldguard', name:'/rg setparent', tag:'OP', desc:'Set region parent', kind:'schema', params:[
+    { id:'name', type:'text', label:'Region' }, { id:'parent', type:'text', label:'Parent', optional:true },
+  ]},
+  { id:'wg_removemember', plugin:'worldguard', name:'/rg removemember', tag:'OP', desc:'Remove a region member', kind:'schema', params:[
+    { id:'name', type:'text', label:'Region' }, { id:'player', type:'text', label:'Player' },
+  ]},
+  { id:'wg_removeowner', plugin:'worldguard', name:'/rg removeowner', tag:'OP', desc:'Remove a region owner', kind:'schema', params:[
+    { id:'name', type:'text', label:'Region' }, { id:'player', type:'text', label:'Player' },
+  ]},
+  { id:'wg_save', plugin:'worldguard', name:'/wg save', tag:'OP', desc:'Save WorldGuard data', kind:'schema', params:[] },
+  { id:'wg_load', plugin:'worldguard', name:'/wg load', tag:'OP', desc:'Reload WorldGuard data', kind:'schema', params:[] },
+  { id:'wg_running', plugin:'worldguard', name:'/wg running', tag:'OP', desc:'Show running tasks', kind:'schema', params:[] },
+  { id:'wg_report', plugin:'worldguard', name:'/wg report', tag:'OP', desc:'Generate a debug report', kind:'schema', params:[] },
+  { id:'wg_version', plugin:'worldguard', name:'/wg version', tag:'OP', desc:'Show plugin version', kind:'schema', params:[] },
+  { id:'wg_stoplag', plugin:'worldguard', name:'/wg stoplag', tag:'OP', desc:'Toggle anti-lag mode', kind:'schema', params:[
+    { id:'state', type:'seg', label:'State', options:['on','off','confirm'], default:'on', optional:true },
+  ]},
+  { id:'wg_locate', plugin:'worldguard', name:'/wg locate', tag:'OP', desc:'Find blocks/biomes/structures', kind:'schema', params:[
+    { id:'kind', type:'seg', label:'Kind', options:['biome','structure','block'], default:'biome' },
+    { id:'name', type:'text', label:'Name' },
+  ]},
+
+  // ── LuckPerms — additional ──────────────────────────────────────────
+  { id:'lp_user_clear', plugin:'luckperms', name:'/lp user … clear', tag:'OP', desc:'Clear all user permissions', kind:'schema', params:[ { id:'user', type:'text', label:'Player' } ]},
+  { id:'lp_user_info', plugin:'luckperms', name:'/lp user … info', tag:'OP', desc:'Show a user info', kind:'schema', params:[ { id:'user', type:'text', label:'Player' } ]},
+  { id:'lp_user_promote', plugin:'luckperms', name:'/lp user … promote', tag:'OP', desc:'Promote on a track', kind:'schema', params:[
+    { id:'user', type:'text', label:'Player' },
+    { id:'track', type:'text', label:'Track', placeholder:'staff' },
+  ]},
+  { id:'lp_user_demote', plugin:'luckperms', name:'/lp user … demote', tag:'OP', desc:'Demote on a track', kind:'schema', params:[
+    { id:'user', type:'text', label:'Player' },
+    { id:'track', type:'text', label:'Track', placeholder:'staff' },
+  ]},
+  { id:'lp_user_meta_unset', plugin:'luckperms', name:'/lp user … meta unset', tag:'OP', desc:'Unset a meta value', kind:'schema', params:[
+    { id:'user', type:'text', label:'Player' },
+    { id:'key', type:'seg', label:'Key', options:['prefix','suffix'], default:'prefix' },
+  ]},
+  { id:'lp_group_perm_set', plugin:'luckperms', name:'/lp group … permission set', tag:'OP', desc:'Grant a permission to a group', kind:'schema', params:[
+    { id:'group', type:'text', label:'Group' },
+    { id:'permission', type:'text', label:'Permission' },
+    { id:'value', type:'seg', label:'Value', options:['true','false'], default:'true' },
+  ]},
+  { id:'lp_group_parent_add', plugin:'luckperms', name:'/lp group … parent add', tag:'OP', desc:'Inherit another group', kind:'schema', params:[
+    { id:'group', type:'text', label:'Group' },
+    { id:'parent', type:'text', label:'Parent group' },
+  ]},
+  { id:'lp_group_info', plugin:'luckperms', name:'/lp group … info', tag:'OP', desc:'Show group info', kind:'schema', params:[ { id:'group', type:'text', label:'Group' } ]},
+  { id:'lp_group_clone', plugin:'luckperms', name:'/lp group … clone', tag:'OP', desc:'Clone a group', kind:'schema', params:[
+    { id:'group', type:'text', label:'Group' },
+    { id:'name', type:'text', label:'New name' },
+  ]},
+  { id:'lp_group_rename', plugin:'luckperms', name:'/lp group … rename', tag:'OP', desc:'Rename a group', kind:'schema', params:[
+    { id:'group', type:'text', label:'Group' },
+    { id:'name', type:'text', label:'New name' },
+  ]},
+  { id:'lp_track_create', plugin:'luckperms', name:'/lp createtrack', tag:'OP', desc:'Create a promotion track', kind:'schema', params:[ { id:'name', type:'text', label:'Track name' } ]},
+  { id:'lp_track_delete', plugin:'luckperms', name:'/lp deletetrack', tag:'OP', desc:'Delete a track', kind:'schema', params:[ { id:'name', type:'text', label:'Track name' } ]},
+  { id:'lp_track_append', plugin:'luckperms', name:'/lp track … append', tag:'OP', desc:'Append a group to a track', kind:'schema', params:[
+    { id:'track', type:'text', label:'Track' },
+    { id:'group', type:'text', label:'Group' },
+  ]},
+  { id:'lp_track_insert', plugin:'luckperms', name:'/lp track … insert', tag:'OP', desc:'Insert a group at position', kind:'schema', params:[
+    { id:'track', type:'text', label:'Track' },
+    { id:'group', type:'text', label:'Group' },
+    { id:'pos', type:'number', label:'Position', default:1, min:1 },
+  ]},
+  { id:'lp_track_remove', plugin:'luckperms', name:'/lp track … remove', tag:'OP', desc:'Remove a group from a track', kind:'schema', params:[
+    { id:'track', type:'text', label:'Track' },
+    { id:'group', type:'text', label:'Group' },
+  ]},
+  { id:'lp_listtracks', plugin:'luckperms', name:'/lp listtracks', tag:'OP', desc:'List all tracks', kind:'schema', params:[] },
+  { id:'lp_search', plugin:'luckperms', name:'/lp search', tag:'OP', desc:'Find users/groups with a permission', kind:'schema', params:[ { id:'permission', type:'text', label:'Permission' } ]},
+  { id:'lp_sync', plugin:'luckperms', name:'/lp sync', tag:'OP', desc:'Sync data from storage', kind:'schema', params:[] },
+  { id:'lp_reload', plugin:'luckperms', name:'/lp reloadconfig', tag:'OP', desc:'Reload config', kind:'schema', params:[] },
+  { id:'lp_verbose', plugin:'luckperms', name:'/lp verbose', tag:'OP', desc:'Toggle permission verbose mode', kind:'schema', params:[
+    { id:'state', type:'seg', label:'State', options:['on','off','record','paste'], default:'on' },
+  ]},
+  { id:'lp_log', plugin:'luckperms', name:'/lp log recent', tag:'OP', desc:'Show recent log entries', kind:'schema', params:[
+    { id:'page', type:'number', label:'Page', default:1, min:1, optional:true },
+  ]},
+  { id:'lp_export', plugin:'luckperms', name:'/lp export', tag:'OP', desc:'Export data to a file', kind:'schema', params:[ { id:'name', type:'text', label:'File name', placeholder:'export' } ]},
+  { id:'lp_import', plugin:'luckperms', name:'/lp import', tag:'OP', desc:'Import data from a file', kind:'schema', params:[ { id:'name', type:'text', label:'File name' } ]},
+  { id:'lp_networksync', plugin:'luckperms', name:'/lp networksync', tag:'OP', desc:'Push sync to other servers', kind:'schema', params:[] },
+
+  // ── Multiverse — additional ─────────────────────────────────────────
+  { id:'mv_clone', plugin:'multiverse', name:'/mv clone', tag:'OP', desc:'Clone an existing world', kind:'schema', params:[
+    { id:'source', type:'text', label:'Source' },
+    { id:'target', type:'text', label:'New name' },
+  ]},
+  { id:'mv_import_world', plugin:'multiverse', name:'/mv import', tag:'OP', desc:'Import an existing folder as world', kind:'schema', params:[
+    { id:'name', type:'text', label:'Folder name' },
+    { id:'env', type:'seg', label:'Environment', options:['normal','nether','end'], default:'normal' },
+    { id:'gen', type:'text', label:'Generator', optional:true, prefix:'-g ' },
+  ]},
+  { id:'mv_who', plugin:'multiverse', name:'/mv who', tag:'OP', desc:'Show who is in each world', kind:'schema', params:[ { id:'world', type:'text', label:'World', optional:true } ]},
+  { id:'mv_remove', plugin:'multiverse', name:'/mv remove', tag:'OP', desc:'Forget a world (keeps files)', kind:'schema', params:[ { id:'world', type:'text', label:'World' } ]},
+  { id:'mv_purge', plugin:'multiverse', name:'/mv purge', tag:'OP', desc:'Purge mobs from a world', kind:'schema', params:[
+    { id:'world', type:'text', label:'World' },
+    { id:'kind', type:'seg', label:'Kind', options:['all','animals','monsters'], default:'monsters' },
+  ]},
+  { id:'mv_confirm', plugin:'multiverse', name:'/mv confirm', tag:'OP', desc:'Confirm a queued action', kind:'schema', params:[] },
+  { id:'mv_reload', plugin:'multiverse', name:'/mv reload', tag:'OP', desc:'Reload Multiverse', kind:'schema', params:[] },
+
+  // ── mcMMO — additional ──────────────────────────────────────────────
+  { id:'mc_mcgod', plugin:'mcmmo', name:'/mcgod', tag:'OP', desc:'Toggle mcMMO god mode', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'mc_mcability', plugin:'mcmmo', name:'/mcability', tag:'PLAYER', desc:'Toggle ability use', kind:'schema', params:[] },
+  { id:'mc_mcrefresh', plugin:'mcmmo', name:'/mcrefresh', tag:'OP', desc:'Refresh ability cooldowns', kind:'schema', params:[ { id:'player', type:'text', label:'Player', optional:true } ]},
+  { id:'mc_mctop', plugin:'mcmmo', name:'/mctop', tag:'PLAYER', desc:'Show top players', kind:'schema', params:[
+    { id:'skill', type:'seg', label:'Skill', options:['all','mining','woodcutting','herbalism','excavation','fishing','unarmed','archery','swords','axes','taming','acrobatics','repair','alchemy'], default:'all' },
+    { id:'page', type:'number', label:'Page', default:1, min:1, optional:true },
+  ]},
+  { id:'mc_inspect', plugin:'mcmmo', name:'/inspect', tag:'OP', desc:'Inspect a player skills', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'mmoeditall', plugin:'mcmmo', name:'/mmoeditall', tag:'OP', desc:'Set every players skill', kind:'schema', params:[
+    { id:'skill', type:'seg', label:'Skill', options:['mining','woodcutting','herbalism','excavation','fishing','unarmed','archery','swords','axes','taming','acrobatics','repair','alchemy'], default:'mining' },
+    { id:'level', type:'number', label:'Level', default:50, min:0, max:1000 },
+  ]},
+  { id:'mc_mmoshowdb', plugin:'mcmmo', name:'/mmoshowdb', tag:'OP', desc:'Show database info', kind:'schema', params:[] },
+  { id:'mc_mmoupdate', plugin:'mcmmo', name:'/mmoupdate', tag:'OP', desc:'Update users from DB', kind:'schema', params:[] },
+  { id:'mc_partychat', plugin:'mcmmo', name:'/partychat', tag:'PLAYER', desc:'Toggle party chat', kind:'schema', params:[] },
+  { id:'mc_adminchat', plugin:'mcmmo', name:'/adminchat', tag:'OP', desc:'Toggle admin chat', kind:'schema', params:[] },
+  { id:'mc_ptp', plugin:'mcmmo', name:'/ptp', tag:'PLAYER', desc:'Teleport to a party member', kind:'schema', params:[ { id:'player', type:'text', label:'Player' } ]},
+  { id:'mc_mcconvert', plugin:'mcmmo', name:'/mcconvert', tag:'OP', desc:'Convert XP/database storage', kind:'schema', params:[
+    { id:'kind', type:'seg', label:'Kind', options:['database','experience'], default:'database' },
+    { id:'value', type:'text', label:'Value', placeholder:'mysql' },
+  ]},
+
+  // ── CoreProtect — additional ────────────────────────────────────────
+  { id:'cp_consumer', plugin:'coreprotect', name:'/co consumer', tag:'OP', desc:'Pause/resume the queue consumer', kind:'schema', params:[
+    { id:'state', type:'seg', label:'State', options:['pause','resume'], default:'pause' },
+  ]},
+  { id:'cp_help_full', plugin:'coreprotect', name:'/co help', tag:'OP', desc:'Show CoreProtect help', kind:'schema', params:[ { id:'topic', type:'text', label:'Topic', optional:true } ]},
+  { id:'cp_reload', plugin:'coreprotect', name:'/co reload', tag:'OP', desc:'Reload configuration', kind:'schema', params:[] },
+  { id:'cp_lookup_chat', plugin:'coreprotect', name:'/co lookup chat', tag:'OP', desc:'Look up chat history', kind:'schema', params:[
+    { id:'time', type:'text', label:'Time', default:'1d', prefix:'t:' },
+    { id:'user', type:'text', label:'User', optional:true, prefix:'u:' },
+    { id:'action', type:'text', label:'Action', default:'chat', prefix:'a:' },
+  ]},
+  { id:'cp_lookup_command', plugin:'coreprotect', name:'/co lookup command', tag:'OP', desc:'Look up command history', kind:'schema', params:[
+    { id:'time', type:'text', label:'Time', default:'1d', prefix:'t:' },
+    { id:'user', type:'text', label:'User', optional:true, prefix:'u:' },
+    { id:'action', type:'text', label:'Action', default:'command', prefix:'a:' },
+  ]},
 ];
 
 const UNLOCK_PRESETS = [
