@@ -475,13 +475,29 @@
   </style>
 </head>
 <body data-tile-style="voxel" data-density="regular">
-  <div id="root"></div>
+  <div id="root">
+    <div id="boot-fallback" style="position:fixed;inset:0;display:grid;place-items:center;font-family:'JetBrains Mono',ui-monospace,monospace;color:#aab7c2;text-align:center;padding:24px;z-index:1;">
+      <div>
+        <div style="font-size:14px;color:#6cc24a;margin-bottom:8px;">Loading Command Builder…</div>
+        <div style="font-size:12px;color:#6b7986;line-height:1.5;">If this stays here for more than a few seconds, your browser may be blocking the React/Babel CDN scripts.<br/><a href="/bruh-minecraft/" style="color:#6cc24a;">Back to BRUH Minecraft</a></div>
+      </div>
+    </div>
+  </div>
 
-  <script is:inline src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
-  <script is:inline src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script is:inline src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+  <script is:inline src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
   <script is:inline src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+  <script is:inline>
+    // Surface boot errors visibly. Babel auto-compiles type="text/babel" scripts at DOMContentLoaded.
+    window.addEventListener('error', function (e) {
+      var fb = document.getElementById('boot-fallback');
+      if (fb) {
+        fb.innerHTML = '<div style="max-width:560px;padding:20px;background:#1b242c;border:1px solid #2a3540;border-radius:10px;text-align:left;font-family:\'JetBrains Mono\',monospace;color:#e0463c;font-size:12px;line-height:1.5;"><b style="color:#f7c948;">Boot error</b><br/><br/>' + (e && (e.message || e.error) ? String(e.message || e.error).replace(/[<&]/g, function(c){return c==="<"?"&lt;":"&amp;";}) : 'Unknown') + '<br/><br/><span style="color:#aab7c2;">Source: ' + (e.filename || 'inline') + ':' + (e.lineno || '?') + '</span></div>';
+      }
+    });
+  </script>
 
-  <script is:inline type="text/babel" data-presets="react">
+  <script is:inline type="text/babel">
 // ── data ────────────────────────────────────────────────────────────
 const PLUGINS = [
   { id: 'vanilla',     name: 'Vanilla',         color: '#6cc24a', count: 0, desc: 'Java Edition 1.20+' },
@@ -639,7 +655,7 @@ const SELECTORS = [
 Object.assign(window, { PLUGINS, COMMANDS, BLOCKS, ITEMS, MOBS, EFFECTS, MC_COLORS, SELECTORS });
   </script>
 
-  <script is:inline type="text/babel" data-presets="react">
+  <script is:inline type="text/babel">
 // ── components ──────────────────────────────────────────────────────
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
@@ -897,7 +913,7 @@ function ItemSlot({ kind, value, onChange, placeholder }) {
 Object.assign(window, { Tile, Toast, Picker, Field, Seg, Stepper, Coord, CoordPicker, SelectorBuilder, ItemSlot });
   </script>
 
-  <script is:inline type="text/babel" data-presets="react">
+  <script is:inline type="text/babel">
 // ── builders + tokenizer ────────────────────────────────────────────
 const { useState, useEffect, useMemo } = React;
 
@@ -1400,7 +1416,7 @@ function buildCommand(cmd, state) {
 Object.assign(window, { tokenize, BUILDERS, getBuilder, getDefaults, buildCommand, SimpleBuilder });
   </script>
 
-  <script is:inline type="text/babel" data-presets="react">
+  <script is:inline type="text/babel">
 // ── commands-extra: SchemaBuilder + UnlockBuilder + extra catalog ───
 const { useState: useState_x } = React;
 
@@ -1947,7 +1963,7 @@ if (!window.__cmds_merged) {
 })();
   </script>
 
-  <script is:inline type="text/babel" data-presets="react">
+  <script is:inline type="text/babel">
 // ── App ─────────────────────────────────────────────────────────────
 const { useState, useEffect, useMemo, useRef } = React;
 
@@ -2197,7 +2213,15 @@ function PreviewPane({ built, history, setHistory, onCopy }) {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+} catch (err) {
+  const fb = document.getElementById('boot-fallback');
+  if (fb) {
+    fb.innerHTML = '<div style="max-width:560px;padding:20px;background:#1b242c;border:1px solid #2a3540;border-radius:10px;text-align:left;font-family:\'JetBrains Mono\',monospace;color:#e0463c;font-size:12px;line-height:1.5;"><b style="color:#f7c948;">Render error</b><br/><br/>' + String(err && err.message || err).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;') + '</div>';
+  }
+  throw err;
+}
   </script>
 </body>
 </html>
