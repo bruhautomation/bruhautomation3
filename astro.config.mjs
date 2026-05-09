@@ -147,6 +147,7 @@ export default defineConfig({
 								{ label: 'Overview', slug: 'bruh-minecraft' },
 								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
 								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
+								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/', badge: { text: 'New', variant: 'tip' } },
 							],
 						},
 					],

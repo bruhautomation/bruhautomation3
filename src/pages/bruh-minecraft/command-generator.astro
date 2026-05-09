@@ -1,0 +1,1391 @@
+---
+import {
+  CATEGORIES,
+  COMMANDS,
+  UNLOCK_PRESETS,
+  COMMON_BLOCKS,
+  COMMON_ITEMS,
+  COMMON_ENTITIES,
+  COMMON_EFFECTS,
+  COMMON_ENCHANTS,
+  GAMERULES,
+} from '../../data/minecraft-commands';
+import logoLight from '../../assets/bruh-logo-light.svg';
+import logoDark from '../../assets/bruh-logo-dark.svg';
+
+const dataPayload = JSON.stringify({
+  CATEGORIES,
+  COMMANDS,
+  UNLOCK_PRESETS,
+  COMMON_BLOCKS,
+  COMMON_ITEMS,
+  COMMON_ENTITIES,
+  COMMON_EFFECTS,
+  COMMON_ENCHANTS,
+  GAMERULES,
+});
+
+const totalCommands = COMMANDS.length;
+const totalCategories = CATEGORIES.length;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minecraft Command Generator — BRUH Automation</title>
+    <meta
+      name="description"
+      content="Build any Minecraft console command for the BRUH Minecraft Server add-on. Vanilla + EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, and ViaVersion — point, click, copy."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BRUH Automation" />
+    <meta property="og:title" content="Minecraft Command Generator" />
+    <meta
+      property="og:description"
+      content="Click-to-build console commands for the BRUH Minecraft add-on. Every supported plugin, every permission, copy to clipboard."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#1e90ff" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <script is:inline>
+      (function () {
+        var s = localStorage.getItem('starlight-theme');
+        var t =
+          s === 'light'
+            ? 'light'
+            : s === 'dark'
+              ? 'dark'
+              : matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      :root {
+        --bg: #0b0d14;
+        --bg-elev: #11141d;
+        --bg-card: rgba(255, 255, 255, 0.04);
+        --bg-card-solid: #14161e;
+        --bg-input: rgba(255, 255, 255, 0.05);
+        --bg-input-focus: rgba(30, 144, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --text: #e4e4e7;
+        --text-muted: #8b8b97;
+        --text-faint: #5a5a66;
+        --accent: #1e90ff;
+        --accent-2: #00d4ff;
+        --accent-glow: rgba(30, 144, 255, 0.18);
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --code-bg: #0a0c12;
+        --code-border: rgba(30, 144, 255, 0.18);
+        --code-text: #e6e9ef;
+        --code-cmd: #ffd166;
+        --code-arg-required: #ef4444;
+        --code-arg-filled: #5eead4;
+        --radius: 14px;
+        --radius-sm: 8px;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+      }
+
+      [data-theme='light'] {
+        --bg: #fafafa;
+        --bg-elev: #ffffff;
+        --bg-card: rgba(0, 0, 0, 0.025);
+        --bg-card-solid: #f4f4f5;
+        --bg-input: rgba(0, 0, 0, 0.03);
+        --bg-input-focus: rgba(30, 144, 255, 0.08);
+        --border: rgba(0, 0, 0, 0.08);
+        --border-strong: rgba(0, 0, 0, 0.18);
+        --text: #18181b;
+        --text-muted: #6b6b72;
+        --text-faint: #a1a1aa;
+        --accent-glow: rgba(30, 144, 255, 0.1);
+        --code-bg: #1a1d27;
+        --code-text: #e6e9ef;
+        --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      }
+
+      html { background: var(--bg); color: var(--text); font-family: var(--font); scroll-behavior: smooth; }
+      body { min-height: 100vh; display: flex; flex-direction: column; }
+      a { color: inherit; text-decoration: none; }
+      button { font-family: inherit; cursor: pointer; }
+      input, select, textarea { font-family: inherit; color: inherit; font-size: inherit; }
+
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--accent); background-clip: padding-box; border: 2px solid transparent; }
+
+      /* ── Top nav ── */
+      nav {
+        position: sticky; top: 0; z-index: 100;
+        display: flex; align-items: center; justify-content: space-between;
+        max-width: 1400px; width: 100%; margin: 0 auto;
+        padding: 1rem 1.5rem;
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      }
+      .nav-left { display: flex; align-items: center; gap: 1rem; }
+      .nav-back {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.9rem; color: var(--text-muted);
+        padding: 0.4rem 0.7rem; border-radius: 9999px;
+        transition: background 0.15s, color 0.15s;
+      }
+      .nav-back:hover { color: var(--text); background: var(--bg-card); }
+      .nav-logo { height: 22px; width: auto; }
+      .logo-for-dark { display: block; }
+      .logo-for-light { display: none; }
+      [data-theme='light'] .logo-for-dark { display: none; }
+      [data-theme='light'] .logo-for-light { display: block; }
+
+      .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+      .nav-link { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+      .nav-link:hover { color: var(--text); }
+
+      .theme-toggle {
+        position: relative; display: inline-flex; align-items: center;
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: 9999px; padding: 3px;
+      }
+      .theme-toggle button {
+        position: relative; z-index: 1;
+        display: flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border: none; border-radius: 50%;
+        background: transparent; color: var(--text-muted); cursor: pointer; transition: color 0.2s;
+      }
+      .theme-toggle button:hover { color: var(--text); }
+      .theme-toggle button[aria-pressed='true'] { color: #fff; }
+      .auto-label { font-size: 14px; font-weight: 700; line-height: 1; }
+      .toggle-pill {
+        position: absolute; top: 3px; left: 3px; width: 30px; height: 30px;
+        border-radius: 50%; background: var(--accent);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .toggle-pill[data-pos='1'] { transform: translateX(30px); }
+      .toggle-pill[data-pos='2'] { transform: translateX(60px); }
+
+      /* ── Hero ── */
+      .hero {
+        position: relative;
+        max-width: 1400px; width: 100%; margin: 0 auto;
+        padding: 2.5rem 1.5rem 1.5rem;
+        text-align: center;
+      }
+      .hero::before {
+        content: '';
+        position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+        width: min(700px, 100vw); height: 400px;
+        background: radial-gradient(ellipse, var(--accent-glow), transparent 70%);
+        pointer-events: none; z-index: -1;
+      }
+      .hero-eyebrow {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.35rem 0.85rem; border-radius: 9999px;
+        background: var(--bg-card); border: 1px solid var(--border);
+        font-size: 0.78rem; color: var(--text-muted); font-weight: 500;
+        margin-bottom: 1rem;
+      }
+      .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+      .hero h1 {
+        font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 700; line-height: 1.1;
+        letter-spacing: -0.03em; padding-bottom: 0.1em;
+        background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      }
+      .hero p {
+        margin: 1rem auto 0; max-width: 60ch;
+        color: var(--text-muted); line-height: 1.6; font-size: 1rem;
+      }
+      .hero-meta {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem;
+        margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);
+      }
+      .hero-meta strong { color: var(--accent); font-weight: 600; }
+
+      /* ── Tip card ── */
+      .tip {
+        max-width: 1400px; width: 100%; margin: 0 auto 1.5rem;
+        padding: 0 1.5rem;
+      }
+      .tip-inner {
+        display: flex; gap: 0.85rem; align-items: flex-start;
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1rem 1.25rem;
+      }
+      .tip-icon {
+        flex-shrink: 0; width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; background: var(--accent-glow); color: var(--accent);
+      }
+      .tip-content { font-size: 0.9rem; line-height: 1.55; color: var(--text-muted); }
+      .tip-content strong { color: var(--text); font-weight: 600; }
+      .tip-content code {
+        font-family: var(--font-mono); font-size: 0.85em;
+        background: var(--bg-card-solid); padding: 0.1em 0.4em;
+        border-radius: 4px; border: 1px solid var(--border);
+      }
+
+      /* ── Layout ── */
+      .layout {
+        max-width: 1400px; width: 100%; margin: 0 auto;
+        padding: 0 1.5rem 4rem;
+        display: grid;
+        grid-template-columns: 220px 320px 1fr;
+        gap: 1.25rem;
+        min-height: 70vh;
+      }
+
+      /* ── Categories rail ── */
+      .rail {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 0.6rem;
+        position: sticky; top: 5rem;
+        max-height: calc(100vh - 6rem); overflow-y: auto;
+      }
+      .rail-section-label {
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+        color: var(--text-faint); text-transform: uppercase;
+        padding: 0.65rem 0.65rem 0.35rem;
+      }
+      .cat-btn {
+        display: flex; align-items: center; gap: 0.65rem; width: 100%;
+        padding: 0.55rem 0.65rem; border: none; background: transparent;
+        border-radius: var(--radius-sm); color: var(--text-muted);
+        font-size: 0.88rem; font-weight: 500; text-align: left;
+        transition: background 0.15s, color 0.15s;
+      }
+      .cat-btn:hover { background: var(--bg-card); color: var(--text); }
+      .cat-btn[aria-pressed='true'] {
+        background: var(--accent-glow); color: var(--accent);
+      }
+      .cat-btn[aria-pressed='true'] .cat-btn-count { color: var(--accent); }
+      .cat-btn-icon {
+        flex-shrink: 0; width: 22px; height: 22px;
+        display: flex; align-items: center; justify-content: center;
+        color: currentColor;
+      }
+      .cat-btn-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .cat-btn-count {
+        flex-shrink: 0; font-size: 0.72rem; font-weight: 600;
+        color: var(--text-faint); padding: 0.1em 0.5em;
+        border-radius: 9999px; background: var(--bg-card-solid);
+      }
+      .cat-btn[aria-pressed='true'] .cat-btn-count { background: rgba(30, 144, 255, 0.2); }
+
+      /* ── Command list ── */
+      .commands {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: var(--radius); display: flex; flex-direction: column;
+        overflow: hidden; min-height: 0;
+      }
+      .search-wrap {
+        position: relative; padding: 0.85rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .search-wrap svg {
+        position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%);
+        color: var(--text-faint); pointer-events: none;
+      }
+      .search {
+        width: 100%; padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+        background: var(--bg-input); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); color: var(--text);
+        font-size: 0.9rem; transition: border-color 0.15s, background 0.15s;
+      }
+      .search:focus { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+      .search::placeholder { color: var(--text-faint); }
+
+      .cmd-list { flex: 1; overflow-y: auto; padding: 0.4rem; }
+      .cmd-section-label {
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+        color: var(--text-faint); text-transform: uppercase;
+        padding: 0.85rem 0.65rem 0.45rem;
+      }
+      .cmd-item {
+        display: block; width: 100%; padding: 0.65rem 0.75rem;
+        border: 1px solid transparent; background: transparent;
+        border-radius: var(--radius-sm); color: var(--text);
+        text-align: left; transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      }
+      .cmd-item:hover { background: var(--bg-card); }
+      .cmd-item[aria-pressed='true'] {
+        background: var(--accent-glow); border-color: rgba(30, 144, 255, 0.3);
+      }
+      .cmd-item-name {
+        font-family: var(--font-mono); font-size: 0.86rem;
+        font-weight: 600; color: var(--text);
+      }
+      .cmd-item[aria-pressed='true'] .cmd-item-name { color: var(--accent); }
+      .cmd-item-desc {
+        font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;
+        line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .empty-state {
+        padding: 2rem 1rem; text-align: center;
+        color: var(--text-muted); font-size: 0.9rem;
+      }
+
+      /* ── Builder ── */
+      .builder {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1.5rem;
+        display: flex; flex-direction: column; gap: 1.25rem;
+        min-height: 0;
+      }
+      .builder-header {
+        display: flex; flex-direction: column; gap: 0.4rem;
+        padding-bottom: 1.1rem; border-bottom: 1px solid var(--border);
+      }
+      .builder-eyebrow {
+        display: inline-flex; align-items: center; gap: 0.55rem;
+        font-size: 0.75rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--accent);
+      }
+      .builder-eyebrow svg { width: 14px; height: 14px; }
+      .builder-title {
+        font-family: var(--font-mono); font-size: 1.5rem;
+        font-weight: 700; line-height: 1.2; color: var(--text);
+        word-break: break-word;
+      }
+      .builder-desc { color: var(--text-muted); font-size: 0.95rem; line-height: 1.55; }
+      .builder-meta {
+        display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-top: 0.4rem;
+        font-size: 0.8rem; color: var(--text-muted);
+      }
+      .builder-meta code {
+        font-family: var(--font-mono);
+        background: var(--bg-card-solid); padding: 0.1em 0.4em;
+        border-radius: 4px; border: 1px solid var(--border);
+      }
+
+      /* ── Args form ── */
+      .args { display: flex; flex-direction: column; gap: 0.95rem; }
+      .args-empty {
+        padding: 0.85rem 1rem; background: var(--bg-card-solid);
+        border: 1px dashed var(--border); border-radius: var(--radius-sm);
+        color: var(--text-muted); font-size: 0.88rem; line-height: 1.5;
+      }
+      .arg-field { display: flex; flex-direction: column; gap: 0.35rem; }
+      .arg-label {
+        display: flex; align-items: center; gap: 0.5rem;
+        font-size: 0.82rem; font-weight: 600; color: var(--text);
+      }
+      .arg-required { color: var(--danger); font-weight: 700; }
+      .arg-type {
+        font-family: var(--font-mono); font-size: 0.7rem;
+        color: var(--text-faint); padding: 0.1em 0.5em;
+        border-radius: 4px; background: var(--bg-card-solid);
+        border: 1px solid var(--border);
+      }
+      .arg-input, .arg-select, .arg-textarea {
+        padding: 0.6rem 0.75rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        color: var(--text); font-size: 0.9rem;
+        transition: border-color 0.15s, background 0.15s;
+        width: 100%;
+      }
+      .arg-input:focus, .arg-select:focus, .arg-textarea:focus {
+        outline: none; border-color: var(--accent); background: var(--bg-input-focus);
+      }
+      .arg-textarea { resize: vertical; min-height: 70px; font-family: var(--font-mono); font-size: 0.85rem; }
+      .arg-input::placeholder, .arg-textarea::placeholder { color: var(--text-faint); }
+      .arg-hint { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
+      .arg-mono { font-family: var(--font-mono); font-size: 0.85rem; }
+
+      /* datalist suggestion select hybrids */
+      .arg-input[list] { background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%, var(--text-muted) 60%, transparent 60%, transparent 70%, var(--text-muted) 70%, var(--text-muted) 80%, transparent 80%); background-position: calc(100% - 12px) center; background-size: 10px 10px; background-repeat: no-repeat; padding-right: 2rem; }
+
+      /* ── Preview ── */
+      .preview {
+        margin-top: auto; display: flex; flex-direction: column; gap: 0.85rem;
+        padding-top: 1rem; border-top: 1px solid var(--border);
+      }
+      .preview-label {
+        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+        color: var(--text-faint); text-transform: uppercase;
+      }
+      .preview-box {
+        position: relative; padding: 1.1rem 3.5rem 1.1rem 1.1rem;
+        background: var(--code-bg); border: 1px solid var(--code-border);
+        border-radius: var(--radius); color: var(--code-text);
+        font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.5;
+        word-break: break-word; white-space: pre-wrap;
+        box-shadow: var(--shadow);
+      }
+      .preview-cmd { color: var(--code-cmd); font-weight: 700; }
+      .preview-arg-required {
+        color: var(--code-arg-required); font-weight: 600;
+        background: rgba(239, 68, 68, 0.1); padding: 0.05em 0.35em;
+        border-radius: 4px;
+      }
+      .preview-arg-filled { color: var(--code-arg-filled); }
+      .preview-mute { color: #6b7280; }
+      .copy-btn {
+        position: absolute; top: 0.75rem; right: 0.75rem;
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.45rem 0.75rem; background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: var(--radius-sm); color: #fff;
+        font-size: 0.8rem; font-weight: 600; font-family: var(--font);
+        transition: background 0.15s, transform 0.1s;
+      }
+      .copy-btn:hover { background: rgba(30, 144, 255, 0.25); border-color: rgba(30, 144, 255, 0.4); }
+      .copy-btn:active { transform: scale(0.96); }
+      .copy-btn.success { background: rgba(34, 197, 94, 0.25); border-color: rgba(34, 197, 94, 0.5); color: #86efac; }
+      .copy-btn.error { background: rgba(239, 68, 68, 0.25); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
+
+      .preview-warning {
+        font-size: 0.8rem; color: var(--warning);
+        display: flex; align-items: center; gap: 0.4rem;
+      }
+
+      .actions {
+        display: flex; flex-wrap: wrap; gap: 0.5rem;
+      }
+      .btn-secondary {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        padding: 0.45rem 0.85rem; background: var(--bg-card-solid);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        color: var(--text-muted); font-size: 0.82rem; font-weight: 500;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); }
+      .btn-secondary svg { flex-shrink: 0; }
+
+      .lp-helper {
+        background: var(--bg-card-solid); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); padding: 0.85rem 1rem;
+        display: flex; flex-direction: column; gap: 0.5rem;
+      }
+      .lp-helper-row {
+        display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
+      }
+      .lp-helper-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+      .lp-helper-input {
+        flex: 1; min-width: 120px;
+        padding: 0.4rem 0.6rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 6px;
+        font-size: 0.85rem; color: var(--text);
+      }
+      .lp-helper-input:focus { outline: none; border-color: var(--accent); }
+      .lp-helper-cmd {
+        font-family: var(--font-mono); font-size: 0.82rem;
+        padding: 0.5rem 0.7rem; background: var(--code-bg);
+        border-radius: 6px; color: var(--code-text);
+        word-break: break-all;
+      }
+
+      /* ── Empty builder ── */
+      .builder-empty {
+        text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+      }
+      .builder-empty svg {
+        width: 64px; height: 64px; color: var(--text-faint); margin-bottom: 1rem;
+      }
+      .builder-empty h3 { color: var(--text); font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+      .builder-empty p { font-size: 0.9rem; line-height: 1.55; }
+
+      /* ── Unlock presets section ── */
+      .presets-section {
+        max-width: 1400px; width: 100%; margin: 0 auto;
+        padding: 1rem 1.5rem 4rem;
+      }
+      .presets-header { margin-bottom: 1.25rem; }
+      .presets-header h2 {
+        font-size: 1.5rem; font-weight: 700; line-height: 1.2;
+        background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      }
+      .presets-header p { color: var(--text-muted); margin-top: 0.4rem; max-width: 70ch; }
+      .presets-username {
+        display: flex; gap: 0.6rem; align-items: center; margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+      .presets-username label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+      .presets-username input {
+        padding: 0.55rem 0.85rem; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
+        color: var(--text); font-size: 0.9rem; min-width: 220px;
+        font-family: var(--font-mono);
+      }
+      .presets-username input:focus { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+      .presets-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 1rem;
+      }
+      .preset-card {
+        background: var(--bg-card); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1.25rem; display: flex;
+        flex-direction: column; gap: 0.6rem;
+        transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+      }
+      .preset-card:hover {
+        border-color: var(--accent); box-shadow: 0 4px 24px var(--accent-glow);
+        transform: translateY(-1px);
+      }
+      .preset-card h3 { font-size: 1rem; font-weight: 600; }
+      .preset-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+      .preset-cmds { background: var(--code-bg); color: var(--code-text); font-family: var(--font-mono); font-size: 0.78rem; padding: 0.65rem 0.8rem; border-radius: var(--radius-sm); line-height: 1.55; word-break: break-all; }
+      .preset-cmds .preset-arg { color: var(--code-arg-filled); }
+      .preset-card .copy-row { display: flex; gap: 0.4rem; align-items: center; margin-top: auto; }
+      .preset-copy {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.4rem 0.75rem; background: var(--accent-glow);
+        border: 1px solid rgba(30, 144, 255, 0.25); border-radius: 6px;
+        color: var(--accent); font-size: 0.82rem; font-weight: 600;
+        transition: background 0.15s;
+      }
+      .preset-copy:hover { background: rgba(30, 144, 255, 0.2); }
+      .preset-copy.success { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.4); color: var(--success); }
+
+      /* ── Footer ── */
+      footer {
+        margin-top: auto; padding: 2rem 1.5rem; text-align: center;
+        font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border);
+      }
+      footer a { color: var(--accent); }
+      footer a:hover { text-decoration: underline; }
+
+      /* ── Toast ── */
+      .toast {
+        position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(100px);
+        padding: 0.7rem 1.1rem; background: var(--bg-elev); border: 1px solid var(--border-strong);
+        border-radius: 9999px; font-size: 0.88rem; color: var(--text);
+        box-shadow: var(--shadow); z-index: 1000;
+        display: flex; align-items: center; gap: 0.45rem;
+        opacity: 0; pointer-events: none;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+      }
+      .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+      .toast.success { border-color: rgba(34, 197, 94, 0.4); }
+      .toast.success svg { color: var(--success); }
+      .toast.error { border-color: rgba(239, 68, 68, 0.4); }
+      .toast.error svg { color: var(--danger); }
+
+      /* ── Mobile ── */
+      @media (max-width: 1024px) {
+        .layout {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+        .rail {
+          position: static; max-height: none; padding: 0.5rem;
+          display: flex; flex-direction: column;
+        }
+        .rail-section-label { display: none; }
+        .rail-cats {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 0.4rem;
+        }
+        .commands { max-height: 50vh; }
+      }
+      @media (max-width: 640px) {
+        .hero { padding: 2rem 1rem 1rem; }
+        .layout { padding: 0 1rem 3rem; }
+        .tip { padding: 0 1rem; }
+        .presets-section { padding: 1rem 1rem 3rem; }
+        .builder { padding: 1.1rem; }
+        .nav-right { gap: 0.85rem; }
+        .nav-link { display: none; }
+      }
+    </style>
+  </head>
+
+  <body data-payload={dataPayload}>
+    <nav>
+      <div class="nav-left">
+        <a href="/bruh-minecraft/" class="nav-back" aria-label="Back to BRUH Minecraft">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <img class="nav-logo logo-for-dark" src={logoLight.src} alt="BRUH" />
+          <img class="nav-logo logo-for-light" src={logoDark.src} alt="BRUH" />
+        </a>
+      </div>
+      <div class="nav-right">
+        <a href="/bruh-minecraft/" class="nav-link">Add-on</a>
+        <a href="/bruh-minecraft/reference/" class="nav-link">Reference</a>
+        <a href="https://github.com/bruhautomation/BRUH-HA-Apps" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+        <div class="theme-toggle" id="theme-toggle">
+          <button data-value="light" aria-label="Light theme" title="Light">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <button data-value="auto" aria-label="System theme" title="Auto">
+            <span class="auto-label">A</span>
+          </button>
+          <button data-value="dark" aria-label="Dark theme" title="Dark">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <div class="toggle-pill" id="toggle-pill"></div>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <span class="hero-eyebrow"><span class="dot"></span>Click to build · Copy to clipboard</span>
+        <h1>Minecraft Command Generator</h1>
+        <p>
+          Build any console command for your BRUH Minecraft Server. Vanilla Java Edition plus
+          every plugin the add-on ships with — point, click, copy, paste into the Console tab,
+          RCON, or in-game.
+        </p>
+        <div class="hero-meta">
+          <span><strong>{totalCommands}</strong> commands</span>
+          <span><strong>{totalCategories}</strong> plugins / categories</span>
+          <span><strong>14</strong> auto-installable plugins covered</span>
+        </div>
+      </section>
+
+      <section class="tip">
+        <div class="tip-inner">
+          <div class="tip-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+          <div class="tip-content">
+            <strong>Where to run these:</strong>
+            paste into the BRUH panel <strong>Console</strong> tab,
+            run via RCON (<code>bruh_minecraft.rcon_command</code> service), drop into a command block,
+            or type in-game (you must be op — flip <code>allow_cheats: true</code> and add your name to
+            <code>initial_ops:</code> in the add-on configuration). Server-only commands like
+            <code>/op</code> or <code>/whitelist</code> need to run from the console or RCON, not in-game.
+          </div>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="rail" aria-label="Categories">
+          <div class="rail-section-label">Plugin / category</div>
+          <div class="rail-cats" id="rail-cats"></div>
+        </aside>
+
+        <section class="commands" aria-label="Commands">
+          <div class="search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              class="search"
+              type="search"
+              id="search"
+              placeholder="Search commands…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="cmd-list" id="cmd-list"></div>
+        </section>
+
+        <section class="builder" id="builder" aria-label="Command builder"></section>
+      </section>
+
+      <section class="presets-section">
+        <div class="presets-header">
+          <h2>Unlock everything</h2>
+          <p>
+            One-click LuckPerms grants that fully unlock each plugin for a player. Type a username
+            below and the commands fill in automatically. Run them in the BRUH panel <strong>Console</strong> tab.
+          </p>
+          <div class="presets-username">
+            <label for="preset-user">Player to grant:</label>
+            <input id="preset-user" type="text" value="YourUsername" autocomplete="off" spellcheck="false" />
+          </div>
+        </div>
+        <div class="presets-grid" id="presets-grid"></div>
+      </section>
+    </main>
+
+    <footer>
+      &copy; 2015–2026 BRUH Automation &middot; Open Source &middot;
+      <a href="https://github.com/bruhautomation" target="_blank" rel="noopener">GitHub</a>
+      &middot;
+      <a href="/bruh-minecraft/">Back to add-on</a>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script is:inline>
+      // ───────── Theme toggle (mirrors index.astro) ─────────
+      (function () {
+        var toggle = document.getElementById('theme-toggle');
+        var pill = document.getElementById('toggle-pill');
+        if (!toggle || !pill) return;
+        var stored = localStorage.getItem('starlight-theme');
+        var current = stored === 'light' || stored === 'dark' ? stored : 'auto';
+        setUI(current);
+        toggle.addEventListener('click', function (e) {
+          var btn = e.target.closest('button[data-value]');
+          if (!btn) return;
+          apply(btn.getAttribute('data-value'));
+        });
+        function setUI(theme) {
+          var posMap = { light: '0', auto: '1', dark: '2' };
+          pill.setAttribute('data-pos', posMap[theme] || '1');
+          toggle.querySelectorAll('button').forEach(function (b) {
+            b.setAttribute(
+              'aria-pressed',
+              b.getAttribute('data-value') === theme ? 'true' : 'false'
+            );
+          });
+        }
+        function apply(theme) {
+          setUI(theme);
+          var resolved = theme;
+          if (theme === 'auto') {
+            resolved = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          }
+          document.documentElement.dataset.theme = resolved;
+          localStorage.setItem('starlight-theme', theme);
+        }
+      })();
+    </script>
+
+    <script is:inline>
+      // ───────── Command generator ─────────
+      (function () {
+        const payload = JSON.parse(document.body.getAttribute('data-payload'));
+        const {
+          CATEGORIES,
+          COMMANDS,
+          UNLOCK_PRESETS,
+          COMMON_BLOCKS,
+          COMMON_ITEMS,
+          COMMON_ENTITIES,
+          COMMON_EFFECTS,
+          COMMON_ENCHANTS,
+          GAMERULES,
+        } = payload;
+
+        const SUGGESTION_LISTS = {
+          block: COMMON_BLOCKS,
+          item: COMMON_ITEMS,
+          entity: COMMON_ENTITIES,
+          effect: COMMON_EFFECTS,
+          enchantment: COMMON_ENCHANTS,
+          gamerule: GAMERULES,
+          target: ['@s', '@p', '@a', '@r', '@e'],
+          player: [],
+        };
+
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+
+        // ─── State ───
+        const state = {
+          activeCategory: 'all',
+          activeCommandId: COMMANDS[0]?.id ?? null,
+          search: '',
+          values: {},          // commandId -> { argKey: value }
+          lpUser: 'PlayerName',
+          presetUser: 'YourUsername',
+        };
+
+        // ─── DOM refs ───
+        const railEl = document.getElementById('rail-cats');
+        const cmdListEl = document.getElementById('cmd-list');
+        const builderEl = document.getElementById('builder');
+        const searchEl = document.getElementById('search');
+        const toastEl = document.getElementById('toast');
+        const presetsGridEl = document.getElementById('presets-grid');
+        const presetUserEl = document.getElementById('preset-user');
+
+        // Categories with command counts
+        function commandCount(catId) {
+          return COMMANDS.filter((c) => c.category === catId).length;
+        }
+        function totalCount() { return COMMANDS.length; }
+
+        // ─── Render the categories rail ───
+        function renderRail() {
+          railEl.innerHTML = '';
+          const all = makeCatBtn({
+            id: 'all',
+            name: 'All commands',
+            iconPath: 'M4 6h16M4 12h16M4 18h12',
+          }, totalCount(), state.activeCategory === 'all');
+          railEl.appendChild(all);
+
+          CATEGORIES.forEach((cat) => {
+            const btn = makeCatBtn(cat, commandCount(cat.id), state.activeCategory === cat.id);
+            railEl.appendChild(btn);
+          });
+        }
+        function makeCatBtn(cat, count, active) {
+          const btn = document.createElement('button');
+          btn.className = 'cat-btn';
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+          btn.dataset.id = cat.id;
+          btn.innerHTML =
+            `<span class="cat-btn-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="${cat.iconPath}"></path>
+              </svg>
+            </span>
+            <span class="cat-btn-name">${escapeHtml(cat.name)}</span>
+            <span class="cat-btn-count">${count}</span>`;
+          btn.addEventListener('click', () => {
+            state.activeCategory = cat.id;
+            renderRail();
+            renderCommandList();
+          });
+          return btn;
+        }
+
+        // ─── Render command list ───
+        function renderCommandList() {
+          const search = state.search.trim().toLowerCase();
+          let filtered = COMMANDS;
+          if (state.activeCategory !== 'all') {
+            filtered = filtered.filter((c) => c.category === state.activeCategory);
+          }
+          if (search) {
+            filtered = filtered.filter((c) =>
+              c.name.toLowerCase().includes(search) ||
+              c.description.toLowerCase().includes(search) ||
+              (c.permission || '').toLowerCase().includes(search)
+            );
+          }
+
+          cmdListEl.innerHTML = '';
+          if (filtered.length === 0) {
+            cmdListEl.innerHTML = `<div class="empty-state">No commands match. Try a different search.</div>`;
+            return;
+          }
+
+          // group by category if showing all
+          if (state.activeCategory === 'all') {
+            const byCat = {};
+            filtered.forEach((c) => {
+              (byCat[c.category] = byCat[c.category] || []).push(c);
+            });
+            CATEGORIES.forEach((cat) => {
+              const group = byCat[cat.id];
+              if (!group) return;
+              const label = document.createElement('div');
+              label.className = 'cmd-section-label';
+              label.textContent = cat.name + ' · ' + group.length;
+              cmdListEl.appendChild(label);
+              group.forEach((c) => cmdListEl.appendChild(makeCmdItem(c)));
+            });
+          } else {
+            filtered.forEach((c) => cmdListEl.appendChild(makeCmdItem(c)));
+          }
+        }
+        function makeCmdItem(cmd) {
+          const btn = document.createElement('button');
+          btn.className = 'cmd-item';
+          btn.setAttribute('aria-pressed', state.activeCommandId === cmd.id ? 'true' : 'false');
+          btn.dataset.id = cmd.id;
+          btn.innerHTML =
+            `<div class="cmd-item-name">${escapeHtml(cmd.name)}</div>
+             <div class="cmd-item-desc">${escapeHtml(cmd.description)}</div>`;
+          btn.addEventListener('click', () => {
+            state.activeCommandId = cmd.id;
+            renderCommandList();
+            renderBuilder();
+          });
+          return btn;
+        }
+
+        // ─── Render builder ───
+        function renderBuilder() {
+          const cmd = COMMANDS.find((c) => c.id === state.activeCommandId);
+          if (!cmd) {
+            builderEl.innerHTML = `
+              <div class="builder-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                <h3>Pick a command</h3>
+                <p>Choose a category on the left, then a command in the middle column.</p>
+              </div>`;
+            return;
+          }
+
+          // ensure a value bag exists for this command
+          if (!state.values[cmd.id]) {
+            state.values[cmd.id] = {};
+            cmd.args.forEach((a) => {
+              if (a.default != null) state.values[cmd.id][a.key] = a.default;
+            });
+          }
+          const vals = state.values[cmd.id];
+          const cat = CATEGORIES.find((c) => c.id === cmd.category);
+
+          builderEl.innerHTML = '';
+          const header = document.createElement('div');
+          header.className = 'builder-header';
+          header.innerHTML = `
+            <div class="builder-eyebrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="${cat ? cat.iconPath : ''}"></path>
+              </svg>
+              ${cat ? escapeHtml(cat.name) : 'Vanilla'}
+            </div>
+            <div class="builder-title">${escapeHtml(cmd.name)}</div>
+            <div class="builder-desc">${escapeHtml(cmd.description)}</div>
+            ${cmd.permission || cmd.notes ? `
+              <div class="builder-meta">
+                ${cmd.permission ? `<span>Permission <code>${escapeHtml(cmd.permission)}</code></span>` : ''}
+                ${cat && cat.wiki ? `<span><a href="${cat.wiki}" target="_blank" rel="noopener" style="color:var(--accent)">Plugin docs ↗</a></span>` : ''}
+              </div>` : ''}
+            ${cmd.notes ? `<div class="builder-meta" style="color:var(--text-muted);margin-top:0.5rem;font-style:italic">${escapeHtml(cmd.notes)}</div>` : ''}
+          `;
+          builderEl.appendChild(header);
+
+          // Args
+          const argsEl = document.createElement('div');
+          argsEl.className = 'args';
+          if (cmd.args.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'args-empty';
+            empty.textContent = 'No arguments — this command runs as-is.';
+            argsEl.appendChild(empty);
+          } else {
+            cmd.args.forEach((arg) => {
+              argsEl.appendChild(makeArgField(cmd, arg, vals));
+            });
+          }
+          builderEl.appendChild(argsEl);
+
+          // Live preview + actions
+          const previewWrap = document.createElement('div');
+          previewWrap.className = 'preview';
+          const previewLabel = document.createElement('div');
+          previewLabel.className = 'preview-label';
+          previewLabel.textContent = 'Preview';
+          previewWrap.appendChild(previewLabel);
+
+          const previewBox = document.createElement('div');
+          previewBox.className = 'preview-box';
+          previewBox.id = 'preview-box';
+          previewWrap.appendChild(previewBox);
+
+          // Permission helper (LuckPerms grant)
+          if (cmd.permission) {
+            const lp = document.createElement('div');
+            lp.className = 'lp-helper';
+            lp.innerHTML = `
+              <div class="lp-helper-label">Grant this permission via LuckPerms</div>
+              <div class="lp-helper-row">
+                <input type="text" class="lp-helper-input" id="lp-user" value="${escapeAttr(state.lpUser)}" placeholder="username" autocomplete="off" spellcheck="false" />
+                <button class="btn-secondary" id="lp-copy-btn" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  Copy grant
+                </button>
+              </div>
+              <div class="lp-helper-cmd" id="lp-cmd"></div>
+            `;
+            previewWrap.appendChild(lp);
+            // wire it up after appending
+            setTimeout(() => {
+              const userInput = lp.querySelector('#lp-user');
+              const cmdEl = lp.querySelector('#lp-cmd');
+              const copyBtn = lp.querySelector('#lp-copy-btn');
+              const updateLp = () => {
+                state.lpUser = userInput.value;
+                const u = (userInput.value || 'PlayerName').trim() || 'PlayerName';
+                cmdEl.textContent = `/lp user ${u} permission set ${cmd.permission} true`;
+              };
+              userInput.addEventListener('input', updateLp);
+              copyBtn.addEventListener('click', () => {
+                copyToClipboard(cmdEl.textContent, copyBtn, 'LuckPerms grant copied');
+              });
+              updateLp();
+            }, 0);
+          }
+
+          builderEl.appendChild(previewWrap);
+
+          // Initial preview render
+          updatePreview(cmd, vals);
+        }
+
+        function makeArgField(cmd, arg, vals) {
+          const wrap = document.createElement('div');
+          wrap.className = 'arg-field';
+
+          const label = document.createElement('label');
+          label.className = 'arg-label';
+          const labelId = 'arg-' + cmd.id + '-' + arg.key;
+          label.htmlFor = labelId;
+          label.innerHTML = `
+            <span>${escapeHtml(arg.label)}</span>
+            ${arg.required ? '<span class="arg-required" title="Required">●</span>' : ''}
+            <span class="arg-type">${escapeHtml(arg.type)}</span>
+          `;
+          wrap.appendChild(label);
+
+          let input;
+          const currentVal = vals[arg.key] ?? arg.default ?? '';
+
+          if (arg.type === 'select') {
+            input = document.createElement('select');
+            input.className = 'arg-select';
+            (arg.options || []).forEach((opt) => {
+              const o = document.createElement('option');
+              o.value = opt;
+              o.textContent = opt === '' ? '— none —' : opt;
+              if (opt === currentVal) o.selected = true;
+              input.appendChild(o);
+            });
+          } else if (arg.type === 'longtext' || arg.type === 'json') {
+            input = document.createElement('textarea');
+            input.className = 'arg-textarea';
+            input.rows = arg.type === 'json' ? 3 : 2;
+            input.value = currentVal;
+            if (arg.placeholder) input.placeholder = arg.placeholder;
+          } else {
+            input = document.createElement('input');
+            input.className = 'arg-input';
+            input.type = arg.type === 'number' ? 'number' : 'text';
+            input.value = currentVal;
+            if (arg.placeholder) input.placeholder = arg.placeholder;
+            if (arg.min != null) input.min = String(arg.min);
+            if (arg.max != null) input.max = String(arg.max);
+            if (arg.step != null) input.step = String(arg.step);
+            if (arg.type === 'block' || arg.type === 'item' || arg.type === 'entity' ||
+                arg.type === 'effect' || arg.type === 'enchantment' || arg.type === 'gamerule' ||
+                arg.type === 'target') {
+              const listId = 'datalist-' + cmd.id + '-' + arg.key;
+              input.setAttribute('list', listId);
+              const list = document.createElement('datalist');
+              list.id = listId;
+              (SUGGESTION_LISTS[arg.type] || []).forEach((opt) => {
+                const o = document.createElement('option');
+                o.value = opt;
+                list.appendChild(o);
+              });
+              wrap.appendChild(list);
+              input.classList.add('arg-mono');
+            }
+          }
+          input.id = labelId;
+          input.addEventListener('input', () => {
+            vals[arg.key] = input.value;
+            updatePreview(cmd, vals);
+          });
+          input.addEventListener('change', () => {
+            vals[arg.key] = input.value;
+            updatePreview(cmd, vals);
+          });
+          wrap.appendChild(input);
+
+          if (arg.hint) {
+            const hint = document.createElement('div');
+            hint.className = 'arg-hint';
+            hint.textContent = arg.hint;
+            wrap.appendChild(hint);
+          }
+
+          // store initial
+          vals[arg.key] = currentVal;
+          return wrap;
+        }
+
+        // ─── Build the command string from template + values ───
+        function buildCommand(cmd, vals) {
+          // Returns { plain, html, missingRequired }
+          const tpl = cmd.template;
+          const re = /\{(\w+)\}/g;
+          let lastIndex = 0;
+          let m;
+          const segs = [];
+          while ((m = re.exec(tpl)) !== null) {
+            if (m.index > lastIndex) {
+              segs.push({ type: 'static', text: tpl.slice(lastIndex, m.index) });
+            }
+            segs.push({ type: 'arg', key: m[1] });
+            lastIndex = m.index + m[0].length;
+          }
+          if (lastIndex < tpl.length) {
+            segs.push({ type: 'static', text: tpl.slice(lastIndex) });
+          }
+
+          // Find the index of the last *filled* arg. Anything before it is
+          // positionally required even if marked optional, since Minecraft
+          // commands are positional and skipping a middle arg is invalid.
+          const argSegs = segs.filter((s) => s.type === 'arg');
+          let lastFilledArgIdx = -1;
+          argSegs.forEach((s, i) => {
+            const v = (vals[s.key] ?? '').toString().trim();
+            if (v !== '') lastFilledArgIdx = i;
+          });
+          let argIdx = -1;
+
+          // Walk segments and produce output. For optional empty args we drop the
+          // preceding whitespace separator so we don't get double spaces.
+          let plain = '';
+          let html = '';
+          let missingRequired = false;
+          let pendingSpace = ''; // whitespace from a static segment that may be skipped
+
+          // Helper to escape HTML in segments
+          const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+
+          // Identify first non-whitespace segment as command name for highlighting
+          let cmdNameDone = false;
+
+          segs.forEach((seg, i) => {
+            if (seg.type === 'static') {
+              const s = seg.text;
+              // If the whole segment is whitespace, hold onto it; flush next time we emit.
+              if (/^\s+$/.test(s)) {
+                pendingSpace += s;
+                return;
+              }
+              // It contains non-whitespace (e.g. the leading slash + command). Flush pending space first.
+              if (pendingSpace) {
+                plain += pendingSpace;
+                html += esc(pendingSpace);
+                pendingSpace = '';
+              }
+              if (!cmdNameDone) {
+                // Find the command name (everything up to first whitespace) and color it.
+                const wsIdx = s.search(/\s/);
+                const name = wsIdx === -1 ? s : s.slice(0, wsIdx);
+                const rest = wsIdx === -1 ? '' : s.slice(wsIdx);
+                plain += s;
+                html += `<span class="preview-cmd">${esc(name)}</span>${esc(rest)}`;
+                cmdNameDone = true;
+              } else {
+                plain += s;
+                html += esc(s);
+              }
+            } else {
+              // arg segment
+              argIdx++;
+              const arg = cmd.args.find((a) => a.key === seg.key);
+              const raw = (vals[seg.key] ?? '').toString();
+              const val = raw.trim();
+              const positionallyNeeded = argIdx < lastFilledArgIdx;
+              if (val === '') {
+                if ((arg && arg.required) || positionallyNeeded) {
+                  // emit a placeholder
+                  if (pendingSpace) {
+                    plain += pendingSpace;
+                    html += esc(pendingSpace);
+                    pendingSpace = '';
+                  }
+                  plain += `<${arg.label}>`;
+                  html += `<span class="preview-arg-required">&lt;${esc(arg.label)}&gt;</span>`;
+                  missingRequired = true;
+                } else {
+                  // optional & blank with nothing later — drop pending space too
+                  pendingSpace = '';
+                }
+              } else {
+                if (pendingSpace) {
+                  plain += pendingSpace;
+                  html += esc(pendingSpace);
+                  pendingSpace = '';
+                }
+                // if value contains spaces and command isn't /say/longtext-trailing,
+                // keep as-is — Minecraft commands generally accept the trailing string verbatim.
+                plain += val;
+                html += `<span class="preview-arg-filled">${esc(val)}</span>`;
+              }
+            }
+          });
+          // Flush trailing pending space (only if something already emitted, otherwise drop)
+          if (pendingSpace && plain.length > 0) {
+            plain += pendingSpace.replace(/\s+$/, '');
+            // don't render trailing whitespace in html either
+          }
+
+          // Collapse any accidental double spaces (from skipped optional args mid-stream)
+          plain = plain.replace(/\s{2,}/g, ' ').trim();
+
+          return { plain, html, missingRequired };
+        }
+
+        function updatePreview(cmd, vals) {
+          const box = document.getElementById('preview-box');
+          if (!box) return;
+          const built = buildCommand(cmd, vals);
+
+          box.innerHTML = `<span class="preview-content">${built.html || '<span class="preview-mute">(empty)</span>'}</span>`;
+          const copy = document.createElement('button');
+          copy.className = 'copy-btn';
+          copy.type = 'button';
+          copy.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          `;
+          copy.addEventListener('click', () => {
+            if (built.missingRequired) {
+              flashCopyBtn(copy, 'Fill required fields', false);
+              showToast('Fill required fields first', 'error');
+              return;
+            }
+            copyToClipboard(built.plain, copy, 'Command copied');
+          });
+          box.appendChild(copy);
+        }
+
+        // ─── Presets ───
+        function renderPresets() {
+          presetsGridEl.innerHTML = '';
+          UNLOCK_PRESETS.forEach((p) => {
+            const card = document.createElement('div');
+            card.className = 'preset-card';
+            const cmdsText = p.commands.join('\n');
+            const cmdsHtml = p.commands
+              .map((c) => escapeHtml(c).replace(/\{USER\}/g, '<span class="preset-arg">{USER}</span>'))
+              .join('<br>');
+            card.innerHTML = `
+              <h3>${escapeHtml(p.name)}</h3>
+              <p>${escapeHtml(p.description)}</p>
+              <div class="preset-cmds" data-template="${escapeAttr(cmdsText)}">${cmdsHtml}</div>
+              <div class="copy-row">
+                <button class="preset-copy" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+            `;
+            const cmdsEl = card.querySelector('.preset-cmds');
+            const updateCmds = () => {
+              const u = (presetUserEl.value || 'YourUsername').trim() || 'YourUsername';
+              cmdsEl.innerHTML = p.commands
+                .map((c) => escapeHtml(c.replace(/\{USER\}/g, u)))
+                .join('<br>');
+              cmdsEl.dataset.template = p.commands.map((c) => c.replace(/\{USER\}/g, u)).join('\n');
+            };
+            const btn = card.querySelector('.preset-copy');
+            btn.addEventListener('click', () => {
+              copyToClipboard(cmdsEl.dataset.template, btn, 'Unlock commands copied');
+            });
+            // Re-render on global username change
+            card._update = updateCmds;
+            updateCmds();
+            presetsGridEl.appendChild(card);
+          });
+        }
+
+        // ─── Helpers ───
+        function copyToClipboard(text, btn, successMsg) {
+          const fallback = () => {
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+              document.body.appendChild(ta); ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              flashCopyBtn(btn, 'Copied!', true);
+              showToast(successMsg || 'Copied', 'success');
+            } catch (e) {
+              flashCopyBtn(btn, 'Copy failed', false);
+              showToast('Copy failed — please copy manually', 'error');
+            }
+          };
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(
+              () => {
+                flashCopyBtn(btn, 'Copied!', true);
+                showToast(successMsg || 'Copied', 'success');
+              },
+              fallback
+            );
+          } else {
+            fallback();
+          }
+        }
+
+        function flashCopyBtn(btn, message, ok) {
+          const span = btn.querySelector('span');
+          const originalText = span ? span.textContent : btn.textContent;
+          if (span) span.textContent = message;
+          else btn.textContent = message;
+          btn.classList.toggle('success', !!ok);
+          btn.classList.toggle('error', !ok);
+          setTimeout(() => {
+            if (span) span.textContent = originalText;
+            else btn.textContent = originalText;
+            btn.classList.remove('success', 'error');
+          }, 1600);
+        }
+
+        function showToast(message, kind) {
+          toastEl.className = 'toast show ' + (kind || '');
+          const icon = kind === 'success'
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+            : kind === 'error'
+              ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+              : '';
+          toastEl.innerHTML = icon + '<span>' + escapeHtml(message) + '</span>';
+          clearTimeout(showToast._t);
+          showToast._t = setTimeout(() => toastEl.classList.remove('show'), 2200);
+        }
+
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>"']/g, (c) =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+          );
+        }
+        function escapeAttr(s) { return escapeHtml(s); }
+
+        // ─── Wire up ───
+        searchEl.addEventListener('input', () => {
+          state.search = searchEl.value;
+          renderCommandList();
+        });
+
+        presetUserEl.addEventListener('input', () => {
+          // Re-render every preset card
+          presetsGridEl.querySelectorAll('.preset-card').forEach((card) => {
+            if (card._update) card._update();
+          });
+        });
+
+        // Initial render
+        renderRail();
+        renderCommandList();
+        renderBuilder();
+        renderPresets();
+      })();
+    </script>
+  </body>
+</html>

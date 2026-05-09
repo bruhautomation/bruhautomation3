@@ -10,6 +10,10 @@ hero:
     - text: Quick Start
       link: /bruh-minecraft/quickstart/
       icon: right-arrow
+    - text: Command Generator
+      link: /bruh-minecraft/command-generator/
+      icon: rocket
+      variant: secondary
     - text: Configuration Reference
       link: /bruh-minecraft/reference/
       icon: open-book
@@ -27,6 +31,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper, Purpur, Folia, Vanilla, Fabric, or Forge — with a management panel in your HA sidebar. No VPS. No proxy jars. No Microsoft account required when you don't want one.
 
 ![BRUH Minecraft management panel](/images/bruh-minecraft/panel-dashboard.png)
+
+:::tip[New: interactive command generator]
+Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generator/)** lets you click together any vanilla or plugin command — EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, ViaVersion — with a copy-to-clipboard button and one-click LuckPerms unlock presets.
+:::
 
 ## For the players
 
@@ -59,6 +67,9 @@ A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper
   </Card>
   <Card title="One-click + declarative plugins" icon="list-format">
     Check off **EssentialsX, LuckPerms, WorldEdit, GriefPrevention, mcMMO, ChestSort** and more — the add-on installs the latest Paper build via Modrinth on every boot. Or drop your own URLs in the `plugins:` list. Bad URLs warn and skip; can't tank startup.
+  </Card>
+  <Card title="Visual command generator" icon="rocket">
+    A point-and-click [console-command builder](/bruh-minecraft/command-generator/) covering vanilla Minecraft and every supported plugin — with copy-to-clipboard and one-click LuckPerms "unlock everything" presets.
   </Card>
   <Card title="Self-healing reliability" icon="approve-check">
     Crash auto-restart (rate-limited 5/5min). Auto-kicker for ghost sessions on iOS retries. Connection-throttle controls. Optional idle-timeout kick. Daily scheduled restart for memory creep.
