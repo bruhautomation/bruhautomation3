@@ -54,7 +54,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				--bg-card-solid: #14161e;
 				--border: rgba(255, 255, 255, 0.08);
 				--text: #e4e4e7;
-				--text-muted: #8b8b97;
+				--text-muted: #9b9ba8;
 				--accent: #1e90ff;
 				--accent-glow: rgba(30, 144, 255, 0.15);
 				--radius: 14px;
@@ -85,6 +85,22 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			a {
 				color: inherit;
 				text-decoration: none;
+			}
+			.skip-link {
+				position: absolute;
+				top: -100px;
+				left: 1rem;
+				z-index: 200;
+				padding: 0.6rem 1rem;
+				border-radius: 8px;
+				background: var(--accent);
+				color: #fff;
+				font-size: 0.9rem;
+				font-weight: 600;
+				transition: top 0.15s;
+			}
+			.skip-link:focus {
+				top: 1rem;
 			}
 
 			/* ── Nav ── */
@@ -422,6 +438,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 	</head>
 
 	<body>
+		<a href="#main" class="skip-link">Skip to content</a>
 		<!-- Nav — no logo here since the hero has it -->
 		<nav>
 			<div class="nav-right">
@@ -495,7 +512,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			</div>
 		</nav>
 
-		<main>
+		<main id="main" tabindex="-1">
 			<!-- Hero -->
 			<section class="hero">
 				<!-- Center content -->
@@ -559,15 +576,15 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				</div>
 				<div class="stat">
 					<div class="stat-number">5</div>
-					<div class="stat-label">Home<br />Projects</div>
+					<div class="stat-label">Maker<br />Projects</div>
 				</div>
 				<div class="stat">
 					<div class="stat-number">10</div>
 					<div class="stat-label">Lab<br />Projects</div>
 				</div>
 				<div class="stat">
-					<div class="stat-number">'15</div>
-					<div class="stat-label">Building<br />Since</div>
+					<div class="stat-number">2</div>
+					<div class="stat-label">HA<br />Apps</div>
 				</div>
 			</section>
 

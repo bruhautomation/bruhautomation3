@@ -3,6 +3,8 @@ title: Quick Start
 description: Install BRUH Minecraft Server, accept the EULA, and connect from Java or Bedrock in under five minutes.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+
 Five minutes from zero to a running Minecraft server.
 
 ## Prerequisites
@@ -11,46 +13,35 @@ Five minutes from zero to a running Minecraft server.
 - A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java 21 is required, which doesn't run on older 32-bit ARM hardware.
 - ~**2 GB free RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
 
-## 1. Add the repository
+## Install it
 
-In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
+<Steps>
 
-```text title="Repository URL"
-https://github.com/bruhautomation/BRUH-HA-Apps
-```
+1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
 
-## 2. Install the add-on
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
 
-Find **BRUH Minecraft Server** in the store and click **Install** (~600 MB image).
+2. **Install the add-on.** Find **BRUH Minecraft Server** in the store and click **Install** (~600 MB image).
 
-## 3. Accept the EULA
+3. **Accept the EULA.** Open the **Configuration** tab and set:
 
-Open the **Configuration** tab and set:
+   ```yaml
+   eula: true
+   ```
 
-```yaml
-eula: true
-```
+   This acknowledges the [Minecraft EULA](https://www.minecraft.net/eula) — required by Mojang. While you're there, you'll likely want:
 
-This acknowledges the [Minecraft EULA](https://www.minecraft.net/eula) — required by Mojang.
+   - `memory_mb: 4096` if you'll have more than ~5 players or any plugins
+   - `initial_ops: ["YourMinecraftUsername"]` so you're an OP the first time you join
+   - `online_mode: false` for LAN-only / no-Xbox-account play (see [Family mode](#family-mode-no-xbox-required) below)
 
-While you're there, you'll likely want to set:
+4. **Start.** Click **Start** and watch the **Log** tab — Paper takes ~30 seconds to reach `Done`. After the integration discovery prompt, click **Configure** in **Settings → Devices & Services**.
 
-- `memory_mb: 4096` if you'll have more than ~5 players or any plugins
-- `initial_ops: ["YourMinecraftUsername"]` so you're an OP the first time you join
-- `online_mode: false` for LAN-only / no-Xbox-account play (see [Family mode](#family-mode-no-xbox-required) below)
+5. **Connect.** Java players use `<your-HA-host>:25565`. Bedrock players (iOS, Android, console, Win10/11) use `<your-HA-host>:19132` — and the server also auto-appears in the **Friends** tab on the same LAN. The panel's dashboard shows the player count tick up as people join.
 
-## 4. Start
-
-Click **Start**. Watch the **Log** tab — Paper takes ~30 seconds to reach `Done`. After the integration discovery prompt, click **Configure** in **Settings → Devices & Services**.
-
-## 5. Connect
-
-| Edition | Address | LAN auto-discovery |
-|---------|---------|--------------------|
-| Java | `<your-HA-host>:25565` | — |
-| Bedrock (iOS, Android, console, Win10/11) | `<your-HA-host>:19132` | Yes — appears in the **Friends** tab |
-
-The panel's dashboard tab shows the player count tick up as people join.
+</Steps>
 
 ## Family mode (no Xbox required)
 
