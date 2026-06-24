@@ -49,7 +49,7 @@
   <rect x="50" y="140" width="210" height="30" rx="6" fill="#1e90ff" fill-opacity="0.12" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
   <text x="155" y="160" text-anchor="middle" fill="#c9d1d9" font-size="11">Automations &amp; Services</text>
   <rect x="50" y="180" width="210" height="30" rx="6" fill="#1e90ff" fill-opacity="0.12" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
-  <text x="155" y="200" text-anchor="middle" fill="#c9d1d9" font-size="11">Token Usage Sensors</text>
+  <text x="155" y="200" text-anchor="middle" fill="#c9d1d9" font-size="11">Usage &amp; Insight Sensors</text>
   <rect x="50" y="220" width="210" height="30" rx="6" fill="#1e90ff" fill-opacity="0.12" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>
   <text x="155" y="240" text-anchor="middle" fill="#c9d1d9" font-size="11">bruh_claude custom_component</text>
 
@@ -70,7 +70,7 @@
   <!-- MCP Server -->
   <rect x="355" y="185" width="170" height="60" rx="8" fill="url(#blueGrad)" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.4"/>
   <text x="440" y="211" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">HA MCP Server</text>
-  <text x="440" y="231" text-anchor="middle" fill="#8b949e" font-size="10">stdio • 14 tools</text>
+  <text x="440" y="231" text-anchor="middle" fill="#8b949e" font-size="10">stdio • 32 tools</text>
 
   <!-- Listeners -->
   <rect x="560" y="185" width="170" height="60" rx="8" fill="url(#blueGrad)" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.4"/>
@@ -85,7 +85,7 @@
   <!-- Background Services -->
   <rect x="560" y="270" width="290" height="55" rx="8" fill="url(#orangeGrad)" stroke="#f0883e" stroke-width="1" stroke-opacity="0.4"/>
   <text x="705" y="293" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="600">Background Services</text>
-  <text x="705" y="311" text-anchor="middle" fill="#8b949e" font-size="10">token-tracker • backup-watcher • context-gen</text>
+  <text x="705" y="311" text-anchor="middle" fill="#8b949e" font-size="10">worker-pool • usage-tracker • backup-watcher</text>
 
   <!-- File-Based IPC box -->
   <rect x="30" y="290" width="250" height="110" rx="10" fill="url(#orangeGrad)" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.4"/>
@@ -93,7 +93,7 @@
   <text x="155" y="340" text-anchor="middle" fill="#8b949e" font-size="10">/config/.bruh_claude/</text>
   <text x="155" y="360" text-anchor="middle" fill="#c9d1d9" font-size="10">requests/ → responses/</text>
   <text x="155" y="378" text-anchor="middle" fill="#c9d1d9" font-size="10">tasks/ → task_results/</text>
-  <text x="155" y="396" text-anchor="middle" fill="#c9d1d9" font-size="10">token_stats.json • logs/</text>
+  <text x="155" y="396" text-anchor="middle" fill="#c9d1d9" font-size="10">usage_limits.json • logs/</text>
 
   <!-- Persistent Storage -->
   <rect x="330" y="420" width="540" height="80" rx="10" fill="url(#purpleGrad)" stroke="#a371f7" stroke-width="1.5" stroke-opacity="0.4"/>

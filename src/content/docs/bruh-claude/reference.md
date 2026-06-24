@@ -3,7 +3,7 @@ title: Reference
 description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Claude Terminal add-on — in one place.
 ---
 
-Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Claude Terminal → Configuration**.
+Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Claude Terminal → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
 
 ## Configuration options
 
@@ -11,36 +11,50 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `auto_launch_claude` | `true` | Auto-start Claude when the terminal opens. `false` shows a session picker instead. |
-| `auto_generate_context` | `true` | Regenerate `/config/CLAUDE.md` on boot — a snapshot of your install Claude reads at the start of each session. |
+| `auto_launch_claude` | `true` | Launch Claude Code immediately in the web terminal. `false` lands on the shell with a session picker instead. |
+| `auto_generate_context` | `true` | Regenerate `/config/CLAUDE.md` on boot — a snapshot of your install (entities by domain, automations + states, add-ons, integrations, file tree) that Claude reads at the start of each session. |
 | `log_level` | `info` | `trace`, `debug`, `info`, `notice`, `warning`, `error`, `fatal`. Bump to `debug` when filing a bug. |
+| `enable_mobile_ui` | `true` | Splice the touch toolbar + iOS fixes into the terminal. `false` falls back to ttyd's stock UI. |
 
 ### Backups
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `auto_backup` | `true` | Git-based versioning of `/config`. Initialises a repo on first boot with sensible `.gitignore`. |
-| `backup_interval_minutes` | `30` | Minutes between auto-commits (5–1440). |
+| `auto_backup` | `true` | Git-based versioning of `/config`. Initialises a repo on first boot with a sensible `.gitignore` (excludes secrets, DBs, logs). |
+| `backup_interval_minutes` | `30` | Minutes between auto-commits (5–1440). `ha-backup` triggers an on-demand commit any time. |
 
 ### Native HA integrations
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `enable_ha_mcp_server` | `true` | The MCP server that gives Claude live entities, services, traces, logs, templates, reloads. |
+| `enable_ha_mcp_server` | `true` | The MCP server that gives Claude live entities, device control, cameras, history, traces, logs, templates, and reloads. |
 | `enable_assist_integration` | `true` | Run as a conversation agent in HA Voice Assistants. |
-| `enable_automation_integration` | `true` | Trigger Claude tasks from automations via the `bruh_claude.run_task` service. |
-| `assist_max_turns` | `5` | Per-request agentic loop cap for Assist (1–20). |
-| `automation_max_turns` | `10` | Per-request loop cap for automation tasks (1–50). |
+| `assist_fast_mode` | `true` | Keep pre-warmed Claude workers alive for voice (one per active conversation plus a hot spare) so turns skip the CLI boot and MCP handshake. ~150–300 MB RAM per warm worker (max 3). `false` uses the classic spawn-per-request listener. |
+| `enable_automation_integration` | `true` | Trigger Claude tasks from automations via `bruh_claude.run_task`. |
 
-### Permissions
+### Turn budgets
+
+These cap how many agentic loops Claude runs before returning — lower is cheaper and faster, higher gives room to chain tool calls.
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `dangerously_skip_permissions` | `false` | **Interactive terminal only.** Skips per-action confirmations. Conversation agents and automation tasks always skip permissions regardless (they can't prompt). |
+| `assist_max_turns` | `5` | Per-request cap for the voice agent (1–20). Enough for the common check/toggle/summarise flows. |
+| `automation_max_turns` | `10` | Per-request cap for automation tasks (1–50) — they do more multi-step work unattended. |
+
+### Permissions & tool scoping
+
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `assist_tool_access` | `mcp_only` | What voice may do. `mcp_only` allows every HA MCP tool (full device control, cameras, history, any service call) but denies shell, **all** file access, and web — so voice can't author automations or read `secrets.yaml`. `full` lifts the restriction. |
+| `dangerously_skip_permissions` | `false` | **Interactive terminal only.** Skips per-action confirmation prompts. Background channels (voice, automations, insights) are unaffected — they use a pre-approved allowlist instead. |
+
+:::note[Per-agent Blocked services]
+Beyond the coarse `assist_tool_access` switch, each voice agent has its own **Blocked services** picker (in its config) — patterns like `lock.unlock` or a whole `alarm_control_panel.*` that *that* agent may never call. It's enforced in the MCP server's `call_service` chokepoint, so it covers every device tool and phrasing, not just the generic call.
+:::
 
 ### Volume access
 
-The container always mounts `/share`, `/media`, `/backup` (read-only), `/addon_configs`, and `/addons`. Toggling these off doesn't unmount them — it just stops Claude from seeing them.
+The container always mounts `/share`, `/media`, `/backup` (read-only), `/addon_configs`, and `/addons`. Toggling one off doesn't unmount it — it stops Claude's tools from being pointed at it (defence in depth).
 
 | Option | Default |
 |--------|---------|
@@ -49,7 +63,7 @@ The container always mounts `/share`, `/media`, `/backup` (read-only), `/addon_c
 | `access_backup` | `true` |
 | `access_addon_configs` | `true` |
 | `access_addons` | `true` |
-| `additional_directories` | `[]` — list of extra absolute paths inside the container |
+| `additional_directories` | `[]` — extra absolute container paths to expose |
 
 ### Persistent packages
 
@@ -62,7 +76,7 @@ The container is rebuilt fresh on every update. These keep your tools installed 
 
 ## Recommended presets
 
-### Casual user — terminal only
+### Casual — terminal only
 
 ```yaml
 auto_launch_claude: true
@@ -74,7 +88,7 @@ enable_automation_integration: false
 dangerously_skip_permissions: false
 ```
 
-### Power user — voice + automations
+### Power user — voice + automations + insights
 
 ```yaml
 auto_launch_claude: true
@@ -82,23 +96,51 @@ auto_backup: true
 backup_interval_minutes: 15
 enable_ha_mcp_server: true
 enable_assist_integration: true
+assist_fast_mode: true
+assist_tool_access: mcp_only
 enable_automation_integration: true
-dangerously_skip_permissions: true
-assist_max_turns: 10
+assist_max_turns: 8
 automation_max_turns: 20
 ```
 
-## CLI tools
+## Voice assistant (Assist)
 
-Available in the terminal.
+Select **BRUH Claude** as a conversation agent in **Settings → Voice Assistants**. Each agent you add has its own name, model, personality, and blocked-services list.
 
-| Command | What it does |
-|---------|--------------|
-| `ha-reload automations \| scripts \| scenes \| groups \| core \| all \| check` | Reload after editing YAML. |
-| `ha-log core \| supervisor \| host \| addon <name> \| errors \| all` | View HA logs. Add `-f` to follow, `-n N` for line count. |
-| `ha-backup ["msg"] \| history \| diff \| restore <file>` | Manual git backup, history, diff, single-file restore. |
-| `ha-context-gen` | Regenerate `/config/CLAUDE.md`. |
-| `persist-install apk\|pip <packages>` / `list` / `remove` | Manage persistent packages. |
+- **Fast mode (default).** A worker pool keeps a live Claude process per active conversation plus a pre-warmed spare, so even brand-new commands skip the cold start. Replies stream into the chat log, so TTS starts speaking at the first sentence on streaming-capable pipelines. Any worker error falls back to a one-shot invocation.
+- **Area-aware.** A cached area → entity map is spliced into the system prompt, so *"turn off the kitchen lights"* resolves to entity_ids without a lookup turn.
+- **Conversation memory.** Follow-ups resume the same Claude session while the chat/voice session stays open. `bruh_claude.clear_conversation` resets it (omit `conversation_id` to reset all).
+- **Model per agent.** New agents default to **Claude Haiku** for snappy voice; pick any model per agent (`Default` inherits the terminal's model).
+
+### Personalities & prompt layering
+
+A custom personality (the agent's system prompt) **owns identity, tone, and verbosity** — it leads, with an explicit precedence note, and the operational block (tools, area map, timezone, routing rules) is identity-free so it can't fight your persona. Without a personality, a built-in default applies ("helpful, efficient, 1–2 short sentences"). If your persona should still be brief for TTS, say so inside the persona.
+
+## Insight jobs
+
+Scheduled Claude reports. Create one from **Settings → Devices & Services → BRUH Claude → Add Service → Insight job**.
+
+- **Templates:** *Daily briefing*, *Anomaly watch* (only problems; says "All quiet." otherwise), *Battery & maintenance*, *Camera check* — or a **custom prompt** that may embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
+- **Scheduling:** an interval (every N minutes), a daily time (HH:MM), both, or neither (manual only). Every job also gets a **Run now** button on its device page.
+- **Trigger from automations:**
+
+  ```yaml
+  service: bruh_claude.run_insight
+  data:
+    name: "Morning Briefing"   # omit to run all jobs
+  ```
+
+- **Where the report lives:** the sensor's *state* is the last-run timestamp; the report is in its attributes — `preview` (first lines), `markdown` (full report), and `card_yaml` (a ready-to-paste card). A job's first successful run sends a one-time notification with that card. Add it to a dashboard with a Markdown card:
+
+  ```yaml
+  type: markdown
+  title: Morning Briefing
+  content: >-
+    {{ state_attr('sensor.morning_briefing_insight', 'markdown')
+       or 'No insight yet — run the bruh_claude.run_insight service.' }}
+  ```
+
+- Set a job's **notify service** to push each report to a phone. A `bruh_claude_insight_complete` event fires after every run with `name`, `entity_id`, `success`, and a `preview` — handy for TTS announcements.
 
 ## HA services
 
@@ -108,6 +150,7 @@ service: bruh_claude.send_prompt
 data:
   prompt: "What entities are offline?"
   timeout: 120
+  model: haiku        # optional per-call override
 
 # Run a task in the background, with optional notification
 service: bruh_claude.run_task
@@ -115,78 +158,175 @@ data:
   prompt: "Check today's error log and summarise the issues"
   notify: true
   timeout: 300
+
+# Run one or all insight jobs now
+service: bruh_claude.run_insight
+data:
+  name: "Daily Briefing"   # omit to run all
+
+# Reset conversation memory
+service: bruh_claude.clear_conversation
+# data: { conversation_id: "..." }   # omit to clear all
 ```
 
-## Token usage sensors
+## Sensors
 
-Real values from the Anthropic API — not estimates. Updated every 30 seconds.
+### Usage-limit sensors
 
-| Sensor | Tracks |
-|--------|--------|
-| Session Input / Output / Total | Current Claude session |
-| Today Total | Resets at midnight |
-| Weekly Total | Mon–Sun, with `session_count` attr |
-| Weekly Sessions | Distinct sessions this week |
-| All Time Total | Lifetime |
+Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every ~2 minutes; the sensors poll it every 30 seconds.
+
+| Sensor | Tracks | Key attributes |
+|--------|--------|----------------|
+| Session Usage | Percent of the current 5-hour session window used | `resets_at`, `data_source`, `last_updated` |
+| Session Usage Resets At | When the 5-hour window resets | `utilization` |
+| Weekly Usage | Percent of the rolling 7-day window used | `resets_at`, `data_source`, `last_updated` |
+| Weekly Usage Resets At | When the 7-day window resets | `utilization` |
+
+:::caution
+These need an **OAuth / subscription login** (the one you do in the terminal), **not** an `ANTHROPIC_API_KEY`. With an API key — or before you've logged in — they stay **unavailable** and explain why in their `error` attribute. `ha-selftest` reports this.
+:::
+
+### Health sensor
+
+`binary_sensor.bruh_claude_system_assist_healthy` reports voice-assistant pool health, with worker count, the pre-warmed spare, and last-request latency as attributes.
 
 ## MCP server tools
 
-What Claude can do against your HA install:
+The built-in MCP server gives Claude **32 tools** against your live install. Verify them on your own system with **`ha-selftest`**.
+
+![MCP server tools by category](/images/bruh-claude/mcp-tools.svg)
+
+### Observe
 
 | Tool | Use |
 |------|-----|
-| `get_entity_state` / `get_all_states` | Live entity state |
-| `call_service` | Any HA service (turn on lights, etc.) |
-| `get_automations` / `get_automation_trace` | Automation list and stored execution traces |
-| `get_ha_config` / `get_services` / `get_device_registry` | Configuration and registry summaries |
-| `get_logbook` / `get_error_log` | Recent activity and Supervisor journal |
-| `render_template` | Jinja2 evaluation |
-| `fire_event` | Custom events |
-| `get_supervisor_info` | System info |
-| `reload_config` | Reload after YAML edits |
+| `get_entity_state` | Current state + attributes of any entity |
+| `get_all_states` | All entities, filterable by domain and name |
+| `get_areas` | Areas (rooms) and the entity_ids in each — resolves "the kitchen lights" |
+| `get_history` | Recent state history (up to 7 days), with min/max for numeric sensors |
+| `get_statistics` | Long-term hourly/daily mean/min/max (survives recorder purge) |
+| `get_logbook` | Recent logbook entries |
+| `get_camera_snapshot` | Returns a camera image so Claude can describe what it sees |
+| `get_weather_forecast` | Daily/hourly forecast via `weather.get_forecasts` |
+
+### Control devices
+
+| Tool | Use |
+|------|-----|
+| `control_light` | On/off/toggle, brightness, color, color-temp |
+| `control_climate` | Temperature, HVAC/preset/fan modes |
+| `control_media_player` | Play/pause/volume/source |
+| `control_cover` | Open/close/position (blinds, garage) |
+| `control_fan` | On/off, speed, oscillation |
+| `control_switch` | On/off/toggle |
+| `control_lock` | Lock/unlock |
+| `control_alarm` | Arm/disarm |
+| `control_vacuum` | Start/stop/return/clean |
+
+### Services & scenes
+
+| Tool | Use |
+|------|-----|
+| `call_service` | Call any HA service (the chokepoint where per-agent deny-lists are enforced) |
+| `activate_scene` | Activate a scene |
+| `run_script` | Run a script (with variables) |
+| `send_notification` | Send a notification |
+| `fire_event` | Fire a custom event |
+
+### Diagnose & system
+
+| Tool | Use |
+|------|-----|
+| `get_automations` | List automations with status |
+| `get_automation_trace` | Automation state + stored execution traces |
+| `get_error_log` | HA logs from the Supervisor journal |
+| `render_template` | Render Jinja2 templates |
+| `get_ha_config` | HA configuration details |
+| `get_services` | List all available services |
+| `get_service_details` | Service schema for a domain |
+| `get_device_registry` | Per-domain entity count summary |
+| `get_supervisor_info` | System information |
+| `reload_config` | Reload configs after YAML edits |
+
+## CLI tools
+
+Available in the terminal.
+
+| Command | What it does |
+|---------|--------------|
+| `ha-reload automations \| scripts \| scenes \| groups \| core \| all \| check` | Reload after editing YAML. |
+| `ha-log core \| supervisor \| host \| addon <name> \| errors \| all` | View HA logs. `-f` to follow, `-n N` for line count. |
+| `ha-backup ["msg"] \| history \| diff \| restore <file>` | Manual git backup, history, diff, single-file restore. |
+| `ha-context-gen` | Regenerate `/config/CLAUDE.md`. |
+| `persist-install apk\|pip <packages>` / `list` / `remove` | Manage persistent packages. |
+| `ha-selftest` | End-to-end diagnostic: API auth, the MCP server over stdio, the integration, listeners, login, sensors — PASS/FAIL with fix hints. |
+| `ha-entity` / `ha-service` / `ha-yaml-check` / `ha-notify` / `ha-share` / `ha-addon` | Focused helpers for entity state, service calls, YAML validation, notifications, the share folder, and add-on info. |
+
+## Transport & health
+
+In fast mode the worker pool serves an internal HTTP API (port 8099 on the hassio network, token-authenticated via the shared `/config` volume). The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically.
+
+![File-based IPC fallback flow](/images/bruh-claude/ipc-flow.svg)
+
+## Permissions architecture
+
+| Channel | Mechanism | Default access |
+|---------|-----------|----------------|
+| Interactive terminal | Prompts (unless `dangerously_skip_permissions: true`) | Everything — you approve actions |
+| Voice / conversation agents | Pre-approved allowlist + `assist_tool_access` + per-agent deny-list | All HA MCP tools; **no** shell, file, or web |
+| Automation tasks & insight jobs | Pre-approved allowlist | All tools (MCP, shell, file edits, web) |
+
+Background channels never use `--dangerously-skip-permissions` — they can't prompt, so the add-on writes `/config/.claude/settings.local.json` pre-approving the tools they need. Everything runs sandboxed as a non-root user (UID 1000), limited to `/config`, `/data`, and the enabled volume toggles.
 
 ## Where data lives
 
 | Path | Contents |
 |------|----------|
 | `/config/CLAUDE.md` | Auto-generated install context |
-| `/config/.bruh_claude/` | IPC bridge — request/response queues, logs |
+| `/config/.bruh_claude/` | IPC bridge — request/response queues, sessions, logs |
+| `/config/.bruh_claude/usage_limits.json` | Cached account utilization for the sensors |
 | `/config/.bruh_claude/logs/{assist,automation}-YYYYMMDD.log` | Per-request debug logs |
 | `/config/custom_components/bruh_claude/` | The HA integration |
 | `/data/` (add-on volume) | OAuth credentials, git backups, persistent packages |
 
 ## Mobile UI
 
-The terminal auto-detects touch devices and shows an on-screen toolbar.
+The terminal auto-detects touch devices and shows an on-screen toolbar above the keyboard.
 
-- **`ESC` / `Tab` / `Ctrl` (sticky) / arrows / `^C` / `Paste`** — keys iOS doesn't give you.
-- **Add to Home Screen** for a fullscreen launcher without Safari chrome.
-- **Voice dictation** — turn off iOS **Voice Control** (Settings → Accessibility) to avoid double-submission. Auto-correct/auto-capitalize/spellcheck are already disabled in the terminal's text field.
-- Disable the mobile UI entirely with `enable_mobile_ui: false`.
+- **`ESC` / `Tab` / `Ctrl` / arrows / `PgUp` / `PgDn` / `^C` / `Paste`** — the keys iOS doesn't give you, plus paging Claude Code's chat history.
+- **Scroll chat history** by swiping up/down with one finger (or the mouse wheel on desktop) — translated to PgUp/PgDn, so long-press text selection still works for copying an OAuth URL.
+- **Add to Home Screen** for a full-screen launcher without Safari chrome.
+- **Voice dictation:** turn off iOS **Voice Control** (Settings → Accessibility) to avoid double-submission.
+- Disable the whole mobile UI with `enable_mobile_ui: false`.
 
 ## When to restart Home Assistant
 
 | Scenario | Restart? |
 |----------|----------|
 | First install | **Yes** — HA must load the new custom component |
-| Add-on version upgrade | **Yes** — updated Python files need reloading (a notification appears) |
+| Add-on version upgrade | **Yes** — updated Python files need reloading (a notification + repair appear) |
 | Add-on restart, same version | No |
 | Config option changes | No — read at add-on boot |
+
+:::tip[Update not showing up?]
+The Supervisor only re-pulls add-on repositories periodically. To pick up a fresh release immediately: **Add-on Store → ⋮ → Check for updates**.
+:::
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
 | Add-on won't start | Check the **Log** tab. Architecture mismatch or port 7681 conflict. |
+| Terminal opens then closes | Update to **3.2.0+** (older builds broke on a Claude Code native-binary/libc mismatch). |
 | Integration not discovered | Restart HA after the first add-on start. Add manually via **Settings → Devices & Services** if needed. |
-| OAuth fails / "auth error" in Assist | Re-authenticate in the terminal. Existing agents work as long as the stored credentials are valid. |
-| Claude can't see entities | `enable_ha_mcp_server: true`? Check the Log tab for `MCP server registered with Claude Code`. |
-| Assist returns cut-off responses | Bump `assist_max_turns`. |
-| Token sensors stay at zero | Brand-new installs show 0 until you've used Claude. If usage exists, verify `/config/.bruh_claude/token_stats.json` exists. |
+| Claude can't see entities | `enable_ha_mcp_server: true`? Run **`ha-selftest`** — it reports any tool that errors. |
+| Voice replies cut off | Bump `assist_max_turns`. |
+| Voice agent answers wrong room | Run `ha-selftest` — the "Assist area map" check confirms the room map is built. |
+| Usage sensors *unavailable* | They need an OAuth/subscription login, not an API key (see above). |
 
 ### Per-request debug logs
 
-Every Assist and automation request is logged with channel, prompt size, model, duration, response preview, and any stderr.
+Every Assist and automation request is logged with channel, prompt size, model, the speed path it took (`warm`/`spare`/`cold`/`…+fallback`), duration, and a response preview.
 
 ```bash
 tail -f /config/.bruh_claude/logs/assist-$(date +%Y%m%d).log

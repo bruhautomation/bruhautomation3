@@ -139,6 +139,7 @@ export default defineConfig({
 								{ label: 'Overview', slug: 'bruh-claude' },
 								{ label: 'Quick Start', slug: 'bruh-claude/quickstart' },
 								{ label: 'Reference', slug: 'bruh-claude/reference' },
+								{ label: 'Changelog', slug: 'bruh-claude/changelog' },
 							],
 						},
 						{
