@@ -10,6 +10,8 @@ export default defineConfig({
 		starlight({
 			plugins: [starlightImageZoom()],
 			title: 'BRUH Automation',
+			editLink: { baseUrl: 'https://github.com/bruhautomation/bruhautomation3/edit/main/' },
+			lastUpdated: true,
 			components: {
 				ThemeSelect: './src/components/ThemeToggle.astro',
 			},
@@ -137,7 +139,7 @@ export default defineConfig({
 							label: 'BRUH Claude',
 							items: [
 								{ label: 'Overview', slug: 'bruh-claude' },
-								{ label: 'Quick Start', slug: 'bruh-claude/quickstart' },
+								{ label: 'Quick Start', slug: 'bruh-claude/quickstart', badge: { text: 'Start here', variant: 'tip' } },
 								{ label: 'Reference', slug: 'bruh-claude/reference' },
 								{ label: 'Changelog', slug: 'bruh-claude/changelog' },
 							],
@@ -146,8 +148,9 @@ export default defineConfig({
 							label: 'BRUH Minecraft Server',
 							items: [
 								{ label: 'Overview', slug: 'bruh-minecraft' },
-								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
+								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart', badge: { text: 'Start here', variant: 'tip' } },
 								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
+								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
 								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/', badge: { text: 'New', variant: 'tip' } },
 							],
 						},

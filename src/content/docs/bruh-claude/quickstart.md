@@ -16,7 +16,7 @@ Five minutes from zero to a working AI assistant inside your Home Assistant.
 
 In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
 
-```
+```text title="Repository URL"
 https://github.com/bruhautomation/BRUH-HA-Apps
 ```
 
@@ -52,7 +52,7 @@ Credentials are stored in the add-on's persistent volume — they survive restar
 
 Type into the terminal:
 
-```
+```text title="In the BRUH Claude terminal"
 > How many entities do I have?
 > Which lights are on right now?
 > How cold did it get last night?

@@ -1,6 +1,10 @@
 ---
 title: 50mL Tube Mixer
 description: A motorized mixer for 50mL conical tubes — 3D printed, adjustable speed.
+sidebar:
+  badge:
+    text: WIP
+    variant: caution
 ---
 
 A motorized mixer for 50mL conical tubes. 3D printed frame, adjustable speed, and compact enough to sit on a bench without taking up much space.

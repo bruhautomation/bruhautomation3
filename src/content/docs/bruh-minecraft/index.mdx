@@ -18,6 +18,10 @@ hero:
       link: /bruh-minecraft/reference/
       icon: open-book
       variant: minimal
+    - text: Changelog
+      link: /bruh-minecraft/changelog/
+      icon: list-format
+      variant: minimal
     - text: GitHub
       link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bruh-minecraft-server
       icon: external
@@ -29,8 +33,6 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## What it is
 
 A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper, Purpur, Folia, Vanilla, Fabric, or Forge — with a management panel in your HA sidebar. No VPS. No proxy jars. No Microsoft account required when you don't want one.
-
-![BRUH Minecraft management panel](/images/bruh-minecraft/panel-dashboard.png)
 
 :::tip[New: interactive command generator]
 Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generator/)** lets you click together any vanilla or plugin command — EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, ViaVersion — with a copy-to-clipboard button and one-click LuckPerms unlock presets.
@@ -85,8 +87,6 @@ Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generat
 ## The panel
 
 A tab for everything you'd want to do without SSHing in:
-
-![Panel tabs](/images/bruh-minecraft/panel-tabs.png)
 
 - **Dashboard** — status, uptime, memory, TPS, online players, quick `/say`, one-shot RCON
 - **Console** — live colour-coded JVM log + command bar

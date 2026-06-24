@@ -1,6 +1,10 @@
 ---
 title: Cellcube Bioreactor Controller
 description: A custom controller for automating Cellcube bioreactors with real-time monitoring and process control.
+sidebar:
+  badge:
+    text: WIP
+    variant: caution
 ---
 
 A custom-built controller for Cellcube bioreactors. Handles process control, real-time monitoring, and automated media exchange — replacing manual intervention with programmable logic.

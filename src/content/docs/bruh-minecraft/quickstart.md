@@ -15,7 +15,7 @@ Five minutes from zero to a running Minecraft server.
 
 In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
 
-```
+```text title="Repository URL"
 https://github.com/bruhautomation/BRUH-HA-Apps
 ```
 
