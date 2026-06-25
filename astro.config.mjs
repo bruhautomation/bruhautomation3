@@ -3,13 +3,16 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
 
-// Draft workflow (see also src/content.config.ts — keep both in sync):
+// Draft workflow (see scripts/build.mjs and src/content.config.ts):
 // A page with `draft: true` is HIDDEN on the Vercel production deployment (the
-// live site) and VISIBLE on every Vercel Preview deployment and in local dev —
-// so you can review in-development pages on a preview URL without `npm run dev`.
-// Force it either way with SHOW_DRAFTS=true|false. This same flag shows/hides
-// the dev-only "In Development" sidebar group below. To take a draft live: set
-// `draft: false` and move its sidebar entry into the matching category group.
+// live site) and VISIBLE on every Vercel Preview deployment and in local dev.
+// Page visibility is enforced by Starlight via the Astro build mode
+// (scripts/build.mjs maps the deploy env to `--mode`); this flag only mirrors
+// that decision for the dev-only "In Development" sidebar group below, so the
+// nav matches the pages that were actually built. The build wrapper exports
+// SHOW_DRAFTS during builds; force it manually with SHOW_DRAFTS=true|false. To
+// take a draft live: set `draft: false` and move its sidebar entry into the
+// matching category group.
 const showDrafts =
 	process.env.SHOW_DRAFTS != null
 		? process.env.SHOW_DRAFTS === 'true'
