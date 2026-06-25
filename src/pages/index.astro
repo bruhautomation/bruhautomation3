@@ -1,7 +1,30 @@
 ---
 // Custom landing page — standalone, outside Starlight's content collection.
+import { getCollection } from 'astro:content';
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
+
+// Hero project counts, derived from the docs content so the numbers always match
+// what the site actually shows. Drafts are counted only when this build shows
+// drafts (Vercel Preview / local dev) — using the same signal as Starlight's own
+// draft gate (`import.meta.env.MODE !== 'production'`) — so the live site
+// reflects shipped projects and previews reflect the full in-development
+// catalogue. Overview/index pages and app sub-pages aren't counted as projects.
+const showDrafts = import.meta.env.MODE !== 'production';
+const docs = await getCollection('docs', ({ data }) => showDrafts || !data.draft);
+const slug = (e) => e.id.replace(/^\/+/, '').replace(/\/index$/, '');
+const isOverview = (e) => slug(e).endsWith('/overview');
+const countIn = (dir) =>
+	docs.filter((e) => slug(e).startsWith(dir + '/') && !isOverview(e)).length;
+const appCount = new Set(
+	docs.map(slug).filter((s) => s.startsWith('bruh-')).map((s) => s.split('/')[0])
+).size;
+const stats = [
+	{ number: countIn('smart-home-projects'), label: 'Smart Home<br />Projects' },
+	{ number: countIn('home-projects'), label: 'Maker<br />Projects' },
+	{ number: countIn('lab-projects'), label: 'Lab<br />Projects' },
+	{ number: appCount, label: 'HA<br />Apps' },
+];
 ---
 
 <!doctype html>
@@ -570,22 +593,14 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 
 			<!-- Stats -->
 			<section class="stats">
-				<div class="stat">
-					<div class="stat-number">4</div>
-					<div class="stat-label">Smart Home<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">5</div>
-					<div class="stat-label">Maker<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">10</div>
-					<div class="stat-label">Lab<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">2</div>
-					<div class="stat-label">HA<br />Apps</div>
-				</div>
+				{
+					stats.map((s) => (
+						<div class="stat">
+							<div class="stat-number">{s.number}</div>
+							<div class="stat-label" set:html={s.label} />
+						</div>
+					))
+				}
 			</section>
 
 			<!-- Categories -->
