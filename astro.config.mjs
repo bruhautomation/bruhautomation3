@@ -3,6 +3,14 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
 
+// Draft workflow: a page with `draft: true` in its frontmatter is excluded
+// from production builds and search by Starlight, but stays visible while you
+// run `npm run dev`. `showDrafts` is true only under `astro dev`, and is used
+// below to surface those pages in a dev-only "In Development" sidebar group so
+// you can click into them locally. To take a draft live: set `draft: false`
+// and move its sidebar entry into the matching category group.
+const showDrafts = process.argv.includes('dev');
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://bruhautomation.com',
@@ -110,8 +118,6 @@ export default defineConfig({
 					items: [
 						{ label: 'Childproof Doorknob', slug: 'home-projects/beautiful-childproof-doorknob' },
 						{ label: 'Couch Cupholder', slug: 'home-projects/3d-prints/couch-cupholder' },
-						{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
-						{ label: 'Magnetic Ring Unlocker', slug: 'home-projects/3d-prints/magnetic-ring-unlocker' },
 						{ label: 'Tablet Wall Mount', slug: 'home-projects/tablet-wall-mount' },
 					],
 				},
@@ -120,15 +126,8 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{ label: '10mL Syringe Puller', slug: 'lab-projects/3d-prints/10ml-syringe-puller' },
-						{ label: '15mL Tube Megarack', slug: 'lab-projects/3d-prints/15ml-tube-megarack' },
-						{ label: '50mL Tube Mixer', slug: 'lab-projects/50ml-tube-mixer' },
-						{ label: '96-Well Plate Inverter', slug: 'lab-projects/96-well-plate-inverter' },
 						{ label: 'BSC Bottle Holder', slug: 'lab-projects/3d-prints/bsc-bottle-holder' },
-						{ label: 'CEDEX BioHT Tube Rack', slug: 'lab-projects/3d-prints/tube-rack-for-cedex-bioht' },
-						{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
-						{ label: 'Peristaltic Dosing Pump', slug: 'lab-projects/peristaltic-dosing-pump' },
 						{ label: 'Tape Dispenser Clip', slug: 'lab-projects/3d-prints/lab-tape-dispenser-clip' },
-						{ label: 'UV Flashlight', slug: 'lab-projects/3d-prints/uv-flashlight' },
 					],
 				},
 				{
@@ -156,6 +155,28 @@ export default defineConfig({
 						},
 					],
 				},
+				// Dev-only: in-development (draft) pages, visible under `npm run dev`,
+				// omitted from production builds. See `showDrafts` at the top.
+				...(showDrafts
+					? [
+							{
+								label: '🚧 In Development',
+								badge: { text: 'Dev only', variant: 'caution' },
+								items: [
+									{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
+									{ label: 'Magnetic Ring Unlocker', slug: 'home-projects/3d-prints/magnetic-ring-unlocker' },
+									{ label: '3D Prints Overview', slug: 'home-projects/3d-prints/overview' },
+									{ label: '15mL Tube Megarack', slug: 'lab-projects/3d-prints/15ml-tube-megarack' },
+									{ label: '50mL Tube Mixer', slug: 'lab-projects/50ml-tube-mixer' },
+									{ label: '96-Well Plate Inverter', slug: 'lab-projects/96-well-plate-inverter' },
+									{ label: 'CEDEX BioHT Tube Rack', slug: 'lab-projects/3d-prints/tube-rack-for-cedex-bioht' },
+									{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
+									{ label: 'Peristaltic Dosing Pump', slug: 'lab-projects/peristaltic-dosing-pump' },
+									{ label: 'UV Flashlight', slug: 'lab-projects/3d-prints/uv-flashlight' },
+								],
+							},
+						]
+					: []),
 				{
 					label: 'Changelog',
 					slug: 'changelog',

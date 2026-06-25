@@ -433,3 +433,56 @@ iframe {
 		padding: 1.25rem 1.15rem;
 	}
 }
+
+/* ─── Image placeholder (image-needed slot) ─── */
+
+.img-placeholder {
+	margin: 1.5rem 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	min-height: 160px;
+	padding: 2rem 1.5rem;
+	border: 2px dashed var(--sl-color-gray-4);
+	border-radius: 12px;
+	background: var(--sl-color-gray-6);
+}
+.img-placeholder__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	max-width: 56ch;
+}
+.img-placeholder__icon {
+	width: 2rem;
+	height: 2rem;
+	color: var(--sl-color-accent);
+	opacity: 0.85;
+}
+.img-placeholder__label {
+	margin: 0;
+	font-size: var(--sl-text-xs);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--sl-color-white);
+}
+.img-placeholder__note {
+	margin: 0;
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+	line-height: 1.5;
+}
+.img-placeholder__alt {
+	margin: 0.3rem 0 0;
+	font-size: var(--sl-text-xs);
+	color: var(--sl-color-gray-3);
+}
+.img-placeholder__alt span {
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.8;
+	margin-right: 0.35rem;
+}

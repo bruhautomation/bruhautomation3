@@ -25,6 +25,7 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import ImagePlaceholder from '../../../components/ImagePlaceholder.astro';
 
 ## What it is
 
@@ -54,6 +55,10 @@ A Home Assistant add-on that runs **Claude Code** inside HA — with native acce
     *"How cold did it get last night?"* *"Which automations haven't run in 30 days?"* *"What's the weather tomorrow?"* Live state, real history, real answers.
   </Card>
 </CardGrid>
+
+<ImagePlaceholder alt="BRUH Claude selected as the conversation agent in Home Assistant Settings → Voice Assistants">
+A screenshot of **Settings → Voice Assistants** with **BRUH Claude** chosen as the conversation agent.
+</ImagePlaceholder>
 
 ## A taste
 
@@ -113,6 +118,10 @@ Two kinds of sensors land in Home Assistant once the integration is set up.
 These mirror **claude.ai → Settings → Usage** and need an **OAuth / subscription login** (not an API key).
 
 **Insight sensors** — one `sensor.<job>_insight` per scheduled job, holding the latest report in its `markdown` attribute plus ready-to-paste `card_yaml`. A `binary_sensor` also reports voice-assistant health (worker count and latency).
+
+<ImagePlaceholder alt="A BRUH Claude insight report rendered as a Markdown card on a Home Assistant dashboard">
+A screenshot of an **insight report** (e.g. the daily briefing) rendered as a Markdown card on a dashboard.
+</ImagePlaceholder>
 
 ## Up and running in 5 minutes
 
