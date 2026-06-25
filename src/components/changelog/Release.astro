@@ -1,0 +1,46 @@
+---
+/**
+ * A single release card in a changelog. Renders the version, an optional
+ * "Latest" badge, the release date, and a slot for one or more <Changes>
+ * groups. Pass `version="Unreleased"` (or `unreleased`) for the work-in-
+ * progress section at the top.
+ */
+interface Props {
+	version: string;
+	date?: string;
+	latest?: boolean;
+	unreleased?: boolean;
+}
+
+const { version, date, latest = false, unreleased = false } = Astro.props;
+const isUnreleased = unreleased || version.toLowerCase() === 'unreleased';
+const heading = isUnreleased ? 'Unreleased' : `v${version}`;
+const anchor = isUnreleased
+	? 'unreleased'
+	: version.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const hasChanges = Astro.slots.has('default');
+---
+
+<section
+	class:list={['changelog-release', { 'is-unreleased': isUnreleased }]}
+	id={anchor}
+>
+	<header class="changelog-release-header">
+		<div class="changelog-release-heading">
+			<h2 class="changelog-release-version">{heading}</h2>
+			{latest && <span class="changelog-latest">Latest</span>}
+		</div>
+		{date && <time class="changelog-release-date">{date}</time>}
+	</header>
+	<div class="changelog-release-body">
+		{
+			hasChanges ? (
+				<slot />
+			) : (
+				<p class="changelog-empty">
+					Nothing yet — track work in progress here.
+				</p>
+			)
+		}
+	</div>
+</section>

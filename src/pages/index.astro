@@ -1,7 +1,30 @@
 ---
 // Custom landing page — standalone, outside Starlight's content collection.
+import { getCollection } from 'astro:content';
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
+
+// Hero project counts, derived from the docs content so the numbers always match
+// what the site actually shows. Drafts are counted only when this build shows
+// drafts (Vercel Preview / local dev) — using the same signal as Starlight's own
+// draft gate (`import.meta.env.MODE !== 'production'`) — so the live site
+// reflects shipped projects and previews reflect the full in-development
+// catalogue. Overview/index pages and app sub-pages aren't counted as projects.
+const showDrafts = import.meta.env.MODE !== 'production';
+const docs = await getCollection('docs', ({ data }) => showDrafts || !data.draft);
+const slug = (e) => e.id.replace(/^\/+/, '').replace(/\/index$/, '');
+const isOverview = (e) => slug(e).endsWith('/overview');
+const countIn = (dir) =>
+	docs.filter((e) => slug(e).startsWith(dir + '/') && !isOverview(e)).length;
+const appCount = new Set(
+	docs.map(slug).filter((s) => s.startsWith('bruh-')).map((s) => s.split('/')[0])
+).size;
+const stats = [
+	{ number: countIn('smart-home-projects'), label: 'Smart Home<br />Projects' },
+	{ number: countIn('home-projects'), label: 'Maker<br />Projects' },
+	{ number: countIn('lab-projects'), label: 'Lab<br />Projects' },
+	{ number: appCount, label: 'HA<br />Apps' },
+];
 ---
 
 <!doctype html>
@@ -54,7 +77,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				--bg-card-solid: #14161e;
 				--border: rgba(255, 255, 255, 0.08);
 				--text: #e4e4e7;
-				--text-muted: #8b8b97;
+				--text-muted: #9b9ba8;
 				--accent: #1e90ff;
 				--accent-glow: rgba(30, 144, 255, 0.15);
 				--radius: 14px;
@@ -85,6 +108,22 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			a {
 				color: inherit;
 				text-decoration: none;
+			}
+			.skip-link {
+				position: absolute;
+				top: -100px;
+				left: 1rem;
+				z-index: 200;
+				padding: 0.6rem 1rem;
+				border-radius: 8px;
+				background: var(--accent);
+				color: #fff;
+				font-size: 0.9rem;
+				font-weight: 600;
+				transition: top 0.15s;
+			}
+			.skip-link:focus {
+				top: 1rem;
 			}
 
 			/* ── Nav ── */
@@ -212,6 +251,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 				letter-spacing: -0.03em;
 				max-width: 16ch;
 				padding-bottom: 0.1em;
+				color: var(--text);
 				background: linear-gradient(
 					135deg,
 					var(--text) 0%,
@@ -421,6 +461,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 	</head>
 
 	<body>
+		<a href="#main" class="skip-link">Skip to content</a>
 		<!-- Nav — no logo here since the hero has it -->
 		<nav>
 			<div class="nav-right">
@@ -494,7 +535,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 			</div>
 		</nav>
 
-		<main>
+		<main id="main" tabindex="-1">
 			<!-- Hero -->
 			<section class="hero">
 				<!-- Center content -->
@@ -552,22 +593,14 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 
 			<!-- Stats -->
 			<section class="stats">
-				<div class="stat">
-					<div class="stat-number">4</div>
-					<div class="stat-label">Smart Home<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">5</div>
-					<div class="stat-label">Home<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">10</div>
-					<div class="stat-label">Lab<br />Projects</div>
-				</div>
-				<div class="stat">
-					<div class="stat-number">'15</div>
-					<div class="stat-label">Building<br />Since</div>
-				</div>
+				{
+					stats.map((s) => (
+						<div class="stat">
+							<div class="stat-number">{s.number}</div>
+							<div class="stat-label" set:html={s.label} />
+						</div>
+					))
+				}
 			</section>
 
 			<!-- Categories -->
@@ -584,7 +617,7 @@ import logoDark from '../assets/bruh-logo-dark.svg';
 					<p>3D prints, mods, and practical builds for around the house.</p>
 					<span class="cat-link">Explore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
 				</a>
-				<a href="/lab-projects/cellcube-bioreactor-controller/" class="cat-card">
+				<a href="/lab-projects/3d-prints/bsc-bottle-holder/" class="cat-card">
 					<div class="cat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v6l3 9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2l3-9V3z"></path><line x1="8" y1="3" x2="16" y2="3"></line><path d="M10 15h4"></path></svg></div>
 					<h3>Lab</h3>
 					<p>Biotech lab automation and 3D-printed accessories.</p>

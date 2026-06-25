@@ -1,0 +1,262 @@
+---
+title: Changelog
+description: Release notes for the BRUH Claude Terminal Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../../components/changelog/Changelog.astro';
+import Release from '../../../components/changelog/Release.astro';
+import Changes from '../../../components/changelog/Changes.astro';
+
+<Changelog project="BRUH Claude Terminal" version="3.2.1">
+
+<Release version="Unreleased" />
+
+<Release version="3.2.1" date="June 24, 2026" latest>
+<Changes type="added">
+
+- **A proper landscape store logo** (the previous `logo.png` was a byte-identical copy of the square icon) and a **terminal illustration** in the README, so the project leads with a picture of what it does.
+
+</Changes>
+<Changes type="changed">
+
+- **Documentation overhaul** — a table of contents, a consolidated troubleshooting table, Support / Authors / License sections, a SemVer policy, the `enable_mobile_ui` option documented, and a corrected automation example (the old one pointed at a task path the listener never watched; use the `bruh_claude.run_task` service).
+
+</Changes>
+</Release>
+
+<Release version="3.2.0" date="June 22, 2026">
+<Changes type="fixed">
+
+- **The terminal no longer opens and instantly closes after an update.** Recent Claude Code releases ship a native binary that needs a libc symbol (`posix_getdents`) only present in musl 1.2.6, so the CLI died the instant you connected. The add-on now builds on **Alpine 3.24** (musl 1.2.6), which also restores normal Claude Code auto-updates instead of being frozen on an old release.
+- **Startup now verifies Claude Code actually runs** after installing it. If a future build ever needs a newer libc than the base image provides, the log says so explicitly — with the fix — instead of leaving a terminal that opens and disappears.
+
+</Changes>
+<Changes type="added">
+
+- **Pin Claude Code to a specific version** with the `BRUH_CLAUDE_CODE_VERSION` environment variable (or the `CLAUDE_CODE_VERSION` Docker build arg), in case a future release ever regresses.
+
+</Changes>
+</Release>
+
+<Release version="3.1.0" date="June 11, 2026">
+<Changes type="added">
+
+- **Per-agent service deny-lists.** Every voice agent gets a **Blocked services** picker — choose common high-risk patterns (`lock.unlock`, `alarm_control_panel.alarm_disarm`, `homeassistant.restart`…), a whole `domain.*`, or type your own. Enforcement is real, not a prompt request: the list is checked in the MCP server's `call_service` chokepoint, so a blocked service can't be reached by any tool or phrasing. A kitchen speaker can be barred from unlocking doors while your office agent isn't.
+
+</Changes>
+<Changes type="changed">
+
+- **Personalities now own identity, tone, and verbosity outright.** The voice system prompt used to merge your persona with a competing built-in identity, watering both down. Now a custom personality leads with an explicit precedence note and the operational block (tools, area map, timezone, routing) is identity-free.
+- **The `mcp_only` voice deny-list now also blocks file *reads*** (Read / Glob / Grep), not just writes — voice gets HA data exclusively through MCP tools, so it can't read `secrets.yaml` aloud.
+
+</Changes>
+</Release>
+
+<Release version="3.0.1" date="June 10, 2026">
+<Changes type="fixed">
+
+- **Blank "Add Service" dialog.** Two translation strings contained literal Jinja braces, which broke the frontend's message-format parser; all strings are now brace-free, with a CI test guarding against regressions.
+- **Local time, not UTC.** The container now adopts HA's configured timezone, the voice prompt names it, and every message carries a local timestamp — agents answer "what time is it?" in your timezone with zero tool calls.
+
+</Changes>
+<Changes type="added">
+
+- **`get_weather_forecast` MCP tool** — modern HA only exposes forecasts via `weather.get_forecasts`, fetched here over the WebSocket API so "what's the weather tomorrow?" works reliably by voice.
+- **Much friendlier insight setup** — a **Run now** button on every job's device page, template previews that pre-fill the prompt box, proper multiline prompt editors, and a one-time notification with ready-to-paste dashboard card YAML after a job's first run.
+- **Model overrides** for `send_prompt` and `run_task`, an optional notify service per insight job, and a richer `bruh_claude_insight_complete` event (now with `entity_id` and a preview) for TTS announcements.
+
+</Changes>
+</Release>
+
+<Release version="3.0.0" date="June 10, 2026">
+<Changes type="added">
+
+- **Insight jobs — proactive Claude.** Schedule Claude reports (daily briefing, anomaly watch, battery & maintenance, camera check, or a custom templated prompt) rendered to `sensor.<job>_insight` with a full markdown report and ready-to-paste card YAML. Trigger by interval, daily time, or the `bruh_claude.run_insight` service.
+- **Streaming voice over an internal HTTP API.** A worker-pool HTTP API (port 8099, token-authenticated on the shared volume) streams replies into the chat log so TTS starts speaking at the first sentence on streaming-capable pipelines.
+- **Health monitoring.** `binary_sensor.bruh_claude_system_assist_healthy` exposes worker count, the pre-warmed spare, and last-request latency.
+- **Voice tool scoping (`assist_tool_access`).** `mcp_only` (default) lets voice use every HA MCP tool but denies shell, file, and web access.
+
+</Changes>
+<Changes type="changed">
+
+- **The file protocol is kept as a permanent fallback.** If the HTTP API is ever unreachable, both sides fall back automatically — nothing existing breaks.
+
+</Changes>
+</Release>
+
+<Release version="2.5.0" date="June 10, 2026">
+<Changes type="added">
+
+- **`get_camera_snapshot`** — Claude can now *see* a camera and describe what's visible ("is the garage door actually closed?"), returned as a real MCP image block (downscaled to keep token cost sane).
+- **`get_history` and `get_statistics`** — recent state history (up to 7 days, with min/max for numeric sensors) and long-term statistics over the WebSocket API: "how cold did it get last week?"
+
+</Changes>
+<Changes type="changed">
+
+- **Schema-driven MCP dispatch.** The hand-written 140-line tool router is replaced by a registry that derives each tool's argument contract from its own input schema. Adding a tool is now a function, a schema, and one mapping line — with a test that keeps schemas and implementations in sync.
+
+</Changes>
+</Release>
+
+<Release version="2.4.1" date="June 10, 2026">
+<Changes type="fixed">
+
+- **Large homes no longer lose their Weather/People voice context.** Oversized area maps were truncated mid-list, dropping exactly the sections voice asks about most; Weather/People now come first, the cap is higher, and truncation lands on a line boundary.
+- **The spare worker is pre-warmed at startup**, so the first voice command after an add-on restart no longer pays the ~20s cold start.
+
+</Changes>
+</Release>
+
+<Release version="2.4.0" date="June 10, 2026">
+<Changes type="added">
+
+- **Assist fast mode (default on).** A worker-pool daemon keeps a live Claude process per active conversation plus a pre-warmed spare, so even brand-new voice commands skip the CLI boot and MCP handshake. Any worker error falls back to a one-shot invocation; set `assist_fast_mode: false` for the classic listener.
+
+</Changes>
+<Changes type="changed">
+
+- **Area map made version-proof and visible.** The area→entity map spliced into the voice prompt now renders on any HA version (pure-core Jinja), gained **Weather** and **People** sections, logs failures instead of silently dropping to discovery mode, and reports its size on every request and in `ha-selftest`.
+
+</Changes>
+</Release>
+
+<Release version="2.3.0" date="June 10, 2026">
+<Changes type="added">
+
+- **Conversations resume real Claude Code sessions.** The first turn starts a session; follow-ups `--resume` it, so Claude keeps full context server-side instead of replaying the transcript every turn — fewer tokens, faster replies, complete memory within a conversation.
+
+</Changes>
+<Changes type="changed">
+
+- **Snappier voice.** An area→controllable-entities map is spliced into the system prompt (no `get_areas` round-trip for "turn off the kitchen lights"), new agents default to **Claude Haiku**, and the bridge polls responses every 0.1s.
+
+</Changes>
+<Changes type="fixed">
+
+- **The "one answer behind" bug.** Per-turn files are now uniquely named and claimed atomically, so a late response can never become the answer to the next turn.
+- **Automation tasks longer than 120s are no longer lost** — the integration now waits the full task timeout (up to 300s).
+
+</Changes>
+</Release>
+
+<Release version="2.2.1" date="June 8, 2026">
+<Changes type="fixed">
+
+- **No more `Permission denied` noise** when scripts (`ha-selftest`, the login shell) sourced the root-owned env file as the non-root user — the guard now checks readability, not just existence.
+
+</Changes>
+</Release>
+
+<Release version="2.2.0" date="June 8, 2026">
+<Changes type="added">
+
+- **`get_areas` — area/room awareness.** Lists every area and its entity_ids so the voice agent can turn "the kitchen lights" into concrete entities without a discovery turn.
+- **`ha-selftest` in-situ diagnostic.** A single command drives the whole chain end-to-end — HA API auth, the MCP server over stdio, the deployed integration, the listeners, your Claude login, and the usage sensors — printing PASS/FAIL with a fix hint for anything wrong.
+
+</Changes>
+<Changes type="removed">
+
+- **The orphaned legacy token-stats tracker** (unused since the token sensors were dropped in 1.9.0) and a few dead code paths in the integration.
+
+</Changes>
+</Release>
+
+<Release version="2.1.0" date="June 8, 2026">
+<Changes type="fixed">
+
+- **Scrolling Claude Code's chat — finally — on both phone and desktop.** A one-finger swipe inside the terminal (and a throttled desktop wheel) now pages Claude Code's own pager via PgUp/PgDn without enabling terminal mouse tracking, so long-press text selection and OAuth-URL copy keep working.
+
+</Changes>
+</Release>
+
+<Release version="2.0.2" date="May 13, 2026">
+<Changes type="removed">
+
+- **The experimental 2.0.x custom chat UI is reverted.** The FastAPI + Preact surface was a worse fit than native Claude Code in ttyd (with the mobile shim), so the add-on returns to the proven terminal. Existing config needs no changes.
+
+</Changes>
+</Release>
+
+<Release version="2.0.1" date="May 13, 2026">
+<Changes type="added">
+
+- **CI now enforces version bumps.** Any change to add-on runtime files without a `config.yaml` version bump fails the build — so a fix can never again sit invisible on `main` because HA only pulls a new image on a version change.
+
+</Changes>
+<Changes type="fixed">
+
+- **Chat UI asset URLs inside HA ingress** (since superseded by the 2.0.2 revert).
+
+</Changes>
+</Release>
+
+<Release version="2.0.0" date="May 13, 2026">
+<Changes type="added">
+
+- **An opt-in chat UI surface** (FastAPI + Preact over a WebSocket) reframing the add-on from "Claude Code in a web terminal" to "Claude Code in your home, surface of your choice." Default off; reverted in 2.0.2 in favour of the native terminal.
+
+</Changes>
+</Release>
+
+<Release version="1.18.0" date="May 3, 2026">
+<Changes type="fixed">
+
+- **Every keystroke double-typed in the web terminal** — fixed, kicking off the 1.18.x line that built out the mobile experience: iOS keyboard avoidance through the HA ingress iframe, OSC-52 clipboard copy, and PgUp/PgDn scroll buttons.
+
+</Changes>
+</Release>
+
+<Release version="1.17.0" date="April 2026">
+<Changes type="added">
+
+- **Mobile toolbar and iOS dictation fix.** An on-screen toolbar above the software keyboard provides the keys iOS doesn't (ESC, Tab, Ctrl, arrows, `^C`, Paste), and the dictation double-word bug is resolved.
+
+</Changes>
+</Release>
+
+<Release version="1.14.0">
+<Changes type="changed">
+
+- **Claude Code now auto-updates on startup** — the add-on re-pulls the newest `@anthropic-ai/claude-code` on every boot (with retries) so you track the latest release without rebuilding.
+
+</Changes>
+</Release>
+
+<Release version="1.9.0">
+<Changes type="removed">
+
+- **Legacy per-token usage sensors** in favour of account-wide usage-limit sensors, and fixed an `/api/mcp` auth error.
+
+</Changes>
+</Release>
+
+<Release version="1.8.0">
+<Changes type="added">
+
+- **Anthropic usage-limit sensors, persistent Claude sessions, and configurable turn budgets** (`assist_max_turns` / `automation_max_turns`).
+
+</Changes>
+</Release>
+
+<Release version="1.5.0">
+<Changes type="added">
+
+- **HA Repairs flow, OAuth credential persistence, and conversation memory** for the Assist agent.
+
+</Changes>
+</Release>
+
+<Release version="1.0.0">
+<Changes type="added">
+
+- **Initial release** — Claude Code in a Home Assistant web terminal, with native HA API access via the built-in MCP server, git-based config backup, and auto-generated `CLAUDE.md` context.
+
+</Changes>
+</Release>
+
+</Changelog>
+
+:::note
+This page highlights notable releases. The complete, unabridged history lives in the [`CHANGELOG.md`](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/bruh-claude-terminal/CHANGELOG.md) in the add-on repository.
+:::
