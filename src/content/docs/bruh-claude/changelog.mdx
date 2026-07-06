@@ -8,11 +8,26 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Claude Terminal" version="3.2.1">
+<Changelog project="BRUH Claude Terminal" version="3.2.2">
 
 <Release version="Unreleased" />
 
-<Release version="3.2.1" date="June 24, 2026" latest>
+<Release version="3.2.2" date="July 6, 2026" latest>
+<Changes type="fixed">
+
+- **The app can be built and updated again on current Home Assistant.** Supervisor 2026.04.0 retired the legacy add-on builder: `build.yaml` is ignored and the `BUILD_FROM` build argument is no longer passed, so the Dockerfile's `FROM ${BUILD_FROM}` resolved to an empty base image and the build failed before it started. The Dockerfile now carries its own default (`ghcr.io/home-assistant/base:3.24`, the official multi-arch base); older Supervisors keep overriding it through `build.yaml`.
+- **Hassio auto-discovery works again on HA 2026.x.** Core removed the old `HassioServiceInfo` re-export; the integration now imports it from its current home (`homeassistant.helpers.service_info.hassio`) with a fallback for older cores.
+
+</Changes>
+<Changes type="changed">
+
+- **The volume map uses the current `homeassistant_config` type** instead of the legacy `config` alias, with an explicit `path: /config` so every script keeps its long-standing mount point (requires Supervisor 2023.09+).
+- **`DeviceInfo` is imported from its canonical `helpers.device_registry` location** across all platforms, ahead of Core removing the deprecated re-export. The rest of the integration was audited against HA Core 2026.7.1 source — conversation entity, chat-log streaming, options flow, repairs, services, and sensors all use current APIs.
+
+</Changes>
+</Release>
+
+<Release version="3.2.1" date="June 24, 2026">
 <Changes type="added">
 
 - **A proper landscape store logo** (the previous `logo.png` was a byte-identical copy of the square icon) and a **terminal illustration** in the README, so the project leads with a picture of what it does.

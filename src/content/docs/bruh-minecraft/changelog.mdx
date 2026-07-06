@@ -8,11 +8,25 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Minecraft Server" version="1.14.0">
+<Changelog project="BRUH Minecraft Server" version="1.14.1">
 
 <Release version="Unreleased" />
 
-<Release version="1.14.0" date="June 23, 2026" latest>
+<Release version="1.14.1" date="July 6, 2026" latest>
+<Changes type="fixed">
+
+- **The add-on can be built and updated again on current Home Assistant.** Supervisor 2026.04.0 retired the legacy add-on builder: `build.yaml` is ignored and the `BUILD_FROM` build argument is no longer passed, so the Dockerfile's `FROM ${BUILD_FROM}` resolved to an empty base image and the build failed before it started. The Dockerfile now carries its own default (`ghcr.io/home-assistant/base:3.24`, the official multi-arch base); older Supervisors keep overriding it through `build.yaml`.
+
+</Changes>
+<Changes type="changed">
+
+- **Base image: Alpine 3.19 → 3.24.** Java still comes bundled from Eclipse Temurin, so the server runtime is unchanged.
+- **The volume map uses the current `homeassistant_config` type** instead of the legacy `config` alias, with an explicit `path: /config` so worlds, backups, and the panel keep their long-standing mount point (requires Supervisor 2023.09+).
+
+</Changes>
+</Release>
+
+<Release version="1.14.0" date="June 23, 2026">
 <Changes type="added">
 
 - **Featured worlds — one-click, fully server-side installs.** The Worlds tab gained a **Featured worlds** section, starting with **Drehmal: APOTHEOSIS**. Click **Install** and the add-on downloads the complete community world (save plus bundled datapacks) onto the server and stages it as a new switchable world — your current world is untouched until you **Switch** to it.
