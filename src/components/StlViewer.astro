@@ -42,6 +42,11 @@ const { src, height = '400px', color = '#1e90ff' } = Astro.props;
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.domElement.setAttribute('role', 'img');
+    renderer.domElement.setAttribute(
+      'aria-label',
+      'Interactive 3D model preview. Drag to rotate, scroll to zoom, right-click to pan.'
+    );
     container.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -98,20 +103,36 @@ const { src, height = '400px', color = '#1e90ff' } = Astro.props;
     grid.position.y = -50;
     scene.add(grid);
 
+    let frameHandle = 0;
     function animate() {
-      requestAnimationFrame(animate);
+      frameHandle = requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
     }
     animate();
 
-    new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       const w = container.clientWidth;
       const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-    }).observe(container);
+    });
+    resizeObserver.observe(container);
+
+    // Tear down the render loop and free the WebGL context when this viewer's
+    // container leaves the page (Astro client navigation). Browsers cap live
+    // WebGL contexts (~16), so leaking one per navigation eventually breaks
+    // every viewer on the site.
+    function cleanup() {
+      cancelAnimationFrame(frameHandle);
+      resizeObserver.disconnect();
+      controls.dispose();
+      renderer.dispose();
+      document.removeEventListener('astro:before-swap', cleanup);
+    }
+    document.addEventListener('astro:before-swap', cleanup);
   }
 
   function initAllViewers() {

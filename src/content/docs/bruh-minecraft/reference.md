@@ -33,7 +33,7 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 | `view_distance` / `simulation_distance` | `10` / `10` | 3–32 each |
 | `pvp` / `hardcore` / `allow_flight` / `white_list` | `true` / `false` / `false` / `false` | |
 | `spawn_protection` | `16` | 0–10000 |
-| `online_mode` | `true` | **`false` = LAN/no-Xbox mode** — the addon auto-fixes everything downstream. |
+| `online_mode` | `true` | **`false` = LAN/no-Xbox mode** — the add-on auto-fixes everything downstream. |
 | `enforce_secure_profile` | `false` | Auto-forced `false` whenever `online_mode: false`. |
 | `level_name` / `level_seed` / `level_type` | `world` / random / `minecraft:normal` | Only takes effect on fresh world generation. |
 | `allow_nether` / `generate_structures` | `true` / `true` | |
@@ -184,7 +184,7 @@ auto_restart_schedule: "03:00"
 
 ## Settings precedence
 
-The single most-confusing part of the addon. Memorise this:
+The single most-confusing part of the add-on. Memorise this:
 
 1. **Add-on Configuration tab = source of truth.** Every boot rewrites `server.properties` from your options.
 2. **Panel → Server Properties tab = live tweaks.** Applies via RCON immediately, but next add-on restart overwrites it.

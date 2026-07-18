@@ -43,13 +43,9 @@ export default defineConfig({
 				'./src/styles/custom.css',
 			],
 			head: [
-				{
-					tag: 'meta',
-					attrs: {
-						name: 'description',
-						content: 'Smart home, maker, and lab projects by Ben — open-source designs, 3D print files, and build guides.',
-					},
-				},
+				// Note: no global `description` meta — every page (docs frontmatter,
+				// index.astro, command-generator.astro) sets its own, so a global one
+				// here would emit a duplicate <meta name="description"> on every page.
 				{
 					tag: 'meta',
 					attrs: {
@@ -68,7 +64,28 @@ export default defineConfig({
 					tag: 'meta',
 					attrs: {
 						property: 'og:image',
-						content: '/og-image.png',
+						content: 'https://bruhautomation.com/og-image.png',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						property: 'og:image:width',
+						content: '1200',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						property: 'og:image:height',
+						content: '630',
+					},
+				},
+				{
+					tag: 'meta',
+					attrs: {
+						property: 'og:image:alt',
+						content: 'BRUH Automation — smart home, maker, and lab projects',
 					},
 				},
 				{
