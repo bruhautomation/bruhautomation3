@@ -29,15 +29,12 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
-import ImagePlaceholder from '../../../components/ImagePlaceholder.astro';
 
 ## What it is
 
 A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper, Purpur, Folia, Vanilla, Fabric, or Forge — with a management panel in your HA sidebar. No VPS. No proxy jars. No Microsoft account required when you don't want one.
 
-<ImagePlaceholder alt="The BRUH Minecraft management panel Dashboard tab showing server status, uptime, memory, TPS, and online players">
-A screenshot of the **Dashboard** tab in the HA sidebar — status, uptime, memory, TPS, and the online-player list.
-</ImagePlaceholder>
+![The BRUH Minecraft management panel Dashboard tab showing server status, uptime, memory, TPS, and online players](/images/bruh-minecraft/panel-dashboard.svg)
 
 :::tip[New: interactive command generator]
 Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generator/)** lets you click together any vanilla or plugin command — EssentialsX, LuckPerms, WorldEdit, WorldGuard, CoreProtect, Multiverse, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark, ViaVersion — with a copy-to-clipboard button and one-click LuckPerms unlock presets.
@@ -93,9 +90,7 @@ Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generat
 
 A tab for everything you'd want to do without SSHing in:
 
-<ImagePlaceholder alt="The BRUH Minecraft panel tab bar: Dashboard, Console, Players, Server Properties, Plugins, Backups, and Worlds">
-A screenshot of the panel's **tab bar** showing every tab — Dashboard, Console, Players, Server Properties, Plugins, Backups, Worlds.
-</ImagePlaceholder>
+![The BRUH Minecraft panel tab bar: Dashboard, Console, Players, Server Properties, Plugins, Backups, and Worlds](/images/bruh-minecraft/panel-tabs.svg)
 
 - **Dashboard** — status, uptime, memory, TPS, online players, quick `/say`, one-shot RCON
 - **Console** — live colour-coded JVM log + command bar
@@ -113,7 +108,7 @@ A first-class companion integration, auto-discovered on first boot:
 
 | What | Includes |
 |------|----------|
-| **12 sensors** | `players_online` (with names list), TPS 1m/5m/15m, latency, uptime, version, MOTD, difficulty, gamemode, server_type |
+| **12 sensors** | `players_online` (with names list), `players_max`, TPS 1m/5m/15m, latency, uptime, version, MOTD, difficulty, gamemode, server_type |
 | **2 binary sensors** | `reachable`, `rcon_ok` |
 | **4 buttons** | `backup_now`, `restart_server`, `stop_server`, `save_all` |
 | **13 services** | `say`, `rcon_command`, `give`, `set_weather`, `set_time`, lifecycle (`backup_now` / `restart_server` / `stop_server`), player ops (`op_player` / `deop_player` / `kick_player` / `ban_player` / `whitelist_add` / `whitelist_remove`) |

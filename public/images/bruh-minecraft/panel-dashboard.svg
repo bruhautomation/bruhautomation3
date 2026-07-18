@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" role="img" aria-label="The BRUH Minecraft management panel Dashboard tab showing server status, uptime, memory, TPS, and online players">
+  <defs>
+    <linearGradient id="mcbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="memfill" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3fb950"/>
+      <stop offset="100%" stop-color="#2ea043"/>
+    </linearGradient>
+  </defs>
+
+  <!-- panel frame -->
+  <rect x="0.5" y="0.5" width="819" height="479" rx="14" fill="url(#mcbg)" stroke="#30363d"/>
+
+  <!-- header -->
+  <text x="28" y="42" fill="#e6edf3" font-size="18" font-weight="700">BRUH Minecraft</text>
+  <circle cx="212" cy="37" r="5" fill="#3fb950"/>
+  <text x="224" y="42" fill="#3fb950" font-size="13" font-weight="600">Running</text>
+  <text x="792" y="42" text-anchor="end" fill="#8b949e" font-size="13">Paper 1.21.4</text>
+  <line x1="0" y1="62" x2="820" y2="62" stroke="#30363d"/>
+
+  <!-- tab bar -->
+  <g font-size="13">
+    <rect x="24" y="78" width="92" height="30" rx="7" fill="#1e90ff" fill-opacity="0.16" stroke="#1e90ff" stroke-opacity="0.5"/>
+    <text x="70" y="98" text-anchor="middle" fill="#58a6ff" font-weight="600">Dashboard</text>
+    <text x="140" y="98" fill="#8b949e">Console</text>
+    <text x="212" y="98" fill="#8b949e">Players</text>
+    <text x="282" y="98" fill="#8b949e">Properties</text>
+    <text x="372" y="98" fill="#8b949e">Plugins</text>
+    <text x="444" y="98" fill="#8b949e">Backups</text>
+    <text x="524" y="98" fill="#8b949e">Worlds</text>
+  </g>
+  <line x1="0" y1="122" x2="820" y2="122" stroke="#30363d"/>
+
+  <!-- stat cards -->
+  <g>
+    <!-- Status -->
+    <rect x="24" y="142" width="180" height="86" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="40" y="166" fill="#8b949e" font-size="12">STATUS</text>
+    <circle cx="46" cy="196" r="6" fill="#3fb950"/>
+    <text x="60" y="201" fill="#e6edf3" font-size="20" font-weight="700">Online</text>
+
+    <!-- Uptime -->
+    <rect x="216" y="142" width="180" height="86" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="232" y="166" fill="#8b949e" font-size="12">UPTIME</text>
+    <text x="232" y="201" fill="#e6edf3" font-size="20" font-weight="700">3d 07h 12m</text>
+
+    <!-- TPS -->
+    <rect x="408" y="142" width="180" height="86" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="424" y="166" fill="#8b949e" font-size="12">TPS</text>
+    <text x="424" y="201" fill="#3fb950" font-size="20" font-weight="700">20.0</text>
+    <text x="490" y="201" fill="#8b949e" font-size="13">avg</text>
+
+    <!-- Players count -->
+    <rect x="600" y="142" width="196" height="86" rx="10" fill="#161b22" stroke="#30363d"/>
+    <text x="616" y="166" fill="#8b949e" font-size="12">PLAYERS ONLINE</text>
+    <text x="616" y="201" fill="#e6edf3" font-size="20" font-weight="700">3 / 20</text>
+  </g>
+
+  <!-- Memory bar -->
+  <rect x="24" y="244" width="372" height="96" rx="10" fill="#161b22" stroke="#30363d"/>
+  <text x="40" y="270" fill="#8b949e" font-size="12">MEMORY</text>
+  <text x="380" y="270" text-anchor="end" fill="#c9d1d9" font-size="13">2.4 GB / 4 GB</text>
+  <rect x="40" y="286" width="340" height="14" rx="7" fill="#0d1117" stroke="#30363d"/>
+  <rect x="40" y="286" width="204" height="14" rx="7" fill="url(#memfill)"/>
+  <text x="40" y="326" fill="#8b949e" font-size="12">Aikar G1GC tuning · daily restart 04:00</text>
+
+  <!-- Online players list -->
+  <rect x="408" y="244" width="388" height="96" rx="10" fill="#161b22" stroke="#30363d"/>
+  <text x="424" y="270" fill="#8b949e" font-size="12">ONLINE PLAYERS</text>
+  <g font-size="13" fill="#c9d1d9">
+    <circle cx="430" cy="292" r="5" fill="#3fb950"/><text x="444" y="297">Steve_Builds</text>
+    <text x="770" y="297" text-anchor="end" fill="#8b949e">18 ms</text>
+    <circle cx="430" cy="314" r="5" fill="#3fb950"/><text x="444" y="319">redstone_kid</text>
+    <text x="770" y="319" text-anchor="end" fill="#8b949e">24 ms</text>
+    <circle cx="430" cy="332" r="5" fill="#3fb950"/><text x="444" y="337" font-size="12">crossplay_bedrock_01</text>
+    <text x="770" y="337" text-anchor="end" fill="#8b949e" font-size="12">41 ms</text>
+  </g>
+
+  <!-- quick say / rcon -->
+  <text x="40" y="380" fill="#8b949e" font-size="12">QUICK /say</text>
+  <rect x="40" y="392" width="560" height="34" rx="8" fill="#0d1117" stroke="#30363d"/>
+  <text x="54" y="414" fill="#6e7681" font-size="13">Server restarting in 5 minutes…</text>
+  <rect x="612" y="392" width="184" height="34" rx="8" fill="#1e90ff" fill-opacity="0.16" stroke="#1e90ff" stroke-opacity="0.5"/>
+  <text x="704" y="414" text-anchor="middle" fill="#58a6ff" font-size="13" font-weight="600">Send to server</text>
+</svg>

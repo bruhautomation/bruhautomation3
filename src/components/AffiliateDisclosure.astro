@@ -1,0 +1,33 @@
+---
+/**
+ * A small, consistent FTC affiliate disclosure for pages that link to Amazon.
+ * As an Amazon Associate, links tagged with the brau01-20 tag earn a commission
+ * on qualifying purchases at no extra cost to the reader. Drop this near the
+ * first cluster of product links on a page:
+ *
+ *   import AffiliateDisclosure from '../../components/AffiliateDisclosure.astro';
+ *   <AffiliateDisclosure />
+ */
+---
+
+<p class="affiliate-disclosure">
+	<span aria-hidden="true">🔗</span>
+	Some links below are Amazon affiliate links. As an Amazon Associate I earn from
+	qualifying purchases — at no extra cost to you. It helps keep these guides free.
+</p>
+
+<style>
+	.affiliate-disclosure {
+		margin: 0.75rem 0 1rem;
+		padding: 0.5rem 0.85rem;
+		border-inline-start: 3px solid var(--sl-color-accent);
+		border-radius: 0.25rem;
+		background: var(--sl-color-gray-6, var(--sl-color-black));
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-xs);
+		line-height: 1.5;
+	}
+	.affiliate-disclosure span {
+		margin-inline-end: 0.35rem;
+	}
+</style>
