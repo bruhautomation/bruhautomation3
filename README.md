@@ -38,28 +38,26 @@ The dev server starts at `localhost:4321`.
 
 ```
 src/
-├── assets/
-│   ├── bruh-logo-dark.svg      # Header logo (dark theme)
-│   ├── bruh-logo-light.svg     # Header logo (light theme)
-│   └── images/                 # Optimized images (processed by Astro)
-├── components/
-│   └── StlViewer.astro         # Interactive 3D model viewer
+├── assets/                     # Logos, app hero icons, Astro-optimized images
+├── components/                 # StlViewer, ThemeToggle, AffiliateDisclosure, changelog/*
+├── pages/
+│   ├── index.astro             # Standalone landing page
+│   └── bruh-minecraft/command-generator.astro
 ├── content/docs/
-│   ├── index.mdx               # Landing page
+│   ├── bruh-claude/            # BRUH Terminal app docs
+│   ├── bruh-insights/          # BRUH Insights app docs
+│   ├── bruh-minecraft/         # BRUH Minecraft app docs
 │   ├── smart-home-projects/    # Smart home project pages
 │   ├── home-projects/          # Home/maker project pages
 │   ├── lab-projects/           # Lab automation project pages
-│   ├── project-list.md         # Full project directory
-│   └── changelog.md            # Site updates
+│   ├── project-list.mdx        # Full project directory
+│   └── changelog.mdx           # Site updates
 └── styles/
     └── custom.css              # Brand accent colors and layout tweaks
 
 public/
-├── images/                     # Static images organized by project
-├── models/                     # STL and STEP files for 3D printing
-│   ├── couch-cupholder/
-│   ├── doorknob/
-│   └── tablet-wall-mount/
+├── images/                     # Static images organized by project/app
+├── models/                     # STL files for 3D printing
 ├── favicon.svg
 ├── og-image.png
 └── robots.txt

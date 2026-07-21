@@ -47,10 +47,10 @@ Don't memorize syntax. The **[Command Generator](/bruh-minecraft/command-generat
     iOS, Android, Switch, Xbox, PS, Win10/11. Auto-installs Geyser + Floodgate. **LAN auto-discovery** — the server appears in the **Friends** tab on any device on the same subnet, no manual IP entry.
   </Card>
   <Card title="No-Xbox family mode" icon="approve-check">
-    Flip `online_mode: false` and the add-on silently fixes every downstream setting — secure-profile, Geyser auth, Floodgate, Bedrock validation. Kids without Microsoft accounts join in seconds.
+    Set a world's `online-mode=false` and the add-on silently fixes every downstream setting — secure-profile, Geyser auth, Floodgate, Bedrock validation. Kids without Microsoft accounts join in seconds.
   </Card>
-  <Card title="One-click cheats + ops" icon="rocket">
-    `allow_cheats: true` enables `/gamemode`, `/give`, `/tp`, `/summon`, `/fill`. List your username under `initial_ops` and you're OP'd automatically on first boot — works in offline mode too.
+  <Card title="Per-world settings + one-click ops" icon="rocket">
+    Every world owns its own `server.properties` — creative sandbox and hard survival side by side, edited live from the panel's **Server Properties** tab. OP anyone with one click on the **Players** tab; ops persist per world.
   </Card>
   <Card title="Voice Chat ready" icon="comment-alt">
     Port 24454/UDP is exposed by default. Drop the Simple Voice Chat plugin into the `plugins:` list and players get spatial in-game voice.

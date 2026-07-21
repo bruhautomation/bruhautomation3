@@ -8,11 +8,27 @@ import Changelog from '../../components/changelog/Changelog.astro';
 import Release from '../../components/changelog/Release.astro';
 import Changes from '../../components/changelog/Changes.astro';
 
-<Changelog project="the BRUH Automation site" version="1.5.0">
+<Changelog project="the BRUH Automation site" version="1.6.0">
 
 <Release version="Unreleased" />
 
-<Release version="1.5.0" date="June 24, 2026" latest>
+<Release version="1.6.0" date="July 21, 2026" latest>
+<Changes type="added">
+
+- **Complete [BRUH Insights](/bruh-insights/) documentation** — Overview, Quick Start, Reference, and a full changelog for the AI insights dashboard add-on, now the third documented app alongside BRUH Terminal and BRUH Minecraft.
+- **Independence disclaimers** on the app docs — BRUH apps are independent projects, not affiliated with or endorsed by Anthropic, Mojang/Microsoft, or Home Assistant.
+
+</Changes>
+<Changes type="changed">
+
+- **App changelogs caught up to the shipped add-ons** — BRUH Terminal through 3.3.2 (memory & learning, login persistence fixes) and BRUH Minecraft through 1.14.3 (BRUH branding).
+- **App naming refreshed across the site** to the current add-on names: **BRUH Terminal** and **BRUH Minecraft**, with the unified "Solid Blocks" hero icons.
+- **Minecraft docs corrected** — removed stale `allow_cheats` / `initial_ops` options (gone since add-on 1.8.0) in favor of the panel's Players-tab op flow.
+
+</Changes>
+</Release>
+
+<Release version="1.5.0" date="June 24, 2026">
 <Changes type="added">
 
 - **A Keep a Changelog–style changelog** (this page), with per-release Added / Changed / Fixed cards.
