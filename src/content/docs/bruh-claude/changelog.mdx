@@ -1,6 +1,6 @@
 ---
 title: Changelog
-description: Release notes for the BRUH Claude Terminal Home Assistant add-on — every notable change, newest first.
+description: Release notes for the BRUH Terminal (formerly BRUH Claude Terminal) Home Assistant add-on — every notable change, newest first.
 tableOfContents: false
 ---
 
@@ -8,11 +8,70 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Claude Terminal" version="3.2.3">
+<Changelog project="BRUH Terminal" version="3.3.2">
 
 <Release version="Unreleased" />
 
-<Release version="3.2.3" date="July 6, 2026" latest>
+<Release version="3.3.2" date="July 20, 2026" latest>
+<Changes type="fixed">
+
+- **"Failed to authenticate: OAuth session expired and could not be refreshed" in Assist conversations and insight cards after 3.3.1, while the sidebar terminal kept working.** Before 3.3.1 some launch paths kept a second credential file in the container layer; OAuth refresh tokens rotate, so only the most recently refreshed copy stays valid — and 3.3.1's credential unification could keep the *dead* lineage. Salvage now keeps the newer `.credentials.json` (the older one is preserved as `.credentials.json.stale`).
+- **Auth failures are now detected and actionable.** The Assist worker pool and the automation/task listener recognize CLI auth errors, recycle pooled workers, and reply with a clear instruction instead of the raw error: open BRUH Terminal and run `/login` once — every background channel picks the fresh login up automatically. (If you're seeing this error today, that one-time `/login` is the fix.)
+
+</Changes>
+</Release>
+
+<Release version="3.3.1" date="July 20, 2026">
+<Changes type="fixed">
+
+- **Having to log in to Claude again after every add-on update (#102).** Claude Code's config/credential directory is pinned to persistent storage with `CLAUDE_CONFIG_DIR` (`/data/home/.claude`) instead of being derived from `HOME` at runtime — code paths that resolved the home directory differently could silently keep credentials in the container layer, which every update wipes. Belt and suspenders: the `claude` user's passwd home entry now points at `/data/home`, credentials found in the old container-layer home are rescued (dotfiles included — `.credentials.json` itself was previously skipped by the salvage glob), and the last known good credential file is kept in `/data/.bruh_claude_auth_backup/` and restored automatically if the live one vanishes.
+- **Startup auth diagnostics.** The health check no longer warns "OAuth tokens: NOT found" while you're logged in — it checks the real credential file (camelCase keys) and logs its owner/mode/mtime.
+- **"Press c to copy" now works over plain HTTP / LAN access.** The modern clipboard API only exists in secure contexts, so on `http://homeassistant.local:8123` every OSC 52 copy failed. The terminal now falls back to the legacy `document.execCommand('copy')` path before bothering you.
+
+</Changes>
+<Changes type="changed">
+
+- **Sidebar naming**: the ingress panel is now titled "BRUH Terminal" (was "Terminal") to match the BRUH family branding.
+
+</Changes>
+</Release>
+
+<Release version="3.3.0" date="July 19, 2026">
+<Changes type="added">
+
+- **Long-term home memory & learning.** A memory store at `/config/.bruh_claude/memory/`: a user-editable `memory.md` (preferences, entity nicknames, household patterns), a ≤2 KB `voice.md` distillate spliced into every voice prompt, and an append-only `inbox/` of candidate facts. A background consolidator merges the inbox with one cheap Haiku pass — daily, or early when more than 20 facts are pending.
+- **Voice assistants learn.** A new `remember_fact` MCP tool stores facts the moment you state them ("actually, we call that lamp the beacon"), and finished conversations get a bounded background reflection pass that extracts durable facts. Learned knowledge is injected into voice prompts, insight jobs (which also see their previous report for continuity), and the generated `CLAUDE.md`.
+- **`ha-memory` CLI**: `add`, `list`, `inbox`, `questions`, `answer`, `consolidate`, `edit`, and `clear --confirm`.
+- **New HA services** `bruh_claude.add_memory` and `bruh_claude.answer_question` feed the memory store from automations.
+- **`ha-share-login`**: runs `claude setup-token` interactively and writes the shared auth file (`/config/.bruh_claude/secrets/claude_auth.json`, 0600) that other BRUH add-ons like **BRUH Insights** pick up automatically — one login for the whole family. Also `--token`, `--status`, `--revoke`, `--force`.
+- **Kill switches**: new `assist_learning` and `memory_injection` options (both on by default), plus `memory_max_kb` (default 8).
+
+</Changes>
+<Changes type="changed">
+
+- **`ha-context-gen` now preserves your notes**: content between `<!-- bruh:user-notes:start -->` / `<!-- bruh:user-notes:end -->` survives regeneration, and the generated context inlines the learned home knowledge.
+
+</Changes>
+</Release>
+
+<Release version="3.2.5" date="July 18, 2026">
+<Changes type="changed">
+
+- **Renamed the add-on to BRUH Terminal** (sidebar panel: "Terminal") as part of the unified BRUH Apps branding; new "Solid Blocks" icon and logo from the BRUH Automation brand system. No functional changes.
+
+</Changes>
+</Release>
+
+<Release version="3.2.4" date="July 16, 2026">
+<Changes type="fixed">
+
+- **Automations calling BRUH Claude failed with "MCP server unavailable" even though voice/conversation still worked.** Recent Claude Code builds require project-scoped MCP servers to be approved before they load, and in non-interactive runs an unapproved server is silently skipped. The add-on now writes `enableAllProjectMcpServers` / `enabledMcpjsonServers` into the Claude settings it manages — the documented way to trust a project `.mcp.json` server without the interactive dialog.
+- **The Automation listener reads Claude's structured result** (`--output-format json` → `.result`) instead of scraping verbose stdout, so diagnostic lines can never again be returned verbatim as a task result.
+
+</Changes>
+</Release>
+
+<Release version="3.2.3" date="July 6, 2026">
 <Changes type="fixed">
 
 - **No more thread-safety errors when an Insight job finishes.** On HA 2026.7 the log filled with `calls async_write_ha_state from a thread other than the event loop` each time an insight ran, because the sensor's dispatcher handler was scheduled on a worker thread. It's now a proper `@callback` that runs on the event loop — clearing the error today and heading off a hard failure in upcoming HA releases. No change to the sensor's output.

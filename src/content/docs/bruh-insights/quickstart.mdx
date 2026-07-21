@@ -1,0 +1,56 @@
+---
+title: Quick Start
+description: Install BRUH Insights, connect your Claude account, and watch your first AI-generated insight cards fill in — in about five minutes.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Five minutes from zero to an AI analyst reading your home.
+
+## Prerequisites
+
+- **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor).
+- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option (Insights authenticates via OAuth and uses your subscription). An API key from console.anthropic.com works too if you'd rather pay per token.
+- A **64-bit HA host** (`amd64` or `aarch64` — any Pi 4/5, x86 NUC, or generic 64-bit server).
+
+## Install it
+
+<Steps>
+
+1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
+
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+2. **Install BRUH Insights.** Find it in the store, click **Install**, then **Start**. The defaults are fine — you can tune them later.
+
+3. **Open the panel.** Click **BRUH Insights** in the HA sidebar.
+
+</Steps>
+
+## Connect your Claude account
+
+Pick whichever fits:
+
+- **Shared login from BRUH Terminal** (easiest if you run it): open the [BRUH Terminal](/bruh-claude/) add-on and run `ha-share-login` once. Insights picks the credential up automatically — the auth chip shows **"Claude · shared login"**.
+- **Guided sign-in**: the panel starts `claude setup-token` for you, shows the Anthropic sign-in link, and you paste back the one-time code. The token is stored inside the add-on (`/data/secrets`, mode 0600) and never leaves it.
+- **Paste a token**: run `claude setup-token` anywhere you use Claude Code and paste the `sk-ant-oat…` token.
+- **API key**: paste an `sk-ant-api…` key from console.anthropic.com — usage is then billed to your API account.
+
+## Generate your first insights
+
+Hit **↻ Refresh all**. Generation runs one insight at a time through a queue (friendly to subscription rate limits), so cards fill in one by one over several minutes — Overview and Energy usually land first. While you wait:
+
+- Click a card to **expand** the interactive visualization.
+- Type a question into **Ask anything** — *"Which rooms are coldest at night?"* — and get a bespoke card back.
+- Answer any **clarifying question** the analyst attaches to a card. You'll only ever be asked once — answers go into its memory.
+
+## Make it yours
+
+- **✎ on any card** edits that category's analysis focus, refresh interval, or disables it.
+- **＋ New insight** creates a fully custom recurring insight from your own prompt.
+- **💬 feedback** ("ignore the guest room sensor", "less text, bigger chart") becomes a standing instruction for that card.
+- **▦ Add to dashboard** produces ready-to-paste YAML for a Webpage card — map port 8100 under **Configuration → Network** first.
+
+Next: the **[Configuration Reference](/bruh-insights/reference/)** for every option, or the **[Changelog](/bruh-insights/changelog/)** for what's new.

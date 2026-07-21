@@ -159,7 +159,7 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{
-							label: 'BRUH Claude',
+							label: 'BRUH Terminal',
 							items: [
 								{ label: 'Overview', slug: 'bruh-claude' },
 								{ label: 'Quick Start', slug: 'bruh-claude/quickstart', badge: { text: 'Start here', variant: 'tip' } },
@@ -168,7 +168,16 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'BRUH Minecraft Server',
+							label: 'BRUH Insights',
+							items: [
+								{ label: 'Overview', slug: 'bruh-insights', badge: { text: 'New', variant: 'tip' } },
+								{ label: 'Quick Start', slug: 'bruh-insights/quickstart', badge: { text: 'Start here', variant: 'tip' } },
+								{ label: 'Reference', slug: 'bruh-insights/reference' },
+								{ label: 'Changelog', slug: 'bruh-insights/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Minecraft',
 							items: [
 								{ label: 'Overview', slug: 'bruh-minecraft' },
 								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart', badge: { text: 'Start here', variant: 'tip' } },

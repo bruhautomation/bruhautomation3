@@ -1,6 +1,6 @@
 ---
 title: Changelog
-description: Release notes for the BRUH Minecraft Server Home Assistant add-on — every notable change, newest first.
+description: Release notes for the BRUH Minecraft Home Assistant add-on — every notable change, newest first.
 tableOfContents: false
 ---
 
@@ -8,11 +8,27 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Minecraft Server" version="1.14.1">
+<Changelog project="BRUH Minecraft" version="1.14.3">
 
 <Release version="Unreleased" />
 
-<Release version="1.14.1" date="July 6, 2026" latest>
+<Release version="1.14.3" date="July 20, 2026" latest>
+<Changes type="changed">
+
+- **Sidebar naming**: the ingress panel is now titled "BRUH Minecraft" (was "Minecraft") to match the BRUH family branding.
+
+</Changes>
+</Release>
+
+<Release version="1.14.2" date="July 18, 2026">
+<Changes type="changed">
+
+- **Renamed the add-on to BRUH Minecraft** as part of the unified BRUH Apps branding; new "Solid Blocks" icon, logo, and panel favicon from the BRUH Automation brand system. No functional changes.
+
+</Changes>
+</Release>
+
+<Release version="1.14.1" date="July 6, 2026">
 <Changes type="fixed">
 
 - **The add-on can be built and updated again on current Home Assistant.** Supervisor 2026.04.0 retired the legacy add-on builder: `build.yaml` is ignored and the `BUILD_FROM` build argument is no longer passed, so the Dockerfile's `FROM ${BUILD_FROM}` resolved to an empty base image and the build failed before it started. The Dockerfile now carries its own default (`ghcr.io/home-assistant/base:3.24`, the official multi-arch base); older Supervisors keep overriding it through `build.yaml`.

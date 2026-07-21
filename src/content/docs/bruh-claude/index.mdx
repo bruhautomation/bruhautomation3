@@ -30,7 +30,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 A Home Assistant add-on that runs **Claude Code** inside HA — with native access to your entities, services, automations, traces, history, cameras, and logs through a built-in MCP server. Open a terminal in your sidebar, talk to it through Voice Assistants, schedule it to watch your house, or call it from automations. Either way, Claude actually knows your setup.
 
-![BRUH Claude Terminal architecture overview](/images/bruh-claude/architecture-overview.svg)
+![BRUH Terminal architecture overview](/images/bruh-claude/architecture-overview.svg)
 
 ## What you can do
 
@@ -84,7 +84,7 @@ What makes this different from running Claude Code on a regular machine:
     Authenticates with Anthropic via **OAuth**, so a Claude **Pro** or **Max** subscription covers your usage. No API key, no pay-per-token billing for everyday use (an API key works too if you prefer).
   </Card>
   <Card title="Live HA awareness (MCP server)" icon="puzzle">
-    A built-in MCP server gives Claude **32 purpose-built tools** — entity states, device control for every domain, camera snapshots, history & statistics, weather forecasts, areas, automation traces, templates, logs, config reload. No manual API setup.
+    A built-in MCP server gives Claude **33 purpose-built tools** — entity states, device control for every domain, camera snapshots, history & statistics, weather forecasts, areas, automation traces, templates, logs, config reload. No manual API setup.
   </Card>
   <Card title="Auto-generated context" icon="information">
     On every boot the add-on regenerates `/config/CLAUDE.md` — a snapshot of your entities by domain, automations with last-triggered times, installed integrations, and your file tree. Claude reads it at the start of every session.
@@ -121,7 +121,7 @@ These mirror **claude.ai → Settings → Usage** and need an **OAuth / subscrip
 ## Up and running in 5 minutes
 
 1. Add the **BRUH HA Apps** repository in HA.
-2. Install **BRUH Claude Terminal** and start it.
+2. Install **BRUH Terminal** and start it.
 3. Restart Home Assistant once (so HA loads the integration).
 4. Accept the discovered **BRUH Claude** integration.
 5. Authenticate with Anthropic in the terminal — then start typing, or pick it as your voice assistant.

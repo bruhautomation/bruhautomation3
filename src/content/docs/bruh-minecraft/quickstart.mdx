@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Install BRUH Minecraft Server, accept the EULA, and connect from Java or Bedrock in under five minutes.
+description: Install BRUH Minecraft, accept the EULA, and connect from Java or Bedrock in under five minutes.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -23,7 +23,7 @@ Five minutes from zero to a running Minecraft server.
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install the add-on.** Find **BRUH Minecraft Server** in the store and click **Install** (~600 MB image).
+2. **Install the add-on.** Find **BRUH Minecraft** in the store and click **Install** (~600 MB image).
 
 3. **Accept the EULA.** Open the **Configuration** tab and set:
 
@@ -31,11 +31,11 @@ Five minutes from zero to a running Minecraft server.
    eula: true
    ```
 
-   This acknowledges the [Minecraft EULA](https://www.minecraft.net/eula) — required by Mojang. While you're there, you'll likely want:
+   This acknowledges the [Minecraft EULA](https://www.minecraft.net/eula) — required by Mojang. (The panel's first-run wizard walks you through the same acceptance plus the first world's settings — online/offline mode, server software, gamemode — if you'd rather click than edit YAML.) While you're there, you'll likely want:
 
    - `memory_mb: 4096` if you'll have more than ~5 players or any plugins
-   - `initial_ops: ["YourMinecraftUsername"]` so you're an OP the first time you join
-   - `online_mode: false` for LAN-only / no-Xbox-account play (see [Family mode](#family-mode-no-xbox-required) below)
+
+   Gameplay settings (difficulty, gamemode, online-mode, …) are per-world — the wizard sets them up front, and the panel's **Server Properties** tab edits them any time. For LAN-only / no-Xbox-account play, see [Family mode](#family-mode-no-xbox-required) below. To OP yourself: join once, then click **op** next to your name on the panel's **Players** tab.
 
 4. **Start.** Click **Start** and watch the **Log** tab — Paper takes ~30 seconds to reach `Done`. After the integration discovery prompt, click **Configure** in **Settings → Devices & Services**.
 
@@ -45,10 +45,10 @@ Five minutes from zero to a running Minecraft server.
 
 ## Family mode (no Xbox required)
 
-Want kids to join without Microsoft accounts?
+Want kids to join without Microsoft accounts? Pick **offline mode** in the first-run wizard's connectivity step — or flip it later on the panel's **Server Properties** tab:
 
-```yaml
-online_mode: false
+```properties
+online-mode=false
 ```
 
 That's the whole change. The add-on then fixes every downstream setting Microsoft and GeyserMC normally gate behind that one flag — secure-profile enforcement, Geyser auth-type, Floodgate, Bedrock login validation. Java and Bedrock both work without Xbox sign-in.

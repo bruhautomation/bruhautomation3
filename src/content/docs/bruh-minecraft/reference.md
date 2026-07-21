@@ -22,26 +22,13 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 | `auto_update_server` | `true` | Re-resolve the jar on every boot. Disable to pin. |
 | `active_world` | `default` | Which saved profile is live. See [Multi-world](#multi-world-profiles). |
 
-### Gameplay
+### Gameplay — per world, not add-on options
 
-| Option | Default | Notes |
-|--------|---------|-------|
-| `motd` | `A BRUH Minecraft Server` | |
-| `difficulty` | `normal` | `peaceful`, `easy`, `normal`, `hard` |
-| `gamemode` | `survival` | `survival`, `creative`, `adventure`, `spectator` |
-| `max_players` | `20` | 1–1000 |
-| `view_distance` / `simulation_distance` | `10` / `10` | 3–32 each |
-| `pvp` / `hardcore` / `allow_flight` / `white_list` | `true` / `false` / `false` / `false` | |
-| `spawn_protection` | `16` | 0–10000 |
-| `online_mode` | `true` | **`false` = LAN/no-Xbox mode** — the add-on auto-fixes everything downstream. |
-| `enforce_secure_profile` | `false` | Auto-forced `false` whenever `online_mode: false`. |
-| `level_name` / `level_seed` / `level_type` | `world` / random / `minecraft:normal` | Only takes effect on fresh world generation. |
-| `allow_nether` / `generate_structures` | `true` / `true` | |
-| `spawn_monsters` / `spawn_animals` / `spawn_npcs` | `true` / `true` / `true` | |
-| `allow_cheats` | `false` | Forces `enable-command-block=true` and `op_permission_level ≥ 2`. |
-| `initial_ops` | `[]` | Auto-OP these usernames at boot via RCON. Works in offline mode too. |
-| `enable_command_block` | `false` | |
-| `op_permission_level` | `4` | 1–4 |
+Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Each world owns its own `server.properties` — gamemode, force-gamemode, difficulty, PVP, hardcore, whitelist, max players, view/sim distance, world-gen (level name/seed/type, structures, mobs), online-mode, resource pack, command blocks, op level, connection throttle, idle timeout, MOTD, and everything else — edited from the panel's **Server Properties** tab (or set up front by the new-world wizard). Settings are seeded with sensible defaults the first time a world boots, then they're yours forever; switching worlds loads each world's own settings.
+
+- **OP a player:** join once, then click **op** next to their name on the panel's **Players** tab. Ops persist per-world in `ops.json`.
+- **Offline / LAN mode:** set a world's `online-mode: false` in **Server Properties** — the add-on silently forces `enforce-secure-profile: false`, switches Geyser to offline auth, uninstalls Floodgate, and disables Bedrock login validation. See [Family mode](/bruh-minecraft/quickstart/#family-mode-no-xbox-required).
+- **Command blocks / op level:** `enable-command-block` and `op-permission-level` are ordinary per-world properties on the same tab.
 
 ### Performance
 
@@ -69,15 +56,15 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 | Option | Default | Notes |
 |--------|---------|-------|
 | `auto_kick_ghost_sessions` | `true` | Kicks stale "already connected" sessions over RCON. |
-| `connection_throttle_ms` | `4000` | Set `0` to disable on LAN. |
-| `player_idle_timeout_minutes` | `0` | Auto-kick after N idle minutes. `0` disables. |
+
+Connection throttle and player idle timeout are per-world `server.properties` keys — edit them on the panel's **Server Properties** tab.
 
 ### Bedrock cross-play
 
 | Option | Default | Notes |
 |--------|---------|-------|
 | `enable_bedrock_support` | `true` | Auto-installs Geyser + Floodgate. |
-| `geyser_auth_type` | `auto` | `auto` resolves to `offline` when `online_mode: false`, else `floodgate`. |
+| `geyser_auth_type` | `auto` | `auto` resolves to `offline` when the active world's `online-mode` is off, else `floodgate`. Also accepts `online`. |
 | `geyser_mtu` | `1400` | Drop to `1200` if iOS hangs on "Connecting…". |
 
 ### Plugins
@@ -94,16 +81,18 @@ Tick a checkbox in the **Configuration** tab and the add-on resolves the latest 
 | `install_essentialsx_chat` | EssentialsXChat | Chat formatting (companion to EssentialsX) |
 | `install_luckperms` | LuckPerms | Modern permissions plugin |
 | `install_worldedit` | WorldEdit | In-game block editing |
-| `install_worldguard` | WorldGuard | Region protection |
 | `install_coreprotect` | CoreProtect | Anti-grief logging + rollback |
-| `install_multiverse_core` | Multiverse-Core | Multi-world support |
 | `install_griefprevention` | GriefPrevention | Golden-shovel claim protection |
+| `install_viaversion` | ViaVersion | Newer clients can join an older server |
+| `install_viabackwards` | ViaBackwards | Older clients can join a newer server |
 | `install_mcmmo` | mcMMO | RPG-style skills (Mining/Woodcutting/Swords) |
 | `install_chestsort` | ChestSort | Left-click outside chest = instantly sorted |
 | `install_veinminer` | VeinMiner | Break one ore → whole vein breaks |
 | `install_spark` | Spark | Server profiler |
 
 Toggling a checkbox **off** does NOT remove the jar — delete it from the panel's **Plugins** tab to remove.
+
+Duplicate plugin jars (which make Paper log "Ambiguous plugin name" and randomly disable one copy) are auto-quarantined to `plugins/.quarantine/` on boot — controlled by `auto_quarantine_duplicates` (default `true`); jars are moved, never deleted.
 
 #### Custom URL list
 
@@ -142,33 +131,30 @@ GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is name
 
 ## Recommended presets
 
+Add-on options set the container; gameplay is set per world in the panel's **Server Properties** tab (noted below each preset).
+
 ### Family LAN (no Xbox accounts)
 
 ```yaml
 eula: true
-online_mode: false
-allow_cheats: true
-initial_ops:
-  - ParentUsername
-difficulty: easy
 memory_mb: 4096
 auto_backup: true
 backup_interval_minutes: 30
 ```
 
+Then in **Server Properties** for the family world: `online-mode=false`, `difficulty=easy` — and op the parents from the **Players** tab.
+
 ### Public survival
 
 ```yaml
 eula: true
-online_mode: true
-white_list: true
-difficulty: hard
 memory_mb: 6144
-prevent_proxy_connections: true
 auto_backup: true
 backup_keep_count: 96
 auto_restart_schedule: "04:00"
 ```
+
+Then in **Server Properties**: `online-mode=true`, `white-list=true`, `difficulty=hard`, `prevent-proxy-connections=true`.
 
 ### Performance / plugin-heavy
 
@@ -176,22 +162,19 @@ auto_restart_schedule: "04:00"
 eula: true
 server_type: paper
 memory_mb: 8192
-view_distance: 8
-simulation_distance: 6
-network_compression_threshold: 512
 auto_restart_schedule: "03:00"
 ```
 
-## Settings precedence
+Then in **Server Properties**: `view-distance=8`, `simulation-distance=6`, `network-compression-threshold=512`.
 
-The single most-confusing part of the add-on. Memorise this:
+## What's set where
 
-1. **Add-on Configuration tab = source of truth.** Every boot rewrites `server.properties` from your options.
-2. **Panel → Server Properties tab = live tweaks.** Applies via RCON immediately, but next add-on restart overwrites it.
-3. **Panel ops/whitelist/bans persist.** They live in `ops.json` etc, not in add-on options.
-4. **`plugins:` URLs re-download on every boot.** Deleting from the panel is temporary if the URL is still in the list.
+Since 1.8.0 the split is simple:
 
-**Rule:** persist via the Configuration tab. Use the panel for "try this now."
+1. **Add-on Configuration tab = install/container level.** EULA, active world, server type/version, RAM + JVM flags, RCON password, auto-update, backups, crash-restart, HA integration, Bedrock/Geyser, plugin toggles + URL list, log level.
+2. **Panel → Server Properties tab = gameplay, per world.** Each world's `server.properties` is seeded with sensible defaults on first boot, then owned by you — edits persist across restarts and travel with the world.
+3. **Panel ops/whitelist/bans persist per world.** They live in each world's `ops.json` / `whitelist.json` / `banned-players.json`.
+4. **`plugins:` URLs and `install_*` toggles re-resolve on every boot** into the **active** world's `plugins/` folder. Deleting a jar from the panel is temporary if its URL/toggle is still set.
 
 ## Multi-world profiles
 
@@ -200,7 +183,7 @@ Each profile is a full server root at `/config/minecraft-worlds/<name>/` with it
 **Switch:** Panel → **Worlds tab → Switch**. Writes `active_world`, full restart, ~30 s.
 
 **Per-profile:** world files, `server.properties`, plugins folder, ops/whitelist/bans, backup history.
-**Shared across profiles:** all add-on options (difficulty, gamemode, memory_mb, motd, the `plugins:` URL list), RCON password.
+**Shared across profiles:** the add-on's install/container options (server type, memory_mb, backups, Bedrock/Geyser, the `plugins:` URL list + toggles), RCON password. Gameplay settings — difficulty, gamemode, MOTD, and the rest of `server.properties` — are per-world.
 
 ## Offline mode
 
@@ -218,7 +201,7 @@ Since 1.3.0, the server starts even when the HA host has no internet — provide
 
 - `server.properties` is re-rendered from add-on options.
 - Geyser config (auth-type, MTU, MOTD) is patched on every boot — those edits don't need network.
-- `initial_ops`, world / backup / panel / RCON, all HA integration plumbing — fully functional.
+- Ops / whitelist / bans, world / backup / panel / RCON, all HA integration plumbing — fully functional.
 
 **First-ever boot still needs internet** (there's nothing cached to fall back to). The add-on will log a clear actionable error if you try to start offline with no cached jar:
 
@@ -237,7 +220,7 @@ There's no config option for this — the behaviour kicks in automatically based
 | **Dashboard** | Status, uptime, memory, TPS, online players, quick `/say`, one-shot RCON. |
 | **Console** | Live colour-coded JVM log via SSE; command input runs over RCON. |
 | **Players** | Op / kick / ban / whitelist with one click. |
-| **Server Properties** | Live editor; managed keys overwritten on next boot (see [precedence](#settings-precedence)). |
+| **Server Properties** | Per-world editor — your edits persist and travel with the world (see [What's set where](#whats-set-where)). |
 | **Plugins** | Install by URL, list with size/mtime, delete. |
 | **Backups** | Git snapshots and archives, one-click restore. Scoped to active profile. |
 | **Worlds** | List, switch, create, delete profiles. |
@@ -359,7 +342,7 @@ automation:
 | Symptom | Fix |
 |---------|-----|
 | Can't connect from internet | Forward `25565/tcp` + `25565/udp` (and `19132/udp` for Bedrock) to HA host. |
-| "Please log into Xbox" | Set `online_mode: false`. |
+| "Please log into Xbox" | Set the world's `online-mode=false` (panel → **Server Properties**). |
 | iOS hangs on "Connecting…" | `geyser_mtu: 1200`. |
 | "You are already connected" | Auto-kicker should clear it; manual kick from Players tab. |
 | Bedrock not in Friends tab | Same subnet/VLAN as HA host? Try manual `<HA IPv4>:19132`. |

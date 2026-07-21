@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" role="img" aria-label="The BRUH Insights panel showing a grid of AI-generated insight cards: Energy, Climate, Presence, and Device Health">
+  <defs>
+    <linearGradient id="insbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1622"/>
+      <stop offset="100%" stop-color="#0E1E30"/>
+    </linearGradient>
+    <linearGradient id="insbar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#1E9FE0"/>
+      <stop offset="100%" stop-color="#5AC4F2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- panel frame -->
+  <rect x="0.5" y="0.5" width="819" height="479" rx="14" fill="url(#insbg)" stroke="#1c3550"/>
+
+  <!-- header -->
+  <text x="28" y="42" fill="#e8f2fa" font-size="18" font-weight="700">BRUH Insights</text>
+  <text x="176" y="42" fill="#5AC4F2" font-size="13" font-weight="600">Claude · shared login</text>
+  <rect x="560" y="22" width="104" height="30" rx="15" fill="#12283e" stroke="#1c3550"/>
+  <text x="612" y="42" text-anchor="end" fill="#e8f2fa" font-size="13">🧠 Memory</text>
+  <rect x="672" y="22" width="120" height="30" rx="15" fill="#1E9FE0"/>
+  <text x="732" y="42" text-anchor="middle" fill="#04263c" font-size="13" font-weight="700">↻ Refresh all</text>
+  <line x1="0" y1="64" x2="820" y2="64" stroke="#1c3550"/>
+
+  <!-- tag chips -->
+  <g font-size="12">
+    <rect x="28" y="78" width="44" height="24" rx="12" fill="#1E9FE0"/>
+    <text x="50" y="94" text-anchor="middle" fill="#04263c" font-weight="700">All</text>
+    <rect x="80" y="78" width="92" height="24" rx="12" fill="#12283e" stroke="#1c3550"/>
+    <text x="126" y="94" text-anchor="middle" fill="#7E96AA">#anomaly · 2</text>
+    <rect x="180" y="78" width="96" height="24" rx="12" fill="#12283e" stroke="#1c3550"/>
+    <text x="228" y="94" text-anchor="middle" fill="#7E96AA">#batteries · 3</text>
+    <rect x="284" y="78" width="84" height="24" rx="12" fill="#12283e" stroke="#1c3550"/>
+    <text x="326" y="94" text-anchor="middle" fill="#7E96AA">#left-on · 1</text>
+    <rect x="376" y="78" width="80" height="24" rx="12" fill="#12283e" stroke="#1c3550"/>
+    <text x="416" y="94" text-anchor="middle" fill="#7E96AA">#asked · 2</text>
+  </g>
+
+  <!-- card: Energy -->
+  <g>
+    <rect x="28" y="118" width="376" height="164" rx="12" fill="#0E1E30" stroke="#1c3550"/>
+    <text x="46" y="146" fill="#e8f2fa" font-size="14" font-weight="700">⚡ Energy — dryer ran overnight again</text>
+    <text x="46" y="166" fill="#7E96AA" font-size="12">Usage up 18% vs last week, driven by two 2–4 AM cycles.</text>
+    <g>
+      <rect x="46" y="230" width="24" height="34" rx="3" fill="url(#insbar)"/>
+      <rect x="78" y="218" width="24" height="46" rx="3" fill="url(#insbar)"/>
+      <rect x="110" y="238" width="24" height="26" rx="3" fill="url(#insbar)"/>
+      <rect x="142" y="204" width="24" height="60" rx="3" fill="url(#insbar)"/>
+      <rect x="174" y="224" width="24" height="40" rx="3" fill="url(#insbar)"/>
+      <rect x="206" y="186" width="24" height="78" rx="3" fill="#f2b53d"/>
+      <rect x="238" y="212" width="24" height="52" rx="3" fill="url(#insbar)"/>
+    </g>
+    <text x="290" y="206" fill="#f2b53d" font-size="22" font-weight="700">31.4 kWh</text>
+    <text x="290" y="224" fill="#7E96AA" font-size="11">yesterday · prev: 26.6</text>
+    <text x="290" y="252" fill="#e8f2fa" font-size="12">Top load: dryer</text>
+    <text x="290" y="268" fill="#7E96AA" font-size="11">#anomaly</text>
+  </g>
+
+  <!-- card: Climate -->
+  <g>
+    <rect x="416" y="118" width="376" height="164" rx="12" fill="#0E1E30" stroke="#1c3550"/>
+    <text x="434" y="146" fill="#e8f2fa" font-size="14" font-weight="700">🌡️ Climate — nursery runs 3°F warm</text>
+    <text x="434" y="166" fill="#7E96AA" font-size="12">Rooms track the thermostat except the nursery after 2 PM sun.</text>
+    <polyline points="434,250 470,244 506,246 542,236 578,240 614,228 650,232 686,214 722,220 758,210"
+      fill="none" stroke="#5AC4F2" stroke-width="2.5" stroke-linecap="round"/>
+    <polyline points="434,258 470,256 506,258 542,254 578,256 614,252 650,254 686,250 722,252 758,248"
+      fill="none" stroke="#7E96AA" stroke-width="2" stroke-dasharray="5 4" stroke-linecap="round"/>
+    <circle cx="758" cy="210" r="4" fill="#5AC4F2"/>
+    <text x="758" y="198" text-anchor="end" fill="#5AC4F2" font-size="12" font-weight="600">Nursery 74.8°F</text>
+  </g>
+
+  <!-- card: Presence -->
+  <g>
+    <rect x="28" y="296" width="376" height="156" rx="12" fill="#0E1E30" stroke="#1c3550"/>
+    <text x="46" y="324" fill="#e8f2fa" font-size="14" font-weight="700">🧭 Presence — everyone home by 6:12 PM</text>
+    <text x="46" y="346" fill="#7E96AA" font-size="12">Ben's phone joined home WiFi at 5:58 and has charged since</text>
+    <text x="46" y="362" fill="#7E96AA" font-size="12">6:03 — home early vs the usual 6:40 pattern.</text>
+    <circle cx="58" cy="392" r="12" fill="#1E9FE0"/>
+    <text x="58" y="397" text-anchor="middle" fill="#04263c" font-size="11" font-weight="700">B</text>
+    <text x="78" y="396" fill="#e8f2fa" font-size="12">Home · WiFi + charging</text>
+    <circle cx="58" cy="424" r="12" fill="#5AC4F2"/>
+    <text x="58" y="429" text-anchor="middle" fill="#04263c" font-size="11" font-weight="700">K</text>
+    <text x="78" y="428" fill="#e8f2fa" font-size="12">Home · arrived 6:12 PM</text>
+    <rect x="284" y="382" width="102" height="24" rx="12" fill="#12283e" stroke="#1c3550"/>
+    <text x="335" y="398" text-anchor="middle" fill="#7E96AA" font-size="11">evidence cited</text>
+  </g>
+
+  <!-- card: Device Health -->
+  <g>
+    <rect x="416" y="296" width="376" height="156" rx="12" fill="#0E1E30" stroke="#1c3550"/>
+    <text x="434" y="324" fill="#e8f2fa" font-size="14" font-weight="700">🩺 Device Health — 3 batteries below 20%</text>
+    <text x="434" y="346" fill="#7E96AA" font-size="12">Front door sensor at 8% — likely dead within the week.</text>
+    <rect x="434" y="366" width="340" height="10" rx="5" fill="#12283e"/>
+    <rect x="434" y="366" width="27" height="10" rx="5" fill="#e0563d"/>
+    <text x="434" y="394" fill="#e8f2fa" font-size="12">Front door · 8%</text>
+    <rect x="434" y="404" width="340" height="10" rx="5" fill="#12283e"/>
+    <rect x="434" y="404" width="58" height="10" rx="5" fill="#f2b53d"/>
+    <text x="434" y="432" fill="#e8f2fa" font-size="12">Garage motion · 17%</text>
+    <text x="774" y="432" text-anchor="end" fill="#7E96AA" font-size="11">#batteries</text>
+  </g>
+
+  <!-- footer -->
+  <text x="28" y="470" fill="#7E96AA" font-size="11">Ask anything: "Which rooms are coldest at night?"</text>
+  <text x="792" y="470" text-anchor="end" fill="#7E96AA" font-size="11">auto-refresh · every 6h</text>
+</svg>

@@ -1,9 +1,9 @@
 ---
 title: Reference
-description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Claude Terminal add-on — in one place.
+description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Terminal add-on — in one place.
 ---
 
-Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Claude Terminal → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
+Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Terminal → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
 
 ## Configuration options
 
@@ -192,7 +192,7 @@ These need an **OAuth / subscription login** (the one you do in the terminal), *
 
 ## MCP server tools
 
-The built-in MCP server gives Claude **32 tools** against your live install. Verify them on your own system with **`ha-selftest`**.
+The built-in MCP server gives Claude **33 tools** against your live install. Verify them on your own system with **`ha-selftest`**.
 
 ![MCP server tools by category](/images/bruh-claude/mcp-tools.svg)
 
@@ -334,3 +334,7 @@ tail -f /config/.bruh_claude/logs/automation-$(date +%Y%m%d).log
 ```
 
 Set `log_level: debug` in the add-on config before reproducing a bug for maximum detail.
+
+## Disclaimer
+
+BRUH Terminal is an independent project, not affiliated with, endorsed by, or sponsored by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic, PBC. The add-on runs the official Claude Code CLI under your own Anthropic account; your use of Claude through it is governed by [Anthropic's terms](https://www.anthropic.com/legal/consumer-terms).
