@@ -20,6 +20,7 @@ The token-diet release: you decide how much of your Claude subscription Insights
 
 - **⚙ Settings dialog.** A new Settings button puts the spend controls one tap away: a master **Automatic insights** switch (pause all background generation without uninstalling — manual Generate/Ask still work), your **Claude plan** (Pro, Max 5×, Max 20×), and a **session usage budget slider** — let Insights use up to N% of each 5-hour subscription session. Once the session hits the budget, auto-refresh pauses until the window rolls over; a topbar chip shows why, and manual clicks are never blocked.
 - **Real account usage when available.** With [BRUH Terminal](/bruh-claude/) installed, the budget runs against your *actual* Anthropic 5-hour utilization (via its usage-limits tracker) — so Insights backs off when *you* are using Claude. Without it, Insights counts its own tokens per run against a per-plan estimate. A live usage meter with the budget mark shows either way.
+- **Usage in the header.** A topbar chip keeps the current session's usage and reset time in view — *"34% used · resets 3:15 PM"* — green until the budget is reached, warning-colored after; tap it to open Settings.
 - **Per-card run schedules.** Every card's ✎ dialog (and the New-insight form) can set fixed daily run times — e.g. `07:00, 19:00` — instead of an every-N-hours interval. Scheduled cards regenerate right after each set time and spend nothing in between.
 
 </Changes>

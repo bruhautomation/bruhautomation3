@@ -37,7 +37,7 @@ The **⚙ Settings** button in the panel controls how much of your Claude subscr
 | **Your Claude subscription** | Pro, Max 5×, or Max 20× — sizes the estimate of your 5-hour session window. |
 | **Session usage budget** | A slider: *let Insights use up to N% of each 5-hour session.* Once the window's usage reaches the budget, automatic runs pause until it rolls over (topbar chip says so). Manual clicks are never blocked. |
 
-The dialog shows a live usage meter. With [BRUH Terminal](/bruh-claude/) installed, the meter and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate.
+The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
 
 ## Connecting a Claude account
 
