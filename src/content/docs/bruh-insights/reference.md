@@ -9,7 +9,7 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `auto_refresh_hours` | `6` | Regenerate each category every N hours (categories can override this individually via their ✎ editor). `0` disables scheduled refresh — manual only. |
+| `auto_refresh_hours` | `24` | Fallback interval: regenerate each category every N hours when it has no schedule or interval of its own (set per card via ✎, globally via the ⚙ Settings dialog). `0` disables scheduled refresh — manual only. |
 | `history_days` | `7` | How many days of history/statistics each analysis sees. |
 | `history_keep_runs` | `40` | Past runs kept per category for the date selector. `0` disables insight history. |
 | `history_keep_days` | `30` | Past runs older than this are pruned. `0` disables insight history. |
@@ -24,7 +24,20 @@ Generation runs **one insight at a time** through a queue, which keeps things fr
 | Port | Default | What it does |
 |------|---------|--------------|
 | Ingress | *(always on)* | The Insights panel in the sidebar. Admin users only; never exposed on a host port. |
-| `8100/tcp` | *(unmapped)* | Optional dashboard-card server: serves each insight's visualization as a token-protected HTML page so HA **Webpage** cards can embed live insights. Map it under **Configuration → Network** to use "Add to dashboard". |
+
+The add-on exposes **no host ports** (since 1.5.0): dashboard cards are served by Home Assistant itself via the `/local` mirror.
+
+## Settings (⚙) — token budget & master switch
+
+The **⚙ Settings** button in the panel controls how much of your Claude subscription Insights may spend — saved instantly, no restart:
+
+| Control | What it does |
+|---------|--------------|
+| **Automatic insights** | Master switch. Off pauses every scheduled run (nothing spends tokens); manual **Generate**, **Refresh all**, and **Ask** still work. A topbar chip reminds you it's off. |
+| **Your Claude subscription** | Pro, Max 5×, or Max 20× — sizes the estimate of your 5-hour session window. |
+| **Session usage budget** | A slider: *let Insights use up to N% of each 5-hour session.* Once the window's usage reaches the budget, automatic runs pause until it rolls over (topbar chip says so). Manual clicks are never blocked. |
+
+The dialog shows a live usage meter. With [BRUH Terminal](/bruh-claude/) installed, the meter and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate.
 
 ## Connecting a Claude account
 
@@ -42,8 +55,8 @@ Generation runs **one insight at a time** through a queue, which keeps things fr
 ### Categories & custom insights
 
 - **Nine built-in categories**: Overview, Energy, Climate, Lighting, Security, Presence, Media, Device Health, Automations.
-- **✎ prompt editor** per card: analysis focus (with "custom prompt" badge and **Restore default**), enable/disable, and a per-category refresh interval (`0` = manual only, empty = add-on default). Each stored insight records the focus it was generated with (`focus_used`).
-- **＋ New insight** creates up to **24 custom recurring insights** — name, icon, analysis prompt, optional refresh interval. They behave exactly like shipped categories: auto-refresh, "Refresh all", run history, feedback.
+- **✎ prompt editor** per card: analysis focus (with "custom prompt" badge and **Restore default**), enable/disable, a per-category refresh interval (`0` = manual only, empty = add-on default), or **fixed daily run times** (e.g. `07:00, 19:00`, 24h clock, up to 6) which take precedence over the interval — the card regenerates right after each listed time and spends nothing in between. Each stored insight records the focus it was generated with (`focus_used`).
+- **＋ New insight** creates up to **24 custom recurring insights** — name, icon, analysis prompt, optional refresh interval or daily run times. They behave exactly like shipped categories: auto-refresh, "Refresh all", run history, feedback.
 - **＋ Make recurring** in any Ask card's footer promotes a one-off question into a recurring insight.
 
 ### Insight history
@@ -64,17 +77,16 @@ The analyst tags every card by what it found (`#anomaly`, `#batteries`, `#left-o
 
 ### Dashboard cards
 
-1. Map port **8100** under **Settings → Add-ons → BRUH Insights → Configuration → Network** and restart.
-2. Press **▦** on a card and paste the YAML it gives you:
+Press **▦** on a card and paste the YAML it gives you:
 
-   ```yaml
-   type: iframe
-   url: http://homeassistant.local:8100/card/energy?token=<your-card-token>
-   title: Energy
-   aspect_ratio: 90%
-   ```
+```yaml
+type: iframe
+url: /local/bruh_insights/energy-<your-card-token>.html
+title: Energy
+aspect_ratio: 90%
+```
 
-The card always shows the **latest run** and reloads every 15 minutes. The `token` is a per-install random secret (`/data/secrets/card_token`); the card server serves *only* stored insight HTML — no API, no credentials, no controls. Anyone with the exact URL on your network can view that insight, so treat the token like any dashboard-level secret.
+Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. The card always shows the **latest run** and reloads every 15 minutes. The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
 
 ## Deep presence
 
@@ -85,8 +97,8 @@ For Overview, Presence, and every Ask question, the add-on walks the device regi
 - Home data is sent to Anthropic's API only when an insight is generated; nothing else leaves your machine, and nothing is sent on a schedule unless auto-refresh is enabled and an account is connected.
 - Person **GPS coordinates are not included** in snapshots — only zone/state and areas. Device-context expansion does include the *states* of phone sensors such as the geocoded-address sensor; disable those sensors in the companion app or hide the entities in HA to exclude them.
 - Generated visualizations render in **sandboxed iframes** (`sandbox="allow-scripts"`) — they cannot touch your HA session, cookies, or the panel.
-- The panel is reachable only through **HA Ingress** (admin users). The optional card server (8100) is unmapped by default and requires the per-install token on every request.
-- The `/config` mount is **read-only**; `/share` is writable solely for the memory-inbox drop-files.
+- The panel is reachable only through **HA Ingress** (admin users). The add-on exposes no host ports; dashboard-card files embed the per-install token in their unguessable `/local` file names.
+- Under `/config` the add-on writes only the home memory file (`/config/.bruh_claude/memory/memory.md`) and — once dashboard cards are first used — the card mirror (`/config/www/bruh_insights/`); `/share` is writable solely for the memory-inbox drop-files.
 
 ## Troubleshooting
 

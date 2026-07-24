@@ -8,11 +8,72 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Insights" version="1.3.0">
+<Changelog project="BRUH Insights" version="1.6.0">
 
 <Release version="Unreleased" />
 
-<Release version="1.3.0" date="July 21, 2026" latest>
+<Release version="1.6.0" date="July 24, 2026" latest>
+
+The token-diet release: you decide how much of your Claude subscription Insights may spend and when — and cards were retooled from long-winded reports into glanceable data points.
+
+<Changes type="added">
+
+- **⚙ Settings dialog.** A new Settings button puts the spend controls one tap away: a master **Automatic insights** switch (pause all background generation without uninstalling — manual Generate/Ask still work), your **Claude plan** (Pro, Max 5×, Max 20×), and a **session usage budget slider** — let Insights use up to N% of each 5-hour subscription session. Once the session hits the budget, auto-refresh pauses until the window rolls over; a topbar chip shows why, and manual clicks are never blocked.
+- **Real account usage when available.** With [BRUH Terminal](/bruh-claude/) installed, the budget runs against your *actual* Anthropic 5-hour utilization (via its usage-limits tracker) — so Insights backs off when *you* are using Claude. Without it, Insights counts its own tokens per run against a per-plan estimate. A live usage meter with the budget mark shows either way.
+- **Per-card run schedules.** Every card's ✎ dialog (and the New-insight form) can set fixed daily run times — e.g. `07:00, 19:00` — instead of an every-N-hours interval. Scheduled cards regenerate right after each set time and spend nothing in between.
+
+</Changes>
+<Changes type="changed">
+
+- **Concise cards, retooled prompts.** The analyst's contract was rewritten around glanceable data points: 3–6 sharp highlights (real value + entity + time) as the main content, a 1–2 sentence summary hard-capped server-side, ONE compact focused visual instead of sprawling multi-chart reports, and an explicit "every sentence carries a number, a name, or a time" rule. All built-in category prompts were trimmed to match.
+- **Fewer background runs by default.** The default auto-refresh interval is now 24 h (was 6 h) — the ⚙ budget, per-card schedules, and per-card intervals are the intended controls for anything more frequent.
+
+</Changes>
+</Release>
+
+<Release version="1.5.0" date="July 21, 2026">
+<Changes type="changed">
+
+- **Port 8100 removed entirely.** Dashboard cards are now served exclusively by Home Assistant itself via the `/local` mirror, which works on HTTP, HTTPS, and Nabu Casa dashboards alike — so the plain-HTTP card server (and the last exposed port) is gone. Cards created with the old `http://<host>:8100/card/…` YAML should be re-added from the ▦ dialog to pick up the `/local/…` URL.
+- **Deleting a learned fact scrubs the memory file too.** Removing a fact from the 🧠 dialog now also removes it from the home memory document — Claude rewrites the file without it (catching reworded copies); when Claude isn't reachable, the matching bullet line is stripped directly. One delete, gone everywhere.
+- **Clearer memory explanations.** The 🧠 dialog now spells out the two kinds of memory — the analyst's own learned facts (auto-discovered, left column) vs the curated home memory file (editable source of truth, right column) — and what each is used for.
+- **Questions only when they matter.** The analyst is now instructed to ask a clarifying question only on a genuine blocker whose answer would materially change future analyses — most runs should ask none, and filler/conversational questions are explicitly banned.
+- **Run-history polish.** The › "Newer run" stepper no longer shows when you're already on the latest run (and ‹ hides at the oldest), and card-footer tooltips now open upward so they aren't cut off by the bottom of the card.
+
+</Changes>
+</Release>
+
+<Release version="1.4.0" date="July 21, 2026">
+<Changes type="added">
+
+- **Dashboard cards over HTTPS and Nabu Casa.** Insight HTML is mirrored into `/config/www/bruh_insights/` (created only the first time you open the ▦ dialog), where Home Assistant itself serves it at a same-origin `/local/…` URL — no port, no mixed content, works on HTTP, HTTPS, and remote dashboards alike. File names embed the per-install card token, so links stay unguessable.
+
+</Changes>
+<Changes type="changed">
+
+- **Card port open by default.** Port 8100 is mapped out of the box, so the classic plain-HTTP card URLs work without a trip to the add-on's Network settings; the dialog's "map the port" setup step only appears when the port is actually closed. *(Superseded in 1.5.0 — the port is gone.)*
+- **Memory dialog uses your screen.** On desktop the 🧠 Memory dialog is wide and two-column — questions and learned facts on the left, the home memory document on the right at full height. Phones keep the stacked layout.
+- **Teaching a fact no longer leaves a duplicate row.** A taught fact's only home is the memory document — Claude merges it straight in (with a live indicator) instead of also parking a permanent copy in the "Learned facts" list; if the merge fails, the fact is appended under "Recently added" so nothing is lost.
+
+</Changes>
+</Release>
+
+<Release version="1.3.1" date="July 21, 2026">
+<Changes type="added">
+
+- **Instant tooltips.** Every icon-only button now shows a fast styled tooltip on hover and keyboard focus explaining what it does — no more mystery icons.
+- **Memory file, readable and editable.** The home memory document in the 🧠 panel renders as formatted markdown with an **✎ Edit markdown** mode (Save/Cancel, unsaved-edits badge). Works standalone — the `/config` mount is writable for this one file (`/config/.bruh_claude/memory/memory.md`); nothing else under `/config` is ever written.
+- **"Not relevant" on card questions.** Every clarifying question on a card has an ✕ button that dismisses it permanently and tells the analyst it was on the wrong track — dismissed topics become dead ends in future prompts.
+
+</Changes>
+<Changes type="fixed">
+
+- **Dashboard-card YAML uses your real address.** The ▦ dialog builds the card URL from the hostname your browser is actually using (`hassio.local`, a raw IP — whatever you typed), never Nabu Casa hosts, with a mixed-content warning when you're on HTTPS.
+
+</Changes>
+</Release>
+
+<Release version="1.3.0" date="July 21, 2026">
 
 A depth release: the analyst now remembers, builds on what it knows, and reasons across sensors instead of reading them one at a time.
 
