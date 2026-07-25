@@ -3,7 +3,7 @@ title: Reference
 description: Every configuration option, auth method, panel feature, and privacy detail for the BRUH Insights Home Assistant add-on — in one place.
 ---
 
-Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Insights → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
+Everything you might need to look up. The defaults work out of the box, and since 1.7.0 the primary place to tune Insights is the panel's **⚙ Settings** dialog — the add-on's Configuration tab (**Settings → Add-ons → BRUH Insights → Configuration**) provides the fallback values below, all of which except `log_level` can be overridden live from ⚙ Settings without a restart.
 
 ## Configuration options
 
@@ -36,6 +36,7 @@ The **⚙ Settings** button in the panel controls how much of your Claude subscr
 | **Automatic insights** | Master switch. Off pauses every scheduled run (nothing spends tokens); manual **Generate**, **Refresh all**, and **Ask** still work. A topbar chip reminds you it's off. |
 | **Your Claude subscription** | Pro, Max 5×, or Max 20× — sizes the estimate of your 5-hour session window. |
 | **Session usage budget** | A slider: *let Insights use up to N% of each 5-hour session.* Once the window's usage reaches the budget, automatic runs pause until it rolls over (topbar chip says so). Manual clicks are never blocked. |
+| **Generation defaults** | Live overrides of the Configuration-tab options: default refresh interval (the "default" the ✎ editor refers to), days of history analyzed, Claude model override, generation timeout, and run-history retention. Empty field = use the Configuration value (shown grayed). |
 
 The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
 

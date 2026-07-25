@@ -8,11 +8,24 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Insights" version="1.6.0">
+<Changelog project="BRUH Insights" version="1.7.0">
 
 <Release version="Unreleased" />
 
-<Release version="1.6.0" date="July 24, 2026" latest>
+<Release version="1.7.0" date="July 24, 2026" latest>
+<Changes type="added">
+
+- **All the knobs, in the app.** The ⚙ Settings dialog grows a **Generation defaults** section covering nearly every add-on Configuration option — default refresh interval, days of history analyzed, Claude model override, generation timeout, and run-history retention. Changes apply immediately with no restart; an empty field falls back to the add-on's Configuration-tab value (shown grayed in the field). Only `log_level` stays add-on-config-only.
+
+</Changes>
+<Changes type="changed">
+
+- **"Default" now says what it is.** The ✎ prompt editor's refresh-interval field shows the actual effective default as its placeholder (e.g. *"default: 24h"*) and points to ⚙ Settings, where that default now lives — no more hunting through the add-on Configuration tab.
+
+</Changes>
+</Release>
+
+<Release version="1.6.0" date="July 24, 2026">
 
 The token-diet release: you decide how much of your Claude subscription Insights may spend and when — and cards were retooled from long-winded reports into glanceable data points.
 
