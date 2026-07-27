@@ -5,17 +5,19 @@ sidebar:
   order: 3
 ---
 
-Labels cut across rooms: *battery powered*, *holiday lights*, *rental-guest accessible*, *critical*. Home Assistant can target a whole label in one service call, which makes them the best bulk-control primitive in the house — and Claude is very good at applying them in bulk.
+Labels cut across rooms: *battery powered*, *holiday lights*, *rental-guest accessible*, *critical*. Home Assistant can target a whole label in one service call.
 
-Unlike Spook's six single-target label services, `add_label` and `remove_label` take **entities, devices, and areas in the same call**.
+Unlike Spook's six single-target label services, `add_label` and `remove_label` take entities, devices, and areas in the same call.
 
 ## Create label
 
-**`bruh_claude.create_label`** — Create a new label. Returns the new label_id as response data.
+`bruh_claude.create_label`
+
+Create a new label. Returns the new label_id as response data.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `name` | text | **yes** | Name of the new label. |
+| `name` | text | yes | Name of the new label. |
 | `icon` | icon | no | Icon for the label. |
 | `color` | text | no | Label color: a theme color name (e.g. red, blue, amber) or hex code. |
 | `description` | text | no | What this label is for. |
@@ -28,15 +30,17 @@ data:
   color: amber
 ```
 
-> 🗣️ *"Create an amber 'Battery powered' label."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Create an amber 'Battery powered' label."*
 
 ## Delete label
 
-**`bruh_claude.delete_label`** — Delete a label. It is removed from everything it was applied to.
+`bruh_claude.delete_label`
+
+Delete a label. It is removed from everything it was applied to.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `label_id` | label | **yes** | The label to delete. |
+| `label_id` | label | yes | The label to delete. |
 
 ```yaml
 service: bruh_claude.delete_label
@@ -44,15 +48,17 @@ data:
   label_id: battery_powered
 ```
 
-> 🗣️ *"Delete the battery-powered label everywhere."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Delete the battery-powered label everywhere."*
 
 ## Add label
 
-**`bruh_claude.add_label`** — Apply one or more labels to entities, devices, and/or areas. At least one target is required.
+`bruh_claude.add_label`
+
+Apply one or more labels to entities, devices, and/or areas. At least one target is required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `label_id` | label (list) | **yes** | Labels to apply. |
+| `label_id` | label (list) | yes | Labels to apply. |
 | `entity_id` | entity (list) | no | Entities to label. |
 | `device_id` | device (list) | no | Devices to label. |
 | `area_id` | area (list) | no | Areas to label. |
@@ -68,15 +74,17 @@ data:
     - a1b2c3d4e5f6
 ```
 
-> 🗣️ *"Label every battery-powered sensor in the house 'Battery powered'."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Label every battery-powered sensor in the house 'Battery powered'."*
 
 ## Remove label
 
-**`bruh_claude.remove_label`** — Remove one or more labels from entities, devices, and/or areas. At least one target is required.
+`bruh_claude.remove_label`
+
+Remove one or more labels from entities, devices, and/or areas. At least one target is required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `label_id` | label (list) | **yes** | Labels to remove. |
+| `label_id` | label (list) | yes | Labels to remove. |
 | `entity_id` | entity (list) | no | Entities to unlabel. |
 | `device_id` | device (list) | no | Devices to unlabel. |
 | `area_id` | area (list) | no | Areas to unlabel. |
@@ -89,8 +97,4 @@ data:
     - sensor.motion_battery
 ```
 
-> 🗣️ *"That motion sensor is wired now — drop its battery label."* — works in the terminal, by voice, or in an automation prompt.
-
----
-
-*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
+> 🗣️ *"That motion sensor is wired now — drop its battery label."*

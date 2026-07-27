@@ -3,7 +3,7 @@ title: BRUH Claude
 description: Claude Code, native to Home Assistant. A fast voice assistant, scheduled AI insight reports, a full terminal, and deep HA integration — in one add-on.
 template: splash
 hero:
-  tagline: Claude Code, living inside your Home Assistant. A fast voice assistant, proactive AI insight reports, an automation engine, a debugger, and config backup — all in one add-on.
+  tagline: "Claude Code inside Home Assistant: voice assistant, scheduled reports, automations, and a full terminal — one add-on."
   image:
     file: ../../../assets/bruh-claude-icon.svg
   actions:
@@ -28,7 +28,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## What it is
 
-A Home Assistant add-on that runs **Claude Code** inside HA — with native access to your entities, services, automations, traces, history, cameras, and logs through a built-in MCP server. Open a terminal in your sidebar, talk to it through Voice Assistants, schedule it to watch your house, or call it from automations. Either way, Claude actually knows your setup.
+A Home Assistant add-on that runs **Claude Code** inside HA, with native access to your entities, services, automations, traces, history, cameras, and logs through a built-in MCP server. Open a terminal in your sidebar, talk to it through Voice Assistants, schedule it to watch your house, or call it from automations. Either way, Claude actually knows your setup.
 
 ![BRUH Terminal architecture overview](/images/bruh-claude/architecture-overview.svg)
 
@@ -36,33 +36,33 @@ A Home Assistant add-on that runs **Claude Code** inside HA — with native acce
 
 <CardGrid>
   <Card title="Fast voice assistant" icon="comment-alt">
-    Pick **BRUH Claude** as a conversation agent in **Settings → Voice Assistants**. Pre-warmed workers answer typical commands in ~3–5s, replies stream so TTS starts at the first sentence, and follow-ups remember the conversation. *"Turn off the kitchen lights"* acts directly — no entity lookups.
+    Pick **BRUH Claude** in **Settings → Voice Assistants**. Typical commands answer in ~3–5 s, replies stream for TTS, and follow-ups remember the conversation.
   </Card>
-  <Card title="Proactive insight reports" icon="rocket">
-    Schedule Claude to watch your house and write **markdown reports to sensors** — daily briefing, anomaly watch, battery & maintenance, camera check, or your own templated prompt. Each report comes with ready-to-paste dashboard card YAML.
+  <Card title="Scheduled insight reports" icon="rocket">
+    Claude watches your house and writes markdown reports to sensors: daily briefing, anomaly watch, battery check, or your own templated prompt — with ready-to-paste dashboard YAML.
   </Card>
-  <Card title="See your cameras" icon="seti:image">
-    Claude can *look* at a camera and tell you what it sees — *"is the garage door actually closed?"*, *"is anyone in the driveway?"* — by voice or in an automation.
+  <Card title="Reorganize by asking" icon="puzzle">
+    **[Power Tools](/bruh-claude/power-tools/)**: 56 admin services for areas, labels, entities, helpers, dashboards, zones, and users. *"Rename all the Shellys"*, *"build me a guest-mode toggle"* — validated, admin-gated, no `.storage` edits.
   </Card>
   <Card title="Debug your automations" icon="error">
-    Claude reads automation traces, cross-references entity state and history, and tells you *exactly* why something fired — or didn't. No more grepping `home-assistant.log`.
+    Claude reads automation traces and cross-references state and history to tell you exactly why something fired — or didn't.
+  </Card>
+  <Card title="See your cameras" icon="seti:image">
+    Claude looks at a camera and tells you what it sees: *"is the garage door actually closed?"* — by voice or in an automation.
   </Card>
   <Card title="Trigger from automations" icon="setting">
-    The `bruh_claude.run_task` service runs Claude in the background — error-log digests, config audits, morning summaries — with an optional notification when it's done.
+    `bruh_claude.run_task` runs Claude in the background — error-log digests, config audits, morning summaries — with an optional done-notification.
   </Card>
-  <Card title="Reorganize your home by asking" icon="puzzle">
-    **[Power Tools](/bruh-claude/power-tools/)**: 41 admin services for areas, floors, labels, entities, devices, zones, users, and more. *"Rename all the Shellys"*, *"label everything battery-powered"* — validated, admin-gated, and no `.storage` hand-edits, ever.
-  </Card>
-  <Card title="Just… ask anything" icon="information">
-    *"How cold did it get last night?"* *"Which automations haven't run in 30 days?"* *"What's the weather tomorrow?"* Live state, real history, real answers.
+  <Card title="Ask anything" icon="information">
+    Live state and real history: *"How cold did it get last night?"*, *"Which automations haven't run in 30 days?"*
   </Card>
 </CardGrid>
 
 ![BRUH Claude selected as the conversation agent in Home Assistant Settings → Voice Assistants](/images/bruh-claude/voice-assistant-agent.svg)
 
-## A taste
+## Example
 
-In the terminal — or by voice, or on a schedule:
+In the terminal, by voice, or on a schedule:
 
 ![A BRUH Claude terminal session: asking why an automation didn't run, and getting a trace-based answer](/images/bruh-claude/terminal-demo.svg)
 
@@ -82,55 +82,17 @@ Want me to disable the unused ones?
 
 What makes this different from running Claude Code on a regular machine:
 
-<CardGrid>
-  <Card title="Use your Claude subscription" icon="approve-check">
-    Authenticates with Anthropic via **OAuth**, so a Claude **Pro** or **Max** subscription covers your usage. No API key, no pay-per-token billing for everyday use (an API key works too if you prefer).
-  </Card>
-  <Card title="Live HA awareness (MCP server)" icon="puzzle">
-    A built-in MCP server gives Claude **34 purpose-built tools** — entity states, device control for every domain, camera snapshots, history & statistics, weather forecasts, areas, registries, automation traces, templates, logs, config reload. No manual API setup.
-  </Card>
-  <Card title="Auto-generated context" icon="information">
-    On every boot the add-on regenerates `/config/CLAUDE.md` — a snapshot of your entities by domain, automations with last-triggered times, installed integrations, and your file tree. Claude reads it at the start of every session.
-  </Card>
-  <Card title="Usage-limit sensors" icon="seti:graphql">
-    The same session and weekly utilization you see on **claude.ai → Settings → Usage**, surfaced as HA sensors with reset timestamps. Build a dashboard, set an alert before you hit a limit.
-  </Card>
-  <Card title="Safe by default" icon="seti:lock">
-    Voice agents get every HA tool but **no** shell, file, or web access — and a per-agent **Blocked services** list can bar a kitchen speaker from unlocking doors. Everything runs sandboxed as a non-root user.
-  </Card>
-  <Card title="Git-based config backup" icon="document">
-    Auto-commit `/config` every 30 minutes (configurable). `ha-backup` for manual snapshots, single-file restore from any commit, sensible `.gitignore` that excludes secrets.
-  </Card>
-</CardGrid>
+- **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your usage; an API key works too.
+- **[36 purpose-built MCP tools](/bruh-claude/mcp/)** — live states, device control, cameras, history and statistics, registries, dashboards, traces, templates, logs, reloads. How the layers fit: [How Claude controls your home](/bruh-claude/how-claude-controls-ha/).
+- **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of your install that Claude reads at the start of each session.
+- **Usage-limit sensors** — the same session/weekly utilization as claude.ai → Settings → Usage, as HA sensors with reset times.
+- **Safe by default** — voice agents get HA tools but no shell, file, or web access; per-agent blocked-services lists; non-root sandbox.
+- **Git-based config backup** — auto-commits of `/config`, manual `ha-backup`, single-file restore from any commit.
 
-## Usage & insight sensors
+## What it doesn't do
 
-Two kinds of sensors land in Home Assistant once the integration is set up.
+Honesty up front: Claude **can't add or remove integrations** (config flows are interactive — OAuth, pairing buttons — so it walks you to the right screen and you click), **never touches credentials** (API keys, tokens, MFA), and **won't edit YAML-mode dashboards through services** (it edits the YAML itself instead). The full scorecard: [what Claude can and can't reach](/bruh-claude/how-claude-controls-ha/#what-claude-can-and-cant-reach).
 
-**Usage-limit sensors** — your real Anthropic account utilization, not estimates:
+**[Quick Start →](/bruh-claude/quickstart/)** — add the repo, install, restart HA once, sign in. About five minutes.
 
-| Sensor | Tracks |
-|--------|--------|
-| `sensor.bruh_claude_session_usage` | Percent of the current 5-hour session window used |
-| `sensor.bruh_claude_weekly_usage` | Percent of the rolling 7-day window used |
-| `…_session_usage_resets_at` / `…_weekly_usage_resets_at` | When each window resets |
-
-These mirror **claude.ai → Settings → Usage** and need an **OAuth / subscription login** (not an API key).
-
-**Insight sensors** — one `sensor.<job>_insight` per scheduled job, holding the latest report in its `markdown` attribute plus ready-to-paste `card_yaml`. A `binary_sensor` also reports voice-assistant health (worker count and latency).
-
-![A BRUH Claude insight report rendered as a Markdown card on a Home Assistant dashboard](/images/bruh-claude/insight-report-card.svg)
-
-## Up and running in 5 minutes
-
-1. Add the **BRUH HA Apps** repository in HA.
-2. Install **BRUH Terminal** and start it.
-3. Restart Home Assistant once (so HA loads the integration).
-4. Accept the discovered **BRUH Claude** integration.
-5. Authenticate with Anthropic in the terminal — then start typing, or pick it as your voice assistant.
-
-[Full Quick Start →](/bruh-claude/quickstart/)
-
-:::tip[Running BRUH Insights too?]
-The two add-ons share one login and one home memory — the Terminal acts, Insights analyzes, and each makes the other smarter. See [Terminal + Insights, better together](/bruh-claude/better-together/).
-:::
+Running [BRUH Insights](/bruh-claude/better-together/) too? They share one login and one home memory.

@@ -3,7 +3,7 @@ title: MCP Tools
 description: Every tool the built-in MCP server gives Claude — live states, device control, cameras, history, registries, and service calls with response data.
 ---
 
-The add-on ships a built-in **MCP server** that Claude Code launches automatically — it's what turns Claude from "a chatbot that read your YAML once" into an operator with live access to your home. Verify every tool on your install with `ha-selftest`.
+The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/bruh-claude/how-claude-controls-ha/)). Verify every tool on your install with `ha-selftest`.
 
 ## Reading your home
 
@@ -20,6 +20,7 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 | `get_logbook` / `get_error_log` | Logbook entries; HA logs from the Supervisor journal |
 | `get_automations` / `get_automation_trace` | Automations with status; stored execution traces for debugging |
 | `get_ha_config` / `get_services` / `get_supervisor_info` | Config details, service catalog, system info |
+| `get_device_registry` | Per-domain entity count summary |
 
 ## Acting on it
 

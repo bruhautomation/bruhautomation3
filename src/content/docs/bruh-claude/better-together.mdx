@@ -1,72 +1,59 @@
 ---
-title: "Terminal + Insights: better together"
+title: Using with Insights
 description: How BRUH Terminal and BRUH Insights share one login, one memory, and one view of your home — and what each one is for.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+[BRUH Terminal](/bruh-claude/) and [BRUH Insights](/bruh-insights/) each work alone. Installed together they share one login and one memory: the Terminal acts, Insights analyzes.
 
-[BRUH Terminal](/bruh-claude/) and [BRUH Insights](/bruh-insights/) are independent add-ons — each works fine alone. But they're built to be halves of the same brain, and installing both is where things get genuinely special: **one login, one shared memory, one increasingly well-organized home** that both of them understand.
+## Setup
+
+1. Install both add-ons from the [BRUH HA Apps repository](https://github.com/bruhautomation/BRUH-HA-Apps).
+2. In the Terminal: sign in to Claude, then run `ha-share-login`.
+3. Open Insights — it's already authenticated. Generate your first insight.
+4. Say *"remember that…"* to your voice assistant; it appears in Insights' Memory dialog (🧠).
 
 ## Which one does what?
 
 | | **BRUH Terminal** | **BRUH Insights** |
 |---|---|---|
-| **Claude acts as…** | Your operator — voice assistant, terminal, automation engine | Your analyst — scheduled reports with interactive visualizations |
+| **Claude acts as…** | Your operator: voice assistant, terminal, automation engine | Your analyst: scheduled reports with interactive visualizations |
 | **Interface** | Sidebar terminal, Voice Assistants, services | Sidebar Ingress panel + dashboard cards |
 | **Output** | Actions, answers, config changes | Insight cards: title, summary, highlight stats, charts |
-| **Typical ask** | *"Turn off the kitchen lights"*, *"why didn't my automation fire?"*, *"rename all the Shellys"* | *"Which rooms are coldest at night?"*, energy trends, presence patterns, device health |
-
-Rule of thumb: **Terminal changes your home; Insights understands it.** Together they close the loop.
+| **Typical ask** | *"Turn off the kitchen lights"*, *"why didn't my automation fire?"* | *"Which rooms are coldest at night?"*, energy trends, device health |
 
 ## One login
 
-Run `ha-share-login` once in the BRUH Terminal and your Claude subscription (Pro/Max) is shared at `/config/.bruh_claude/secrets/` — Insights picks it up automatically and shows **"Claude · shared login"** in its auth chip. No second sign-in, no pasted tokens, and background channels refresh from the same credential. Revoke any time with `ha-share-login --revoke`.
+Run `ha-share-login` once in the Terminal and your Claude subscription is shared at `/config/.bruh_claude/secrets/`. Insights picks it up automatically and shows "Claude · shared login" in its auth chip — no second sign-in, no pasted tokens. Revoke any time with `ha-share-login --revoke`.
 
 ## One memory
 
-Both add-ons read and write the **same home memory file**, `/config/.bruh_claude/memory/memory.md`:
+Both add-ons read and write the same home memory file, `/config/.bruh_claude/memory/memory.md`:
 
-- Tell the Terminal *"remember that guests use the loft"* (voice, `ha-memory add`, or the `bruh_claude.add_memory` service) — Insights folds that fact into every future data snapshot it analyzes.
-- Insights' analyst discovers a **finding** (a flaky sensor, a recurring pattern) or you answer one of its **clarifying questions** — it hands the knowledge to the `bruh_claude` integration (`add_memory` / `answer_question`), where the Terminal's consolidator merges it into the shared memory. Voice answers get smarter because a *report* learned something.
-- The 🧠 Memory dialog in Insights and `ha-memory edit` in the Terminal are two editors for the same document.
+- Tell the Terminal *"remember that guests use the loft"* (voice, `ha-memory add`, or `bruh_claude.add_memory`) and Insights folds that fact into every future analysis.
+- When Insights' analyst discovers a finding or you answer one of its questions, it hands the knowledge to the `bruh_claude` integration, and the Terminal's consolidator merges it into shared memory. Voice answers get smarter because a report learned something.
+- The Memory dialog in Insights and `ha-memory edit` in the Terminal are two editors for the same document.
 
-A background consolidator (Terminal side) dedupes, resolves contradictions newest-wins, and keeps it all within budget. Even without the Terminal installed, Insights parks facts in `/share/bruh_claude/memory-inbox/` drop-files, ready to be ingested the day you add it.
+A background consolidator dedupes and resolves contradictions newest-wins. Without the Terminal installed, Insights parks facts in `/share/bruh_claude/memory-inbox/` drop-files, ready to be ingested the day you add it.
+
+## One usage budget
+
+Insights' token-budget meter uses your **real Anthropic account utilization** when the Terminal is installed (its usage-limits tracker), so Insights automatically backs off when you're using Claude elsewhere. Standalone, it can only estimate from its own runs.
 
 ## Power Tools make Insights smarter
 
-Insights' analysis is only as good as the structure it reads. [Power Tools](/bruh-claude/power-tools/) — the Terminal's registry services — are how that structure gets good:
+Insights' analysis is only as good as the structure it reads. The Terminal's [Power Tools](/bruh-claude/power-tools/) are how that structure gets good:
 
-- **Areas and floors** → room-by-room climate and presence analysis needs entities that actually *have* rooms. *"Put every unassigned entity in its right area"* is a one-liner in the Terminal.
-- **Labels** → label your battery-powered devices once; every future device-health insight can group by it.
-- **Sane names** → `light.kitchen_ceiling` reads better than `light.shelly_1pm_9a4c2f` in a chart, a report, and a voice reply alike.
-- **[`import_statistics`](/bruh-claude/power-tools/blueprints-and-statistics/)** → Insights' energy analysis reads long-term statistics. Backfill the gap from when your meter was offline, and the energy insight stops drawing a hole.
-- **[`find_orphaned_references`](/bruh-claude/power-tools/diagnostics-and-repairs/)** → dead references found by the Terminal can be surfaced as repair issues *before* they show up as anomalies in a report.
+- **Areas and floors** — room-by-room climate and presence analysis needs entities that actually have rooms. *"Put every unassigned entity in its right area"* is a one-liner.
+- **Labels** — label your battery-powered devices once; device-health insights can group by it.
+- **Sane names** — `light.kitchen_ceiling` reads better than `light.shelly_1pm_9a4c2f` in a chart and a voice reply alike.
+- **[`import_statistics`](/bruh-claude/power-tools/blueprints-and-statistics/)** — backfill the gap from when your meter was offline, and the energy insight stops drawing a hole.
+- **[`find_orphaned_references`](/bruh-claude/power-tools/diagnostics-and-repairs/)** — dead references become repair issues before they show up as anomalies in a report.
 
-## Reports that lead to action — and back
-
-The loop in practice:
+## The loop in practice
 
 1. **Insights notices**: the nightly report flags that the garage fridge compressor runs 40% more than last month.
-2. **You ask the Terminal**: *"pull the fridge's power history and compare it to the garage temperature"* — Claude cross-references history, statistics, and weather.
-3. **Terminal acts**: creates an automation to alert on the pattern, labels the fridge *watchlist*, and files a repair issue if it's genuinely failing.
+2. **You ask the Terminal**: *"pull the fridge's power history and compare it to the garage temperature"*.
+3. **The Terminal acts**: creates an alerting automation, labels the fridge *watchlist*, files a repair issue if it's genuinely failing.
 4. **Insights knows**: the finding is in shared memory, so the next report builds on it instead of rediscovering it.
 
-Or run it all from one place: the Terminal's own [insight jobs](/bruh-claude/automations/#insight-jobs) render scheduled reports to sensors for dashboards, while the Insights panel is the richer, interactive analyst. Many homes run both — jobs for glanceable dashboard tiles and TTS briefings, the panel for deep dives.
-
-## Setup in 60 seconds
-
-1. Install both add-ons from the [BRUH HA Apps repository](https://github.com/bruhautomation/BRUH-HA-Apps).
-2. In the Terminal: sign in to Claude, then run `ha-share-login`.
-3. Open Insights — it's already authenticated. Generate your first insight.
-4. Say *"remember that…"* to your voice assistant and watch it show up in Insights' 🧠 Memory dialog.
-
-<CardGrid>
-  <Card title="BRUH Terminal docs" icon="rocket">
-    Voice, Power Tools, automations, memory, MCP, CLI.
-    [Start here →](/bruh-claude/quickstart/)
-  </Card>
-  <Card title="BRUH Insights docs" icon="magnifier">
-    Categories, questions & findings, dashboard cards, token budgets.
-    [Start here →](/bruh-insights/quickstart/)
-  </Card>
-</CardGrid>
+The Terminal's own [insight jobs](/bruh-claude/automations/#insight-jobs) complement the panel: jobs for glanceable dashboard tiles and TTS briefings, the panel for interactive deep dives.

@@ -26,19 +26,11 @@ Five minutes from zero to a working AI assistant inside your Home Assistant.
 
 2. **Install the add-on.** Find **BRUH Terminal** in the store and click **Install**, then **Start** when it's done.
 
-3. **Restart Home Assistant** — required on first install so HA loads the BRUH Claude integration: **Settings → System → Restart**.
-
-   :::tip
-   You'll see a persistent notification when a restart is needed — after this first install, and after add-on version upgrades (a repair appears too). Add-on restarts within the same version don't need an HA restart.
-   :::
+3. **Restart Home Assistant** — required on first install so HA loads the BRUH Claude integration: **Settings → System → Restart**. A persistent notification tells you whenever a restart is needed (first install and add-on version upgrades); add-on restarts within the same version don't need one.
 
 4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the assist-health binary sensor, and the `bruh_claude.send_prompt` / `run_task` / `run_insight` / `clear_conversation` services.
 
-5. **Sign in with Anthropic.** Open the **BRUH Claude** entry in the HA sidebar and complete the OAuth login in the terminal. Credentials are stored in the add-on's persistent volume — they survive restarts.
-
-   :::tip[Use your Claude subscription]
-   Claude Code authenticates via OAuth, so a **Claude Pro** or **Max** subscription covers your usage — no per-token API billing for everyday use. You can also sign in with an API key if you prefer, though the usage-limit sensors only populate with a subscription login.
-   :::
+5. **Sign in with Anthropic.** Open the **BRUH Claude** entry in the HA sidebar and complete the OAuth login in the terminal. Credentials are stored in the add-on's persistent volume and survive restarts.
 
 </Steps>
 

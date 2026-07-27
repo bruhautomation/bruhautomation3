@@ -1,0 +1,135 @@
+---
+title: Dashboards
+description: Edit and restore Lovelace dashboards through supervised service calls with automatic backups.
+sidebar:
+  order: 9
+---
+
+Claude edits dashboards through a fetch-modify-save flow instead of touching `.storage` files: read the config with the `get_dashboard` MCP tool (`list_dashboards` enumerates them), change the JSON, and save the complete object back with `update_dashboard`.
+
+Every update automatically backs up the previous configuration first (the last 20 per dashboard are kept), and `restore_dashboard` undoes a bad edit with one call. Only storage-mode dashboards can be edited; YAML-mode dashboards are refused with a clear error. Dashboard files are also part of the Terminal's git config backup.
+
+## Create dashboard
+
+`bruh_claude.create_dashboard`
+
+Create a new storage-mode dashboard. The URL path must contain a hyphen (e.g. lovelace-lights). Returns the new dashboard's url_path and id as response data.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url_path` | text | yes | URL path for the dashboard; must contain a hyphen. |
+| `title` | text | yes | Sidebar title. |
+| `icon` | icon | no | Sidebar icon. |
+| `show_in_sidebar` | boolean | no | Show the dashboard in the sidebar (default on). |
+| `require_admin` | boolean | no | Only admins can see this dashboard. |
+
+```yaml
+service: bruh_claude.create_dashboard
+data:
+  url_path: lovelace-guest
+  title: Guest
+  icon: mdi:account-heart
+```
+
+> 🗣️ *"Make a simple Guest dashboard with just the lights and the thermostat."*
+
+## Update dashboard
+
+`bruh_claude.update_dashboard`
+
+Replace a storage-mode dashboard's configuration. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. YAML-mode dashboards are refused.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `config` | object | yes | The full dashboard configuration object, including the complete views list. |
+| `url_path` | text | no | The dashboard's URL path (e.g. lovelace-lights). Omit for the default dashboard. |
+
+```yaml
+service: bruh_claude.update_dashboard
+data:
+  url_path: lovelace-lights
+  config:
+    views:
+      - title: Lights
+        cards:
+          - type: light
+            entity: light.kitchen_ceiling
+```
+
+> 🗣️ *"Add a card for the new kitchen light to my Lights dashboard."*
+
+## Restore dashboard
+
+`bruh_claude.restore_dashboard`
+
+Restore a storage-mode dashboard from a backup made by update_dashboard. Restores the most recent backup unless a specific backup name is given.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url_path` | text | no | The dashboard's URL path. Omit for the default dashboard. |
+| `backup` | text | no | A specific backup file name from a previous update_dashboard response. Omit for the most recent. |
+
+```yaml
+# Undo the last edit
+service: bruh_claude.restore_dashboard
+data:
+  url_path: lovelace-lights
+```
+
+> 🗣️ *"That dashboard change was worse — put it back how it was."*
+
+## Delete dashboard
+
+`bruh_claude.delete_dashboard`
+
+Delete a storage-mode dashboard. Its configuration is backed up first (same backup store as update_dashboard) and the backup name is returned as response data, so a deletion can be recovered by recreating the dashboard and restoring.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url_path` | text | yes | The dashboard's URL path. |
+
+```yaml
+service: bruh_claude.delete_dashboard
+data:
+  url_path: lovelace-old-tablet
+```
+
+> 🗣️ *"Delete the old tablet dashboard — we don't use it anymore."*
+
+## Add dashboard resource
+
+`bruh_claude.add_dashboard_resource`
+
+Register a dashboard resource — the JavaScript module or stylesheet of a custom card (e.g. /hacsfiles/... or /local/...). Returns the resource id as response data. Duplicate URLs are refused.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url` | text | yes | Resource URL. |
+| `res_type` | select | no | Resource type (default module). |
+
+```yaml
+service: bruh_claude.add_dashboard_resource
+data:
+  url: /local/community/mushroom/mushroom.js
+  res_type: module
+```
+
+> 🗣️ *"Install the Mushroom cards and redo my overview with them."*
+
+## Remove dashboard resource
+
+`bruh_claude.remove_dashboard_resource`
+
+Remove a registered dashboard resource by its URL.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url` | text | yes | The URL of the resource to remove. |
+
+```yaml
+service: bruh_claude.remove_dashboard_resource
+data:
+  url: /local/old-card.js
+```
+
+> 🗣️ *"Remove that custom card module I stopped using."*
