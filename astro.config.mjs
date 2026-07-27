@@ -177,6 +177,7 @@ export default defineConfig({
 										{ label: 'Devices & Integrations', slug: 'bruh-claude/power-tools/devices-and-integrations' },
 										{ label: 'Zones & Persons', slug: 'bruh-claude/power-tools/zones-and-persons' },
 										{ label: 'Blueprints & Statistics', slug: 'bruh-claude/power-tools/blueprints-and-statistics' },
+										{ label: 'Dashboards', slug: 'bruh-claude/power-tools/dashboards' },
 										{ label: 'Users', slug: 'bruh-claude/power-tools/users' },
 										{ label: 'Diagnostics & Repairs', slug: 'bruh-claude/power-tools/diagnostics-and-repairs' },
 									],
