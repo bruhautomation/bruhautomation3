@@ -13,7 +13,7 @@ They exist for one reason: **so nothing ever has to touch `/config/.storage` by 
 
 ## What this unlocks
 
-Say any of these — by voice, in the terminal, or in a `run_task` prompt — and it just happens:
+All of these work by voice, in the terminal, or in a `run_task` prompt:
 
 - *"Rename all the `shelly_1pm_xxxx` lights to what they actually are."*
 - *"Create a Guest Room area, put these three devices in it, and add 'spare room' as a voice alias."*
@@ -21,6 +21,8 @@ Say any of these — by voice, in the terminal, or in a `run_task` prompt — an
 - *"Which automations reference entities that don't exist anymore?"*
 - *"Import this blueprint from the forum and set it up for the hallway."*
 - *"Backfill the gas meter history from this CSV."*
+
+Each service page below shows a 🗣️ line: a natural-language phrasing that works anywhere Claude listens.
 
 ## The catalog
 
@@ -81,12 +83,10 @@ In the terminal, Claude pairs Power Tools with two MCP tools:
 1. **`get_registry`** — read-only listings of areas, floors, labels, devices, entities, integrations, and users, with exactly the ids the services need. The safe replacement for reading `.storage` files.
 2. **`call_service`** — invokes the `bruh_claude.*` service, with `return_response` to capture returned ids and reports.
 
-So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back — no file edits, no restarts, no guesswork. The same services power [voice](/bruh-claude/voice/) requests and [automation tasks](/bruh-claude/automations/).
+So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back. No file edits, no restarts, no guesswork. The same services power [voice](/bruh-claude/voice/) requests and [automation tasks](/bruh-claude/automations/).
 
-:::tip[Better together]
-[BRUH Insights](/bruh-insights/) analyses are built on your areas, labels, and long-term statistics — so a well-organized registry (and backfilled statistics) directly improves every insight it generates. See [Terminal + Insights, better together](/bruh-claude/better-together/).
-:::
+A well-organized registry also improves every analysis [BRUH Insights](/bruh-claude/better-together/) generates — it reads your areas, labels, and statistics.
 
 ## Credit where due
 
-Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed) — the definitive "not your homie" toolbox for Home Assistant power users. BRUH Claude renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you want these superpowers *without* BRUH Claude, go give Spook a star — it's excellent.
+Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed). BRUH Claude renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you don't run BRUH Claude, use Spook directly — it's excellent.

@@ -13,12 +13,14 @@ The entity registry is where friendly names, entity ids, and visibility live. Th
 
 ## Rename entity
 
-**`bruh_claude.rename_entity`** — Set the friendly name override of one or more entities.
+`bruh_claude.rename_entity`
+
+Set the friendly name override of one or more entities.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Entities to rename. |
-| `name` | text | **yes** | The new friendly name. |
+| `entity_id` | entity (list) | yes | Entities to rename. |
+| `name` | text | yes | The new friendly name. |
 
 ```yaml
 service: bruh_claude.rename_entity
@@ -28,16 +30,18 @@ data:
   name: Kitchen Ceiling
 ```
 
-> 🗣️ *"Rename light.shelly_1pm_abc123 to 'Kitchen Ceiling'."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Rename light.shelly_1pm_abc123 to 'Kitchen Ceiling'."*
 
 ## Change entity ID
 
-**`bruh_claude.change_entity_id`** — Change an entity's ID (e.g. light.shelly_abc123 to light.kitchen_ceiling). Automations and dashboards referencing the old ID must be updated separately.
+`bruh_claude.change_entity_id`
+
+Change an entity's ID (e.g. light.shelly_abc123 to light.kitchen_ceiling). Automations and dashboards referencing the old ID must be updated separately.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity | **yes** | The current entity ID. |
-| `new_entity_id` | text | **yes** | The new entity ID, same domain. |
+| `entity_id` | entity | yes | The current entity ID. |
+| `new_entity_id` | text | yes | The new entity ID, same domain. |
 
 ```yaml
 service: bruh_claude.change_entity_id
@@ -46,15 +50,17 @@ data:
   new_entity_id: light.kitchen_ceiling
 ```
 
-> 🗣️ *"Give that Shelly a sane entity id: light.kitchen_ceiling."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Give that Shelly a sane entity id: light.kitchen_ceiling."*
 
 ## Enable entity
 
-**`bruh_claude.enable_entity`** — Enable one or more disabled entities. Takes effect after the owning integration reloads.
+`bruh_claude.enable_entity`
+
+Enable one or more disabled entities. Takes effect after the owning integration reloads.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Entities to enable. |
+| `entity_id` | entity (list) | yes | Entities to enable. |
 
 ```yaml
 service: bruh_claude.enable_entity
@@ -63,15 +69,17 @@ data:
     - sensor.zigbee_router_lqi
 ```
 
-> 🗣️ *"Re-enable the LQI diagnostic sensor."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Re-enable the LQI diagnostic sensor."*
 
 ## Disable entity
 
-**`bruh_claude.disable_entity`** — Disable one or more entities. They stop updating and are removed from the UI.
+`bruh_claude.disable_entity`
+
+Disable one or more entities. They stop updating and are removed from the UI.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Entities to disable. |
+| `entity_id` | entity (list) | yes | Entities to disable. |
 
 ```yaml
 service: bruh_claude.disable_entity
@@ -80,15 +88,17 @@ data:
     - sensor.noisy_diagnostic
 ```
 
-> 🗣️ *"Disable that diagnostic sensor that spams the recorder."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Disable that diagnostic sensor that spams the recorder."*
 
 ## Hide entity
 
-**`bruh_claude.hide_entity`** — Hide one or more entities from auto-generated dashboards and voice assistants. They keep working.
+`bruh_claude.hide_entity`
+
+Hide one or more entities from auto-generated dashboards and voice assistants. They keep working.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Entities to hide. |
+| `entity_id` | entity (list) | yes | Entities to hide. |
 
 ```yaml
 service: bruh_claude.hide_entity
@@ -97,15 +107,17 @@ data:
     - switch.washing_machine_child_lock
 ```
 
-> 🗣️ *"Hide the child-lock switch from dashboards but keep it working."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Hide the child-lock switch from dashboards but keep it working."*
 
 ## Unhide entity
 
-**`bruh_claude.unhide_entity`** — Unhide one or more hidden entities.
+`bruh_claude.unhide_entity`
+
+Unhide one or more hidden entities.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Entities to unhide. |
+| `entity_id` | entity (list) | yes | Entities to unhide. |
 
 ```yaml
 service: bruh_claude.unhide_entity
@@ -114,11 +126,13 @@ data:
     - switch.washing_machine_child_lock
 ```
 
-> 🗣️ *"Show the child-lock switch again."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Show the child-lock switch again."*
 
 ## Delete orphaned entities
 
-**`bruh_claude.delete_orphaned_entities`** — Remove registry entries for entities whose integration no longer provides them (state shows as 'restored'). Runs as a dry run by default and returns the list of affected entities as response data.
+`bruh_claude.delete_orphaned_entities`
+
+Remove registry entries for entities whose integration no longer provides them (state shows as 'restored'). Runs as a dry run by default and returns the list of affected entities as response data.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -135,8 +149,4 @@ data:
   dry_run: false
 ```
 
-> 🗣️ *"Are there any dead entities left over from integrations I removed? Clean them up."* — works in the terminal, by voice, or in an automation prompt.
-
----
-
-*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
+> 🗣️ *"Are there any dead entities left over from integrations I removed? Clean them up."*

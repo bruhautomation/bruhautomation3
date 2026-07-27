@@ -5,21 +5,19 @@ sidebar:
   order: 7
 ---
 
-Two importers. `import_blueprint` pulls an automation or script blueprint straight from a community-forum topic, GitHub file, or Gist — tell Claude "set up that blueprint" with a link and it can import *and* configure it in one conversation.
+Two importers. `import_blueprint` pulls an automation or script blueprint straight from a community-forum topic, GitHub file, or Gist. Tell Claude "set up that blueprint" with a link and it can import *and* configure it in one conversation.
 
-`import_statistics` writes long-term statistics rows directly — the tool for repairing a broken energy dashboard, migrating meter history from a previous system, or feeding external data (solar forecasts, utility bills) into HA's statistics store. **BRUH Insights reads long-term statistics for its energy analysis**, so backfilled history immediately makes those insights smarter too.
-
-:::note
-Rows are hourly: each `start` must be the top of an hour. Metered totals (`has_sum: true`) carry `state`/`sum`; measurements (`has_mean: true`) carry `mean`/`min`/`max`. The statistics source is derived from the id — entity ids (`sensor.gas_meter`) become recorder statistics, `domain:object_id` ids become external statistics — so you can't write rows Home Assistant refuses to load.
-:::
+`import_statistics` writes long-term statistics rows directly: repair a broken energy dashboard, migrate meter history from a previous system, or feed external data (solar forecasts, utility bills) into HA's statistics store. BRUH Insights reads long-term statistics for its energy analysis, so backfilled history makes those insights smarter too.
 
 ## Import blueprint
 
-**`bruh_claude.import_blueprint`** — Import an automation or script blueprint from a URL (Home Assistant community forum, GitHub, or GitHub Gist). Returns the blueprint domain, name, and file path as response data.
+`bruh_claude.import_blueprint`
+
+Import an automation or script blueprint from a URL (Home Assistant community forum, GitHub, or GitHub Gist). Returns the blueprint domain, name, and file path as response data.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `url` | text | **yes** | The URL to import the blueprint from. |
+| `url` | text | yes | The URL to import the blueprint from. |
 
 ```yaml
 service: bruh_claude.import_blueprint
@@ -27,20 +25,22 @@ data:
   url: https://community.home-assistant.io/t/motion-activated-light/123456
 ```
 
-> 🗣️ *"Import that motion-activated-light blueprint from the forum and set it up for the hallway."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Import that motion-activated-light blueprint from the forum and set it up for the hallway."*
 
 ## Import statistics
 
-**`bruh_claude.import_statistics`** — Import or backfill long-term statistics rows. Use an entity ID (sensor.gas_meter) for recorder statistics, or an external ID (bruh:solar_forecast) for external statistics; the source is derived automatically.
+`bruh_claude.import_statistics`
+
+Import or backfill long-term statistics rows. Use an entity ID (sensor.gas_meter) for recorder statistics, or an external ID (bruh:solar_forecast) for external statistics; the source is derived automatically.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `statistic_id` | text | **yes** | Entity ID (sensor.gas_meter) or external ID (domain:object_id). |
-| `has_mean` | boolean | **yes** | Whether the rows carry mean/min/max values (measurements). |
-| `has_sum` | boolean | **yes** | Whether the rows carry sum values (metered totals like energy). |
+| `statistic_id` | text | yes | Entity ID (sensor.gas_meter) or external ID (domain:object_id). |
+| `has_mean` | boolean | yes | Whether the rows carry mean/min/max values (measurements). |
+| `has_sum` | boolean | yes | Whether the rows carry sum values (metered totals like energy). |
 | `name` | text | no | Display name for the statistic. |
 | `unit_of_measurement` | text | no | Unit of measurement of the values. |
-| `stats` | list of objects | **yes** | List of statistics rows. Each row needs a start timestamp (top of an hour) plus mean/min/max and/or state/sum values. |
+| `stats` | list of objects | yes | List of statistics rows. Each row needs a start timestamp (top of an hour) plus mean/min/max and/or state/sum values. |
 
 ```yaml
 service: bruh_claude.import_statistics
@@ -58,8 +58,4 @@ data:
       sum: 1235.1
 ```
 
-> 🗣️ *"My energy dashboard has a gap from when the meter was offline — backfill it from this CSV."* — works in the terminal, by voice, or in an automation prompt.
-
----
-
-*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
+> 🗣️ *"My energy dashboard has a gap from when the meter was offline — backfill it from this CSV."*

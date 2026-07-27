@@ -5,13 +5,15 @@ sidebar:
   order: 9
 ---
 
-The feedback loop. `find_orphaned_references` scans every automation, script, and scene for references to entities Home Assistant doesn't know — the silent breakage left behind by renames, removed integrations, and typos. It never changes anything; it reports (and can optionally raise a repair issue with the findings).
+`find_orphaned_references` scans every automation, script, and scene for references to entities Home Assistant doesn't know — the silent breakage left behind by renames, removed integrations, and typos. It never changes anything; it reports, and can optionally raise a repair issue with the findings.
 
-`create_repair_issue` gives Claude — and your automations — a first-class way to flag things in **Settings → System → Repairs**: persistent, severity-tagged, dismissible. An insight job that spots a failing sensor, a night-audit automation that finds an open gate — they can now leave a proper paper trail instead of a notification that scrolls away.
+`create_repair_issue` gives Claude and your automations a first-class way to flag things in **Settings → System → Repairs**: persistent, severity-tagged, dismissible. A proper paper trail instead of a notification that scrolls away.
 
 ## Find orphaned references
 
-**`bruh_claude.find_orphaned_references`** — Scan every automation, script, and scene for references to entities Home Assistant doesn't know (renamed, deleted, or typo'd). Returns the findings as response data; optionally raises a repair issue listing them.
+`bruh_claude.find_orphaned_references`
+
+Scan every automation, script, and scene for references to entities Home Assistant doesn't know (renamed, deleted, or typo'd). Returns the findings as response data; optionally raises a repair issue listing them.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -27,16 +29,18 @@ data:
   create_issue: true
 ```
 
-> 🗣️ *"Do any of my automations still reference entities that don't exist?"* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Do any of my automations still reference entities that don't exist?"*
 
 ## Create repair issue
 
-**`bruh_claude.create_repair_issue`** — Create a custom issue in Settings > System > Repairs — a persistent, dismissible way to surface something that needs the user's attention. Returns the issue_id as response data.
+`bruh_claude.create_repair_issue`
+
+Create a custom issue in Settings > System > Repairs: persistent, severity-tagged, dismissible. Returns the issue_id as response data. Claude also uses this on its own initiative — an insight job that spots a failing sensor can flag it here.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `title` | text | **yes** | Short title of the issue. |
-| `description` | text | **yes** | Full description shown when the issue is opened. |
+| `title` | text | yes | Short title of the issue. |
+| `description` | text | yes | Full description shown when the issue is opened. |
 | `severity` | select | no | How serious the issue is (default warning). |
 | `persistent` | boolean | no | Keep the issue across Home Assistant restarts. |
 | `issue_id` | text | no | Optional stable ID so the issue can be removed or replaced later. Auto-generated when omitted. |
@@ -50,15 +54,15 @@ data:
   issue_id: front_lock_battery
 ```
 
-> 🗣️ (Claude uses this itself — e.g. an insight job that finds a failing sensor can flag it in Repairs.)
-
 ## Remove repair issue
 
-**`bruh_claude.remove_repair_issue`** — Remove a previously created repair issue by its issue ID.
+`bruh_claude.remove_repair_issue`
+
+Remove a previously created repair issue by its issue ID.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `issue_id` | text | **yes** | The issue_id used (or returned) when the issue was created. |
+| `issue_id` | text | yes | The issue_id used (or returned) when the issue was created. |
 
 ```yaml
 service: bruh_claude.remove_repair_issue
@@ -66,8 +70,4 @@ data:
   issue_id: front_lock_battery
 ```
 
-> 🗣️ *"The lock battery is replaced — clear that repair issue."* — works in the terminal, by voice, or in an automation prompt.
-
----
-
-*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
+> 🗣️ *"The lock battery is replaced — clear that repair issue."*

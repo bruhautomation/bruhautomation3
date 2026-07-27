@@ -11,13 +11,15 @@ The `zone.home` zone set in `configuration.yaml` isn't editable — that's a Hom
 
 ## Create zone
 
-**`bruh_claude.create_zone`** — Create a new zone for location tracking.
+`bruh_claude.create_zone`
+
+Create a new zone for location tracking.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `name` | text | **yes** | Name of the new zone. |
-| `latitude` | number | **yes** | Latitude of the zone center. |
-| `longitude` | number | **yes** | Longitude of the zone center. |
+| `name` | text | yes | Name of the new zone. |
+| `latitude` | number | yes | Latitude of the zone center. |
+| `longitude` | number | yes | Longitude of the zone center. |
 | `radius` | number | no | Radius of the zone in meters (default 100). |
 | `icon` | icon | no | Icon for the zone. |
 | `passive` | boolean | no | Passive zones are only used for automations, not shown on the map. |
@@ -32,15 +34,17 @@ data:
   icon: mdi:dumbbell
 ```
 
-> 🗣️ *"Create a zone for the gym so automations know when I'm there."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Create a zone for the gym so automations know when I'm there."*
 
 ## Delete zone
 
-**`bruh_claude.delete_zone`** — Delete one or more UI-created zones.
+`bruh_claude.delete_zone`
+
+Delete one or more UI-created zones.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity (list) | **yes** | Zone entities to delete. |
+| `entity_id` | entity (list) | yes | Zone entities to delete. |
 
 ```yaml
 service: bruh_claude.delete_zone
@@ -49,16 +53,18 @@ data:
     - zone.gym
 ```
 
-> 🗣️ *"Delete the gym zone."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Delete the gym zone."*
 
 ## Add device tracker to person
 
-**`bruh_claude.add_device_tracker_to_person`** — Attach one or more device trackers to a person for presence detection.
+`bruh_claude.add_device_tracker_to_person`
+
+Attach one or more device trackers to a person for presence detection.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity | **yes** | The person entity. |
-| `device_tracker` | entity (list) | **yes** | Device trackers to attach. |
+| `entity_id` | entity | yes | The person entity. |
+| `device_tracker` | entity (list) | yes | Device trackers to attach. |
 
 ```yaml
 service: bruh_claude.add_device_tracker_to_person
@@ -68,16 +74,18 @@ data:
     - device_tracker.alex_phone
 ```
 
-> 🗣️ *"Track Alex with their new phone."* — works in the terminal, by voice, or in an automation prompt.
+> 🗣️ *"Track Alex with their new phone."*
 
 ## Remove device tracker from person
 
-**`bruh_claude.remove_device_tracker_from_person`** — Detach one or more device trackers from a person.
+`bruh_claude.remove_device_tracker_from_person`
+
+Detach one or more device trackers from a person.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `entity_id` | entity | **yes** | The person entity. |
-| `device_tracker` | entity (list) | **yes** | Device trackers to detach. |
+| `entity_id` | entity | yes | The person entity. |
+| `device_tracker` | entity (list) | yes | Device trackers to detach. |
 
 ```yaml
 service: bruh_claude.remove_device_tracker_from_person
@@ -87,8 +95,4 @@ data:
     - device_tracker.old_phone
 ```
 
-> 🗣️ *"Stop tracking Alex's old phone."* — works in the terminal, by voice, or in an automation prompt.
-
----
-
-*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
+> 🗣️ *"Stop tracking Alex's old phone."*

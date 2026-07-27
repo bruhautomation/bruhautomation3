@@ -7,7 +7,7 @@ Pick **BRUH Claude** as a conversation agent under **Settings → Voice Assistan
 
 ## Why it's fast
 
-Typical commands answer in **~3–5 seconds**, and replies **stream**, so TTS starts speaking at the first sentence on streaming-capable pipelines. Two tricks make that possible:
+Typical commands answer in **~3–5 seconds**, and replies **stream**, so TTS starts speaking at the first sentence on streaming-capable pipelines. Two mechanisms:
 
 - **Fast mode** (`assist_fast_mode`, default on): a pool of pre-warmed Claude worker processes — one per active conversation plus a hot spare — so voice turns skip CLI boot and MCP handshake entirely. Budget ~150–300 MB RAM per warm worker (max 3). If a worker ever errors, the add-on falls back to a one-shot spawn automatically.
 - **The area map**: a cached area → entity map (controllable domains plus Weather and People) is spliced into the system prompt, so *"turn off the kitchen lights"* acts directly — no lookup turns.

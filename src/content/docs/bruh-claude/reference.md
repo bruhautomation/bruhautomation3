@@ -105,42 +105,11 @@ automation_max_turns: 20
 
 ## Voice assistant (Assist)
 
-Select **BRUH Claude** as a conversation agent in **Settings → Voice Assistants**. Each agent you add has its own name, model, personality, and blocked-services list.
-
-- **Fast mode (default).** A worker pool keeps a live Claude process per active conversation plus a pre-warmed spare, so even brand-new commands skip the cold start. Replies stream into the chat log, so TTS starts speaking at the first sentence on streaming-capable pipelines. Any worker error falls back to a one-shot invocation.
-- **Area-aware.** A cached area → entity map is spliced into the system prompt, so *"turn off the kitchen lights"* resolves to entity_ids without a lookup turn.
-- **Conversation memory.** Follow-ups resume the same Claude session while the chat/voice session stays open. `bruh_claude.clear_conversation` resets it (omit `conversation_id` to reset all).
-- **Model per agent.** New agents default to **Claude Haiku** for snappy voice; pick any model per agent (`Default` inherits the terminal's model).
-
-### Personalities & prompt layering
-
-A custom personality (the agent's system prompt) **owns identity, tone, and verbosity** — it leads, with an explicit precedence note, and the operational block (tools, area map, timezone, routing rules) is identity-free so it can't fight your persona. Without a personality, a built-in default applies ("helpful, efficient, 1–2 short sentences"). If your persona should still be brief for TTS, say so inside the persona.
+Select **BRUH Claude** as a conversation agent in **Settings → Voice Assistants**. Each agent has its own name, model, personality, and blocked-services list. New agents default to Claude Haiku (`Default` inherits the terminal's model); `bruh_claude.clear_conversation` resets conversation memory (omit `conversation_id` to reset all). How it works — fast mode, the area map, personalities: [Voice Assistant](/bruh-claude/voice/).
 
 ## Insight jobs
 
-Scheduled Claude reports. Create one from **Settings → Devices & Services → BRUH Claude → Add Service → Insight job**.
-
-- **Templates:** *Daily briefing*, *Anomaly watch* (only problems; says "All quiet." otherwise), *Battery & maintenance*, *Camera check* — or a **custom prompt** that may embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
-- **Scheduling:** an interval (every N minutes), a daily time (HH:MM), both, or neither (manual only). Every job also gets a **Run now** button on its device page.
-- **Trigger from automations:**
-
-  ```yaml
-  service: bruh_claude.run_insight
-  data:
-    name: "Morning Briefing"   # omit to run all jobs
-  ```
-
-- **Where the report lives:** the sensor's *state* is the last-run timestamp; the report is in its attributes — `preview` (first lines), `markdown` (full report), and `card_yaml` (a ready-to-paste card). A job's first successful run sends a one-time notification with that card. Add it to a dashboard with a Markdown card:
-
-  ```yaml
-  type: markdown
-  title: Morning Briefing
-  content: >-
-    {{ state_attr('sensor.morning_briefing_insight', 'markdown')
-       or 'No insight yet — run the bruh_claude.run_insight service.' }}
-  ```
-
-- Set a job's **notify service** to push each report to a phone. A `bruh_claude_insight_complete` event fires after every run with `name`, `entity_id`, `success`, and a `preview` — handy for TTS announcements.
+Scheduled Claude reports, created from **Settings → Devices & Services → BRUH Claude → Add Service → Insight job**. The report lands in the sensor's attributes: `preview` (first lines), `markdown` (full report), `card_yaml` (ready-to-paste card). A `bruh_claude_insight_complete` event fires after every run with `name`, `entity_id`, `success`, and `preview`. Templates, scheduling, and dashboard recipes: [Automations & Insight Jobs](/bruh-claude/automations/#insight-jobs).
 
 ## HA services
 
@@ -195,58 +164,6 @@ These need an **OAuth / subscription login** (the one you do in the terminal), *
 The built-in MCP server gives Claude **34 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users) and `call_service` with `return_response` for the [Power Tools](/bruh-claude/power-tools/) workflow. Verify them on your own system with **`ha-selftest`**. Full tool-by-tool reference: [MCP Tools](/bruh-claude/mcp/).
 
 ![MCP server tools by category](/images/bruh-claude/mcp-tools.svg)
-
-### Observe
-
-| Tool | Use |
-|------|-----|
-| `get_entity_state` | Current state + attributes of any entity |
-| `get_all_states` | All entities, filterable by domain and name |
-| `get_areas` | Areas (rooms) and the entity_ids in each — resolves "the kitchen lights" |
-| `get_history` | Recent state history (up to 7 days), with min/max for numeric sensors |
-| `get_statistics` | Long-term hourly/daily mean/min/max (survives recorder purge) |
-| `get_logbook` | Recent logbook entries |
-| `get_camera_snapshot` | Returns a camera image so Claude can describe what it sees |
-| `get_weather_forecast` | Daily/hourly forecast via `weather.get_forecasts` |
-
-### Control devices
-
-| Tool | Use |
-|------|-----|
-| `control_light` | On/off/toggle, brightness, color, color-temp |
-| `control_climate` | Temperature, HVAC/preset/fan modes |
-| `control_media_player` | Play/pause/volume/source |
-| `control_cover` | Open/close/position (blinds, garage) |
-| `control_fan` | On/off, speed, oscillation |
-| `control_switch` | On/off/toggle |
-| `control_lock` | Lock/unlock |
-| `control_alarm` | Arm/disarm |
-| `control_vacuum` | Start/stop/return/clean |
-
-### Services & scenes
-
-| Tool | Use |
-|------|-----|
-| `call_service` | Call any HA service (the chokepoint where per-agent deny-lists are enforced) |
-| `activate_scene` | Activate a scene |
-| `run_script` | Run a script (with variables) |
-| `send_notification` | Send a notification |
-| `fire_event` | Fire a custom event |
-
-### Diagnose & system
-
-| Tool | Use |
-|------|-----|
-| `get_automations` | List automations with status |
-| `get_automation_trace` | Automation state + stored execution traces |
-| `get_error_log` | HA logs from the Supervisor journal |
-| `render_template` | Render Jinja2 templates |
-| `get_ha_config` | HA configuration details |
-| `get_services` | List all available services |
-| `get_service_details` | Service schema for a domain |
-| `get_device_registry` | Per-domain entity count summary |
-| `get_supervisor_info` | System information |
-| `reload_config` | Reload configs after YAML edits |
 
 ## CLI tools
 

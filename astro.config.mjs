@@ -162,13 +162,12 @@ export default defineConfig({
 							label: 'BRUH Terminal',
 							items: [
 								{ label: 'Overview', slug: 'bruh-claude' },
-								{ label: 'Quick Start', slug: 'bruh-claude/quickstart', badge: { text: 'Start here', variant: 'tip' } },
+								{ label: 'Quick Start', slug: 'bruh-claude/quickstart' },
 								{ label: 'Voice Assistant', slug: 'bruh-claude/voice' },
 								{ label: 'Automations & Insight Jobs', slug: 'bruh-claude/automations' },
 								{ label: 'Memory & Learning', slug: 'bruh-claude/memory' },
 								{
 									label: 'Power Tools',
-									badge: { text: 'New', variant: 'tip' },
 									collapsed: true,
 									items: [
 										{ label: 'Overview', slug: 'bruh-claude/power-tools' },
@@ -184,7 +183,7 @@ export default defineConfig({
 								},
 								{ label: 'MCP Tools', slug: 'bruh-claude/mcp' },
 								{ label: 'CLI Tools', slug: 'bruh-claude/cli' },
-								{ label: 'Better Together', slug: 'bruh-claude/better-together', badge: { text: '+ Insights', variant: 'note' } },
+								{ label: 'Using with Insights', slug: 'bruh-claude/better-together' },
 								{ label: 'Reference', slug: 'bruh-claude/reference' },
 								{ label: 'Changelog', slug: 'bruh-claude/changelog' },
 							],
@@ -192,10 +191,9 @@ export default defineConfig({
 						{
 							label: 'BRUH Insights',
 							items: [
-								{ label: 'Overview', slug: 'bruh-insights', badge: { text: 'New', variant: 'tip' } },
-								{ label: 'Quick Start', slug: 'bruh-insights/quickstart', badge: { text: 'Start here', variant: 'tip' } },
+								{ label: 'Overview', slug: 'bruh-insights' },
+								{ label: 'Quick Start', slug: 'bruh-insights/quickstart' },
 								{ label: 'How It Works', slug: 'bruh-insights/how-it-works' },
-								{ label: 'Better Together', slug: 'bruh-claude/better-together', badge: { text: '+ Terminal', variant: 'note' } },
 								{ label: 'Reference', slug: 'bruh-insights/reference' },
 								{ label: 'Changelog', slug: 'bruh-insights/changelog' },
 							],
@@ -204,11 +202,11 @@ export default defineConfig({
 							label: 'BRUH Minecraft',
 							items: [
 								{ label: 'Overview', slug: 'bruh-minecraft' },
-								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart', badge: { text: 'Start here', variant: 'tip' } },
+								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
 								{ label: 'Home Assistant Integration', slug: 'bruh-minecraft/home-assistant' },
+								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/' },
 								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
 								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
-								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/', badge: { text: 'New', variant: 'tip' } },
 							],
 						},
 					],

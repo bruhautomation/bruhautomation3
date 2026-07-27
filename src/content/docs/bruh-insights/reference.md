@@ -88,10 +88,6 @@ aspect_ratio: 90%
 
 Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. The card always shows the **latest run** and reloads every 15 minutes. The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
 
-## Deep presence
-
-For Overview, Presence, and every Ask question, the add-on walks the device registry and includes the sibling entities on the same physical device as each presence tracker — typically the companion-app phone: WiFi SSID, geocoded address, detected activity, battery and charging state — with recent history. The analyst is instructed to cross-reference these signals and cite its evidence ("phone on home WiFi and charging since 10:41 PM") instead of parroting `home`/`not_home`.
-
 ## Privacy & security
 
 - Home data is sent to Anthropic's API only when an insight is generated; nothing else leaves your machine, and nothing is sent on a schedule unless auto-refresh is enabled and an account is connected.

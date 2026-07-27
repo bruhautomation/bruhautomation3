@@ -13,7 +13,7 @@ The terminal ships a toolbox of `ha-*` commands so common Home Assistant chores 
 | `ha-log [core\|supervisor\|addons]` | Tail HA logs in real time |
 | `ha-entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
 | `ha-service call <domain>.<service>` | Call any HA service from the shell |
-| `ha-yaml-check` | Validate YAML configuration before a reload bites you |
+| `ha-yaml-check` | Validate YAML before reloading |
 | `ha-notify "msg"` | Send a persistent or mobile push notification |
 | `ha-addon <action> <slug>` | Manage add-ons: `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
 
@@ -36,4 +36,4 @@ The terminal ships a toolbox of `ha-*` commands so common Home Assistant chores 
 
 ## Everything is Claude-usable
 
-These aren't just for you: Claude's generated context lists every tool, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"back up my config before we start"* resolve to the right command. The CLI, the [MCP tools](/bruh-claude/mcp/), and [Power Tools](/bruh-claude/power-tools/) are three rungs of the same ladder — shell convenience, live API access, and supervised registry management.
+Claude's generated context lists every tool, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"back up my config before we start"* resolve to the right command.
