@@ -1,0 +1,92 @@
+---
+title: Power Tools
+description: 41 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, devices, integrations, zones, users, and more.
+sidebar:
+  order: 1
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+**BRUH Power Tools** are 41 admin services, registered by the BRUH Claude integration under the `bruh_claude.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, zones, persons, users, blueprints, statistics, and repair issues.
+
+They exist for one reason: **so nothing ever has to touch `/config/.storage` by hand.** Every call is validated before anything changes, requires admin rights, and runs through Home Assistant's own registry APIs. Claude uses them when you ask it to reorganize your home; your automations and scripts can use them too — every service shows up in **Developer Tools → Actions** with full field pickers.
+
+## What this unlocks
+
+Say any of these — by voice, in the terminal, or in a `run_task` prompt — and it just happens:
+
+- *"Rename all the `shelly_1pm_xxxx` lights to what they actually are."*
+- *"Create a Guest Room area, put these three devices in it, and add 'spare room' as a voice alias."*
+- *"Label everything battery-powered, then show me the ones under 20%."*
+- *"Which automations reference entities that don't exist anymore?"*
+- *"Import this blueprint from the forum and set it up for the hallway."*
+- *"Backfill the gas meter history from this CSV."*
+
+## The catalog
+
+<CardGrid>
+  <Card title="Areas & Floors" icon="puzzle">
+    13 services: create, delete, rename, voice aliases, and device/entity assignment.
+    [Reference →](/bruh-claude/power-tools/areas-and-floors/)
+  </Card>
+  <Card title="Labels" icon="seti:notebook">
+    Create and delete labels; apply or remove them on entities, devices, and areas **in one call**.
+    [Reference →](/bruh-claude/power-tools/labels/)
+  </Card>
+  <Card title="Entities" icon="pencil">
+    Rename, change entity IDs, enable/disable, hide/unhide, and clean up orphaned registry entries (dry-run by default).
+    [Reference →](/bruh-claude/power-tools/entities/)
+  </Card>
+  <Card title="Devices & Integrations" icon="setting">
+    Rename and enable/disable devices (with parent-hub cascade); enable, disable, or reload integrations.
+    [Reference →](/bruh-claude/power-tools/devices-and-integrations/)
+  </Card>
+  <Card title="Zones & Persons" icon="star">
+    Create/delete zones; attach and detach device trackers for presence.
+    [Reference →](/bruh-claude/power-tools/zones-and-persons/)
+  </Card>
+  <Card title="Blueprints & Statistics" icon="download">
+    Import blueprints from URLs; import or backfill long-term statistics.
+    [Reference →](/bruh-claude/power-tools/blueprints-and-statistics/)
+  </Card>
+  <Card title="Users" icon="approve-check">
+    Enable/disable accounts — with a guard that makes locking yourself out impossible.
+    [Reference →](/bruh-claude/power-tools/users/)
+  </Card>
+  <Card title="Diagnostics & Repairs" icon="magnifier">
+    Find references to dead entities; raise and clear custom repair issues.
+    [Reference →](/bruh-claude/power-tools/diagnostics-and-repairs/)
+  </Card>
+</CardGrid>
+
+## The safety model
+
+Power Tools are powerful by design, so the guardrails are built into the services themselves — not left to whoever calls them:
+
+| Guardrail | What it means |
+|-----------|---------------|
+| **Admin-gated** | Calls from non-admin HA users are rejected. Claude, automations, and scripts run as admin. |
+| **Validated first** | Every referenced area/floor/label/device/entity/integration id is checked **before** any change is applied. A typo fails loudly; it never half-applies. |
+| **Dry-run defaults** | `delete_orphaned_entities` only reports unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. |
+| **Lockout-proof** | `disable_user` refuses owner accounts and system-generated users. |
+| **Response data** | Creation services return the new id (`area_id`, `floor_id`, `label_id`, …) so multi-step workflows chain without guessing. |
+| **Namespaced** | Everything lives under `bruh_claude.*` — no core services are overridden, and running [Spook](https://github.com/frenck/spook) alongside is perfectly fine. |
+
+And the human stays in charge: Claude's generated context instructs it to **confirm with you before disabling devices, integrations, or users, and before deleting anything non-trivial**.
+
+## How Claude uses them
+
+In the terminal, Claude pairs Power Tools with two MCP tools:
+
+1. **`get_registry`** — read-only listings of areas, floors, labels, devices, entities, integrations, and users, with exactly the ids the services need. The safe replacement for reading `.storage` files.
+2. **`call_service`** — invokes the `bruh_claude.*` service, with `return_response` to capture returned ids and reports.
+
+So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back — no file edits, no restarts, no guesswork. The same services power [voice](/bruh-claude/voice/) requests and [automation tasks](/bruh-claude/automations/).
+
+:::tip[Better together]
+[BRUH Insights](/bruh-insights/) analyses are built on your areas, labels, and long-term statistics — so a well-organized registry (and backfilled statistics) directly improves every insight it generates. See [Terminal + Insights, better together](/bruh-claude/better-together/).
+:::
+
+## Credit where due
+
+Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed) — the definitive "not your homie" toolbox for Home Assistant power users. BRUH Claude renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you want these superpowers *without* BRUH Claude, go give Spook a star — it's excellent.

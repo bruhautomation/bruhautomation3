@@ -1,0 +1,252 @@
+---
+title: Areas & Floors
+description: Create, rename, and organize Home Assistant areas and floors — and assign devices and entities to them — with bruh_claude services.
+sidebar:
+  order: 2
+---
+
+Areas and floors are how Home Assistant understands the *shape* of your home — and how voice assistants resolve "turn off the lights upstairs". These services let Claude (or any automation) build and maintain that structure: create rooms, group them into floors, move devices and entities around, and manage the aliases voice assistants listen for.
+
+A device normally gives its area to all of its entities; assigning an **entity** to an area directly overrides that — handy when one hub owns gadgets in different rooms.
+
+## Create area
+
+**`bruh_claude.create_area`** — Create a new area. Returns the new area_id as response data.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | text | **yes** | Name of the new area. |
+| `icon` | icon | no | Icon for the area. |
+| `aliases` | text (list) | no | Alternative names, used by voice assistants. |
+| `floor_id` | floor | no | Floor to place the area on. |
+
+```yaml
+service: bruh_claude.create_area
+data:
+  name: Guest Room
+  icon: mdi:bed
+  aliases: ["spare room"]
+  floor_id: upstairs
+```
+
+> 🗣️ *"Create a Guest Room area on the upstairs floor, with 'spare room' as a voice alias."* — works in the terminal, by voice, or in an automation prompt.
+
+## Delete area
+
+**`bruh_claude.delete_area`** — Delete an area. Entities and devices in it are left unassigned.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | **yes** | The area to delete. |
+
+```yaml
+service: bruh_claude.delete_area
+data:
+  area_id: guest_room
+```
+
+> 🗣️ *"Delete the guest room area."* — works in the terminal, by voice, or in an automation prompt.
+
+## Rename area
+
+**`bruh_claude.rename_area`** — Rename an existing area.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | **yes** | The area to rename. |
+| `name` | text | **yes** | The new name. |
+
+```yaml
+service: bruh_claude.rename_area
+data:
+  area_id: guest_room
+  name: Nursery
+```
+
+> 🗣️ *"Rename the guest room to Nursery."* — works in the terminal, by voice, or in an automation prompt.
+
+## Set area aliases
+
+**`bruh_claude.set_area_aliases`** — Replace the aliases of an area (used by voice assistants).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | **yes** | The area to update. |
+| `aliases` | text (list) | **yes** | The full new list of aliases. |
+
+```yaml
+service: bruh_claude.set_area_aliases
+data:
+  area_id: living_room
+  aliases: ["lounge", "front room"]
+```
+
+> 🗣️ *"Make the living room also answer to 'lounge' and 'front room'."* — works in the terminal, by voice, or in an automation prompt.
+
+## Add device to area
+
+**`bruh_claude.add_device_to_area`** — Assign one or more devices to an area.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | **yes** | The target area. |
+| `device_id` | device (list) | **yes** | Devices to assign. |
+
+```yaml
+service: bruh_claude.add_device_to_area
+data:
+  area_id: office
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"Move the desk lamp's device into the office."* — works in the terminal, by voice, or in an automation prompt.
+
+## Remove device from area
+
+**`bruh_claude.remove_device_from_area`** — Remove one or more devices from whatever area they are in.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `device_id` | device (list) | **yes** | Devices to unassign. |
+
+```yaml
+service: bruh_claude.remove_device_from_area
+data:
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"Take that device out of whatever room it's in."* — works in the terminal, by voice, or in an automation prompt.
+
+## Add entity to area
+
+**`bruh_claude.add_entity_to_area`** — Assign one or more entities to an area (overrides the device's area).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | **yes** | The target area. |
+| `entity_id` | entity (list) | **yes** | Entities to assign. |
+
+```yaml
+service: bruh_claude.add_entity_to_area
+data:
+  area_id: kitchen
+  entity_id:
+    - light.under_cabinet
+```
+
+> 🗣️ *"Put the under-cabinet light in the kitchen (even though its hub device lives elsewhere)."* — works in the terminal, by voice, or in an automation prompt.
+
+## Remove entity from area
+
+**`bruh_claude.remove_entity_from_area`** — Remove one or more entities from whatever area they are in.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity (list) | **yes** | Entities to unassign. |
+
+```yaml
+service: bruh_claude.remove_entity_from_area
+data:
+  entity_id:
+    - light.under_cabinet
+```
+
+> 🗣️ *"Remove that light from its area."* — works in the terminal, by voice, or in an automation prompt.
+
+## Create floor
+
+**`bruh_claude.create_floor`** — Create a new floor. Returns the new floor_id as response data.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | text | **yes** | Name of the new floor. |
+| `icon` | icon | no | Icon for the floor. |
+| `level` | number | no | Level number (0 = ground floor). |
+| `aliases` | text (list) | no | Alternative names, used by voice assistants. |
+
+```yaml
+service: bruh_claude.create_floor
+data:
+  name: Upstairs
+  level: 1
+  icon: mdi:home-floor-2
+```
+
+> 🗣️ *"Create an Upstairs floor and put the bedrooms on it."* — works in the terminal, by voice, or in an automation prompt.
+
+## Delete floor
+
+**`bruh_claude.delete_floor`** — Delete a floor. Areas on it are left without a floor.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `floor_id` | floor | **yes** | The floor to delete. |
+
+```yaml
+service: bruh_claude.delete_floor
+data:
+  floor_id: upstairs
+```
+
+> 🗣️ *"Delete the upstairs floor."* — works in the terminal, by voice, or in an automation prompt.
+
+## Rename floor
+
+**`bruh_claude.rename_floor`** — Rename an existing floor.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `floor_id` | floor | **yes** | The floor to rename. |
+| `name` | text | **yes** | The new name. |
+
+```yaml
+service: bruh_claude.rename_floor
+data:
+  floor_id: upstairs
+  name: First Floor
+```
+
+> 🗣️ *"Rename Upstairs to First Floor."* — works in the terminal, by voice, or in an automation prompt.
+
+## Add area to floor
+
+**`bruh_claude.add_area_to_floor`** — Place one or more areas on a floor.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `floor_id` | floor | **yes** | The target floor. |
+| `area_id` | area (list) | **yes** | Areas to place on the floor. |
+
+```yaml
+service: bruh_claude.add_area_to_floor
+data:
+  floor_id: upstairs
+  area_id:
+    - master_bedroom
+    - kids_room
+```
+
+> 🗣️ *"Put the master bedroom and the kids' room on the upstairs floor."* — works in the terminal, by voice, or in an automation prompt.
+
+## Remove area from floor
+
+**`bruh_claude.remove_area_from_floor`** — Remove one or more areas from whatever floor they are on.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area (list) | **yes** | Areas to remove from their floor. |
+
+```yaml
+service: bruh_claude.remove_area_from_floor
+data:
+  area_id:
+    - kids_room
+```
+
+> 🗣️ *"Take the kids' room off its floor."* — works in the terminal, by voice, or in an automation prompt.
+
+---
+
+*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*

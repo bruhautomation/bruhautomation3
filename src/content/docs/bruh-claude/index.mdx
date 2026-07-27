@@ -50,6 +50,9 @@ A Home Assistant add-on that runs **Claude Code** inside HA — with native acce
   <Card title="Trigger from automations" icon="setting">
     The `bruh_claude.run_task` service runs Claude in the background — error-log digests, config audits, morning summaries — with an optional notification when it's done.
   </Card>
+  <Card title="Reorganize your home by asking" icon="puzzle">
+    **[Power Tools](/bruh-claude/power-tools/)**: 41 admin services for areas, floors, labels, entities, devices, zones, users, and more. *"Rename all the Shellys"*, *"label everything battery-powered"* — validated, admin-gated, and no `.storage` hand-edits, ever.
+  </Card>
   <Card title="Just… ask anything" icon="information">
     *"How cold did it get last night?"* *"Which automations haven't run in 30 days?"* *"What's the weather tomorrow?"* Live state, real history, real answers.
   </Card>
@@ -84,7 +87,7 @@ What makes this different from running Claude Code on a regular machine:
     Authenticates with Anthropic via **OAuth**, so a Claude **Pro** or **Max** subscription covers your usage. No API key, no pay-per-token billing for everyday use (an API key works too if you prefer).
   </Card>
   <Card title="Live HA awareness (MCP server)" icon="puzzle">
-    A built-in MCP server gives Claude **33 purpose-built tools** — entity states, device control for every domain, camera snapshots, history & statistics, weather forecasts, areas, automation traces, templates, logs, config reload. No manual API setup.
+    A built-in MCP server gives Claude **34 purpose-built tools** — entity states, device control for every domain, camera snapshots, history & statistics, weather forecasts, areas, registries, automation traces, templates, logs, config reload. No manual API setup.
   </Card>
   <Card title="Auto-generated context" icon="information">
     On every boot the add-on regenerates `/config/CLAUDE.md` — a snapshot of your entities by domain, automations with last-triggered times, installed integrations, and your file tree. Claude reads it at the start of every session.
@@ -127,3 +130,7 @@ These mirror **claude.ai → Settings → Usage** and need an **OAuth / subscrip
 5. Authenticate with Anthropic in the terminal — then start typing, or pick it as your voice assistant.
 
 [Full Quick Start →](/bruh-claude/quickstart/)
+
+:::tip[Running BRUH Insights too?]
+The two add-ons share one login and one home memory — the Terminal acts, Insights analyzes, and each makes the other smarter. See [Terminal + Insights, better together](/bruh-claude/better-together/).
+:::

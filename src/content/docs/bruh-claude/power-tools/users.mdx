@@ -1,0 +1,52 @@
+---
+title: Users
+description: Enable and disable Home Assistant user accounts — with lockout protection — using bruh_claude services.
+sidebar:
+  order: 8
+---
+
+Account switches for real-life patterns: the house sitter's login that should only work while you're away, the rental-guest account between stays, the kid's account after bedtime.
+
+:::tip[You cannot lock yourself out]
+Unlike the Spook originals, `disable_user` **refuses to disable owner accounts and system-generated users** — no automation, prompt, or typo can take the owner's access away.
+:::
+
+Find `user_id` values with the MCP `get_registry` tool (`users`) from the terminal, or in **Settings → People**.
+
+## Enable user
+
+**`bruh_claude.enable_user`** — Re-enable one or more disabled Home Assistant user accounts.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `user_id` | text (list) | **yes** | IDs of the users to enable. |
+
+```yaml
+service: bruh_claude.enable_user
+data:
+  user_id:
+    - 1234567890abcdef
+```
+
+> 🗣️ *"Re-enable the babysitter's account."* — works in the terminal, by voice, or in an automation prompt.
+
+## Disable user
+
+**`bruh_claude.disable_user`** — Disable one or more Home Assistant user accounts. Owner accounts and system-generated users are protected and cannot be disabled.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `user_id` | text (list) | **yes** | IDs of the users to disable. |
+
+```yaml
+service: bruh_claude.disable_user
+data:
+  user_id:
+    - 1234567890abcdef
+```
+
+> 🗣️ *"Disable the account we made for the house sitter."* — works in the terminal, by voice, or in an automation prompt.
+
+---
+
+*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*

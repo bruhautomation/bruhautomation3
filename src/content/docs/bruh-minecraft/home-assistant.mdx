@@ -1,0 +1,93 @@
+---
+title: Home Assistant Integration
+description: The bruh_minecraft companion integration — sensors, buttons, services, and automation recipes for your Minecraft server.
+---
+
+The add-on deploys a companion integration (`bruh_minecraft`) that Home Assistant auto-discovers — turning the server into a first-class smart-home citizen with sensors, buttons, and services you can automate like anything else.
+
+## Device & entities
+
+Everything lives under one **BRUH Minecraft** device:
+
+| Entity | What it tells you |
+|--------|-------------------|
+| `sensor.…_players_online` | Player count, with the `players` name list in attributes |
+| `sensor.…_players_max` | Slots |
+| `sensor.…_tps_1m/5m/15m` | Server tick rate (Paper/Purpur) — the lag early-warning |
+| `sensor.…_latency_ms` | Status ping latency |
+| `sensor.…_uptime` / `version` / `server_type` / `motd` / `difficulty` / `gamemode` | Server facts |
+| `binary_sensor.…_reachable` | Status ping succeeds |
+| `binary_sensor.…_rcon_ok` | RCON handshake OK (disabled by default) |
+| Buttons | `backup_now`, `restart_server`, `stop_server`, `save_all` |
+
+## Services
+
+| Service | Fields | What it does |
+|---------|--------|--------------|
+| `bruh_minecraft.say` | `message` | Broadcast to everyone online |
+| `bruh_minecraft.rcon_command` | `command` | Any Minecraft command over RCON |
+| `bruh_minecraft.give` | `player`, `item`, `amount` | Give items (player must be online) |
+| `bruh_minecraft.set_weather` | `weather` | `clear` / `rain` / `thunder` |
+| `bruh_minecraft.set_time` | `time` | `day`, `night`, `noon`, `midnight`, or ticks |
+| `bruh_minecraft.backup_now` | — | Git or archive backup, per your config |
+| `bruh_minecraft.restart_server` | — | Graceful save + restart |
+| `bruh_minecraft.stop_server` | — | Graceful save + stop (stays stopped) |
+| `bruh_minecraft.op_player` / `deop_player` / `kick_player` / `ban_player` / `whitelist_add` / `whitelist_remove` | `player` | Player management |
+
+## Recipes
+
+**Bedtime enforcement:**
+
+```yaml
+automation:
+  - alias: Minecraft - bedtime
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.bruh_minecraft_players_online
+      above: 0
+    condition:
+      condition: time
+      after: "22:30:00"
+      before: "06:00:00"
+    action:
+      - service: bruh_minecraft.say
+        data: { message: "Server going to sleep in 60s — save your work!" }
+      - delay: "00:01:00"
+      - service: bruh_minecraft.stop_server
+```
+
+**Nightly backup at 04:00:**
+
+```yaml
+automation:
+  - alias: Minecraft - nightly backup
+    trigger: { platform: time, at: "04:00:00" }
+    action:
+      service: bruh_minecraft.backup_now
+```
+
+**Announce dinner over the server** (paired with a [BRUH Terminal](/bruh-claude/) voice assistant, *"tell everyone dinner's ready"* does this hands-free — no config needed on the Minecraft side):
+
+```yaml
+- service: bruh_minecraft.say
+  data:
+    message: "Dinner's ready — pause your builds!"
+```
+
+**TPS watchdog:**
+
+```yaml
+automation:
+  - alias: Minecraft - lag alert
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.bruh_minecraft_tps_1m
+      below: 15
+      for: "00:05:00"
+    action:
+      service: notify.mobile_app_phone
+      data:
+        message: "Minecraft TPS dropped to {{ states('sensor.bruh_minecraft_tps_1m') }} — {{ state_attr('sensor.bruh_minecraft_players_online','players') | join(', ') }} online."
+```
+
+Under the hood, services run through a file-based IPC bridge at `/config/.bruh_minecraft/` — HA drops a JSON request, the add-on executes it over RCON and writes the response back. See the [Reference](/bruh-minecraft/reference/) for RCON and backup configuration.

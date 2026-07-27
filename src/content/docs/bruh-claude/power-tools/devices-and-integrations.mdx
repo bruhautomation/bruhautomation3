@@ -1,0 +1,114 @@
+---
+title: Devices & Integrations
+description: Rename and enable/disable devices, and enable, disable, or reload integration config entries with bruh_claude services.
+sidebar:
+  order: 5
+---
+
+Device-level and integration-level switches. Disabling a device disables all of its entities at once; when the last child of a hub is disabled, the hub follows (and enabling walks back up the chain) — the same smart cascade Spook pioneered.
+
+`reload_integration` is the service equivalent of the **Reload** button on an integration page — the classic first fix when an integration wedges, now available to automations and to Claude.
+
+## Rename device
+
+**`bruh_claude.rename_device`** — Set the user-facing name of a device.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `device_id` | device | **yes** | The device to rename. |
+| `name` | text | **yes** | The new name. |
+
+```yaml
+service: bruh_claude.rename_device
+data:
+  device_id: a1b2c3d4e5f6
+  name: Kitchen Ceiling Light
+```
+
+> 🗣️ *"Rename that Shelly device to 'Kitchen Ceiling Light'."* — works in the terminal, by voice, or in an automation prompt.
+
+## Enable device
+
+**`bruh_claude.enable_device`** — Enable one or more disabled devices (including their parent hub devices if those were disabled).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `device_id` | device (list) | **yes** | Devices to enable. |
+
+```yaml
+service: bruh_claude.enable_device
+data:
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"Re-enable the garage sensor device."* — works in the terminal, by voice, or in an automation prompt.
+
+## Disable device
+
+**`bruh_claude.disable_device`** — Disable one or more devices and all their entities. A parent hub device is also disabled once none of its children remain enabled.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `device_id` | device (list) | **yes** | Devices to disable. |
+
+```yaml
+service: bruh_claude.disable_device
+data:
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"Disable the old motion sensor I unplugged."* — works in the terminal, by voice, or in an automation prompt.
+
+## Enable integration
+
+**`bruh_claude.enable_integration`** — Enable one or more disabled integration config entries.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `config_entry_id` | config entry | **yes** | The config entry to enable. |
+
+```yaml
+service: bruh_claude.enable_integration
+data:
+  config_entry_id: 1234abcd5678efgh
+```
+
+> 🗣️ *"Turn the Sonos integration back on."* — works in the terminal, by voice, or in an automation prompt.
+
+## Disable integration
+
+**`bruh_claude.disable_integration`** — Disable one or more integration config entries and everything they provide.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `config_entry_id` | config entry | **yes** | The config entry to disable. |
+
+```yaml
+service: bruh_claude.disable_integration
+data:
+  config_entry_id: 1234abcd5678efgh
+```
+
+> 🗣️ *"Disable the Sonos integration while the speakers are packed away."* — works in the terminal, by voice, or in an automation prompt.
+
+## Reload integration
+
+**`bruh_claude.reload_integration`** — Reload one or more integration config entries — like pressing Reload on the integration page.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `config_entry_id` | config entry | **yes** | The config entry to reload. |
+
+```yaml
+service: bruh_claude.reload_integration
+data:
+  config_entry_id: 1234abcd5678efgh
+```
+
+> 🗣️ *"The Hue integration is acting up — reload it."* — works in the terminal, by voice, or in an automation prompt.
+
+---
+
+*Part of [BRUH Power Tools](/bruh-claude/power-tools/) — adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT), rebuilt for BRUH Claude with validation-first handlers and admin gating.*
