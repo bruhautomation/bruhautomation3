@@ -132,21 +132,25 @@ data:
 
 `bruh_claude.delete_orphaned_entities`
 
-Remove registry entries for entities whose integration no longer provides them (state shows as 'restored'). Runs as a dry run by default and returns the list of affected entities as response data.
+Remove registry entries for entities whose integration no longer provides them (state shows as 'restored'). Runs as a dry run by default and returns the list of affected entities as response data. Optionally scoped to specific entities: each one is re-verified as orphaned, and anything still alive is skipped and reported, never deleted.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `dry_run` | boolean | no | When on (default), only report what would be removed. |
+| `entity_id` | entity (list) | no | Restrict the cleanup to these entities. Each is re-verified as orphaned; anything still provided by an integration is skipped and reported in skipped_not_orphaned. Omit to target every orphan. |
 
 ```yaml
 # Report only — nothing is deleted
 service: bruh_claude.delete_orphaned_entities
 response_variable: orphans
 
-# The real thing, once you've reviewed the list
+# Delete only the ones you reviewed; live entities are skipped, never deleted
 service: bruh_claude.delete_orphaned_entities
 data:
   dry_run: false
+  entity_id:
+    - sensor.old_hub_battery
+    - sensor.old_hub_signal
 ```
 
 > 🗣️ *"Are there any dead entities left over from integrations I removed? Clean them up."*
