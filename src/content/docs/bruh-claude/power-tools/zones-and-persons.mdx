@@ -2,7 +2,7 @@
 title: Zones & Persons
 description: Create and delete zones, and attach or detach device trackers from persons with bruh_claude services.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 Location plumbing: zones define the places your automations care about, and persons tie the humans of the house to the devices that reveal where they are. Both are normally UI-only — these services open them to Claude and automations.
@@ -36,6 +36,31 @@ data:
 
 > 🗣️ *"Create a zone for the gym so automations know when I'm there."*
 
+## Update zone
+
+`bruh_claude.update_zone`
+
+Move, resize, rename, or restyle an editable zone. Only the fields you pass are changed.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The zone to update. |
+| `name` | text | no | New name. |
+| `latitude` | number | no | New latitude of the zone center. |
+| `longitude` | number | no | New longitude of the zone center. |
+| `radius` | number | no | New radius in meters. |
+| `icon` | icon | no | New icon. |
+| `passive` | boolean | no | Passive zones are only used for automations. |
+
+```yaml
+service: bruh_claude.update_zone
+data:
+  entity_id: zone.gym
+  radius: 250
+```
+
+> 🗣️ *"The gym zone keeps missing me in the parking lot — make it bigger."*
+
 ## Delete zone
 
 `bruh_claude.delete_zone`
@@ -54,6 +79,46 @@ data:
 ```
 
 > 🗣️ *"Delete the gym zone."*
+
+## Create person
+
+`bruh_claude.create_person`
+
+Create a person, optionally linked to a Home Assistant user and with initial device trackers. Returns the person's id as response data.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | text | yes | The person's name. |
+| `user_id` | text | no | Home Assistant user to link (from get_registry users). |
+| `device_tracker` | entity (list) | no | Initial device trackers for presence. |
+
+```yaml
+service: bruh_claude.create_person
+data:
+  name: Alex
+  device_tracker:
+    - device_tracker.alex_phone
+```
+
+> 🗣️ *"Add Alex to the house and track them with their phone."*
+
+## Delete person
+
+`bruh_claude.delete_person`
+
+Delete a UI-created person. YAML-defined persons are refused.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The person entity to delete. |
+
+```yaml
+service: bruh_claude.delete_person
+data:
+  entity_id: person.old_roommate
+```
+
+> 🗣️ *"Remove the old roommate from presence tracking."*
 
 ## Add device tracker to person
 

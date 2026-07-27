@@ -8,11 +8,29 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Terminal" version="3.4.0">
+<Changelog project="BRUH Terminal" version="3.6.0">
 
 <Release version="Unreleased" />
 
-<Release version="3.4.0" date="July 27, 2026" latest>
+<Release version="3.6.0" date="July 27, 2026" latest>
+<Changes type="added">
+
+- **Full HA administration without touching `.storage` — 13 new Power Tools (56 total).** Helpers (`create_helper`/`delete_helper` for all eight storage-backed types, so *"build me a guest-mode toggle"* just happens), `update_zone`, entity voice aliases and icon overrides, dashboard lifecycle (`create_dashboard`/`delete_dashboard` with automatic pre-delete backup) plus custom-card resources (`add_dashboard_resource`/`remove_dashboard_resource` — Claude can install a custom card end-to-end), person lifecycle, and user lifecycle (`create_user` with optional local login created atomically, `delete_user` with the owner lockout guard). [Full docs →](/bruh-claude/power-tools/)
+
+</Changes>
+</Release>
+
+<Release version="3.5.0" date="July 27, 2026">
+<Changes type="added">
+
+- **`delete_orphaned_entities` gained an `entity_id` filter** — scope the cleanup to reviewed entities; each is re-verified as orphaned at call time and live entities are skipped, never deleted (reported in `skipped_not_orphaned`).
+- **Dashboard editing**: `update_dashboard` (automatic backup of the previous config, last 20 kept) and `restore_dashboard` (one-call undo), with new MCP tools `list_dashboards`/`get_dashboard` as the read half.
+- **Registry & dashboard files joined the git backup** — the auto-backup previously excluded all of `.storage`, so Power Tools changes had no backup coverage; the credential-free registry and `lovelace*` files are now versioned (secrets stay excluded), with a safe one-time migration for existing installs.
+
+</Changes>
+</Release>
+
+<Release version="3.4.0" date="July 27, 2026">
 <Changes type="added">
 
 - **BRUH Power Tools — 41 registry-management admin services**, adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT). Claude, automations, and scripts can now reorganize Home Assistant through safe, supervised `bruh_claude.*` service calls instead of hand-editing `/config/.storage`: **areas** (create/delete/rename, aliases, device & entity assignment), **floors**, **labels** (multi-target apply/remove), **entities** (rename, change entity ID, enable/disable, hide/unhide, orphan cleanup with dry-run default), **devices** (rename, enable/disable with parent-hub cascade), **integrations** (enable/disable/reload), **zones**, **persons** (device-tracker assignment), **blueprints** (import from URL), **statistics** (import/backfill long-term stats), **users** (enable/disable with owner-lockout protection), **diagnostics** (`find_orphaned_references` scans automations/scripts/scenes for dead entity references), and **repairs** (raise/clear custom issues in Settings → System → Repairs). Everything is admin-gated, validated before any change, and visible in Developer Tools → Actions. [Full docs →](/bruh-claude/power-tools/)

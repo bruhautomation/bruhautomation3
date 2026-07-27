@@ -163,6 +163,7 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'bruh-claude' },
 								{ label: 'Quick Start', slug: 'bruh-claude/quickstart' },
+								{ label: 'How Claude Controls HA', slug: 'bruh-claude/how-claude-controls-ha' },
 								{ label: 'Voice Assistant', slug: 'bruh-claude/voice' },
 								{ label: 'Automations & Insight Jobs', slug: 'bruh-claude/automations' },
 								{ label: 'Memory & Learning', slug: 'bruh-claude/memory' },
@@ -175,6 +176,7 @@ export default defineConfig({
 										{ label: 'Labels', slug: 'bruh-claude/power-tools/labels' },
 										{ label: 'Entities', slug: 'bruh-claude/power-tools/entities' },
 										{ label: 'Devices & Integrations', slug: 'bruh-claude/power-tools/devices-and-integrations' },
+										{ label: 'Helpers', slug: 'bruh-claude/power-tools/helpers' },
 										{ label: 'Zones & Persons', slug: 'bruh-claude/power-tools/zones-and-persons' },
 										{ label: 'Blueprints & Statistics', slug: 'bruh-claude/power-tools/blueprints-and-statistics' },
 										{ label: 'Dashboards', slug: 'bruh-claude/power-tools/dashboards' },

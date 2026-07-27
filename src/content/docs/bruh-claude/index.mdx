@@ -42,7 +42,7 @@ A Home Assistant add-on that runs **Claude Code** inside HA, with native access 
     Claude watches your house and writes markdown reports to sensors: daily briefing, anomaly watch, battery check, or your own templated prompt — with ready-to-paste dashboard YAML.
   </Card>
   <Card title="Reorganize by asking" icon="puzzle">
-    **[Power Tools](/bruh-claude/power-tools/)**: 43 admin services for areas, floors, labels, entities, devices, zones, and users. *"Rename all the Shellys"* — validated, admin-gated, no `.storage` edits.
+    **[Power Tools](/bruh-claude/power-tools/)**: 56 admin services for areas, labels, entities, helpers, dashboards, zones, and users. *"Rename all the Shellys"*, *"build me a guest-mode toggle"* — validated, admin-gated, no `.storage` edits.
   </Card>
   <Card title="Debug your automations" icon="error">
     Claude reads automation traces and cross-references state and history to tell you exactly why something fired — or didn't.
@@ -83,11 +83,15 @@ Want me to disable the unused ones?
 What makes this different from running Claude Code on a regular machine:
 
 - **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your usage; an API key works too.
-- **[34 purpose-built MCP tools](/bruh-claude/mcp/)** — live states, device control, cameras, history and statistics, registries, traces, templates, logs, reloads.
+- **[36 purpose-built MCP tools](/bruh-claude/mcp/)** — live states, device control, cameras, history and statistics, registries, dashboards, traces, templates, logs, reloads. How the layers fit: [How Claude controls your home](/bruh-claude/how-claude-controls-ha/).
 - **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of your install that Claude reads at the start of each session.
 - **Usage-limit sensors** — the same session/weekly utilization as claude.ai → Settings → Usage, as HA sensors with reset times.
 - **Safe by default** — voice agents get HA tools but no shell, file, or web access; per-agent blocked-services lists; non-root sandbox.
 - **Git-based config backup** — auto-commits of `/config`, manual `ha-backup`, single-file restore from any commit.
+
+## What it doesn't do
+
+Honesty up front: Claude **can't add or remove integrations** (config flows are interactive — OAuth, pairing buttons — so it walks you to the right screen and you click), **never touches credentials** (API keys, tokens, MFA), and **won't edit YAML-mode dashboards through services** (it edits the YAML itself instead). The full scorecard: [what Claude can and can't reach](/bruh-claude/how-claude-controls-ha/#what-claude-can-and-cant-reach).
 
 **[Quick Start →](/bruh-claude/quickstart/)** — add the repo, install, restart HA once, sign in. About five minutes.
 

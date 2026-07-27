@@ -128,6 +128,47 @@ data:
 
 > 🗣️ *"Show the child-lock switch again."*
 
+## Set entity aliases
+
+`bruh_claude.set_entity_aliases`
+
+Replace an entity's voice-assistant aliases — the alternative names Assist listens for.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The entity to update. |
+| `aliases` | text (list) | yes | The full new list of aliases. |
+
+```yaml
+service: bruh_claude.set_entity_aliases
+data:
+  entity_id: light.office_desk_lamp
+  aliases: ["the beacon", "desk light"]
+```
+
+> 🗣️ *"We call the office lamp 'the beacon' — make voice understand that."*
+
+## Set entity icon
+
+`bruh_claude.set_entity_icon`
+
+Set an icon override on one or more entities. Omit the icon to clear the override and return to the default.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity (list) | yes | Entities to update. |
+| `icon` | icon | no | The icon to set. Omit to clear the override. |
+
+```yaml
+service: bruh_claude.set_entity_icon
+data:
+  entity_id:
+    - switch.bedroom_fan
+  icon: mdi:ceiling-fan
+```
+
+> 🗣️ *"That fan shows as a generic switch — give it a fan icon."*
+
 ## Delete orphaned entities
 
 `bruh_claude.delete_orphaned_entities`
