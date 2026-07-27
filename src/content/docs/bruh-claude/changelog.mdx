@@ -8,11 +8,22 @@ import Changelog from '../../../components/changelog/Changelog.astro';
 import Release from '../../../components/changelog/Release.astro';
 import Changes from '../../../components/changelog/Changes.astro';
 
-<Changelog project="BRUH Terminal" version="3.3.2">
+<Changelog project="BRUH Terminal" version="3.4.0">
 
 <Release version="Unreleased" />
 
-<Release version="3.3.2" date="July 20, 2026" latest>
+<Release version="3.4.0" date="July 27, 2026" latest>
+<Changes type="added">
+
+- **BRUH Power Tools — 41 registry-management admin services**, adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT). Claude, automations, and scripts can now reorganize Home Assistant through safe, supervised `bruh_claude.*` service calls instead of hand-editing `/config/.storage`: **areas** (create/delete/rename, aliases, device & entity assignment), **floors**, **labels** (multi-target apply/remove), **entities** (rename, change entity ID, enable/disable, hide/unhide, orphan cleanup with dry-run default), **devices** (rename, enable/disable with parent-hub cascade), **integrations** (enable/disable/reload), **zones**, **persons** (device-tracker assignment), **blueprints** (import from URL), **statistics** (import/backfill long-term stats), **users** (enable/disable with owner-lockout protection), **diagnostics** (`find_orphaned_references` scans automations/scripts/scenes for dead entity references), and **repairs** (raise/clear custom issues in Settings → System → Repairs). Everything is admin-gated, validated before any change, and visible in Developer Tools → Actions. [Full docs →](/bruh-claude/power-tools/)
+- **New MCP tool `get_registry`** — read-only listings of areas, floors, labels, devices, entities, integrations, and users with exactly the ids the services need; the safe replacement for reading `.storage` files.
+- **MCP `call_service` gained `return_response`** — routes over the WebSocket API and returns service response data (any responding HA service, e.g. todo lists and calendars, not just the new ones).
+- The generated `CLAUDE.md` context teaches Claude the full catalog, the `get_registry` → `call_service` workflow, and the cautions: dry-run first, `change_entity_id` doesn't rewrite automations (run `find_orphaned_references` after), confirm before destructive changes, never edit `.storage`.
+
+</Changes>
+</Release>
+
+<Release version="3.3.2" date="July 20, 2026">
 <Changes type="fixed">
 
 - **"Failed to authenticate: OAuth session expired and could not be refreshed" in Assist conversations and insight cards after 3.3.1, while the sidebar terminal kept working.** Before 3.3.1 some launch paths kept a second credential file in the container layer; OAuth refresh tokens rotate, so only the most recently refreshed copy stays valid — and 3.3.1's credential unification could keep the *dead* lineage. Salvage now keeps the newer `.credentials.json` (the older one is preserved as `.credentials.json.stale`).

@@ -1,0 +1,39 @@
+---
+title: CLI Tools
+description: The ha-* command-line tools that ship in the BRUH Terminal — reloads, logs, backups, memory, self-test, and more.
+---
+
+The terminal ships a toolbox of `ha-*` commands so common Home Assistant chores are one line — for you *and* for Claude, which uses them constantly.
+
+## Daily drivers
+
+| Command | What it does |
+|---------|--------------|
+| `ha-reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, `core`, `all` |
+| `ha-log [core\|supervisor\|addons]` | Tail HA logs in real time |
+| `ha-entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
+| `ha-service call <domain>.<service>` | Call any HA service from the shell |
+| `ha-yaml-check` | Validate YAML configuration before a reload bites you |
+| `ha-notify "msg"` | Send a persistent or mobile push notification |
+| `ha-addon <action> <slug>` | Manage add-ons: `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
+
+## Backup & context
+
+| Command | What it does |
+|---------|--------------|
+| `ha-backup [message]` | On-demand git commit of `/config` (auto-backup also commits on an interval — every edit session is recoverable) |
+| `ha-context-gen` | Regenerate `/config/CLAUDE.md`, the [context file](/bruh-claude/mcp/#generated-context) Claude reads each session |
+
+## Memory, sharing, diagnostics
+
+| Command | What it does |
+|---------|--------------|
+| `ha-memory <action>` | The [long-term memory](/bruh-claude/memory/): `add`, `list`, `inbox`, `questions`, `answer`, `consolidate`, `edit`, `clear` |
+| `ha-share-login` | Share your Claude login with other BRUH add-ons — this is the one-liner that [connects BRUH Insights](/bruh-claude/better-together/#one-login) (`--status`, `--revoke`) |
+| `ha-share <action>` | Cross-add-on file sync via `/share`: `push`, `pull`, `ls` |
+| `ha-selftest` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool) and prints PASS/FAIL with a fix hint per part |
+| `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts |
+
+## Everything is Claude-usable
+
+These aren't just for you: Claude's generated context lists every tool, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"back up my config before we start"* resolve to the right command. The CLI, the [MCP tools](/bruh-claude/mcp/), and [Power Tools](/bruh-claude/power-tools/) are three rungs of the same ladder — shell convenience, live API access, and supervised registry management.

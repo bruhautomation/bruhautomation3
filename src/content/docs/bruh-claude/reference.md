@@ -192,7 +192,7 @@ These need an **OAuth / subscription login** (the one you do in the terminal), *
 
 ## MCP server tools
 
-The built-in MCP server gives Claude **33 tools** against your live install. Verify them on your own system with **`ha-selftest`**.
+The built-in MCP server gives Claude **34 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users) and `call_service` with `return_response` for the [Power Tools](/bruh-claude/power-tools/) workflow. Verify them on your own system with **`ha-selftest`**. Full tool-by-tool reference: [MCP Tools](/bruh-claude/mcp/).
 
 ![MCP server tools by category](/images/bruh-claude/mcp-tools.svg)
 
