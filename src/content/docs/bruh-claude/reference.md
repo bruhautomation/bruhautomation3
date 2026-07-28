@@ -181,6 +181,8 @@ Available in the terminal.
 | `ha-selftest` | End-to-end diagnostic: API auth, the MCP server over stdio, the integration, listeners, login, sensors — PASS/FAIL with fix hints. |
 | `ha-entity` / `ha-service` / `ha-yaml-check` / `ha-notify` / `ha-share` / `ha-addon` | Focused helpers for entity state, service calls, YAML validation, notifications, the share folder, and add-on info. |
 
+![ha-selftest output with every check green: HA API auth, the MCP server over stdio, CLI smoke tests, the deployed integration, background listeners, the worker pool, and the usage sensors](/images/bruh-claude/selftest.png)
+
 ## Transport & health
 
 In fast mode the worker pool serves an internal HTTP API (port 8099 on the hassio network, token-authenticated via the shared `/config` volume). The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically.
