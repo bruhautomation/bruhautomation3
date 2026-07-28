@@ -40,6 +40,8 @@ The Settings dialog (⚙) caps how much of each 5-hour session window Insights m
 - **History** — every run is stored (per `history_keep_runs`/`history_keep_days`); each card has a run selector with prev-run comparisons on highlight stats.
 - **Tags** — the analyst tags cards by what it found (`#anomaly`, `#batteries`, `#left-on`); the chip row filters live.
 
+![A Device Health insight card: highlight stats with prev-run comparisons, a battery scoreboard chart of devices below 30%, and the run-history selector in the footer](/images/bruh-insights/device-health-card.png)
+
 ## Dashboard cards
 
 Any insight can be embedded on a dashboard with ready-to-paste YAML from the dashboard-card dialog (▦). Cards are served by Home Assistant itself at `/local/…` — same-origin, so they work on LAN, local SSL, and Nabu Casa with no port mapping. Details and the security model: [Reference](/bruh-insights/reference/#dashboard-cards).

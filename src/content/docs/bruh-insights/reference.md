@@ -62,6 +62,8 @@ The dialog shows a live usage meter, and a **topbar chip** keeps the session's u
 - **＋ New insight** creates up to **24 custom recurring insights** — name, icon, analysis prompt, optional refresh interval or daily run times. They behave exactly like shipped categories: auto-refresh, "Refresh all", run history, feedback.
 - **＋ Make recurring** in any Ask card's footer promotes a one-off question into a recurring insight.
 
+![A custom insight card generated from an Ask question about energy trends — written analysis, highlight stats, a bespoke chart, and the ＋ Make recurring button in the footer](/images/bruh-insights/custom-insight-card.png)
+
 ### Insight history
 
 Every category run is stored as a dated copy (Ask cards are not kept). Each card's footer has a run selector and ‹/› step buttons; picking a past run pins the card ("Viewing … — Back to latest") and highlight stats show a "prev: …" comparison. Retention is governed by `history_keep_runs` / `history_keep_days`; individual runs can be deleted via `DELETE /api/insight/{id}/history/{timestamp}`.
