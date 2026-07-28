@@ -40,6 +40,8 @@ The **⚙ Settings** button in the panel controls how much of your Claude subscr
 
 The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
 
+![The ⚙ Settings dialog: the Automatic insights master switch, subscription picker, session-usage-budget slider with a live usage meter, and the Generation defaults overrides](/images/bruh-insights/settings-dialog.png)
+
 ## Connecting a Claude account
 
 | Method | How | Notes |
@@ -86,6 +88,8 @@ url: /local/bruh_insights/energy-<your-card-token>.html
 title: Energy
 aspect_ratio: 90%
 ```
+
+![The ▦ Add-to-dashboard dialog showing ready-to-paste iframe card YAML with a Copy YAML button](/images/bruh-insights/dashboard-card-dialog.png)
 
 Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. The card always shows the **latest run** and reloads every 15 minutes. The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
 
