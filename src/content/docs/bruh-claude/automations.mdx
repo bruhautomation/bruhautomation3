@@ -5,6 +5,8 @@ description: Run Claude from automations with bruh_claude.run_task, get one-shot
 
 Three ways to put Claude to work without opening the terminal.
 
+![Home Assistant's automation action picker filtered to "BRUH Claude", listing the Run task, Send prompt, Add memory fact, Answer memory question, and Clear conversation services](/images/bruh-claude/automation-action-picker.webp)
+
 ## `bruh_claude.run_task` — background jobs
 
 Runs Claude as a background task from any automation or script — error-log digests, config audits, morning summaries — with an optional notification when it's done.
@@ -59,6 +61,8 @@ content: >-
   {{ state_attr('sensor.morning_briefing_insight', 'markdown')
      or 'No insight yet — run bruh_claude.run_insight.' }}
 ```
+
+![A Battery & Maintenance Audit insight job rendered as a dashboard markdown card: a "Replace Now" checklist of devices at or below 20% battery](/images/bruh-claude/insight-job-card.png)
 
 Jobs or the [BRUH Insights](/bruh-claude/better-together/) panel? Jobs produce glanceable markdown on dashboards and TTS-able events; the Insights add-on produces interactive visual analysis. Homes that run both use jobs for tiles and briefings, and the panel for deep dives.
 

@@ -144,6 +144,8 @@ service: bruh_claude.clear_conversation
 
 Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every ~2 minutes; the sensors poll it every 30 seconds.
 
+![The Claude Terminal device page in Home Assistant, showing the Session Usage, Session Usage Resets At, Weekly Usage, and Weekly Usage Resets At sensors](/images/bruh-claude/usage-sensors.png)
+
 | Sensor | Tracks | Key attributes |
 |--------|--------|----------------|
 | Session Usage | Percent of the current 5-hour session window used | `resets_at`, `data_source`, `last_updated` |
