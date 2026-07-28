@@ -3,7 +3,17 @@ title: Reference
 description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Terminal add-on — in one place.
 ---
 
-Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Terminal → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
+import Detail from '../../../components/Detail.astro';
+
+Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Terminal → Configuration**. The defaults work out of the box<Detail inline min={2}>; the tables below mirror `config.yaml` as shipped</Detail>.
+
+<Detail max={1}>
+
+Right now you're seeing the essentials — the sections most people need: the mobile UI, when a restart is required, and troubleshooting. The full option tables, service payloads, and internals are further up the **Detail** slider.
+
+</Detail>
+
+<Detail min={2}>
 
 ## Configuration options
 
@@ -183,6 +193,10 @@ Available in the terminal.
 
 ![ha-selftest output with every check green: HA API auth, the MCP server over stdio, CLI smoke tests, the deployed integration, background listeners, the worker pool, and the usage sensors](/images/bruh-claude/selftest.png)
 
+</Detail>
+
+<Detail only={3}>
+
 ## Transport & health
 
 In fast mode the worker pool serves an internal HTTP API (port 8099 on the hassio network, token-authenticated via the shared `/config` volume). The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically.
@@ -209,6 +223,8 @@ Background channels never use `--dangerously-skip-permissions` — they can't pr
 | `/config/.bruh_claude/logs/{assist,automation}-YYYYMMDD.log` | Per-request debug logs |
 | `/config/custom_components/bruh_claude/` | The HA integration |
 | `/data/` (add-on volume) | OAuth credentials, git backups, persistent packages |
+
+</Detail>
 
 ## Mobile UI
 
@@ -245,6 +261,8 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 | Voice agent answers wrong room | Run `ha-selftest` — the "Assist area map" check confirms the room map is built. |
 | Usage sensors *unavailable* | They need an OAuth/subscription login, not an API key (see above). |
 
+<Detail only={3}>
+
 ### Per-request debug logs
 
 Every Assist and automation request is logged with channel, prompt size, model, the speed path it took (`warm`/`spare`/`cold`/`…+fallback`), duration, and a response preview.
@@ -255,6 +273,8 @@ tail -f /config/.bruh_claude/logs/automation-$(date +%Y%m%d).log
 ```
 
 Set `log_level: debug` in the add-on config before reproducing a bug for maximum detail.
+
+</Detail>
 
 ## Disclaimer
 

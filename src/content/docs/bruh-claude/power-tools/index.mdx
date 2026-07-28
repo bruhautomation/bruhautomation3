@@ -6,6 +6,7 @@ sidebar:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import Detail from '../../../../components/Detail.astro';
 
 **BRUH Power Tools** are 56 admin services, registered by the BRUH Claude integration under the `bruh_claude.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
 
@@ -74,7 +75,9 @@ Each service page below shows a 🗣️ line: a natural-language phrasing that w
 
 ## The safety model
 
-Power Tools are powerful by design, so the guardrails are built into the services themselves — not left to whoever calls them:
+Power Tools are powerful by design, so the guardrails are built into the services themselves — not left to whoever calls them: every call needs admin rights, every id is validated before anything changes, and destructive services default to reporting instead of deleting.
+
+<Detail min={2}>
 
 | Guardrail | What it means |
 |-----------|---------------|
@@ -85,16 +88,24 @@ Power Tools are powerful by design, so the guardrails are built into the service
 | **Response data** | Creation services return the new id (`area_id`, `floor_id`, `label_id`, …) so multi-step workflows chain without guessing. |
 | **Namespaced** | Everything lives under `bruh_claude.*` — no core services are overridden, and running [Spook](https://github.com/frenck/spook) alongside is perfectly fine. |
 
+</Detail>
+
 And the human stays in charge: Claude's generated context instructs it to **confirm with you before disabling devices, integrations, or users, and before deleting anything non-trivial**.
 
 ## How Claude uses them
+
+*"Move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back. No file edits, no restarts, no guesswork. The same services answer [voice](/bruh-claude/voice/) requests and [automation tasks](/bruh-claude/automations/) alike.
+
+<Detail min={2}>
 
 In the terminal, Claude pairs Power Tools with two MCP tools:
 
 1. **`get_registry`** — read-only listings of areas, floors, labels, devices, entities, integrations, and users, with exactly the ids the services need. The safe replacement for reading `.storage` files.
 2. **`call_service`** — invokes the `bruh_claude.*` service, with `return_response` to capture returned ids and reports.
 
-So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back. No file edits, no restarts, no guesswork. The same services power [voice](/bruh-claude/voice/) requests and [automation tasks](/bruh-claude/automations/) — and because they're real HA services, your automations can call them with no Claude in the loop. Where this layer sits relative to the MCP and CLI tools: [How Claude controls your home](/bruh-claude/how-claude-controls-ha/).
+Because they're real HA services, your automations can call them with no Claude in the loop. Where this layer sits relative to the MCP and CLI tools: [How Claude controls your home](/bruh-claude/how-claude-controls-ha/).
+
+</Detail>
 
 What Power Tools deliberately **don't** do: add or remove integrations (config flows are interactive), touch credentials or auth internals, or modify YAML-defined dashboards, helpers, and persons — YAML belongs to your config files, which Claude edits directly in the terminal.
 

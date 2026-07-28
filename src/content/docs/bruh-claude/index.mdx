@@ -25,12 +25,23 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import Detail from '../../../components/Detail.astro';
 
 ## What it is
+
+<Detail max={1}>
+
+A Home Assistant add-on that puts **Claude** — the AI assistant — inside your smart home. Talk to it out loud, type to it in a terminal, schedule it to watch the house, or let your automations call it. It knows *your* rooms, *your* devices, and *your* history, so you can just ask: *"why is the hallway light on?"*
+
+</Detail>
+
+<Detail min={2}>
 
 A Home Assistant add-on that runs **Claude Code** inside HA, with native access to your entities, services, automations, traces, history, cameras, and logs through a built-in MCP server. Open a terminal in your sidebar, talk to it through Voice Assistants, schedule it to watch your house, or call it from automations. Either way, Claude actually knows your setup.
 
 ![BRUH Terminal architecture overview](/images/bruh-claude/architecture-overview.svg)
+
+</Detail>
 
 ## What you can do
 
@@ -82,12 +93,25 @@ Want me to disable the unused ones?
 
 What makes this different from running Claude Code on a regular machine:
 
+<Detail max={1}>
+
+- **Your Claude subscription covers it** — sign in with your Claude account (Pro/Max), or use an API key.
+- **It genuinely knows your home** — live states, history, cameras, and every device, refreshed automatically. No copy-pasting entity lists.
+- **Safe by default** — voice can control the house but can't run shell commands or read files, and you can block specific services per agent.
+- **Your config is always recoverable** — automatic git backups of `/config`, with single-file restore.
+
+</Detail>
+
+<Detail min={2}>
+
 - **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your usage; an API key works too.
 - **[36 purpose-built MCP tools](/bruh-claude/mcp/)** — live states, device control, cameras, history and statistics, registries, dashboards, traces, templates, logs, reloads. How the layers fit: [How Claude controls your home](/bruh-claude/how-claude-controls-ha/).
 - **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of your install that Claude reads at the start of each session.
 - **Usage-limit sensors** — the same session/weekly utilization as claude.ai → Settings → Usage, as HA sensors with reset times.
-- **Safe by default** — voice agents get HA tools but no shell, file, or web access; per-agent blocked-services lists; non-root sandbox.
-- **Git-based config backup** — auto-commits of `/config`, manual `ha-backup`, single-file restore from any commit.
+- **Safety layers** — voice agents default to HA tools only (no shell, file, or web access); per-agent blocked-services lists are enforced at the MCP `call_service` chokepoint; everything runs in a non-root sandbox.
+- **Git-based config backup** — auto-commits of `/config` on an interval, manual `ha-backup`, single-file restore from any commit.
+
+</Detail>
 
 ## What it doesn't do
 

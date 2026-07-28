@@ -5,6 +5,8 @@ sidebar:
   order: 9
 ---
 
+import Detail from '../../../../components/Detail.astro';
+
 Claude edits dashboards through a fetch-modify-save flow instead of touching `.storage` files: read the config with the `get_dashboard` MCP tool (`list_dashboards` enumerates them), change the JSON, and save the complete object back with `update_dashboard`.
 
 Every update automatically backs up the previous configuration first (the last 20 per dashboard are kept), and `restore_dashboard` undoes a bad edit with one call. Only storage-mode dashboards can be edited; YAML-mode dashboards are refused with a clear error. Dashboard files are also part of the Terminal's git config backup.
@@ -14,6 +16,8 @@ Every update automatically backs up the previous configuration first (the last 2
 `bruh_claude.create_dashboard`
 
 Create a new storage-mode dashboard. The URL path must contain a hyphen (e.g. lovelace-lights). Returns the new dashboard's url_path and id as response data.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -31,6 +35,8 @@ data:
   icon: mdi:account-heart
 ```
 
+</Detail>
+
 > 🗣️ *"Make a simple Guest dashboard with just the lights and the thermostat."*
 
 ## Update dashboard
@@ -38,6 +44,8 @@ data:
 `bruh_claude.update_dashboard`
 
 Replace a storage-mode dashboard's configuration. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. YAML-mode dashboards are refused.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -56,6 +64,8 @@ data:
             entity: light.kitchen_ceiling
 ```
 
+</Detail>
+
 > 🗣️ *"Add a card for the new kitchen light to my Lights dashboard."*
 
 ## Restore dashboard
@@ -63,6 +73,8 @@ data:
 `bruh_claude.restore_dashboard`
 
 Restore a storage-mode dashboard from a backup made by update_dashboard. Restores the most recent backup unless a specific backup name is given.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -76,6 +88,8 @@ data:
   url_path: lovelace-lights
 ```
 
+</Detail>
+
 > 🗣️ *"That dashboard change was worse — put it back how it was."*
 
 ## Delete dashboard
@@ -83,6 +97,8 @@ data:
 `bruh_claude.delete_dashboard`
 
 Delete a storage-mode dashboard. Its configuration is backed up first (same backup store as update_dashboard) and the backup name is returned as response data, so a deletion can be recovered by recreating the dashboard and restoring.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -94,6 +110,8 @@ data:
   url_path: lovelace-old-tablet
 ```
 
+</Detail>
+
 > 🗣️ *"Delete the old tablet dashboard — we don't use it anymore."*
 
 ## Add dashboard resource
@@ -101,6 +119,8 @@ data:
 `bruh_claude.add_dashboard_resource`
 
 Register a dashboard resource — the JavaScript module or stylesheet of a custom card (e.g. /hacsfiles/... or /local/...). Returns the resource id as response data. Duplicate URLs are refused.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -114,6 +134,8 @@ data:
   res_type: module
 ```
 
+</Detail>
+
 > 🗣️ *"Install the Mushroom cards and redo my overview with them."*
 
 ## Remove dashboard resource
@@ -121,6 +143,8 @@ data:
 `bruh_claude.remove_dashboard_resource`
 
 Remove a registered dashboard resource by its URL.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -131,5 +155,7 @@ service: bruh_claude.remove_dashboard_resource
 data:
   url: /local/old-card.js
 ```
+
+</Detail>
 
 > 🗣️ *"Remove that custom card module I stopped using."*

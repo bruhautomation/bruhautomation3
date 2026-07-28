@@ -3,6 +3,22 @@ title: How Claude Controls Your Home
 description: The three access layers — CLI tools, MCP tools, and Power Tools services — what each one is for, how they fit together, and why they aren't redundant.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
+<Detail max={1}>
+
+Claude gets three kinds of access to your home, each with its own job:
+
+- **Terminal commands** — for working on your configuration files: editing YAML, checking logs, making backups.
+- **A live connection** — for reading and controlling the home right now: lights, sensors, cameras, history. This is the *only* path Claude's actions take, so safety limits set here cover everything.
+- **Admin services** — for reorganizing: renaming things, creating rooms and labels, building dashboards. These are real Home Assistant services, so your own automations can use them too.
+
+You never pick a layer — you just ask, and Claude routes the request. The full architecture, including why the layers aren't redundant, is further up the **Detail** slider.
+
+</Detail>
+
+<Detail min={2}>
+
 BRUH Terminal gives Claude three ways to touch Home Assistant, and at first glance they look like three overlapping control panels. They're not — they're **one brain with one set of hands, plus a toolbox anyone in the house can reach**. This page explains what each layer is for, how they interact, and exactly where the (small, deliberate) overlap is.
 
 ## The three layers in one table
@@ -25,6 +41,10 @@ BRUH Terminal gives Claude three ways to touch Home Assistant, and at first glan
 3. **You can drive them by hand** from Developer Tools → Actions, with field pickers and validation.
 
 **CLI tools are the workshop bench**, and they only exist inside the terminal. They cover the file-and-workflow side that live APIs don't: editing and reloading YAML, tailing logs, git backups, the memory store, persistent packages. Claude uses them for config work; you use them when you're in the shell anyway.
+
+</Detail>
+
+<Detail only={3}>
 
 So the flow for any request is:
 
@@ -56,11 +76,19 @@ A little, and it's intentional — same verb, different caller:
 | `ha-entity get` (CLI) vs `get_entity_state` (MCP) | Same read. One for humans at a prompt, one for Claude. |
 | `get_areas` (MCP) vs `get_registry areas` (MCP) | `get_areas` is the voice-optimized room→entities map; `get_registry` is the admin view with ids. Different questions. |
 
-Nothing here is a dead layer to remove. Collapsing to "just one layer" would mean either taking services away from your automations (making them Claude-only), or pushing file/YAML work through an API that can't do it. The rule of thumb:
+Nothing here is a dead layer to remove. Collapsing to "just one layer" would mean either taking services away from your automations (making them Claude-only), or pushing file/YAML work through an API that can't do it.
+
+</Detail>
+
+<Detail min={2}>
+
+The rule of thumb:
 
 > **Files → CLI. Live home → MCP. Admin changes → Power Tools (via MCP).**
 
 Claude's generated context teaches it this routing, so you never have to think about it — you just ask.
+
+</Detail>
 
 ## What Claude can and can't reach
 

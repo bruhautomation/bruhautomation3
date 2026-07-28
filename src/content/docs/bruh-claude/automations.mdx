@@ -3,6 +3,8 @@ title: Automations & Insight Jobs
 description: Run Claude from automations with bruh_claude.run_task, get one-shot answers with send_prompt, and schedule recurring reports with insight jobs.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
 Three ways to put Claude to work without opening the terminal.
 
 ![Home Assistant's automation action picker filtered to "BRUH Claude", listing the Run task, Send prompt, Add memory fact, Answer memory question, and Clear conversation services](/images/bruh-claude/automation-action-picker.webp)
@@ -10,6 +12,8 @@ Three ways to put Claude to work without opening the terminal.
 ## `bruh_claude.run_task` — background jobs
 
 Runs Claude as a background task from any automation or script — error-log digests, config audits, morning summaries — with an optional notification when it's done.
+
+<Detail min={2}>
 
 ```yaml
 automation:
@@ -29,9 +33,13 @@ automation:
 
 Tasks run with a capped agentic budget (`automation_max_turns`, default 10) and full MCP access — including [Power Tools](/bruh-claude/power-tools/), so a task can *fix* what it finds, not just report it. Responses are also returned as service response data for use in the same automation.
 
+</Detail>
+
 ## `bruh_claude.send_prompt` — one-shot Q&A
 
 A synchronous question → answer call, ideal inside scripts that need Claude's answer immediately:
+
+<Detail min={2}>
 
 ```yaml
 - service: bruh_claude.send_prompt
@@ -43,11 +51,15 @@ A synchronous question → answer call, ideal inside scripts that need Claude's 
     message: "{{ claude.response }}"
 ```
 
+</Detail>
+
 ## Insight jobs
 
 Scheduled Claude reports rendered to **sensors** — the dashboard-native little sibling of the full [BRUH Insights](/bruh-insights/) panel.
 
 Create them from the integration: **Settings → Devices & Services → BRUH Claude → Add service → Insight job**. Pick a shipped template — daily briefing, anomaly watch, battery & maintenance, camera check — or write a custom prompt. Custom prompts can embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
+
+<Detail min={2}>
 
 - **Scheduling**: an interval, a daily time (HH:MM), both, or manual-only. Every job also gets a **Run now** button, and `bruh_claude.run_insight` triggers by name from automations.
 - **Reading it**: the report lives in the sensor's attributes — `preview`, full `markdown`, and ready-to-paste `card_yaml`. After the first successful run you get a notification containing the dashboard card.
@@ -62,6 +74,8 @@ content: >-
      or 'No insight yet — run bruh_claude.run_insight.' }}
 ```
 
+</Detail>
+
 ![A Battery & Maintenance Audit insight job rendered as a dashboard markdown card: a "Replace Now" checklist of devices at or below 20% battery](/images/bruh-claude/insight-job-card.png)
 
 Jobs or the [BRUH Insights](/bruh-claude/better-together/) panel? Jobs produce glanceable markdown on dashboards and TTS-able events; the Insights add-on produces interactive visual analysis. Homes that run both use jobs for tiles and briefings, and the panel for deep dives.
@@ -69,6 +83,8 @@ Jobs or the [BRUH Insights](/bruh-claude/better-together/) panel? Jobs produce g
 ## Power Tools from automations
 
 Every [Power Tools](/bruh-claude/power-tools/) service is a normal HA service — automations can call them directly, no Claude in the loop:
+
+<Detail min={2}>
 
 ```yaml
 # Flag it in Repairs when the washer finishes but nobody empties it
@@ -79,3 +95,5 @@ Every [Power Tools](/bruh-claude/power-tools/) service is a normal HA service �
     severity: warning
     issue_id: washer_forgotten
 ```
+
+</Detail>

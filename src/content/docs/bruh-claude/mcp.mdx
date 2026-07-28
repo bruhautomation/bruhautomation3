@@ -3,6 +3,18 @@ title: MCP Tools
 description: Every tool the built-in MCP server gives Claude — live states, device control, cameras, history, registries, and service calls with response data.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
+<Detail max={1}>
+
+Claude's connection to your home is a set of **36 built-in tools**: reading any sensor, controlling any device, looking at cameras, checking history (*"how cold did it get last night?"*), and calling any Home Assistant service. Everything Claude does to your live home goes through them — which is exactly where the safety limits are enforced.
+
+You don't need to know the individual tools — you just ask, and Claude picks. The full tool-by-tool reference is one notch up on the **Detail** slider.
+
+</Detail>
+
+<Detail min={2}>
+
 The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/bruh-claude/how-claude-controls-ha/)). Verify every tool on your install with `ha-selftest`.
 
 ## Reading your home
@@ -33,12 +45,20 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 | `render_template` | Render Jinja2 — test a template before it goes in an automation |
 | `remember_fact` | Store a durable household fact in the [memory](/bruh-claude/memory/) inbox |
 
+</Detail>
+
 ## Scoping & safety
 
-- Every control tool funnels through the `call_service` chokepoint, so **per-agent service deny-lists** (e.g. no `lock.unlock` for a bedroom satellite) cover all of them at once.
-- Voice agents default to `mcp_only` tool access — HA tools yes, shell and file edits no.
-- `bruh_claude.*` Power Tools add their own layer: admin gating and id validation inside the service, regardless of who calls.
+- Voice agents get home-control tools but no shell, file, or web access<Detail inline min={2}> (`mcp_only` tool access, the default)</Detail>.
+- You can block specific services per voice agent (e.g. no `lock.unlock` for a bedroom satellite). <Detail inline min={2}>Every control tool funnels through the `call_service` chokepoint, so the deny-list covers all of them at once.</Detail>
+- <Detail inline min={2}>`bruh_claude.*`</Detail> [Power Tools](/bruh-claude/power-tools/) add their own layer: admin gating and validation inside each service, regardless of who calls.
 
 ## Generated context
 
-With `auto_generate_context` on (default), the add-on regenerates `/config/CLAUDE.md` at startup — a snapshot of your install (entities by domain, automations and their states, add-ons, integrations, directory guide) plus instructions for using the MCP tools and the Power Tools workflow. Claude reads it at the start of every session, which is why it never has to ask what a `sensor.lumi_lumi_weather_temperature_3` is doing in your kitchen.
+Claude starts every session already knowing your setup — your rooms, devices, automations, and naming quirks — so it never has to ask what a `sensor.lumi_lumi_weather_temperature_3` is doing in your kitchen.
+
+<Detail min={2}>
+
+With `auto_generate_context` on (default), the add-on regenerates `/config/CLAUDE.md` at startup — a snapshot of your install (entities by domain, automations and their states, add-ons, integrations, directory guide) plus instructions for using the MCP tools and the Power Tools workflow. Claude reads it at the start of every session.
+
+</Detail>

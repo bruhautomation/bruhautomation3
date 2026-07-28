@@ -29,6 +29,9 @@ export default defineConfig({
 			lastUpdated: true,
 			components: {
 				ThemeSelect: './src/components/ThemeToggle.astro',
+				// Adds the Detail slider next to the social icons (header +
+				// mobile menu footer). The default icons still render inside.
+				SocialIcons: './src/components/SocialIcons.astro',
 			},
 			logo: {
 				dark: './src/assets/bruh-logo-light.svg',
@@ -46,6 +49,17 @@ export default defineConfig({
 				// Note: no global `description` meta — every page (docs frontmatter,
 				// index.astro, command-generator.astro) sets its own, so a global one
 				// here would emit a duplicate <meta name="description"> on every page.
+				{
+					// Detail slider: stamp the saved level on <html> BEFORE first
+					// paint so gated content never flashes (same trick as theme).
+					// `?detail=1|2|3` in the URL overrides and persists — lets a
+					// link share a page at a given depth. Without JS the attribute
+					// is never set and every level stays visible (CSS only hides
+					// under :root[data-detail]), so crawlers/no-JS lose nothing.
+					tag: 'script',
+					content:
+						'(function(){try{var q=new URLSearchParams(location.search).get("detail");var v=q||localStorage.getItem("bruh-detail")||"1";if(v!=="1"&&v!=="2"&&v!=="3")v="1";if(q)try{localStorage.setItem("bruh-detail",v)}catch(e){}document.documentElement.dataset.detail=v}catch(e){document.documentElement.dataset.detail="1"}})();',
+				},
 				{
 					tag: 'meta',
 					attrs: {

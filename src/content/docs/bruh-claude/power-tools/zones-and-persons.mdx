@@ -5,6 +5,8 @@ sidebar:
   order: 7
 ---
 
+import Detail from '../../../../components/Detail.astro';
+
 Location plumbing: zones define the places your automations care about, and persons tie the humans of the house to the devices that reveal where they are. Both are normally UI-only — these services open them to Claude and automations.
 
 The `zone.home` zone set in `configuration.yaml` isn't editable — that's a Home Assistant rule, and these services respect it.
@@ -14,6 +16,8 @@ The `zone.home` zone set in `configuration.yaml` isn't editable — that's a Hom
 `bruh_claude.create_zone`
 
 Create a new zone for location tracking.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -34,6 +38,8 @@ data:
   icon: mdi:dumbbell
 ```
 
+</Detail>
+
 > 🗣️ *"Create a zone for the gym so automations know when I'm there."*
 
 ## Update zone
@@ -41,6 +47,8 @@ data:
 `bruh_claude.update_zone`
 
 Move, resize, rename, or restyle an editable zone. Only the fields you pass are changed.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -59,6 +67,8 @@ data:
   radius: 250
 ```
 
+</Detail>
+
 > 🗣️ *"The gym zone keeps missing me in the parking lot — make it bigger."*
 
 ## Delete zone
@@ -66,6 +76,8 @@ data:
 `bruh_claude.delete_zone`
 
 Delete one or more UI-created zones.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -78,6 +90,8 @@ data:
     - zone.gym
 ```
 
+</Detail>
+
 > 🗣️ *"Delete the gym zone."*
 
 ## Create person
@@ -85,6 +99,8 @@ data:
 `bruh_claude.create_person`
 
 Create a person, optionally linked to a Home Assistant user and with initial device trackers. Returns the person's id as response data.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -100,6 +116,8 @@ data:
     - device_tracker.alex_phone
 ```
 
+</Detail>
+
 > 🗣️ *"Add Alex to the house and track them with their phone."*
 
 ## Delete person
@@ -107,6 +125,8 @@ data:
 `bruh_claude.delete_person`
 
 Delete a UI-created person. YAML-defined persons are refused.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -118,6 +138,8 @@ data:
   entity_id: person.old_roommate
 ```
 
+</Detail>
+
 > 🗣️ *"Remove the old roommate from presence tracking."*
 
 ## Add device tracker to person
@@ -125,6 +147,8 @@ data:
 `bruh_claude.add_device_tracker_to_person`
 
 Attach one or more device trackers to a person for presence detection.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -139,6 +163,8 @@ data:
     - device_tracker.alex_phone
 ```
 
+</Detail>
+
 > 🗣️ *"Track Alex with their new phone."*
 
 ## Remove device tracker from person
@@ -146,6 +172,8 @@ data:
 `bruh_claude.remove_device_tracker_from_person`
 
 Detach one or more device trackers from a person.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -159,5 +187,7 @@ data:
   device_tracker:
     - device_tracker.old_phone
 ```
+
+</Detail>
 
 > 🗣️ *"Stop tracking Alex's old phone."*

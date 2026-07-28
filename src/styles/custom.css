@@ -488,3 +488,219 @@ iframe {
 	opacity: 0.8;
 	margin-right: 0.35rem;
 }
+
+/* ─── Detail slider ─── */
+/*
+ * Site-wide content-depth control. A blocking head script (astro.config.mjs)
+ * stamps <html data-detail="1|2|3"> before first paint; these rules hide
+ * <Detail> wrappers (src/components/Detail.astro) above the chosen level.
+ * Every rule is scoped to :root[data-detail], so without JS nothing is
+ * hidden — crawlers and no-JS readers always get the full page.
+ */
+
+/* The control (header right-group + mobile menu footer) */
+.detail-slider {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* Stays hidden on pages with no level-tagged content (the author display
+   above would otherwise beat the [hidden] attribute's UA style) */
+.detail-slider[hidden] {
+	display: none;
+}
+
+.detail-slider__label {
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--sl-color-gray-3);
+	user-select: none;
+}
+
+.detail-slider input[type='range'] {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 4.25rem;
+	height: 1.25rem; /* generous hit area; track is drawn thinner */
+	margin: 0;
+	background: transparent;
+	cursor: pointer;
+	--detail-fill: 0%;
+}
+
+.detail-slider input[type='range']:focus-visible {
+	outline: 2px solid var(--sl-color-accent);
+	outline-offset: 4px;
+	border-radius: 4px;
+}
+
+/* Track: accent fill up to the thumb, three faint detent dots behind it */
+.detail-slider input[type='range']::-webkit-slider-runnable-track {
+	height: 4px;
+	border-radius: 2px;
+	background:
+		linear-gradient(
+			to right,
+			var(--sl-color-accent) var(--detail-fill),
+			transparent var(--detail-fill)
+		),
+		radial-gradient(circle 2px at 2px 50%, var(--sl-color-gray-3) 98%, transparent),
+		radial-gradient(circle 2px at 50% 50%, var(--sl-color-gray-3) 98%, transparent),
+		radial-gradient(circle 2px at calc(100% - 2px) 50%, var(--sl-color-gray-3) 98%, transparent),
+		linear-gradient(var(--sl-color-gray-5), var(--sl-color-gray-5));
+}
+
+.detail-slider input[type='range']::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	margin-top: -5px;
+	border: none;
+	border-radius: 50%;
+	background: var(--sl-color-accent);
+	box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
+	transition: transform 0.15s ease;
+}
+
+.detail-slider input[type='range']:active::-webkit-slider-thumb {
+	transform: scale(1.15);
+}
+
+.detail-slider input[type='range']::-moz-range-track {
+	height: 4px;
+	border-radius: 2px;
+	background:
+		radial-gradient(circle 2px at 2px 50%, var(--sl-color-gray-3) 98%, transparent),
+		radial-gradient(circle 2px at 50% 50%, var(--sl-color-gray-3) 98%, transparent),
+		radial-gradient(circle 2px at calc(100% - 2px) 50%, var(--sl-color-gray-3) 98%, transparent),
+		linear-gradient(var(--sl-color-gray-5), var(--sl-color-gray-5));
+}
+
+.detail-slider input[type='range']::-moz-range-progress {
+	height: 4px;
+	border-radius: 2px;
+	background: var(--sl-color-accent);
+}
+
+.detail-slider input[type='range']::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border: none;
+	border-radius: 50%;
+	background: var(--sl-color-accent);
+	box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
+	transition: transform 0.15s ease;
+}
+
+/* First visit: pulse the thumb once so the control gets noticed */
+@keyframes detail-hint-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
+	}
+	50% {
+		box-shadow:
+			0 0 0 3px var(--sl-color-bg-nav),
+			0 0 0 8px color-mix(in srgb, var(--sl-color-accent) 35%, transparent);
+	}
+}
+
+.detail-slider.is-hint input[type='range']::-webkit-slider-thumb {
+	animation: detail-hint-pulse 1.6s ease-in-out 3;
+}
+
+.detail-slider.is-hint input[type='range']::-moz-range-thumb {
+	animation: detail-hint-pulse 1.6s ease-in-out 3;
+}
+
+/* Gated content — block form animates open/closed via the 0fr/1fr trick */
+.detail-block {
+	display: grid;
+	grid-template-rows: 1fr;
+	transition:
+		grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.35s ease,
+		margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+		visibility 0s;
+}
+
+.detail-block-inner {
+	min-height: 0;
+	overflow: clip;
+}
+
+:root[data-detail='1'] .detail-block[data-dmin='2'],
+:root[data-detail='1'] .detail-block[data-dmin='3'],
+:root[data-detail='2'] .detail-block[data-dmin='3'],
+:root[data-detail='2'] .detail-block[data-dmax='1'],
+:root[data-detail='3'] .detail-block[data-dmax='1'],
+:root[data-detail='3'] .detail-block[data-dmax='2'] {
+	grid-template-rows: 0fr;
+	opacity: 0;
+	visibility: hidden;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	/* Delay the visibility flip until the collapse finishes */
+	transition:
+		grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.35s ease,
+		margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+		visibility 0s 0.45s;
+}
+
+:root[data-detail='1'] .detail-inline[data-dmin='2'],
+:root[data-detail='1'] .detail-inline[data-dmin='3'],
+:root[data-detail='2'] .detail-inline[data-dmin='3'],
+:root[data-detail='2'] .detail-inline[data-dmax='1'],
+:root[data-detail='3'] .detail-inline[data-dmax='1'],
+:root[data-detail='3'] .detail-inline[data-dmax='2'] {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.detail-block {
+		transition: none;
+	}
+	.detail-slider.is-hint input[type='range']::-webkit-slider-thumb,
+	.detail-slider.is-hint input[type='range']::-moz-range-thumb {
+		animation: none;
+	}
+}
+
+/* Toast shown when a #link auto-raises the level */
+.detail-toast {
+	position: fixed;
+	bottom: 1.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: var(--sl-z-index-skiplink, 9999);
+	max-width: min(90vw, 40ch);
+	padding: 0.55rem 1rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 9999px;
+	background: var(--sl-color-black);
+	color: var(--sl-color-white);
+	font-size: var(--sl-text-sm);
+	box-shadow: var(--sl-shadow-md);
+	animation: detail-toast-in 0.3s ease;
+}
+
+.detail-toast.is-leaving {
+	opacity: 0;
+	transition: opacity 0.45s ease;
+}
+
+@keyframes detail-toast-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 0.5rem);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}

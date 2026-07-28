@@ -13,6 +13,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "node scripts/build.mjs",
+    "check:detail": "node scripts/check-detail-levels.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

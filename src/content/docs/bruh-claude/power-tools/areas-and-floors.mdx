@@ -5,6 +5,8 @@ sidebar:
   order: 2
 ---
 
+import Detail from '../../../../components/Detail.astro';
+
 Areas and floors are how Home Assistant understands the *shape* of your home — and how voice assistants resolve "turn off the lights upstairs". These services let Claude (or any automation) build and maintain that structure: create rooms, group them into floors, move devices and entities around, and manage the aliases voice assistants listen for.
 
 A device normally gives its area to all of its entities; assigning an **entity** to an area directly overrides that — handy when one hub owns gadgets in different rooms.
@@ -14,6 +16,8 @@ A device normally gives its area to all of its entities; assigning an **entity**
 `bruh_claude.create_area`
 
 Create a new area. Returns the new area_id as response data.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -31,6 +35,8 @@ data:
   floor_id: upstairs
 ```
 
+</Detail>
+
 > 🗣️ *"Create a Guest Room area on the upstairs floor, with 'spare room' as a voice alias."*
 
 ## Delete area
@@ -38,6 +44,8 @@ data:
 `bruh_claude.delete_area`
 
 Delete an area. Entities and devices in it are left unassigned.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -49,6 +57,8 @@ data:
   area_id: guest_room
 ```
 
+</Detail>
+
 > 🗣️ *"Delete the guest room area."*
 
 ## Rename area
@@ -56,6 +66,8 @@ data:
 `bruh_claude.rename_area`
 
 Rename an existing area.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -69,6 +81,8 @@ data:
   name: Nursery
 ```
 
+</Detail>
+
 > 🗣️ *"Rename the guest room to Nursery."*
 
 ## Set area aliases
@@ -76,6 +90,8 @@ data:
 `bruh_claude.set_area_aliases`
 
 Replace the aliases of an area (used by voice assistants).
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -89,6 +105,8 @@ data:
   aliases: ["lounge", "front room"]
 ```
 
+</Detail>
+
 > 🗣️ *"Make the living room also answer to 'lounge' and 'front room'."*
 
 ## Add device to area
@@ -96,6 +114,8 @@ data:
 `bruh_claude.add_device_to_area`
 
 Assign one or more devices to an area.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -110,6 +130,8 @@ data:
     - a1b2c3d4e5f6
 ```
 
+</Detail>
+
 > 🗣️ *"Move the desk lamp's device into the office."*
 
 ## Remove device from area
@@ -117,6 +139,8 @@ data:
 `bruh_claude.remove_device_from_area`
 
 Remove one or more devices from whatever area they are in.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -129,6 +153,8 @@ data:
     - a1b2c3d4e5f6
 ```
 
+</Detail>
+
 > 🗣️ *"Take that device out of whatever room it's in."*
 
 ## Add entity to area
@@ -136,6 +162,8 @@ data:
 `bruh_claude.add_entity_to_area`
 
 Assign one or more entities to an area (overrides the device's area).
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -150,6 +178,8 @@ data:
     - light.under_cabinet
 ```
 
+</Detail>
+
 > 🗣️ *"Put the under-cabinet light in the kitchen (even though its hub device lives elsewhere)."*
 
 ## Remove entity from area
@@ -157,6 +187,8 @@ data:
 `bruh_claude.remove_entity_from_area`
 
 Remove one or more entities from whatever area they are in.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -169,6 +201,8 @@ data:
     - light.under_cabinet
 ```
 
+</Detail>
+
 > 🗣️ *"Remove that light from its area."*
 
 ## Create floor
@@ -176,6 +210,8 @@ data:
 `bruh_claude.create_floor`
 
 Create a new floor. Returns the new floor_id as response data.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -192,6 +228,8 @@ data:
   icon: mdi:home-floor-2
 ```
 
+</Detail>
+
 > 🗣️ *"Create an Upstairs floor and put the bedrooms on it."*
 
 ## Delete floor
@@ -199,6 +237,8 @@ data:
 `bruh_claude.delete_floor`
 
 Delete a floor. Areas on it are left without a floor.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -210,6 +250,8 @@ data:
   floor_id: upstairs
 ```
 
+</Detail>
+
 > 🗣️ *"Delete the upstairs floor."*
 
 ## Rename floor
@@ -217,6 +259,8 @@ data:
 `bruh_claude.rename_floor`
 
 Rename an existing floor.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -230,6 +274,8 @@ data:
   name: First Floor
 ```
 
+</Detail>
+
 > 🗣️ *"Rename Upstairs to First Floor."*
 
 ## Add area to floor
@@ -237,6 +283,8 @@ data:
 `bruh_claude.add_area_to_floor`
 
 Place one or more areas on a floor.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -252,6 +300,8 @@ data:
     - kids_room
 ```
 
+</Detail>
+
 > 🗣️ *"Put the master bedroom and the kids' room on the upstairs floor."*
 
 ## Remove area from floor
@@ -259,6 +309,8 @@ data:
 `bruh_claude.remove_area_from_floor`
 
 Remove one or more areas from whatever floor they are on.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -270,5 +322,7 @@ data:
   area_id:
     - kids_room
 ```
+
+</Detail>
 
 > 🗣️ *"Take the kids' room off its floor."*

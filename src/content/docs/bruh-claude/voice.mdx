@@ -3,16 +3,24 @@ title: Voice Assistant
 description: BRUH Claude as a Home Assistant conversation agent — fast mode, personalities, conversation memory, and per-agent tool scoping.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
 Pick **BRUH Claude** as a conversation agent under **Settings → Voice Assistants** and every Assist pipeline — voice satellites, the chat dialog, the mobile app — routes through Claude with full knowledge of your home.
 
 ## Why it's fast
 
-Typical commands answer in **~3–5 seconds**, and replies **stream**, so TTS starts speaking at the first sentence on streaming-capable pipelines. Two mechanisms:
+Typical commands answer in **~3–5 seconds**, and replies **stream**, so TTS starts speaking at the first sentence on streaming-capable pipelines.
+
+<Detail min={2}>
+
+Two mechanisms:
 
 - **Fast mode** (`assist_fast_mode`, default on): a pool of pre-warmed Claude worker processes — one per active conversation plus a hot spare — so voice turns skip CLI boot and MCP handshake entirely. Budget ~150–300 MB RAM per warm worker (max 3). If a worker ever errors, the add-on falls back to a one-shot spawn automatically.
 - **The area map**: a cached area → entity map (controllable domains plus Weather and People) is spliced into the system prompt, so *"turn off the kitchen lights"* acts directly — no lookup turns.
 
 `binary_sensor.bruh_claude_system_assist_healthy` reports pool health (worker count, spare, last-request latency), and `ha-selftest` probes the whole path end-to-end.
+
+</Detail>
 
 ## Personalities
 
@@ -23,21 +31,31 @@ Each conversation agent you create gets its own **name, model, and system prompt
 1. **Your personality** leads, and explicitly owns identity, tone, and verbosity.
 2. An **operational block** follows — tools, the area map, timezone, routing rules — deliberately identity-free so it can't fight your persona.
 
+<Detail min={2}>
+
 Without a personality, a built-in default applies ("helpful, efficient, 1–2 short sentences"). With one, that default is dropped entirely — so if your persona should stay brief for TTS, say so in the persona: *"…no matter how excited you get, keep spoken replies under two sentences."*
+
+</Detail>
 
 New agents default to **Claude Haiku** for snappy responses; pick any model per agent in the integration options.
 
 ## Conversation memory
 
-While the same Assist chat or voice session stays open, Home Assistant keeps the same `conversation_id` — and the add-on **resumes the same Claude session** for each turn, so follow-ups genuinely remember the conversation. A new session starts a clean slate; `bruh_claude.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.
+Follow-ups genuinely remember the conversation — *"turn on the fan"* … *"actually, make it slower"* just works — for as long as the same chat or voice session stays open. <Detail inline min={2}>Mechanically: Home Assistant keeps the same `conversation_id` for the session, and the add-on **resumes the same Claude session** for each turn. A new session starts a clean slate; `bruh_claude.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.</Detail>
 
 Voice is also how the house [learns](/bruh-claude/memory/): say *"remember that we call the office lamp 'the beacon'"* and it's stored instantly.
 
 ## Safe by default: tool scoping
 
-Voice can control everything but can't run shell commands or edit files — `assist_tool_access: mcp_only` is the default. Two more dials:
+Voice can control everything but can't run shell commands or edit files<Detail inline min={2}> — `assist_tool_access: mcp_only` is the default</Detail>. And you can forbid specific services per agent — say, no unlocking doors from the kids' bedroom satellite.
+
+<Detail min={2}>
+
+Two more dials:
 
 - **`--max-turns` budgets** cap agentic loops per request (default 5 for Assist) so a misunderstood command can't spiral.
 - **Per-agent service deny-lists** (e.g. forbid `lock.unlock` for the kids' satellite): every control tool funnels through one chokepoint, so the deny-list covers all of them. See the [Reference](/bruh-claude/reference/) for the option syntax.
+
+</Detail>
 
 With [Power Tools](/bruh-claude/power-tools/) installed, voice requests can also reorganize — *"create a zone for the gym"*, *"hide the child-lock switches"* — with the same validation and admin gating as everywhere else.

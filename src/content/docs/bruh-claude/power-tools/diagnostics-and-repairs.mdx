@@ -5,6 +5,8 @@ sidebar:
   order: 11
 ---
 
+import Detail from '../../../../components/Detail.astro';
+
 `find_orphaned_references` scans every automation, script, and scene for references to entities Home Assistant doesn't know — the silent breakage left behind by renames, removed integrations, and typos. It never changes anything; it reports, and can optionally raise a repair issue with the findings.
 
 `create_repair_issue` gives Claude and your automations a first-class way to flag things in **Settings → System → Repairs**: persistent, severity-tagged, dismissible. A proper paper trail instead of a notification that scrolls away.
@@ -14,6 +16,8 @@ sidebar:
 `bruh_claude.find_orphaned_references`
 
 Scan every automation, script, and scene for references to entities Home Assistant doesn't know (renamed, deleted, or typo'd). Returns the findings as response data; optionally raises a repair issue listing them.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -29,6 +33,8 @@ data:
   create_issue: true
 ```
 
+</Detail>
+
 > 🗣️ *"Do any of my automations still reference entities that don't exist?"*
 
 ## Create repair issue
@@ -36,6 +42,8 @@ data:
 `bruh_claude.create_repair_issue`
 
 Create a custom issue in Settings > System > Repairs: persistent, severity-tagged, dismissible. Returns the issue_id as response data. Claude also uses this on its own initiative — an insight job that spots a failing sensor can flag it here.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -54,11 +62,15 @@ data:
   issue_id: front_lock_battery
 ```
 
+</Detail>
+
 ## Remove repair issue
 
 `bruh_claude.remove_repair_issue`
 
 Remove a previously created repair issue by its issue ID.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -69,5 +81,7 @@ service: bruh_claude.remove_repair_issue
 data:
   issue_id: front_lock_battery
 ```
+
+</Detail>
 
 > 🗣️ *"The lock battery is replaced — clear that repair issue."*

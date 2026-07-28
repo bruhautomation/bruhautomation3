@@ -5,6 +5,8 @@ sidebar:
   order: 10
 ---
 
+import Detail from '../../../../components/Detail.astro';
+
 Enable or disable Home Assistant user accounts on a schedule or condition: house-sitter logins, rental-guest accounts, kids' accounts after bedtime.
 
 You cannot lock yourself out: `disable_user` refuses owner accounts and system-generated users, so no automation, prompt, or typo can take the owner's access away.
@@ -16,6 +18,8 @@ Find `user_id` values with the MCP `get_registry` tool (`users`) from the termin
 `bruh_claude.create_user`
 
 Create a Home Assistant user account, optionally with a local username/password login (they must be provided together; password minimum 8 characters). Returns the new user_id as response data.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -32,6 +36,8 @@ data:
   password: "correct-horse-battery"
 ```
 
+</Detail>
+
 > 🗣️ *"Set up a login for the babysitter — no admin rights."*
 
 ## Delete user
@@ -39,6 +45,8 @@ data:
 `bruh_claude.delete_user`
 
 Delete one or more Home Assistant user accounts and their credentials. Owner accounts and system-generated users are protected and cannot be deleted.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -51,6 +59,8 @@ data:
     - 1234567890abcdef
 ```
 
+</Detail>
+
 > 🗣️ *"The house sitter's gone — delete their account entirely."*
 
 ## Enable user
@@ -58,6 +68,8 @@ data:
 `bruh_claude.enable_user`
 
 Re-enable one or more disabled Home Assistant user accounts.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -70,6 +82,8 @@ data:
     - 1234567890abcdef
 ```
 
+</Detail>
+
 > 🗣️ *"Re-enable the babysitter's account."*
 
 ## Disable user
@@ -77,6 +91,8 @@ data:
 `bruh_claude.disable_user`
 
 Disable one or more Home Assistant user accounts. Owner accounts and system-generated users are protected and cannot be disabled.
+
+<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -88,5 +104,7 @@ data:
   user_id:
     - 1234567890abcdef
 ```
+
+</Detail>
 
 > 🗣️ *"Disable the account we made for the house sitter."*

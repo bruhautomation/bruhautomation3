@@ -1,0 +1,13 @@
+---
+/**
+ * Starlight `SocialIcons` override: renders the Detail slider ahead of the
+ * default social icons. This is the supported way to add a control to the
+ * header (and the mobile menu footer, which reuses this slot) without
+ * forking Header.astro. The ThemeSelect/ThemeToggle slot is untouched.
+ */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import DetailSlider from './DetailSlider.astro';
+---
+
+<DetailSlider />
+<Default><slot /></Default>
