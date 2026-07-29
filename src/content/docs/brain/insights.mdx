@@ -1,0 +1,79 @@
+---
+title: Insights
+description: How BRain's insight cards work — the study-first onboarding, the generation pipeline, schedules, feedback, run history, and dashboard cards.
+---
+
+The **Insights** tab is BRain acting as your home's analyst: it reads your Home Assistant data and renders it as self-contained interactive cards with sharp written analysis, highlight stats, hover tooltips, light & dark mode, and a colorblind-safe palette — designed for *your* data, not a template.
+
+## It learns before it reports
+
+A fresh install has **no cards**. This is the single biggest change from BRUH Insights, which shipped nine categories switched on from the moment you installed it.
+
+Those cards generated before the add-on knew anything about the house. They said generic things about a home they had never looked at, and cost tokens doing it, on every schedule, forever.
+
+So the first run is a **study**, not a report:
+
+1. **BRain studies the home** one topic at a time — naming and areas, occupancy rhythms, energy, climate, device reliability — and files what it finds in [memory](/brain/memory/).
+2. **It proposes cards** grounded in what it actually found, each with a one-line reason citing the evidence. A proposal that could have been written for a different house isn't a proposal.
+3. **You pick.** Nothing generates, and the scheduler stays idle, until you do.
+
+The flow is **resumable** — close the panel mid-study and come back — and re-running it never re-studies a topic it already covered, because a study session is expensive.
+
+:::note[If your home is too sparse]
+BRain says what's missing and stops. There is deliberately **no canned fallback**: generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard. Add more entities, let history accumulate, and run it again.
+:::
+
+## The pipeline
+
+For each card (and every Ask question), BRain:
+
+1. **Collects a slimmed snapshot** of your home through the Supervisor API — entity states with areas and friendly names, recent history for relevant sensors, long-term statistics for energy, and the home memory document. GPS coordinates never leave the house; only zone/state and areas are included.
+2. **Sends it to Claude** with a strict design system — colorblind-safe palette, proper chart rules, dark & light mode, hover interactivity.
+3. **Stores and renders the result** — title, summary, highlight stats, and a self-contained HTML visualization, rendered in a sandboxed iframe (`sandbox="allow-scripts"`; it cannot touch your HA session).
+
+Cards persist across restarts, refresh on their own schedules, and generation runs **one at a time** through a queue to stay friendly to subscription rate limits.
+
+## Ask anything
+
+Type a question — *"Which rooms are coldest at night?"* — and get a bespoke card back. **＋ Make recurring** promotes it onto its own schedule, where it behaves exactly like any other card.
+
+`brain ask "why is the garage cold"` in the terminal is the same engine against the same memory, printed as text instead of a card.
+
+## Guesses
+
+When a run believes something it can't confirm, it says so as a claim you can answer with one tap — *"The garage fridge is meant to run 24/7 — right?"* — right on the card, or in the Memory tab. **✓** files it as a plain memory line; **✗** records a dead end that is never revisited.
+
+Three open at a time, 14-day expiry, never re-proposed in any wording. The full model: [Memory & Learning](/brain/memory/#guesses-not-questions).
+
+## Schedules, feedback, history
+
+- **Per-card schedules** — an interval, or fixed daily times (`07:00, 19:00`, up to 6) which take precedence over the interval and spend nothing in between. `0` means manual only.
+- **✎ prompt editor** — edit a card's analysis focus, with a "custom prompt" badge and **Restore default**.
+- **💬 feedback** — standing instructions (*"show costs in dollars"*, *"ignore the guest room sensor"*) injected into every future run of that card until removed. **Send & regenerate** applies it immediately.
+- **Run history** — every run is stored per `history_keep_runs` / `history_keep_days`, with a run selector, ‹/› step buttons, and "prev: …" comparisons on highlight stats.
+- **Tags** — the analyst tags cards by what it found (`#anomaly`, `#batteries`, `#left-on`); the chip row is the live union of those tags and filters as you click.
+
+## Deep presence
+
+Presence analysis goes beyond `home`/`not_home`: BRain walks the device registry and includes sibling entities from each presence tracker's physical device — the companion app's WiFi SSID, geocoded address, activity, battery and charging state, with recent history. It must **cite its evidence** (*"phone on home WiFi and charging since 10:41 PM"*) rather than parrot a state string.
+
+## Token budget
+
+The panel's **Settings** dialog caps how much of each 5-hour session window BRain may spend on scheduled work. Automatic runs pause at the budget; manual clicks never do. The meter uses your **real Anthropic account utilization** — all Claude use counts, so BRain backs off when *you* are using Claude elsewhere — and a topbar chip keeps usage and reset time in view. Every control: [Reference](/brain/reference/#token-budget).
+
+## Dashboard cards
+
+Any insight can be embedded on a dashboard with ready-to-paste YAML from the dashboard-card dialog:
+
+```yaml
+type: iframe
+url: /local/brain/energy-<your-card-token>.html
+title: Energy
+aspect_ratio: 90%
+```
+
+Cards are served by **Home Assistant itself** at `/local/…` — same origin as every dashboard, so they work on LAN, local SSL, and Nabu Casa with no port mapping. The card always shows the latest run and reloads every 15 minutes. Security model: [Reference](/brain/reference/#dashboard-cards).
+
+## Insight jobs are the other half
+
+Cards are interactive deep dives in a panel. **[Insight jobs](/brain/automations/#insight-jobs)** are the dashboard-native sibling: scheduled reports rendered to *sensors*, with markdown and ready-to-paste card YAML in their attributes, and an event that fires on completion — ideal for glanceable tiles and TTS briefings. Both read the same memory.

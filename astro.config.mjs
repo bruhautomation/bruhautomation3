@@ -18,9 +18,55 @@ const showDrafts =
 		? process.env.SHOW_DRAFTS === 'true'
 		: process.env.VERCEL_ENV !== 'production';
 
+// BRUH Terminal (`/bruh-claude/`) and BRUH Insights (`/bruh-insights/`) were
+// merged into BRain (`/brain/`). Those URLs are in the wild — in the add-on
+// changelogs, in YouTube descriptions, in people's bookmarks — so every one of
+// them keeps working. Old pages with no direct successor land on the section of
+// the merged docs that now covers them, never on a bare index.
+const retiredAppUrls = {
+	'/bruh-claude/': '/brain/',
+	'/bruh-claude/quickstart/': '/brain/quickstart/',
+	'/bruh-claude/memory/': '/brain/memory/',
+	'/bruh-claude/voice/': '/brain/voice/',
+	'/bruh-claude/automations/': '/brain/automations/',
+	'/bruh-claude/mcp/': '/brain/mcp/',
+	'/bruh-claude/cli/': '/brain/cli/',
+	'/bruh-claude/reference/': '/brain/reference/',
+	'/bruh-claude/how-claude-controls-ha/': '/brain/how-brain-controls-ha/',
+	// The two add-ons are one now, so "using them together" has no successor
+	// page; what survived of it is the shared-memory model.
+	'/bruh-claude/better-together/': '/brain/memory/',
+	'/bruh-claude/changelog/': '/brain/archive/bruh-terminal-changelog/',
+	'/bruh-claude/power-tools/': '/brain/power-tools/',
+	'/bruh-insights/': '/brain/',
+	'/bruh-insights/quickstart/': '/brain/quickstart/',
+	'/bruh-insights/how-it-works/': '/brain/insights/',
+	'/bruh-insights/reference/': '/brain/reference/',
+	'/bruh-insights/changelog/': '/brain/archive/bruh-insights-changelog/',
+};
+
+const powerToolsPages = [
+	'areas-and-floors',
+	'labels',
+	'entities',
+	'devices-and-integrations',
+	'helpers',
+	'zones-and-persons',
+	'blueprints-and-statistics',
+	'dashboards',
+	'users',
+	'diagnostics-and-repairs',
+];
+
+for (const page of powerToolsPages) {
+	retiredAppUrls[`/bruh-claude/power-tools/${page}/`] =
+		`/brain/power-tools/${page}/`;
+}
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://bruhautomation.com',
+	redirects: retiredAppUrls,
 	integrations: [
 		starlight({
 			plugins: [starlightImageZoom()],
@@ -159,46 +205,44 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{
-							label: 'BRUH Terminal',
+							label: 'BRain',
 							items: [
-								{ label: 'Overview', slug: 'bruh-claude' },
-								{ label: 'Quick Start', slug: 'bruh-claude/quickstart' },
-								{ label: 'How Claude Controls HA', slug: 'bruh-claude/how-claude-controls-ha' },
-								{ label: 'Voice Assistant', slug: 'bruh-claude/voice' },
-								{ label: 'Automations & Insight Jobs', slug: 'bruh-claude/automations' },
-								{ label: 'Memory & Learning', slug: 'bruh-claude/memory' },
+								{ label: 'Overview', slug: 'brain' },
+								{ label: 'Quick Start', slug: 'brain/quickstart' },
+								{ label: 'Memory & Learning', slug: 'brain/memory' },
+								{ label: 'Insights', slug: 'brain/insights' },
+								{ label: 'Voice Assistant', slug: 'brain/voice' },
+								{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
+								{ label: 'How BRain Controls HA', slug: 'brain/how-brain-controls-ha' },
 								{
 									label: 'Power Tools',
 									collapsed: true,
 									items: [
-										{ label: 'Overview', slug: 'bruh-claude/power-tools' },
-										{ label: 'Areas & Floors', slug: 'bruh-claude/power-tools/areas-and-floors' },
-										{ label: 'Labels', slug: 'bruh-claude/power-tools/labels' },
-										{ label: 'Entities', slug: 'bruh-claude/power-tools/entities' },
-										{ label: 'Devices & Integrations', slug: 'bruh-claude/power-tools/devices-and-integrations' },
-										{ label: 'Helpers', slug: 'bruh-claude/power-tools/helpers' },
-										{ label: 'Zones & Persons', slug: 'bruh-claude/power-tools/zones-and-persons' },
-										{ label: 'Blueprints & Statistics', slug: 'bruh-claude/power-tools/blueprints-and-statistics' },
-										{ label: 'Dashboards', slug: 'bruh-claude/power-tools/dashboards' },
-										{ label: 'Users', slug: 'bruh-claude/power-tools/users' },
-										{ label: 'Diagnostics & Repairs', slug: 'bruh-claude/power-tools/diagnostics-and-repairs' },
+										{ label: 'Overview', slug: 'brain/power-tools' },
+										{ label: 'Areas & Floors', slug: 'brain/power-tools/areas-and-floors' },
+										{ label: 'Labels', slug: 'brain/power-tools/labels' },
+										{ label: 'Entities', slug: 'brain/power-tools/entities' },
+										{ label: 'Devices & Integrations', slug: 'brain/power-tools/devices-and-integrations' },
+										{ label: 'Helpers', slug: 'brain/power-tools/helpers' },
+										{ label: 'Zones & Persons', slug: 'brain/power-tools/zones-and-persons' },
+										{ label: 'Blueprints & Statistics', slug: 'brain/power-tools/blueprints-and-statistics' },
+										{ label: 'Dashboards', slug: 'brain/power-tools/dashboards' },
+										{ label: 'Users', slug: 'brain/power-tools/users' },
+										{ label: 'Diagnostics & Repairs', slug: 'brain/power-tools/diagnostics-and-repairs' },
 									],
 								},
-								{ label: 'MCP Tools', slug: 'bruh-claude/mcp' },
-								{ label: 'CLI Tools', slug: 'bruh-claude/cli' },
-								{ label: 'Using with Insights', slug: 'bruh-claude/better-together' },
-								{ label: 'Reference', slug: 'bruh-claude/reference' },
-								{ label: 'Changelog', slug: 'bruh-claude/changelog' },
-							],
-						},
-						{
-							label: 'BRUH Insights',
-							items: [
-								{ label: 'Overview', slug: 'bruh-insights' },
-								{ label: 'Quick Start', slug: 'bruh-insights/quickstart' },
-								{ label: 'How It Works', slug: 'bruh-insights/how-it-works' },
-								{ label: 'Reference', slug: 'bruh-insights/reference' },
-								{ label: 'Changelog', slug: 'bruh-insights/changelog' },
+								{ label: 'MCP Tools', slug: 'brain/mcp' },
+								{ label: 'The CLI', slug: 'brain/cli' },
+								{ label: 'Reference', slug: 'brain/reference' },
+								{ label: 'Changelog', slug: 'brain/changelog' },
+								{
+									label: 'Archive',
+									collapsed: true,
+									items: [
+										{ label: 'BRUH Terminal changelog', slug: 'brain/archive/bruh-terminal-changelog' },
+										{ label: 'BRUH Insights changelog', slug: 'brain/archive/bruh-insights-changelog' },
+									],
+								},
 							],
 						},
 						{

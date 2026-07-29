@@ -1,0 +1,84 @@
+---
+title: Quick Start
+description: Install BRain, restart HA once, sign in, and let it learn your home — in about five minutes.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Five minutes from zero to an AI that knows your house.
+
+## Prerequisites
+
+- **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor).
+- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option, since Claude Code authenticates via OAuth and uses your subscription. An API key works too if you'd rather pay per token (note: usage-limit sensors need the subscription login).
+- A **modern 64-bit HA host** (any Pi 4/5, x86 NUC, or generic 64-bit server). Older 32-bit ARM boards (Pi 3 and earlier) aren't supported — the add-on builds for `amd64` and `aarch64`.
+- ~**1 GB of free RAM** beyond what HA itself uses. Fast voice mode keeps pre-warmed workers around (~150–300 MB each, max 3); you can turn it off on tight hosts.
+
+## Install it
+
+<Steps>
+
+1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
+
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+2. **Install the add-on.** Find **BRain** in the store and click **Install**, then **Start** when it's done.
+
+3. **Restart Home Assistant** — required on first install so HA loads the BRain integration: **Settings → System → Restart**. A persistent notification tells you whenever a restart is needed (first install and add-on version upgrades); add-on restarts within the same version don't need one.
+
+4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, and the `brain.send_prompt` / `run_task` / `run_insight` / `add_memory` / `clear_conversation` services.
+
+5. **Sign in with Anthropic.** Open **BRain** in the HA sidebar and complete the sign-in. This is the **only** login — the terminal, insight generation, voice, and memory consolidation all share it.
+
+</Steps>
+
+## Let it learn your home
+
+A fresh install has **no cards**, on purpose. A generic "Energy" or "Climate" card about a home BRain has never looked at says nothing useful and costs tokens on every run, forever.
+
+<Steps>
+
+1. **Press "Start learning."** BRain studies your house one topic at a time — naming and areas, occupancy rhythms, energy, climate, device reliability — and files what it finds in memory. This takes a few minutes and runs in the background; close the panel and come back, it picks up where it left off.
+
+2. **Pick your cards.** When the study finishes, BRain proposes a handful of cards grounded in what it actually found, each with a one-line reason citing the evidence. Tick the ones you want. Nothing generates, and the scheduler stays idle, until you do.
+
+3. **Watch the first run.** Cards generate one at a time through a queue (friendly to subscription rate limits), so they fill in over a few minutes.
+
+</Steps>
+
+**If your home is too sparse to learn from**, BRain says what's missing instead of inventing generic cards — add more entities, let history accumulate, and run it again. There is deliberately no canned fallback: cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard.
+
+## Try it
+
+Switch to the **Terminal** tab and type:
+
+```text title="In the BRain terminal"
+> How many entities do I have?
+> Which lights are on right now?
+> How cold did it get last night?
+> Show me automations that haven't run in 30 days
+```
+
+Or ask the same thing from the **Insights** tab's *Ask* box and get an answer card back — same engine, same memory. Keep the ones you like as recurring cards, or drop any of them on a dashboard.
+
+## Next steps
+
+- **Use BRain as your voice assistant.** Go to **Settings → Voice Assistants → [your pipeline]** and pick **BRain** as the conversation agent. Give the agent a name, a model, and (optionally) a personality. By default voice can control everything but can't run shell commands or read files.
+- **Teach it something.** Say *"remember that we call the office lamp the beacon"* to a voice assistant, or run `brain memory add "…"` in the terminal. It lands in the same document every other surface reads.
+- **Answer its guesses.** When BRain believes something it can't confirm, it says so in the **Memory** tab as a yes/no. Two taps settle it. `binary_sensor.brain_waiting_on_you` exists so you can push that to your phone — a guess sitting in a panel nobody has open just expires.
+- **Trigger it from automations.** Call `brain.run_task` with a prompt — it runs in the background and (optionally) notifies you when it's done.
+- **Tune behaviour.** See the [Reference](/brain/reference/) for every config option and the full service / sensor / tool list.
+
+## Common first-install hiccups
+
+| Symptom | Fix |
+|---------|-----|
+| Add-on won't start | Check the **Log** tab. Almost always an architecture mismatch (only `amd64`/`aarch64`) or a port 7681 conflict. |
+| Integration not discovered | You probably skipped step 3. Restart HA, then check **Settings → Devices & Services** (or add **BRain** manually). |
+| Sign-in fails | Verify the HA host can reach `console.anthropic.com`. After updates, you may need to re-authenticate. |
+| The terminal asks for a second login | It shouldn't — one credential is shared with the CLI both ways. If it does, run `brain doctor`; the auth check names the file it found and the one it expected. |
+| "It can't see my entities" | Confirm `enable_ha_mcp_server: true`, then run **`brain doctor`** in the terminal — it drives the MCP server end-to-end and reports any tool that errors. |
+| Learning seems stuck | Study sessions are deliberately long-running (up to `study_timeout_minutes`, default 30). The progress list shows which topic is in flight; the add-on log shows the session. |
+| Usage-limit sensors stay *unavailable* | They need an OAuth/subscription login (not an API key). New installs show data once you've used Claude; the sensor's `error` attribute explains why if not. |

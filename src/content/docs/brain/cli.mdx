@@ -1,0 +1,73 @@
+---
+title: The CLI
+description: Two commands, brain and ha — memory, learning, undo and diagnostics on one side; Home Assistant reloads, logs, entities and services on the other.
+---
+
+The terminal ships **two commands**, split by what they act on:
+
+- **`brain`** — BRain's own faculties: memory, learning, undo, diagnostics.
+- **`ha`** — Home Assistant operations: logs, reloads, entities, services, add-ons.
+
+The split exists so that *"which log?"* is never a question anyone has to ask. `brain help` and `ha help` list everything; typing a subcommand into the wrong dispatcher tells you which one it belongs to rather than failing quietly.
+
+These cover the **file-and-workflow side** that live APIs don't; the live home belongs to the [MCP tools](/brain/mcp/), and admin changes to [Power Tools](/brain/power-tools/) — see [how the layers fit](/brain/how-brain-controls-ha/).
+
+## `brain` — its own faculties
+
+| Command | What it does |
+|---------|--------------|
+| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses`, `confirm`, `reject`, `log`, `undo`, `consolidate`, `clear` |
+| `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
+| `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
+| `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
+| `brain doctor` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool, memory) and prints PASS/FAIL with a fix hint per part |
+| `brain help` | The full list |
+
+```bash
+brain memory add "We call the office lamp the beacon"
+brain memory hypotheses            # pending guesses awaiting a yes/no
+brain memory confirm "the garage fridge runs 24/7"
+brain learn energy
+brain undo --all-today             # revert everything Claude changed today
+```
+
+## `ha` — Home Assistant operations
+
+| Command | What it does |
+|---------|--------------|
+| `ha log [core\|supervisor\|host\|addon <name>\|errors\|all]` | Tail HA logs. `-f` to follow, `-n N` for line count |
+| `ha reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, `core`, `all` |
+| `ha check [path]` | Validate YAML before reloading |
+| `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session |
+| `ha entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
+| `ha service call <domain>.<service>` | Call any HA service from the shell |
+| `ha addon <action> <slug>` | Manage add-ons: `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
+| `ha notify "msg"` | Send a persistent or mobile push notification |
+| `ha share <action>` | Cross-add-on file sync via `/share`: `push`, `pull`, `ls` |
+| `ha login` | Authenticate the shared Claude credential from the shell |
+| `ha help` | The full list |
+
+:::note[If `ha` is already taken]
+If some other `ha` command is ever present on `PATH` inside the container, BRain installs its own as **`hass`** instead rather than shadowing it. The startup log says so when this happens.
+:::
+
+## Also on `PATH`
+
+| Command | What it does |
+|---------|--------------|
+| `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts (`list`, `remove` too) |
+
+## Slash commands in the terminal
+
+Inside a Claude Code session, two shortcuts do the same work without leaving the conversation:
+
+- **`/learn [topic]`** — start a study session and watch it work, correcting it mid-flight.
+- **`/memory`** — show what it knows right now.
+
+## There is no backup command
+
+BRain doesn't version your configuration; **Home Assistant's own backups** do that job, whole-system and restorable. What it keeps instead is an edit journal — a snapshot of any file *before* Claude writes to it — which `brain undo` restores from. See [Undo](/brain/reference/#undo).
+
+## Everything is BRain-usable
+
+The generated context lists both dispatchers, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"what did you learn last week?"* resolve to the right command without you naming it.

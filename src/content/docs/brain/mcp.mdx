@@ -1,0 +1,44 @@
+---
+title: MCP Tools
+description: Every tool the built-in MCP server gives Claude — live states, device control, cameras, history, registries, and service calls with response data.
+---
+
+The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/brain/how-brain-controls-ha/)). Verify every tool on your install with `brain doctor`.
+
+## Reading your home
+
+| Tool | What it does |
+|------|--------------|
+| `get_entity_state` | Current state + attributes of any entity |
+| `get_all_states` | All entities, filterable by domain and name (capped at 300) |
+| `get_areas` | Areas with their entity ids — resolves *"the kitchen lights"* |
+| `get_registry` | **Registry listings**: areas, floors, labels, devices, entities, integrations, users — with the ids [Power Tools](/brain/power-tools/) need. The safe replacement for reading `.storage` |
+| `get_history` | Recent state history (up to 7 days), min/max for numerics |
+| `get_statistics` | Long-term statistics — *"how cold did it get last week?"* |
+| `get_weather_forecast` | Daily/hourly forecast |
+| `get_camera_snapshot` | **Sees** a camera — returns the image so Claude can describe it |
+| `get_logbook` / `get_error_log` | Logbook entries; HA logs from the Supervisor journal |
+| `get_automations` / `get_automation_trace` | Automations with status; stored execution traces for debugging |
+| `get_ha_config` / `get_services` / `get_supervisor_info` | Config details, service catalog, system info |
+| `get_device_registry` | Per-domain entity count summary |
+
+## Acting on it
+
+| Tool | What it does |
+|------|--------------|
+| `call_service` | Any HA service. With `return_response: true` it routes over the WebSocket API and returns **service response data** — how Claude captures the `area_id` from `brain.create_area` or a todo list's items |
+| `get_service_details` | Full field schema for a domain's services |
+| `control_light` / `control_climate` / `control_media_player` / `control_cover` / `control_fan` / `control_switch` / `control_lock` / `control_alarm` / `control_vacuum` | Purpose-built device control for every major domain |
+| `activate_scene` / `run_script` / `send_notification` / `fire_event` / `reload_config` | Scenes, scripts (with variables), notifications, custom events, config reloads |
+| `render_template` | Render Jinja2 — test a template before it goes in an automation |
+| `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox |
+
+## Scoping & safety
+
+- Every control tool funnels through the `call_service` chokepoint, so **per-agent service deny-lists** (e.g. no `lock.unlock` for a bedroom satellite) cover all of them at once.
+- Voice agents default to `mcp_only` tool access — HA tools yes, shell and file edits no.
+- `brain.*` Power Tools add their own layer: admin gating and id validation inside the service, regardless of who calls.
+
+## Generated context
+
+With `auto_generate_context` on (default), the add-on regenerates `/config/CLAUDE.md` at startup — a snapshot of your install (entities by domain, automations and their states, add-ons, integrations, directory guide) plus instructions for using the MCP tools and the Power Tools workflow. Claude reads it at the start of every session, which is why it never has to ask what a `sensor.lumi_lumi_weather_temperature_3` is doing in your kitchen.

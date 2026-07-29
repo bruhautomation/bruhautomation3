@@ -1,0 +1,55 @@
+---
+title: Helpers
+description: Create and delete input_boolean, input_number, input_select, input_text, input_datetime, counter, timer, and schedule helpers by asking.
+sidebar:
+  order: 6
+---
+
+Helpers are the building blocks of automations: the *Guest Mode* toggle, the heating-target slider, the laundry timer. They're normally UI-only — these two services open all eight storage-backed types to Claude and to automations, so “build me a manual heating override” creates the helper *and* the automation in one conversation.
+
+Type-specific options (min/max for `input_number`, the options list for `input_select`, duration for `timer`, weekday blocks for `schedule`) pass through to the helper's own schema, so validation errors match what the UI would say. Helpers defined in YAML are refused — those belong to your configuration files.
+
+## Create helper
+
+`brain.create_helper`
+
+Create a helper of any storage-backed type: input_boolean, input_number, input_select, input_text, input_datetime, counter, timer, or schedule. Type-specific options pass through and are validated by the helper's own schema. Returns the new helper's id and entity_id as response data.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `helper_type` | select | yes | Which kind of helper to create. |
+| `name` | text | yes | Name of the new helper. |
+| `options` | list of objects | no | Type-specific options, e.g. min/max/step for input_number, options list for input_select, duration for timer, has_date/has_time for input_datetime. |
+
+```yaml
+service: brain.create_helper
+data:
+  helper_type: input_number
+  name: Heating Target
+  options:
+    min: 15
+    max: 25
+    step: 0.5
+    unit_of_measurement: °C
+```
+
+> 🗣️ *"Build me a manual heating override: a target-temperature slider and a boolean to turn it on."*
+
+## Delete helper
+
+`brain.delete_helper`
+
+Delete one or more UI-created helpers of any storage-backed type. Helpers defined in YAML are refused with a clear error.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity (list) | yes | Helper entities to delete. |
+
+```yaml
+service: brain.delete_helper
+data:
+  entity_id:
+    - input_boolean.old_test_toggle
+```
+
+> 🗣️ *"Clean up the test helpers I made last month."*

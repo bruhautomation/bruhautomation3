@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 380" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#1e90ff" opacity="0.8"/>
+    </marker>
+    <marker id="arrG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#3fb950" opacity="0.8"/>
+    </marker>
+  </defs>
+
+  <rect width="860" height="380" rx="12" fill="url(#bg2)"/>
+  <text x="430" y="32" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="600">File-Based IPC — Assist Request Flow</text>
+
+  <!-- Step 1: User -->
+  <rect x="30" y="70" width="140" height="70" rx="10" fill="#1e90ff" fill-opacity="0.15" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="100" y="98" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">User</text>
+  <text x="100" y="118" text-anchor="middle" fill="#8b949e" font-size="10">Voice / Text</text>
+  <text x="100" y="155" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">1</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="170" y1="105" x2="210" y2="105" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr)"/>
+
+  <!-- Step 2: HA Core -->
+  <rect x="215" y="70" width="140" height="70" rx="10" fill="#1e90ff" fill-opacity="0.15" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="285" y="98" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">HA Core</text>
+  <text x="285" y="118" text-anchor="middle" fill="#8b949e" font-size="10">brain integration</text>
+  <text x="285" y="155" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">2</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="355" y1="105" x2="395" y2="105" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr)"/>
+
+  <!-- Step 3: Write JSON -->
+  <rect x="400" y="70" width="160" height="70" rx="10" fill="#f0883e" fill-opacity="0.15" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="480" y="93" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="600">Write Request</text>
+  <text x="480" y="113" text-anchor="middle" fill="#8b949e" font-size="10">requests/{uuid}.json</text>
+  <text x="480" y="130" text-anchor="middle" fill="#8b949e" font-size="9">{text, session_id, model}</text>
+  <text x="480" y="155" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">3</text>
+
+  <!-- Arrow 3→4 -->
+  <line x1="560" y1="105" x2="600" y2="105" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.6" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+  <text x="580" y="95" text-anchor="middle" fill="#8b949e" font-size="9">inotify</text>
+
+  <!-- Step 4: Assist Listener -->
+  <rect x="605" y="70" width="160" height="70" rx="10" fill="#3fb950" fill-opacity="0.15" stroke="#3fb950" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="685" y="93" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="600">Assist Listener</text>
+  <text x="685" y="113" text-anchor="middle" fill="#8b949e" font-size="10">Detects new file</text>
+  <text x="685" y="130" text-anchor="middle" fill="#8b949e" font-size="9">Parses JSON request</text>
+  <text x="685" y="155" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">4</text>
+
+  <!-- Arrow 4→5 (down) -->
+  <line x1="685" y1="140" x2="685" y2="195" stroke="#3fb950" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arrG)"/>
+
+  <!-- Step 5: Claude Code -->
+  <rect x="605" y="200" width="220" height="70" rx="10" fill="#f0883e" fill-opacity="0.15" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="715" y="228" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="600">Claude Code Invocation</text>
+  <text x="715" y="248" text-anchor="middle" fill="#8b949e" font-size="10">--print --model --max-turns</text>
+  <text x="715" y="278" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">5</text>
+
+  <!-- Arrow 5→6 (left) -->
+  <line x1="605" y1="235" x2="560" y2="235" stroke="#3fb950" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arrG)"/>
+
+  <!-- Step 6: Write Response -->
+  <rect x="370" y="200" width="185" height="70" rx="10" fill="#3fb950" fill-opacity="0.15" stroke="#3fb950" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="462" y="223" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="600">Write Response</text>
+  <text x="462" y="243" text-anchor="middle" fill="#8b949e" font-size="10">responses/{uuid}.json</text>
+  <text x="462" y="258" text-anchor="middle" fill="#8b949e" font-size="9">{response, session_id}</text>
+  <text x="462" y="278" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">6</text>
+
+  <!-- Arrow 6→7 (left) -->
+  <line x1="370" y1="235" x2="330" y2="235" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.6" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+  <text x="350" y="225" text-anchor="middle" fill="#8b949e" font-size="9">poll</text>
+
+  <!-- Step 7: Integration reads response -->
+  <rect x="155" y="200" width="170" height="70" rx="10" fill="#1e90ff" fill-opacity="0.15" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="240" y="223" text-anchor="middle" fill="#1e90ff" font-size="12" font-weight="600">Integration Reads</text>
+  <text x="240" y="243" text-anchor="middle" fill="#8b949e" font-size="10">Polls for response file</text>
+  <text x="240" y="258" text-anchor="middle" fill="#8b949e" font-size="9">Returns to conversation</text>
+  <text x="240" y="278" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">7</text>
+
+  <!-- Arrow 7→8 (left) -->
+  <line x1="155" y1="235" x2="115" y2="235" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.6" marker-end="url(#arr)"/>
+
+  <!-- Step 8: User response -->
+  <rect x="20" y="200" width="90" height="70" rx="10" fill="#a371f7" fill-opacity="0.15" stroke="#a371f7" stroke-width="1.5" stroke-opacity="0.5"/>
+  <text x="65" y="228" text-anchor="middle" fill="#a371f7" font-size="12" font-weight="600">User</text>
+  <text x="65" y="248" text-anchor="middle" fill="#8b949e" font-size="10">Gets reply</text>
+  <text x="65" y="278" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="500">8</text>
+
+  <!-- Bottom notes -->
+  <rect x="30" y="305" width="800" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="430" y="328" text-anchor="middle" fill="#c9d1d9" font-size="11" font-weight="500">Key Design Decisions</text>
+  <text x="170" y="350" text-anchor="middle" fill="#8b949e" font-size="10">Resilient fallback for the HTTP/SSE path</text>
+  <text x="430" y="350" text-anchor="middle" fill="#8b949e" font-size="10">inotifywait for instant detection</text>
+  <text x="690" y="350" text-anchor="middle" fill="#8b949e" font-size="10">Polling fallback with 0.1s interval</text>
+</svg>
