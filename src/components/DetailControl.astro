@@ -1,28 +1,32 @@
 ---
 /**
- * The site-wide Detail slider: a three-detent range control that sets how
- * much depth the current page shows. Sits in the header next to the social
- * icons (see SocialIcons.astro) and in the mobile menu footer.
+ * The site-wide Detail control: three labeled buttons — Overview · Details ·
+ * Under the hood — that set how much depth the current page shows. Docked at
+ * the top of the page content (see MarkdownContent.astro) so it's equally
+ * visible on desktop and mobile; the words themselves say what it does.
  *
- * Positions label the content, not the reader:
- *   ●○○ Overview · ●●○ More details · ●●● Under the hood
+ * Positions label the content, not the reader.
  *
  * State lives in localStorage('bruh-detail') and is stamped on
  * <html data-detail> by a blocking head script (astro.config.mjs) before
- * first paint, so there is no flash and no animation on page load. This
- * component only renders visibly on pages that contain level-tagged
- * content (Detail.astro wrappers). Styles live in custom.css.
+ * first paint, so there is no flash and no animation on page load. The
+ * control only renders visibly on pages that contain level-tagged content
+ * (Detail.astro wrappers). Styles live in custom.css.
  */
 ---
 
-<bruh-detail-slider class="detail-slider" hidden>
-	<span class="detail-slider__label" aria-hidden="true">Detail</span>
-	<input type="range" min="1" max="3" step="1" value="1" aria-label="Detail level" />
-</bruh-detail-slider>
+<bruh-detail-control class="detail-control" hidden>
+	<span class="detail-control__label" aria-hidden="true">Detail</span>
+	<div class="detail-control__track" role="group" aria-label="Detail level">
+		<button type="button" data-level="1" aria-pressed="false">Overview</button>
+		<button type="button" data-level="2" aria-pressed="false">Details</button>
+		<button type="button" data-level="3" aria-pressed="false">Under the hood</button>
+	</div>
+</bruh-detail-control>
 
 <script>
 	const KEY = 'bruh-detail';
-	const NAMES = ['Overview', 'More details', 'Under the hood'];
+	const NAMES = ['Overview', 'Details', 'Under the hood'];
 	const root = document.documentElement;
 
 	const current = (): number => {
@@ -99,51 +103,42 @@
 		if (!levels.length || levels.includes(current())) return;
 		const target = levels.find((l) => l > current()) ?? levels[levels.length - 1];
 		setLevel(target, false);
-		toast(`Detail turned up to “${NAMES[target - 1]}” for this link`);
+		toast(`Showing “${NAMES[target - 1]}” to reveal this section`);
 		setTimeout(() => el.scrollIntoView({ block: 'start' }), 500);
 	}
 
-	class BruhDetailSlider extends HTMLElement {
-		#input: HTMLInputElement | null = null;
+	class BruhDetailControl extends HTMLElement {
+		#buttons: HTMLButtonElement[] = [];
 
 		connectedCallback() {
 			// Only appear on pages that actually have level-tagged content.
 			if (!document.querySelector('[data-dmin]')) return;
-			const input = this.querySelector('input');
-			if (!input) return;
-			this.#input = input;
+			this.#buttons = Array.from(this.querySelectorAll('button'));
+			if (!this.#buttons.length) return;
 			this.hidden = false;
 
-			let stored: string | null = null;
-			try {
-				stored = localStorage.getItem(KEY);
-			} catch {
-				/* private browsing */
-			}
-			if (stored === null) this.classList.add('is-hint'); // first visit: pulse once
-
 			this.#sync(current());
-			input.addEventListener('input', () => {
-				this.classList.remove('is-hint');
-				setLevel(parseInt(input.value, 10) || 1);
+			this.#buttons.forEach((btn) => {
+				btn.addEventListener('click', () => {
+					setLevel(parseInt(btn.dataset.level || '1', 10));
+				});
 			});
 			window.addEventListener('bruh-detail-change', ((e: CustomEvent) =>
 				this.#sync(e.detail as number)) as EventListener);
 		}
 
 		#sync(level: number) {
-			const input = this.#input;
-			if (!input) return;
-			input.value = String(level);
-			input.style.setProperty('--detail-fill', `${((level - 1) / 2) * 100}%`);
-			const name = NAMES[level - 1];
-			input.setAttribute('aria-valuetext', name);
-			input.title = `Detail: ${name}`;
+			this.#buttons.forEach((btn) => {
+				btn.setAttribute(
+					'aria-pressed',
+					btn.dataset.level === String(level) ? 'true' : 'false',
+				);
+			});
 		}
 	}
 
-	if (!customElements.get('bruh-detail-slider')) {
-		customElements.define('bruh-detail-slider', BruhDetailSlider);
+	if (!customElements.get('bruh-detail-control')) {
+		customElements.define('bruh-detail-control', BruhDetailControl);
 	}
 
 	// Initial pass: the head script has already stamped data-detail.

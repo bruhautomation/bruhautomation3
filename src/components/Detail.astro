@@ -1,15 +1,16 @@
 ---
 /**
- * Level-gated content for the site-wide Detail slider.
+ * Level-gated content for the site-wide Detail control.
  *
- * The slider (see DetailSlider.astro) stamps `data-detail="1|2|3"` on <html>;
- * CSS in custom.css shows or hides these wrappers to match. Everything is
- * always in the DOM, so search indexing and no-JS readers see the full page.
+ * The control (see DetailControl.astro) stamps `data-detail="1|2|3"` on
+ * <html>; CSS in custom.css shows or hides these wrappers to match.
+ * Everything is always in the DOM, so search indexing and no-JS readers see
+ * the full page.
  *
  * Levels label the CONTENT, never the reader:
  *   1 — Overview        what it is, what it does, how to get it running
- *   2 — More details    configuration, how-it-works, gotchas
- *   3 — Under the hood  architecture, internals, full reference tables
+ *   2 — Details         configuration, how-it-works, tables, gotchas
+ *   3 — Under the hood  architecture, internals, design rationale
  *
  * Usage (block — animates open/closed):
  *   <Detail min={2}> …extra depth from level 2 up… </Detail>

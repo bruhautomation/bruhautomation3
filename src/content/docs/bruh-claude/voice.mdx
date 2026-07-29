@@ -11,7 +11,7 @@ Pick **BRUH Claude** as a conversation agent under **Settings → Voice Assistan
 
 Typical commands answer in **~3–5 seconds**, and replies **stream**, so TTS starts speaking at the first sentence on streaming-capable pipelines.
 
-<Detail min={2}>
+<Detail min={3}>
 
 Two mechanisms:
 
@@ -41,7 +41,7 @@ New agents default to **Claude Haiku** for snappy responses; pick any model per 
 
 ## Conversation memory
 
-Follow-ups genuinely remember the conversation — *"turn on the fan"* … *"actually, make it slower"* just works — for as long as the same chat or voice session stays open. <Detail inline min={2}>Mechanically: Home Assistant keeps the same `conversation_id` for the session, and the add-on **resumes the same Claude session** for each turn. A new session starts a clean slate; `bruh_claude.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.</Detail>
+Follow-ups genuinely remember the conversation — *"turn on the fan"* … *"actually, make it slower"* just works — for as long as the same chat or voice session stays open. <Detail inline min={3}>Mechanically: Home Assistant keeps the same `conversation_id` for the session, and the add-on **resumes the same Claude session** for each turn. A new session starts a clean slate; `bruh_claude.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.</Detail>
 
 Voice is also how the house [learns](/bruh-claude/memory/): say *"remember that we call the office lamp 'the beacon'"* and it's stored instantly.
 

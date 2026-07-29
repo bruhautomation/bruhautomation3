@@ -252,30 +252,11 @@ iframe {
 	--cl-security: #8250df;
 }
 
-.changelog-eyebrow {
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	font-size: var(--sl-text-xs);
-	font-weight: 700;
-	color: var(--sl-color-accent);
-	margin: 0 0 0.75rem;
-}
-
-.changelog-intro {
-	color: var(--sl-color-gray-2);
-	margin: 0.35rem 0;
-	max-width: 70ch;
-}
-.changelog-intro--muted {
-	font-size: var(--sl-text-sm);
-	color: var(--sl-color-gray-3);
-}
-
 .changelog-releases {
 	display: flex;
 	flex-direction: column;
 	gap: 1.25rem;
-	margin-top: 2.25rem;
+	margin-top: 1.5rem;
 }
 
 /* Release card */
@@ -498,20 +479,23 @@ iframe {
  * hidden — crawlers and no-JS readers always get the full page.
  */
 
-/* The control (header right-group + mobile menu footer) */
-.detail-slider {
-	display: inline-flex;
+/* The control — docked at the top of page content on every viewport */
+.detail-control {
+	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	margin: 0 0 1rem;
 }
 
 /* Stays hidden on pages with no level-tagged content (the author display
    above would otherwise beat the [hidden] attribute's UA style) */
-.detail-slider[hidden] {
+.detail-control[hidden] {
 	display: none;
 }
 
-.detail-slider__label {
+.detail-control__label {
 	font-size: var(--sl-text-xs);
 	font-weight: 600;
 	text-transform: uppercase;
@@ -520,101 +504,57 @@ iframe {
 	user-select: none;
 }
 
-.detail-slider input[type='range'] {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 4.25rem;
-	height: 1.25rem; /* generous hit area; track is drawn thinner */
-	margin: 0;
+.detail-control__track {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	padding: 3px;
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 9999px;
+}
+
+.detail-control__track button {
+	border: 0;
 	background: transparent;
+	color: var(--sl-color-gray-2);
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+	line-height: 1;
+	padding: 0.45rem 0.8rem;
+	border-radius: 9999px;
 	cursor: pointer;
-	--detail-fill: 0%;
+	white-space: nowrap;
+	transition:
+		background 0.2s ease,
+		color 0.2s ease;
 }
 
-.detail-slider input[type='range']:focus-visible {
+.detail-control__track button:hover {
+	color: var(--sl-color-white);
+}
+
+.detail-control__track button[aria-pressed='true'] {
+	background: var(--sl-color-accent);
+	color: #fff;
+}
+
+.detail-control__track button:focus-visible {
 	outline: 2px solid var(--sl-color-accent);
-	outline-offset: 4px;
-	border-radius: 4px;
+	outline-offset: 2px;
 }
 
-/* Track: accent fill up to the thumb, three faint detent dots behind it */
-.detail-slider input[type='range']::-webkit-slider-runnable-track {
-	height: 4px;
-	border-radius: 2px;
-	background:
-		linear-gradient(
-			to right,
-			var(--sl-color-accent) var(--detail-fill),
-			transparent var(--detail-fill)
-		),
-		radial-gradient(circle 2px at 2px 50%, var(--sl-color-gray-3) 98%, transparent),
-		radial-gradient(circle 2px at 50% 50%, var(--sl-color-gray-3) 98%, transparent),
-		radial-gradient(circle 2px at calc(100% - 2px) 50%, var(--sl-color-gray-3) 98%, transparent),
-		linear-gradient(var(--sl-color-gray-5), var(--sl-color-gray-5));
-}
-
-.detail-slider input[type='range']::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 14px;
-	height: 14px;
-	margin-top: -5px;
-	border: none;
-	border-radius: 50%;
-	background: var(--sl-color-accent);
-	box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
-	transition: transform 0.15s ease;
-}
-
-.detail-slider input[type='range']:active::-webkit-slider-thumb {
-	transform: scale(1.15);
-}
-
-.detail-slider input[type='range']::-moz-range-track {
-	height: 4px;
-	border-radius: 2px;
-	background:
-		radial-gradient(circle 2px at 2px 50%, var(--sl-color-gray-3) 98%, transparent),
-		radial-gradient(circle 2px at 50% 50%, var(--sl-color-gray-3) 98%, transparent),
-		radial-gradient(circle 2px at calc(100% - 2px) 50%, var(--sl-color-gray-3) 98%, transparent),
-		linear-gradient(var(--sl-color-gray-5), var(--sl-color-gray-5));
-}
-
-.detail-slider input[type='range']::-moz-range-progress {
-	height: 4px;
-	border-radius: 2px;
-	background: var(--sl-color-accent);
-}
-
-.detail-slider input[type='range']::-moz-range-thumb {
-	width: 14px;
-	height: 14px;
-	border: none;
-	border-radius: 50%;
-	background: var(--sl-color-accent);
-	box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
-	transition: transform 0.15s ease;
-}
-
-/* First visit: pulse the thumb once so the control gets noticed */
-@keyframes detail-hint-pulse {
-	0%,
-	100% {
-		box-shadow: 0 0 0 3px var(--sl-color-bg-nav);
+/* Tight phones: drop the label, keep the three words */
+@media (max-width: 24rem) {
+	.detail-control {
+		justify-content: center;
 	}
-	50% {
-		box-shadow:
-			0 0 0 3px var(--sl-color-bg-nav),
-			0 0 0 8px color-mix(in srgb, var(--sl-color-accent) 35%, transparent);
+	.detail-control__label {
+		display: none;
 	}
-}
-
-.detail-slider.is-hint input[type='range']::-webkit-slider-thumb {
-	animation: detail-hint-pulse 1.6s ease-in-out 3;
-}
-
-.detail-slider.is-hint input[type='range']::-moz-range-thumb {
-	animation: detail-hint-pulse 1.6s ease-in-out 3;
+	.detail-control__track button {
+		padding: 0.45rem 0.6rem;
+	}
 }
 
 /* Gated content — block form animates open/closed via the 0fr/1fr trick */
@@ -664,10 +604,6 @@ iframe {
 @media (prefers-reduced-motion: reduce) {
 	.detail-block {
 		transition: none;
-	}
-	.detail-slider.is-hint input[type='range']::-webkit-slider-thumb,
-	.detail-slider.is-hint input[type='range']::-moz-range-thumb {
-		animation: none;
 	}
 }
 

@@ -29,9 +29,9 @@ export default defineConfig({
 			lastUpdated: true,
 			components: {
 				ThemeSelect: './src/components/ThemeToggle.astro',
-				// Adds the Detail slider next to the social icons (header +
-				// mobile menu footer). The default icons still render inside.
-				SocialIcons: './src/components/SocialIcons.astro',
+				// Docks the Detail control (Overview · Details · Under the hood)
+				// at the top of every page's content, on all viewports.
+				MarkdownContent: './src/components/MarkdownContent.astro',
 			},
 			logo: {
 				dark: './src/assets/bruh-logo-light.svg',
@@ -50,7 +50,7 @@ export default defineConfig({
 				// index.astro, command-generator.astro) sets its own, so a global one
 				// here would emit a duplicate <meta name="description"> on every page.
 				{
-					// Detail slider: stamp the saved level on <html> BEFORE first
+					// Detail control: stamp the saved level on <html> BEFORE first
 					// paint so gated content never flashes (same trick as theme).
 					// `?detail=1|2|3` in the URL overrides and persists — lets a
 					// link share a page at a given depth. Without JS the attribute

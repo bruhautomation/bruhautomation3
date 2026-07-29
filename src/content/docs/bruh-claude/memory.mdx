@@ -7,7 +7,7 @@ import Detail from '../../../components/Detail.astro';
 
 BRUH Claude keeps a small, human-readable long-term memory about your home<Detail inline min={2}> at `/config/.bruh_claude/memory/`</Detail> — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and it's shared across every Claude surface in your house.
 
-<Detail min={2}>
+<Detail min={3}>
 
 ## What lives where
 
@@ -23,10 +23,10 @@ BRUH Claude keeps a small, human-readable long-term memory about your home<Detai
 ## How it learns
 
 - **You tell it** — say *"remember that…"* to a voice assistant<Detail inline min={2}>, run `ha-memory add "…"` in the terminal, or call `bruh_claude.add_memory` from an automation</Detail>.
-- **It notices** — after a voice conversation ends, it quietly extracts the facts worth keeping: preferences, corrections, nicknames. <Detail inline min={2}>Mechanically, a bounded reflection pass (cheap Haiku, no tools, ~60 s budget) extracts at most 3 durable facts per conversation. Transient states, one-off commands, and secrets are excluded.</Detail>
+- **It notices** — after a voice conversation ends, it quietly extracts the facts worth keeping: preferences, corrections, nicknames. <Detail inline min={3}>Mechanically, a bounded reflection pass (cheap Haiku, no tools, ~60 s budget) extracts at most 3 durable facts per conversation. Transient states, one-off commands, and secrets are excluded.</Detail>
 - **Other add-ons contribute** — [BRUH Insights](/bruh-insights/) shares what its reports discover<Detail inline min={2}> via `bruh_claude.add_memory` / `bruh_claude.answer_question`; add-ons without the integration drop facts into `/share/bruh_claude/memory-inbox/`. See [better together](/bruh-claude/better-together/)</Detail>.
 
-<Detail min={2}>
+<Detail min={3}>
 
 A background **consolidator** merges the inbox into `memory.md` + `voice.md` once a day (or early when 20+ facts are pending) — deduping, resolving contradictions newest-wins, enforcing the size cap. Questions unanswered for 21 days retire automatically.
 

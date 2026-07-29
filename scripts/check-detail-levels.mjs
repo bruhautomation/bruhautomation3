@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Guardrail for the Detail slider (src/components/Detail.astro).
+ * Guardrail for the Detail control (src/components/Detail.astro).
  *
  * The authoring rule is that every page must read as a complete document at
  * level 1 (Overview) — level 1 is the default a first-time visitor sees, not
