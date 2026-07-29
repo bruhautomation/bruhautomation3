@@ -3,8 +3,6 @@ title: Using with Insights
 description: How BRUH Terminal and BRUH Insights share one login, one memory, and one view of your home — and what each one is for.
 ---
 
-import Detail from '../../../components/Detail.astro';
-
 [BRUH Terminal](/bruh-claude/) and [BRUH Insights](/bruh-insights/) each work alone. Installed together they share one login and one memory: the Terminal acts, Insights analyzes.
 
 ## Setup
@@ -25,21 +23,17 @@ import Detail from '../../../components/Detail.astro';
 
 ## One login
 
-Run `ha-share-login` once in the Terminal and your Claude subscription is shared<Detail inline min={2}> at `/config/.bruh_claude/secrets/`</Detail>. Insights picks it up automatically and shows "Claude · shared login" in its auth chip — no second sign-in, no pasted tokens. Revoke any time with `ha-share-login --revoke`.
+Run `ha-share-login` once in the Terminal and your Claude subscription is shared at `/config/.bruh_claude/secrets/`. Insights picks it up automatically and shows "Claude · shared login" in its auth chip — no second sign-in, no pasted tokens. Revoke any time with `ha-share-login --revoke`.
 
 ## One memory
 
 Both add-ons read and write the same home memory file, `/config/.bruh_claude/memory/memory.md`:
 
-- Tell the Terminal *"remember that guests use the loft"*<Detail inline min={2}> (voice, `ha-memory add`, or `bruh_claude.add_memory`)</Detail> and Insights folds that fact into every future analysis.
-- When Insights' analyst discovers a finding or you answer one of its questions, the knowledge lands in the shared memory. Voice answers get smarter because a report learned something.
+- Tell the Terminal *"remember that guests use the loft"* (voice, `ha-memory add`, or `bruh_claude.add_memory`) and Insights folds that fact into every future analysis.
+- When Insights' analyst discovers a finding or you answer one of its questions, it hands the knowledge to the `bruh_claude` integration, and the Terminal's consolidator merges it into shared memory. Voice answers get smarter because a report learned something.
 - The Memory dialog in Insights and `ha-memory edit` in the Terminal are two editors for the same document.
 
-<Detail min={3}>
-
 A background consolidator dedupes and resolves contradictions newest-wins. Without the Terminal installed, Insights parks facts in `/share/bruh_claude/memory-inbox/` drop-files, ready to be ingested the day you add it.
-
-</Detail>
 
 ## One usage budget
 
@@ -52,13 +46,8 @@ Insights' analysis is only as good as the structure it reads. The Terminal's [Po
 - **Areas and floors** — room-by-room climate and presence analysis needs entities that actually have rooms. *"Put every unassigned entity in its right area"* is a one-liner.
 - **Labels** — label your battery-powered devices once; device-health insights can group by it.
 - **Sane names** — `light.kitchen_ceiling` reads better than `light.shelly_1pm_9a4c2f` in a chart and a voice reply alike.
-
-<Detail min={2}>
-
 - **[`import_statistics`](/bruh-claude/power-tools/blueprints-and-statistics/)** — backfill the gap from when your meter was offline, and the energy insight stops drawing a hole.
 - **[`find_orphaned_references`](/bruh-claude/power-tools/diagnostics-and-repairs/)** — dead references become repair issues before they show up as anomalies in a report.
-
-</Detail>
 
 ## The loop in practice
 

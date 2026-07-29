@@ -26,16 +26,6 @@ const showDrafts =
 
 const mode = showDrafts ? 'preview' : 'production';
 
-// Guardrail: every page using the Detail slider must still read as a
-// complete document at level 1. Fails fast, before the (slower) Astro build.
-const detailCheck = spawnSync('node scripts/check-detail-levels.mjs', {
-	stdio: 'inherit',
-	shell: true,
-});
-if (detailCheck.status !== 0) {
-	process.exit(detailCheck.status ?? 1);
-}
-
 const result = spawnSync(`npx astro build --mode ${mode}`, {
 	stdio: 'inherit',
 	shell: true,

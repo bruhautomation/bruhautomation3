@@ -5,8 +5,6 @@ sidebar:
   order: 6
 ---
 
-import Detail from '../../../../components/Detail.astro';
-
 Helpers are the building blocks of automations: the *Guest Mode* toggle, the heating-target slider, the laundry timer. They're normally UI-only — these two services open all eight storage-backed types to Claude and to automations, so “build me a manual heating override” creates the helper *and* the automation in one conversation.
 
 Type-specific options (min/max for `input_number`, the options list for `input_select`, duration for `timer`, weekday blocks for `schedule`) pass through to the helper's own schema, so validation errors match what the UI would say. Helpers defined in YAML are refused — those belong to your configuration files.
@@ -16,8 +14,6 @@ Type-specific options (min/max for `input_number`, the options list for `input_s
 `bruh_claude.create_helper`
 
 Create a helper of any storage-backed type: input_boolean, input_number, input_select, input_text, input_datetime, counter, timer, or schedule. Type-specific options pass through and are validated by the helper's own schema. Returns the new helper's id and entity_id as response data.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -37,8 +33,6 @@ data:
     unit_of_measurement: °C
 ```
 
-</Detail>
-
 > 🗣️ *"Build me a manual heating override: a target-temperature slider and a boolean to turn it on."*
 
 ## Delete helper
@@ -46,8 +40,6 @@ data:
 `bruh_claude.delete_helper`
 
 Delete one or more UI-created helpers of any storage-backed type. Helpers defined in YAML are refused with a clear error.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -59,7 +51,5 @@ data:
   entity_id:
     - input_boolean.old_test_toggle
 ```
-
-</Detail>
 
 > 🗣️ *"Clean up the test helpers I made last month."*

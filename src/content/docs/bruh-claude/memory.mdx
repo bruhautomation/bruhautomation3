@@ -3,11 +3,7 @@ title: Memory & Learning
 description: How BRUH Claude builds long-term memory about your home — what it learns, where it lives, and how to view, edit, or erase it.
 ---
 
-import Detail from '../../../components/Detail.astro';
-
-BRUH Claude keeps a small, human-readable long-term memory about your home<Detail inline min={2}> at `/config/.bruh_claude/memory/`</Detail> — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and it's shared across every Claude surface in your house.
-
-<Detail min={3}>
+BRUH Claude keeps a small, human-readable long-term memory about your home at `/config/.bruh_claude/memory/` — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and it's shared across every Claude surface in your house.
 
 ## What lives where
 
@@ -18,27 +14,17 @@ BRUH Claude keeps a small, human-readable long-term memory about your home<Detai
 | `inbox/` | Append-only candidate facts (JSONL) waiting to be consolidated. |
 | `questions.jsonl` | Open questions Claude wants answered, plus their answers. |
 
-</Detail>
-
 ## How it learns
 
-- **You tell it** — say *"remember that…"* to a voice assistant<Detail inline min={2}>, run `ha-memory add "…"` in the terminal, or call `bruh_claude.add_memory` from an automation</Detail>.
-- **It notices** — after a voice conversation ends, it quietly extracts the facts worth keeping: preferences, corrections, nicknames. <Detail inline min={3}>Mechanically, a bounded reflection pass (cheap Haiku, no tools, ~60 s budget) extracts at most 3 durable facts per conversation. Transient states, one-off commands, and secrets are excluded.</Detail>
-- **Other add-ons contribute** — [BRUH Insights](/bruh-insights/) shares what its reports discover<Detail inline min={2}> via `bruh_claude.add_memory` / `bruh_claude.answer_question`; add-ons without the integration drop facts into `/share/bruh_claude/memory-inbox/`. See [better together](/bruh-claude/better-together/)</Detail>.
-
-<Detail min={3}>
+- **You tell it** — say *"remember that…"* to a voice assistant, run `ha-memory add "…"` in the terminal, or call `bruh_claude.add_memory` from an automation.
+- **It notices** — when a voice conversation ends, a bounded reflection pass (cheap Haiku, no tools, ~60 s budget) extracts up to 3 durable facts: preferences, corrections, nicknames. Transient states, one-off commands, and secrets are excluded.
+- **Other add-ons contribute** — [BRUH Insights](/bruh-insights/) hands over its findings and answered questions via `bruh_claude.add_memory` / `bruh_claude.answer_question`; add-ons without the integration drop facts into `/share/bruh_claude/memory-inbox/`. See [better together](/bruh-claude/better-together/).
 
 A background **consolidator** merges the inbox into `memory.md` + `voice.md` once a day (or early when 20+ facts are pending) — deduping, resolving contradictions newest-wins, enforcing the size cap. Questions unanswered for 21 days retire automatically.
 
 Learned knowledge is used in three places: **voice prompts** (`voice.md`), **insight jobs** (alongside each job's previous report for continuity), and the generated `/config/CLAUDE.md` **terminal context**.
 
-</Detail>
-
 ## Viewing, editing, clearing
-
-Everything it knows is yours to see and change: `ha-memory list` shows it, `ha-memory edit` opens it in an editor, `ha-memory clear --confirm` erases it.
-
-<Detail min={2}>
 
 ```bash
 ha-memory list                        # what Claude knows
@@ -68,8 +54,6 @@ data:
   question: "Which thermostat schedule applies on holidays?"
   answer: "Treat holidays like weekends"
 ```
-
-</Detail>
 
 ## Kill switches
 

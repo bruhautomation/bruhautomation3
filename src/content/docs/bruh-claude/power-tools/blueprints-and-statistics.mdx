@@ -5,8 +5,6 @@ sidebar:
   order: 8
 ---
 
-import Detail from '../../../../components/Detail.astro';
-
 Two importers. `import_blueprint` pulls an automation or script blueprint straight from a community-forum topic, GitHub file, or Gist. Tell Claude "set up that blueprint" with a link and it can import *and* configure it in one conversation.
 
 `import_statistics` writes long-term statistics rows directly: repair a broken energy dashboard, migrate meter history from a previous system, or feed external data (solar forecasts, utility bills) into HA's statistics store. BRUH Insights reads long-term statistics for its energy analysis, so backfilled history makes those insights smarter too.
@@ -16,8 +14,6 @@ Two importers. `import_blueprint` pulls an automation or script blueprint straig
 `bruh_claude.import_blueprint`
 
 Import an automation or script blueprint from a URL (Home Assistant community forum, GitHub, or GitHub Gist). Returns the blueprint domain, name, and file path as response data.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -29,8 +25,6 @@ data:
   url: https://community.home-assistant.io/t/motion-activated-light/123456
 ```
 
-</Detail>
-
 > 🗣️ *"Import that motion-activated-light blueprint from the forum and set it up for the hallway."*
 
 ## Import statistics
@@ -38,8 +32,6 @@ data:
 `bruh_claude.import_statistics`
 
 Import or backfill long-term statistics rows. Use an entity ID (sensor.gas_meter) for recorder statistics, or an external ID (bruh:solar_forecast) for external statistics; the source is derived automatically.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -65,7 +57,5 @@ data:
       state: 1235.1
       sum: 1235.1
 ```
-
-</Detail>
 
 > 🗣️ *"My energy dashboard has a gap from when the meter was offline — backfill it from this CSV."*

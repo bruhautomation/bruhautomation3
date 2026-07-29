@@ -3,15 +3,7 @@ title: Reference
 description: Every BRUH Minecraft Server option, sensor, button, service, and panel tab — in one place.
 ---
 
-import Detail from '../../../components/Detail.astro';
-
 Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Minecraft Server → Configuration**.
-
-<Detail max={1}>
-
-At this Overview level the page keeps the essentials: the one option you must set (`eula: true`), where gameplay settings live, plugins, the panel tour, and troubleshooting. Turn the **Detail** control up a notch for every configuration option, the recommended presets, and the full entity/service tables — and to *Under the hood* for file layouts and how offline mode is detected.
-
-</Detail>
 
 ## Configuration options
 
@@ -20,8 +12,6 @@ At this Overview level the page keeps the essentials: the one option you must se
 | Option | Default | What it does |
 |--------|---------|--------------|
 | `eula` | `false` | **Set to `true` to start.** Accepts the Minecraft EULA. |
-
-<Detail min={2}>
 
 ### Server type & version
 
@@ -32,8 +22,6 @@ At this Overview level the page keeps the essentials: the one option you must se
 | `auto_update_server` | `true` | Re-resolve the jar on every boot. Disable to pin. |
 | `active_world` | `default` | Which saved profile is live. See [Multi-world](#multi-world-profiles). |
 
-</Detail>
-
 ### Gameplay — per world, not add-on options
 
 Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Each world owns its own `server.properties` — gamemode, force-gamemode, difficulty, PVP, hardcore, whitelist, max players, view/sim distance, world-gen (level name/seed/type, structures, mobs), online-mode, resource pack, command blocks, op level, connection throttle, idle timeout, MOTD, and everything else — edited from the panel's **Server Properties** tab (or set up front by the new-world wizard). Settings are seeded with sensible defaults the first time a world boots, then they're yours forever; switching worlds loads each world's own settings.
@@ -41,8 +29,6 @@ Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Eac
 - **OP a player:** join once, then click **op** next to their name on the panel's **Players** tab. Ops persist per-world in `ops.json`.
 - **Offline / LAN mode:** set a world's `online-mode: false` in **Server Properties** — the add-on silently forces `enforce-secure-profile: false`, switches Geyser to offline auth, uninstalls Floodgate, and disables Bedrock login validation. See [Family mode](/bruh-minecraft/quickstart/#family-mode-no-xbox-required).
 - **Command blocks / op level:** `enable-command-block` and `op-permission-level` are ordinary per-world properties on the same tab.
-
-<Detail min={2}>
 
 ### Performance
 
@@ -81,8 +67,6 @@ Connection throttle and player idle timeout are per-world `server.properties` ke
 | `geyser_auth_type` | `auto` | `auto` resolves to `offline` when the active world's `online-mode` is off, else `floodgate`. Also accepts `online`. |
 | `geyser_mtu` | `1400` | Drop to `1200` if iOS hangs on "Connecting…". |
 
-</Detail>
-
 ### Plugins
 
 Two ways to install plugins, mix and match freely.
@@ -108,11 +92,7 @@ Tick a checkbox in the **Configuration** tab and the add-on resolves the latest 
 
 Toggling a checkbox **off** does NOT remove the jar — delete it from the panel's **Plugins** tab to remove.
 
-<Detail min={2}>
-
 Duplicate plugin jars (which make Paper log "Ambiguous plugin name" and randomly disable one copy) are auto-quarantined to `plugins/.quarantine/` on boot — controlled by `auto_quarantine_duplicates` (default `true`); jars are moved, never deleted.
-
-</Detail>
 
 #### Custom URL list
 
@@ -125,15 +105,11 @@ plugins:
   - "https://example.com/ViaVersion.jar"   # plain URL also works
 ```
 
-Loaded for `paper` / `purpur` / `folia`. Bad URLs are skipped with a warning, never block startup.<Detail inline min={3}> Downloads use `If-Modified-Since` so unchanged jars don't re-fetch.</Detail>
-
-<Detail min={2}>
+Loaded for `paper` / `purpur` / `folia`. Bad URLs are skipped with a warning, never block startup. Downloads use `If-Modified-Since` so unchanged jars don't re-fetch.
 
 :::tip
 GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is named *exactly* `X.jar`. Versioned filenames like `NickNamer-5.15.0.jar` need a pinned URL.
 :::
-
-</Detail>
 
 #### Where to browse for more plugins
 
@@ -143,8 +119,6 @@ GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is name
 | [Hangar](https://hangar.papermc.io) | PaperMC's official marketplace. ViaVersion, ViaBackwards, ViaRewind, ProtocolLib, PlaceholderAPI live here. |
 | [SpigotMC](https://www.spigotmc.org/resources/categories/spigot.4/) | The original Bukkit-plugin marketplace. Some plugins are still SpigotMC-only. |
 | [BukkitDev](https://dev.bukkit.org/bukkit-plugins) | Older but still hosts a few classics. |
-
-<Detail min={2}>
 
 ### Other
 
@@ -202,34 +176,20 @@ Since 1.8.0 the split is simple:
 3. **Panel ops/whitelist/bans persist per world.** They live in each world's `ops.json` / `whitelist.json` / `banned-players.json`.
 4. **`plugins:` URLs and `install_*` toggles re-resolve on every boot** into the **active** world's `plugins/` folder. Deleting a jar from the panel is temporary if its URL/toggle is still set.
 
-</Detail>
-
 ## Multi-world profiles
 
 Each profile is a full server root at `/config/minecraft-worlds/<name>/` with its own world, `server.properties`, plugins, and backups. Only one is active at a time.
 
-![The Worlds tab: each profile listed with size, per-world settings, and Switch / Download / Delete actions — plus one-click Featured world installs below](/images/bruh-minecraft/panel-worlds.webp)
-
 **Switch:** Panel → **Worlds tab → Switch**. Writes `active_world`, full restart, ~30 s.
-
-<Detail min={2}>
 
 **Per-profile:** world files, `server.properties`, plugins folder, ops/whitelist/bans, backup history.
 **Shared across profiles:** the add-on's install/container options (server type, memory_mb, backups, Bedrock/Geyser, the `plugins:` URL list + toggles), RCON password. Gameplay settings — difficulty, gamemode, MOTD, and the rest of `server.properties` — are per-world.
-
-</Detail>
 
 ## Offline mode
 
 Since 1.3.0, the server starts even when the HA host has no internet — provided it's been online at least once to cache the jars.
 
-<Detail min={3}>
-
 **How it's detected:** at boot, the add-on hits `https://api.papermc.io/v2/` with a 5-second timeout. Reachable = online; otherwise the add-on logs a banner and runs in offline mode for the rest of the session.
-
-</Detail>
-
-<Detail min={2}>
 
 **What gets skipped when offline:**
 
@@ -242,8 +202,6 @@ Since 1.3.0, the server starts even when the HA host has no internet — provide
 - `server.properties` is re-rendered from add-on options.
 - Geyser config (auth-type, MTU, MOTD) is patched on every boot — those edits don't need network.
 - Ops / whitelist / bans, world / backup / panel / RCON, all HA integration plumbing — fully functional.
-
-</Detail>
 
 **First-ever boot still needs internet** (there's nothing cached to fall back to). The add-on will log a clear actionable error if you try to start offline with no cached jar:
 
@@ -268,10 +226,6 @@ There's no config option for this — the behaviour kicks in automatically based
 | **Worlds** | List, switch, create, delete profiles. |
 
 Header buttons (always visible): **Backup** • **Update** • **Restart** (JVM-only, ~15 s) • **Stop** (sets `no_restart`).
-
-![The Backups tab: git snapshots with SHA, timestamp, subject, and a one-click Restore button per snapshot](/images/bruh-minecraft/panel-backups.webp)
-
-<Detail min={2}>
 
 ## Home Assistant entities
 
@@ -361,10 +315,6 @@ automation:
       - service: bruh_minecraft.stop_server
 ```
 
-</Detail>
-
-<Detail min={3}>
-
 ## Where data lives
 
 | Path | Contents |
@@ -376,8 +326,6 @@ automation:
 | `/config/custom_components/bruh_minecraft/` | Companion integration |
 | `/data/server-cache/` | Cached jars (content-addressed) |
 | `/data/panel/` | Panel state, RCON secret, console log |
-
-</Detail>
 
 ## Troubleshooting
 
@@ -411,4 +359,4 @@ automation:
 
 Bump `log_level: debug` and reproduce. Check the **Log** tab for boot/supervisor errors and the panel's **Console** tab for live JVM output. Full historical JVM log: `/data/panel/console.log`.
 
-File issues at [github.com/bruhautomation/BRUH-HA-Apps/issues](https://github.com/bruhautomation/BRUH-HA-Apps/issues).
+File issues at <https://github.com/bruhautomation/BRUH-HA-Apps/issues>.

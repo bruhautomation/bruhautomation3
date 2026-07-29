@@ -25,13 +25,12 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
-import Detail from '../../../components/Detail.astro';
 
 ## What it is
 
 A Home Assistant add-on that puts **Claude** to work as your home's analyst. It collects a slimmed snapshot of your HA data — entity states with areas, recent history, long-term energy statistics — sends it to Claude with a strict design system, and renders the result as a self-contained interactive visualization in an **Insights** panel in your sidebar. Every card comes with sharp written analysis, highlight stats, hover tooltips, animations, light & dark mode, and a colorblind-safe palette — designed specifically for *your* data.
 
-![The BRUH Insights panel: AI-generated insight cards with written analysis, highlight stats, and interactive charts, under the Ask bar and live tag filters](/images/bruh-insights/panel-grid.webp)
+![The BRUH Insights panel: a grid of AI-generated insight cards for Energy, Climate, Presence, and Device Health](/images/bruh-insights/panel-grid.svg)
 
 ## What you get
 
@@ -46,10 +45,10 @@ A Home Assistant add-on that puts **Claude** to work as your home's analyst. It 
     The analyst learns your home over time: findings, your answers, and feedback are stored, viewable (and editable) in the 🧠 Memory panel, and fed into every future run. Questions are never asked twice; each run builds on the last.
   </Card>
   <Card title="Deep presence" icon="magnifier">
-    Goes beyond `home`/`not_home`: it cross-references the phone sensors living on each presence tracker's device<Detail inline min={2}> — WiFi SSID, geocoded address, activity, charging —</Detail> and cites its evidence.
+    Goes beyond `home`/`not_home`: it cross-references the phone sensors living on each presence tracker's device — WiFi SSID, geocoded address, activity, charging — and cites its evidence.
   </Card>
   <Card title="Dashboard cards" icon="seti:html">
-    Every insight can be embedded on an HA dashboard as a **Webpage** card — ready-to-paste YAML, <Detail inline min={2}>token-protected, </Detail>always showing the latest run.
+    Every insight can be embedded on an HA dashboard as a **Webpage** card — ready-to-paste YAML, token-protected, always showing the latest run.
   </Card>
   <Card title="Your own insights" icon="pencil">
     Create up to 24 custom recurring insights with their own prompt, icon, and refresh schedule — or edit any built-in category's analysis focus with the ✎ button.
@@ -58,7 +57,7 @@ A Home Assistant add-on that puts **Claude** to work as your home's analyst. It 
 
 ## Works with your Claude subscription
 
-No API key required. Connect once with your Claude **Pro or Max** account using the guided sign-in in the panel<Detail inline min={2}> (or paste a token from `claude setup-token`)</Detail>. An Anthropic API key works too if you prefer pay-as-you-go. Running BRUH Terminal too? [One login, one shared memory →](/bruh-claude/better-together/)
+No API key required. Connect once with your Claude **Pro or Max** account using the guided sign-in in the panel (or paste a token from `claude setup-token`). An Anthropic API key works too if you prefer pay-as-you-go. Running BRUH Terminal too? [One login, one shared memory →](/bruh-claude/better-together/)
 
 ## What it doesn't do
 

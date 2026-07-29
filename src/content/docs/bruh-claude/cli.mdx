@@ -3,23 +3,7 @@ title: CLI Tools
 description: The ha-* command-line tools that ship in the BRUH Terminal — reloads, logs, backups, memory, self-test, and more.
 ---
 
-import Detail from '../../../components/Detail.astro';
-
-The terminal ships a toolbox of `ha-*` commands so common Home Assistant chores are one line — for you *and* for Claude, which uses them constantly. <Detail inline min={2}>These cover the **file-and-workflow side** (YAML, logs, backups, memory) that live APIs don't; the live home belongs to the [MCP tools](/bruh-claude/mcp/), and admin changes to [Power Tools](/bruh-claude/power-tools/) — see [how the layers fit](/bruh-claude/how-claude-controls-ha/).</Detail>
-
-<Detail max={1}>
-
-Three worth knowing from day one:
-
-- **`ha-selftest`** — run this when anything misbehaves. It checks the whole stack end-to-end and prints PASS/FAIL with a fix hint for each part.
-- **`ha-backup`** — snapshot your config to git before an experiment (automatic backups run on an interval too).
-- **`ha-log`** — watch Home Assistant's logs live.
-
-You rarely need to remember the rest: just ask Claude — *"back up my config"*, *"check the logs for zigbee errors"* — and it picks the right tool. The full command reference is one notch up on the **Detail** slider.
-
-</Detail>
-
-<Detail min={2}>
+The terminal ships a toolbox of `ha-*` commands so common Home Assistant chores are one line — for you *and* for Claude, which uses them constantly. These cover the **file-and-workflow side** (YAML, logs, backups, memory) that live APIs don't; the live home belongs to the [MCP tools](/bruh-claude/mcp/), and admin changes to [Power Tools](/bruh-claude/power-tools/) — see [how the layers fit](/bruh-claude/how-claude-controls-ha/).
 
 ## Daily drivers
 
@@ -49,8 +33,6 @@ You rarely need to remember the rest: just ask Claude — *"back up my config"*,
 | `ha-share <action>` | Cross-add-on file sync via `/share`: `push`, `pull`, `ls` |
 | `ha-selftest` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool) and prints PASS/FAIL with a fix hint per part |
 | `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts |
-
-</Detail>
 
 ## Everything is Claude-usable
 

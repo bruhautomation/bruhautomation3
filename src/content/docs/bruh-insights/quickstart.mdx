@@ -4,15 +4,14 @@ description: Install BRUH Insights, connect your Claude account, and watch your 
 ---
 
 import { Steps } from '@astrojs/starlight/components';
-import Detail from '../../../components/Detail.astro';
 
 Five minutes from zero to an AI analyst reading your home.
 
 ## Prerequisites
 
 - **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor).
-- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option<Detail inline min={2}> (Insights authenticates via OAuth and uses your subscription)</Detail>. An API key from console.anthropic.com works too if you'd rather pay per token.
-- A **64-bit HA host** (<Detail inline min={2}>`amd64` or `aarch64` — </Detail>any Pi 4/5, x86 NUC, or generic 64-bit server).
+- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option (Insights authenticates via OAuth and uses your subscription). An API key from console.anthropic.com works too if you'd rather pay per token.
+- A **64-bit HA host** (`amd64` or `aarch64` — any Pi 4/5, x86 NUC, or generic 64-bit server).
 
 ## Install it
 
@@ -35,13 +34,13 @@ Five minutes from zero to an AI analyst reading your home.
 Pick whichever fits:
 
 - **Shared login from BRUH Terminal** (easiest if you run it): open the [BRUH Terminal](/bruh-claude/) add-on and run `ha-share-login` once. Insights picks the credential up automatically — the auth chip shows **"Claude · shared login"**.
-- **Guided sign-in**: the panel starts `claude setup-token` for you, shows the Anthropic sign-in link, and you paste back the one-time code. The token is stored inside the add-on<Detail inline min={3}> (`/data/secrets`, mode 0600)</Detail> and never leaves it.
+- **Guided sign-in**: the panel starts `claude setup-token` for you, shows the Anthropic sign-in link, and you paste back the one-time code. The token is stored inside the add-on (`/data/secrets`, mode 0600) and never leaves it.
 - **Paste a token**: run `claude setup-token` anywhere you use Claude Code and paste the `sk-ant-oat…` token.
 - **API key**: paste an `sk-ant-api…` key from console.anthropic.com — usage is then billed to your API account.
 
 ## Generate your first insights
 
-Hit **↻ Refresh all**. Generation runs one insight at a time through a queue<Detail inline min={2}> (friendly to subscription rate limits)</Detail>, so cards fill in one by one over several minutes — Overview and Energy usually land first. While you wait:
+Hit **↻ Refresh all**. Generation runs one insight at a time through a queue (friendly to subscription rate limits), so cards fill in one by one over several minutes — Overview and Energy usually land first. While you wait:
 
 - Click a card to **expand** the interactive visualization.
 - Type a question into **Ask anything** — *"Which rooms are coldest at night?"* — and get a bespoke card back.
@@ -50,9 +49,9 @@ Hit **↻ Refresh all**. Generation runs one insight at a time through a queue<D
 ## Make it yours
 
 - **⚙ Settings** sets the token controls: a master auto-insights switch, your Claude plan, and a budget slider — *let Insights use up to N% of each 5-hour session*.
-- **✎ on any card** edits that category's analysis focus<Detail inline min={2}>, refresh interval or fixed daily run times (e.g. `07:00, 19:00`)</Detail>, or disables it.
+- **✎ on any card** edits that category's analysis focus, refresh interval or fixed daily run times (e.g. `07:00, 19:00`), or disables it.
 - **＋ New insight** creates a fully custom recurring insight from your own prompt.
 - **💬 feedback** ("ignore the guest room sensor", "less text, bigger chart") becomes a standing instruction for that card.
-- **▦ Add to dashboard** produces ready-to-paste YAML for a dashboard card<Detail inline min={2}> — served by Home Assistant itself at `/local/…`, no ports to map</Detail>.
+- **▦ Add to dashboard** produces ready-to-paste YAML for a dashboard card — served by Home Assistant itself at `/local/…`, no ports to map.
 
 Next: the **[Configuration Reference](/bruh-insights/reference/)** for every option, or the **[Changelog](/bruh-insights/changelog/)** for what's new.

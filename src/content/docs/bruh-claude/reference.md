@@ -3,17 +3,7 @@ title: Reference
 description: Every configuration option, service, sensor, CLI tool, and MCP capability for the BRUH Terminal add-on — in one place.
 ---
 
-import Detail from '../../../components/Detail.astro';
-
-Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Terminal → Configuration**. The defaults work out of the box<Detail inline min={2}>; the tables below mirror `config.yaml` as shipped</Detail>.
-
-<Detail max={1}>
-
-Right now you're seeing the essentials — the sections most people need: the mobile UI, when a restart is required, and troubleshooting. The full option tables, service payloads, and internals are further up the **Detail** slider.
-
-</Detail>
-
-<Detail min={2}>
+Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Terminal → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
 
 ## Configuration options
 
@@ -154,8 +144,6 @@ service: bruh_claude.clear_conversation
 
 Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every ~2 minutes; the sensors poll it every 30 seconds.
 
-![The Claude Terminal device page in Home Assistant, showing the Session Usage, Session Usage Resets At, Weekly Usage, and Weekly Usage Resets At sensors](/images/bruh-claude/usage-sensors.png)
-
 | Sensor | Tracks | Key attributes |
 |--------|--------|----------------|
 | Session Usage | Percent of the current 5-hour session window used | `resets_at`, `data_source`, `last_updated` |
@@ -191,12 +179,6 @@ Available in the terminal.
 | `ha-selftest` | End-to-end diagnostic: API auth, the MCP server over stdio, the integration, listeners, login, sensors — PASS/FAIL with fix hints. |
 | `ha-entity` / `ha-service` / `ha-yaml-check` / `ha-notify` / `ha-share` / `ha-addon` | Focused helpers for entity state, service calls, YAML validation, notifications, the share folder, and add-on info. |
 
-![ha-selftest output with every check green: HA API auth, the MCP server over stdio, CLI smoke tests, the deployed integration, background listeners, the worker pool, and the usage sensors](/images/bruh-claude/selftest.png)
-
-</Detail>
-
-<Detail only={3}>
-
 ## Transport & health
 
 In fast mode the worker pool serves an internal HTTP API (port 8099 on the hassio network, token-authenticated via the shared `/config` volume). The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically.
@@ -223,8 +205,6 @@ Background channels never use `--dangerously-skip-permissions` — they can't pr
 | `/config/.bruh_claude/logs/{assist,automation}-YYYYMMDD.log` | Per-request debug logs |
 | `/config/custom_components/bruh_claude/` | The HA integration |
 | `/data/` (add-on volume) | OAuth credentials, git backups, persistent packages |
-
-</Detail>
 
 ## Mobile UI
 
@@ -261,8 +241,6 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 | Voice agent answers wrong room | Run `ha-selftest` — the "Assist area map" check confirms the room map is built. |
 | Usage sensors *unavailable* | They need an OAuth/subscription login, not an API key (see above). |
 
-<Detail only={3}>
-
 ### Per-request debug logs
 
 Every Assist and automation request is logged with channel, prompt size, model, the speed path it took (`warm`/`spare`/`cold`/`…+fallback`), duration, and a response preview.
@@ -273,8 +251,6 @@ tail -f /config/.bruh_claude/logs/automation-$(date +%Y%m%d).log
 ```
 
 Set `log_level: debug` in the add-on config before reproducing a bug for maximum detail.
-
-</Detail>
 
 ## Disclaimer
 

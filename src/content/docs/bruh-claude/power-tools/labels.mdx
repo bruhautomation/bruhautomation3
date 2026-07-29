@@ -5,8 +5,6 @@ sidebar:
   order: 3
 ---
 
-import Detail from '../../../../components/Detail.astro';
-
 Labels cut across rooms: *battery powered*, *holiday lights*, *rental-guest accessible*, *critical*. Home Assistant can target a whole label in one service call.
 
 Unlike Spook's six single-target label services, `add_label` and `remove_label` take entities, devices, and areas in the same call.
@@ -16,8 +14,6 @@ Unlike Spook's six single-target label services, `add_label` and `remove_label` 
 `bruh_claude.create_label`
 
 Create a new label. Returns the new label_id as response data.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -34,8 +30,6 @@ data:
   color: amber
 ```
 
-</Detail>
-
 > 🗣️ *"Create an amber 'Battery powered' label."*
 
 ## Delete label
@@ -43,8 +37,6 @@ data:
 `bruh_claude.delete_label`
 
 Delete a label. It is removed from everything it was applied to.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -56,8 +48,6 @@ data:
   label_id: battery_powered
 ```
 
-</Detail>
-
 > 🗣️ *"Delete the battery-powered label everywhere."*
 
 ## Add label
@@ -65,8 +55,6 @@ data:
 `bruh_claude.add_label`
 
 Apply one or more labels to entities, devices, and/or areas. At least one target is required.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -86,8 +74,6 @@ data:
     - a1b2c3d4e5f6
 ```
 
-</Detail>
-
 > 🗣️ *"Label every battery-powered sensor in the house 'Battery powered'."*
 
 ## Remove label
@@ -95,8 +81,6 @@ data:
 `bruh_claude.remove_label`
 
 Remove one or more labels from entities, devices, and/or areas. At least one target is required.
-
-<Detail min={2}>
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -112,7 +96,5 @@ data:
   entity_id:
     - sensor.motion_battery
 ```
-
-</Detail>
 
 > 🗣️ *"That motion sensor is wired now — drop its battery label."*

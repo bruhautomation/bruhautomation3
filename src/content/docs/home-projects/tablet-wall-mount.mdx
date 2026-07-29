@@ -9,7 +9,6 @@ import tabletFront from '../../../assets/images/tablet-front.png';
 import tabletSide from '../../../assets/images/tablet-side.png';
 import tabletInstalled from '../../../assets/images/tablet-installed.jpg';
 import AffiliateDisclosure from '../../../components/AffiliateDisclosure.astro';
-import Detail from '../../../components/Detail.astro';
 
 ## Background
 
@@ -51,27 +50,17 @@ After a few prototypes, I landed on a design built around a keystone jack plate.
 
 ### Finding the Right Spot
 
+Where you install the tablet determines how easy the project will be. If you're routing the cable through the wall, find a spot that shares the same stud cavity as an outlet. In the US, studs are typically 16 inches apart, and outlets are attached to the stud on either side. Use a stud finder and look for a clear path without studs or firebreaks. Interior walls generally aren't insulated, which makes pulling wires easier.
+
 :::caution
 Don't cut into walls unless you're comfortable with what's behind the drywall.
 :::
 
-<Detail min={2}>
-
-Where you install the tablet determines how easy the project will be. If you're routing the cable through the wall, find a spot that shares the same stud cavity as an outlet. In the US, studs are typically 16 inches apart, and outlets are attached to the stud on either side. Use a stud finder and look for a clear path without studs or firebreaks. Interior walls generally aren't insulated, which makes pulling wires easier.
-
-</Detail>
-
 ### Low-Voltage Bracket
-
-<Detail min={2}>
 
 Trace the interior outline of the bracket onto the wall. I installed mine about 55 inches off the floor. Cut out the hole with a [drywall saw](https://www.amazon.com/IRWIN-Tools-Standard-Drywall-2014102/dp/B000B3EGN8?tag=brau01-20), push in the bracket, and tighten the screws to extend the wings and secure it.
 
-</Detail>
-
 ### Keystone Plate
-
-<Detail min={2}>
 
 1. **Pick your angle.** The repo has keystone inserts at 0°, 10°, 15°, and 20° — the angled ones point the USB plug down and away from the wall so the cable doesn't kink behind the tablet. If you're not sure, start with 15°.
 2. **Snap the keystone insert into the printed plate** from the back, like any network keystone jack — it clicks in one orientation only.
@@ -80,15 +69,9 @@ Trace the interior outline of the bracket onto the wall. I installed mine about 
 
 STL files for the plate (1- and 2-gang) and every keystone angle are in the [GitHub repo](https://github.com/bruhautomation/BRUH-CAD-Files), and the models are previewable below.
 
-</Detail>
-
-<Detail min={3}>
-
 ## Bezel Variant
 
 I also designed a bezel version when helping my parents replace old Crestron CT-1000 touch panels. The setup used ancient VIZIO XR6M10 tablets with a dual-gang bracket installed into the old CT-1000 housing, powered by a [USB buck-boost step-down](https://www.amazon.com/gp/product/B07JHH294R?tag=brau01-20) wired to the existing power supply.
-
-</Detail>
 
 ## Make Your Own
 
@@ -98,10 +81,6 @@ STL and STEP files are in the [GitHub repo](https://github.com/bruhautomation/BR
 
 <StlViewer src="/models/tablet-wall-mount/keystone_plate_1_gang.stl" />
 
-<Detail min={2}>
-
 ## Dashboard Setup
 
 My tablets run the Home Assistant app and land directly on the HA dashboard. I use the [Google Photos](https://github.com/daanoz/ha-google-photos) and [WallPanel](https://github.com/j-a-n/lovelace-wallpanel) integrations to display photos as a screensaver when the tablets are idle.
-
-</Detail>
