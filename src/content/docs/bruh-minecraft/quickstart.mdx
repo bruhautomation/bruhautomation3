@@ -4,14 +4,15 @@ description: Install BRUH Minecraft, accept the EULA, and connect from Java or B
 ---
 
 import { Steps } from '@astrojs/starlight/components';
+import Detail from '../../../components/Detail.astro';
 
 Five minutes from zero to a running Minecraft server.
 
 ## Prerequisites
 
 - **Home Assistant OS** or **Supervised**
-- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java comes bundled in the add-on (Eclipse Temurin JRE 25) — you don't install it — but it needs 64-bit hardware, so older 32-bit ARM boards won't work.
-- ~**2 GB free RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
+- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java comes bundled in the add-on<Detail inline min={2}> (Eclipse Temurin JRE 25)</Detail> — you don't install it — but it needs 64-bit hardware, so older 32-bit ARM boards won't work.
+- ~**2 GB free RAM** beyond what HA itself uses<Detail inline min={2}> (4 GB+ for plugin-heavy setups)</Detail>
 
 ## Install it
 
@@ -51,7 +52,17 @@ Want kids to join without Microsoft accounts? Pick **offline mode** in the first
 online-mode=false
 ```
 
+<Detail max={1}>
+
+That's the whole change — the add-on quietly fixes everything else behind the scenes, and Java and Bedrock players can both join without an Xbox sign-in.
+
+</Detail>
+
+<Detail min={2}>
+
 That's the whole change. The add-on then fixes every downstream setting Microsoft and GeyserMC normally gate behind that one flag — secure-profile enforcement, Geyser auth-type, Floodgate, Bedrock login validation. Java and Bedrock both work without Xbox sign-in.
+
+</Detail>
 
 :::caution
 **LAN-only.** Offline mode is unsafe on a public/internet-exposed server — anyone who guesses a username can join as that player.

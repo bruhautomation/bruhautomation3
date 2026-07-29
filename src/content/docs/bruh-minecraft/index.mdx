@@ -29,6 +29,7 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import Detail from '../../../components/Detail.astro';
 
 ## What it is
 
@@ -93,6 +94,8 @@ Always-visible header buttons: **Backup** • **Update** • **Restart** (JVM-on
 
 A companion integration is auto-discovered on first boot: 12 sensors (players, TPS, latency, uptime, …), 2 binary sensors, 4 buttons, 13 services, and a notify platform for in-game broadcasts. Pair with [BRUH Claude](/bruh-claude/) and *"tell everyone dinner is ready"* works by voice. [Entities, services, and automation recipes →](/bruh-minecraft/home-assistant/)
 
+<Detail min={2}>
+
 ## Example
 
 ```yaml
@@ -119,5 +122,7 @@ script:
 service: notify.bruh_minecraft_broadcast
 data: { message: "Doorbell rang!" }
 ```
+
+</Detail>
 
 **[Quick Start →](/bruh-minecraft/quickstart/)** — add the repo, install, set `eula: true`, start. Java `:25565`, Bedrock `:19132`.

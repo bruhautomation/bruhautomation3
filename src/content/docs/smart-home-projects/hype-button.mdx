@@ -3,18 +3,24 @@ title: Hype Button
 description: Physical multi-click button controller with NeoPixel feedback and rotary encoder support.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
 A physical button that triggers custom actions and celebrations in Home Assistant. Supports single click, double click, triple click, long press, and up to 5-click sequences with addressable LED feedback.
 
 ## How It Works
 
 An ESP32 monitors a capacitive button with advanced multi-click detection logic. Each click pattern (single, double, triple, etc.) triggers different Home Assistant automations or scenes. An 8-LED NeoPixel strip provides visual feedback showing the selected mode or intensity level.
 
+<Detail min={2}>
+
 ## Hardware
 
 - **Board:** ESP32
-- **Input:** Capacitive touch button or momentary switch (GPIO22)
-- **Output:** 8-LED NeoPixel strip (GPIO13)
+- **Input:** Capacitive touch button or momentary switch <Detail inline min={3}>(GPIO22)</Detail>
+- **Output:** 8-LED NeoPixel strip <Detail inline min={3}>(GPIO13)</Detail>
 - **Optional:** Rotary encoder for value adjustment (future)
+
+</Detail>
 
 ## Firmware
 

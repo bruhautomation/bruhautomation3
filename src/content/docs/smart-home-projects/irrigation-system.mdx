@@ -3,20 +3,26 @@ title: Irrigation System
 description: Large-scale automated irrigation system with flow monitoring and zone control.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
 Large-scale automated irrigation system covering 1500ft with 7 independent zones, real-time flow monitoring, manifold pressure/temperature/TDS sensors, and fertilizer dosing control. Perfect for garden beds, raised planters, orchards, and complete landscape automation.
 
 ## How It Works
 
-An ESP32 controls multiple irrigation zones via I2C relay expander (PCF8574) while monitoring flow rates through each zone with pulse counters. The ADS1115 ADC measures manifold pressure, temperature (via NTC thermistor), and TDS (total dissolved solids) for nutrient tracking. Separate flow meters on the fertilizer inflow and outflow allow precise nutrient metering.
+An ESP32 controls multiple irrigation zones via I2C relay expander <Detail inline min={2}>(PCF8574)</Detail> while monitoring flow rates through each zone with pulse counters. The ADS1115 ADC measures manifold pressure, temperature (via NTC thermistor), and TDS (total dissolved solids) for nutrient tracking. Separate flow meters on the fertilizer inflow and outflow allow precise nutrient metering.
+
+<Detail min={2}>
 
 ## Hardware
 
 - **Board:** ESP32
-- **Flow Sensors:** Pulse counters (10 total: 7 zones + 1 manifold + 2 fertilizer)
+- **Flow Sensors:** Pulse counters <Detail inline min={3}>(10 total: 7 zones + 1 manifold + 2 fertilizer)</Detail>
 - **ADC:** ADS1115 for analog sensors (pressure, temperature, TDS)
-- **Relay Expander:** PCF8574 I2C I/O expander (7 zones + 2 valves)
+- **Relay Expander:** PCF8574 I2C I/O expander <Detail inline min={3}>(7 zones + 2 valves)</Detail>
 - **Sensors:** Pressure transducer, NTC thermistor, TDS electrode
 - **Control:** 7 zone solenoid valves + pump valve + fertilizer valve
+
+</Detail>
 
 ## Firmware
 

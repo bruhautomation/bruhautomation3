@@ -14,12 +14,15 @@ import doorknobDetail3 from '../../../assets/images/doorknob-detail-3.jpg';
 import doorknobCover from '../../../assets/images/doorknob-cover.jpg';
 import doorknobPrototypes from '../../../assets/images/doorknob-prototypes.jpg';
 import AffiliateDisclosure from '../../../components/AffiliateDisclosure.astro';
+import Detail from '../../../components/Detail.astro';
 
 ## The Problem
 
 I replaced all the doorknobs in my house with [Schlage Bowery](https://amzn.to/467wrSB) knobs — then had kids. Every child-proof cover I could find was a plastic clamshell that looked terrible on nice hardware. So I designed my own.
 
 <AffiliateDisclosure />
+
+<Detail min={2}>
 
 ## The Knob
 
@@ -39,6 +42,8 @@ The Schlage Bowery comes in a lot of finishes and configurations. I went with [M
     <figcaption>3) Click in doorknob</figcaption>
   </figure>
 </div>
+
+</Detail>
 
 ## The Design
 
@@ -60,9 +65,23 @@ Standard child-proof covers act like a slip ring — you squeeze down on the out
 
 ## Printing
 
+<Detail max={1}>
+
+Prints well on both resin and FDM printers — resin gives the cleanest finish.
+
+</Detail>
+
+<Detail min={2}>
+
 Best results came from an MSLA printer ([Elegoo Mars](https://amzn.to/3r8xZge)), but FDM works fine too. I used [water-washable resin](https://amzn.to/453EP4R) which was rigid enough to function without being hard enough to scratch the knob. It also happened to be an exact color match, and the surface finish was good right off the print bed.
 
+</Detail>
+
+<Detail min={3}>
+
 <Image src={doorknobPrototypes} alt="Prototypes" />
+
+</Detail>
 
 ## Make Your Own
 

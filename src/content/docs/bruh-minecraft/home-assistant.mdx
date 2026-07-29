@@ -3,9 +3,19 @@ title: Home Assistant Integration
 description: The bruh_minecraft companion integration — sensors, buttons, services, and automation recipes for your Minecraft server.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
 The add-on deploys a companion integration (`bruh_minecraft`) that Home Assistant auto-discovers — turning the server into a first-class smart-home citizen with sensors, buttons, and services you can automate like anything else.
 
 ## Device & entities
+
+<Detail max={1}>
+
+Everything lives under one **BRUH Minecraft** device: sensors for the player count (with names in the attributes), max slots, tick rate (the lag early-warning), ping latency, uptime, and server facts like version and difficulty — plus binary sensors for reachability and one-click buttons for backup, restart, stop, and save. The full entity table is one notch up on the **Detail** control.
+
+</Detail>
+
+<Detail min={2}>
 
 Everything lives under one **BRUH Minecraft** device:
 
@@ -20,7 +30,17 @@ Everything lives under one **BRUH Minecraft** device:
 | `binary_sensor.…_rcon_ok` | RCON handshake OK (disabled by default) |
 | Buttons | `backup_now`, `restart_server`, `stop_server`, `save_all` |
 
+</Detail>
+
 ## Services
+
+<Detail max={1}>
+
+Thirteen services cover everything you'd otherwise type at the console: broadcast a chat message, run any raw command, give items, change the weather or time, back up, restart or stop the server, and manage players (op, kick, ban, whitelist). The field-by-field table is one notch up on the **Detail** control.
+
+</Detail>
+
+<Detail min={2}>
 
 | Service | Fields | What it does |
 |---------|--------|--------------|
@@ -33,6 +53,8 @@ Everything lives under one **BRUH Minecraft** device:
 | `bruh_minecraft.restart_server` | — | Graceful save + restart |
 | `bruh_minecraft.stop_server` | — | Graceful save + stop (stays stopped) |
 | `bruh_minecraft.op_player` / `deop_player` / `kick_player` / `ban_player` / `whitelist_add` / `whitelist_remove` | `player` | Player management |
+
+</Detail>
 
 ## Recipes
 
@@ -92,4 +114,10 @@ automation:
         message: "Minecraft TPS dropped to {{ states('sensor.bruh_minecraft_tps_1m') }} — {{ state_attr('sensor.bruh_minecraft_players_online','players') | join(', ') }} online."
 ```
 
-Under the hood, services run through a file-based IPC bridge at `/config/.bruh_minecraft/` — HA drops a JSON request, the add-on executes it over RCON and writes the response back. See the [Reference](/bruh-minecraft/reference/) for RCON and backup configuration.
+<Detail min={3}>
+
+Under the hood, services run through a file-based IPC bridge at `/config/.bruh_minecraft/` — HA drops a JSON request, the add-on executes it over RCON and writes the response back.
+
+</Detail>
+
+See the [Reference](/bruh-minecraft/reference/) for RCON and backup configuration.

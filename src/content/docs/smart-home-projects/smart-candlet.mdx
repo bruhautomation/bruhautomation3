@@ -7,6 +7,7 @@ banner:
 ---
 
 import AffiliateDisclosure from '../../../components/AffiliateDisclosure.astro';
+import Detail from '../../../components/Detail.astro';
 
 A WiFi-connected candle that ignites and extinguishes itself on command via Home Assistant. Arc lighter for ignition, diaphragm pump for blowout.
 
@@ -24,15 +25,29 @@ For this prototype, I used an oil-filled candle with a fixed wick — the igniti
 
 ## Ignition
 
+<Detail max={2}>
+
+Ignition comes from a USB rechargeable [arc lighter](https://www.amazon.com/dp/B09YPZK854?tag=brau01-20) with opto-isolated relay control — that's the one method that worked reliably.
+
+</Detail>
+
+<Detail min={3}>
+
 I tested three different methods before finding one that worked reliably:
 
 - **Resistance wire** — [32AWG Kanthal A1](https://amzn.to/3LvWkn8) heated up but was inconsistent and burned out quickly.
 - **High voltage generator** — A [5V buck boost](https://amzn.to/3sZZnh4) was extremely loud and immediately destroyed the wick. Turns out stun guns and arc lighters work very differently — arc lighters use higher frequency, lower power pulses that transfer heat more efficiently.
 - **Arc lighter** — A USB rechargeable [arc lighter](https://www.amazon.com/dp/B09YPZK854?tag=brau01-20) with opto-isolated relay control. This is what worked.
 
+</Detail>
+
+<Detail min={2}>
+
 :::note
 High-voltage modules need to be electrically isolated from your control circuitry. Otherwise you'll get random resets on the microcontroller.
 :::
+
+</Detail>
 
 <img src="/images/candlet/candle-arc-ignition.gif" alt="Candle ignition test with arc lighter" style="max-width: 400px; border-radius: 8px;" />
 
@@ -40,11 +55,19 @@ High-voltage modules need to be electrically isolated from your control circuitr
 
 I went with a [5V diaphragm pump](https://www.amazon.com/NW-5V-6VDC-Miniature-Vacuum-100KPa/dp/B078H8V563?tag=brau01-20) — it has both an inlet and an outlet, so I positioned copper tubes on either side of the flame to simultaneously blow and suck the fire out.
 
+<Detail min={2}>
+
 The copper tubes double as the arc lighter conductors, so there's no additional hardware needed for ignition.
+
+</Detail>
 
 ## Build
 
-The controller is an ESP32 running ESPHome. Here's the parts list:
+The controller is an ESP32 running ESPHome.
+
+<Detail min={2}>
+
+Here's the parts list:
 
 ### Parts
 
@@ -55,6 +78,8 @@ The controller is an ESP32 running ESPHome. Here's the parts list:
 - [Arc lighter](https://amzn.to/3sY6EOD)
 - [Diaphragm pump](https://amzn.to/3PIcYTg)
 - [Copper tube](https://amzn.to/3RsNtXs) + [silicone tubing](https://amzn.to/44YBIeb) + 3D-printed base
+
+</Detail>
 
 ### Code
 

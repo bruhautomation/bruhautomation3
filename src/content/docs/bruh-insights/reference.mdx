@@ -3,6 +3,16 @@ title: Reference
 description: Every configuration option, auth method, panel feature, and privacy detail for the BRUH Insights Home Assistant add-on — in one place.
 ---
 
+import Detail from '../../../components/Detail.astro';
+
+<Detail max={1}>
+
+Everything you might need to look up. The defaults work out of the box, and the primary place to tune Insights is the panel's **⚙ Settings** dialog. The full option tables, auth details, and file paths are one notch up on the **Detail** slider.
+
+</Detail>
+
+<Detail min={2}>
+
 Everything you might need to look up. The defaults work out of the box, and since 1.7.0 the primary place to tune Insights is the panel's **⚙ Settings** dialog — the add-on's Configuration tab (**Settings → Add-ons → BRUH Insights → Configuration**) provides the fallback values below, all of which except `log_level` can be overridden live from ⚙ Settings without a restart.
 
 ## Configuration options
@@ -27,7 +37,17 @@ Generation runs **one insight at a time** through a queue, which keeps things fr
 
 The add-on exposes **no host ports** (since 1.5.0): dashboard cards are served by Home Assistant itself via the `/local` mirror.
 
+</Detail>
+
 ## Settings (⚙) — token budget & master switch
+
+<Detail max={1}>
+
+The **⚙ Settings** button in the panel controls how much of your Claude subscription Insights may spend — a master switch for automatic runs, your Claude plan, and a session budget slider — saved instantly, no restart. A topbar chip keeps the session's usage and reset time in view at all times.
+
+</Detail>
+
+<Detail min={2}>
 
 The **⚙ Settings** button in the panel controls how much of your Claude subscription Insights may spend — saved instantly, no restart:
 
@@ -38,11 +58,21 @@ The **⚙ Settings** button in the panel controls how much of your Claude subscr
 | **Session usage budget** | A slider: *let Insights use up to N% of each 5-hour session.* Once the window's usage reaches the budget, automatic runs pause until it rolls over (topbar chip says so). Manual clicks are never blocked. |
 | **Generation defaults** | Live overrides of the Configuration-tab options: default refresh interval (the "default" the ✎ editor refers to), days of history analyzed, Claude model override, generation timeout, and run-history retention. Empty field = use the Configuration value (shown grayed). |
 
-The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
+The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (<Detail inline min={3}>its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — </Detail>all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
+
+</Detail>
 
 ![The ⚙ Settings dialog: the Automatic insights master switch, subscription picker, session-usage-budget slider with a live usage meter, and the Generation defaults overrides](/images/bruh-insights/settings-dialog.png)
 
 ## Connecting a Claude account
+
+<Detail max={1}>
+
+Four ways to connect: share the login from [BRUH Terminal](/bruh-claude/) by running `ha-share-login` there, use the guided sign-in in the panel, paste a token from `claude setup-token`, or paste an API key from console.anthropic.com.
+
+</Detail>
+
+<Detail min={2}>
 
 | Method | How | Notes |
 |--------|-----|-------|
@@ -51,6 +81,8 @@ The dialog shows a live usage meter, and a **topbar chip** keeps the session's u
 | Paste a token | `claude setup-token` anywhere → paste `sk-ant-oat…` | Same result as guided sign-in. |
 | API key | Paste `sk-ant-api…` from console.anthropic.com | Billed to your API account instead of the subscription. |
 
+</Detail>
+
 **Sign out** (auth chip → logout) forgets the locally stored credential; if a shared BRUH Terminal login exists, Insights falls back to it automatically.
 
 ## The panel
@@ -58,15 +90,25 @@ The dialog shows a live usage meter, and a **topbar chip** keeps the session's u
 ### Categories & custom insights
 
 - **Nine built-in categories**: Overview, Energy, Climate, Lighting, Security, Presence, Media, Device Health, Automations.
+
+<Detail min={2}>
+
 - **✎ prompt editor** per card: analysis focus (with "custom prompt" badge and **Restore default**), enable/disable, a per-category refresh interval (`0` = manual only, empty = add-on default), or **fixed daily run times** (e.g. `07:00, 19:00`, 24h clock, up to 6) which take precedence over the interval — the card regenerates right after each listed time and spends nothing in between. Each stored insight records the focus it was generated with (`focus_used`).
+
+</Detail>
+
 - **＋ New insight** creates up to **24 custom recurring insights** — name, icon, analysis prompt, optional refresh interval or daily run times. They behave exactly like shipped categories: auto-refresh, "Refresh all", run history, feedback.
 - **＋ Make recurring** in any Ask card's footer promotes a one-off question into a recurring insight.
 
 ![A custom insight card generated from an Ask question about energy trends — written analysis, highlight stats, a bespoke chart, and the ＋ Make recurring button in the footer](/images/bruh-insights/custom-insight-card.png)
 
+<Detail min={2}>
+
 ### Insight history
 
-Every category run is stored as a dated copy (Ask cards are not kept). Each card's footer has a run selector and ‹/› step buttons; picking a past run pins the card ("Viewing … — Back to latest") and highlight stats show a "prev: …" comparison. Retention is governed by `history_keep_runs` / `history_keep_days`; individual runs can be deleted via `DELETE /api/insight/{id}/history/{timestamp}`.
+Every category run is stored as a dated copy (Ask cards are not kept). Each card's footer has a run selector and ‹/› step buttons; picking a past run pins the card ("Viewing … — Back to latest") and highlight stats show a "prev: …" comparison. Retention is governed by `history_keep_runs` / `history_keep_days`<Detail inline min={3}>; individual runs can be deleted via `DELETE /api/insight/{id}/history/{timestamp}`</Detail>.
+
+</Detail>
 
 ### Feedback
 
@@ -78,7 +120,7 @@ The analyst tags every card by what it found (`#anomaly`, `#batteries`, `#left-o
 
 ### Memory
 
-🧠 **Memory** shows everything Insights has learned: open questions (answer or dismiss inline), learned facts (remove or teach), answered Q&A, and — when BRUH Terminal maintains one — the shared memory file at `/config/.bruh_claude/memory/memory.md`. Questions have a lifecycle (open → answered/dismissed) with a hard never-re-ask rule. Findings and answers are handed to the `bruh_claude` integration (`bruh_claude.add_memory` / `bruh_claude.answer_question`) when installed, with a `/share/bruh_claude/memory-inbox/` fallback — Insights' own memory works either way.
+🧠 **Memory** shows everything Insights has learned: open questions (answer or dismiss inline), learned facts (remove or teach), answered Q&A, and — when BRUH Terminal maintains one — the shared memory file<Detail inline min={3}> at `/config/.bruh_claude/memory/memory.md`</Detail>. <Detail inline min={2}>Questions have a lifecycle (open → answered/dismissed) with a hard never-re-ask rule.</Detail> <Detail inline min={3}>Findings and answers are handed to the `bruh_claude` integration (`bruh_claude.add_memory` / `bruh_claude.answer_question`) when installed, with a `/share/bruh_claude/memory-inbox/` fallback — Insights' own memory works either way.</Detail>
 
 ### Dashboard cards
 
@@ -93,13 +135,13 @@ aspect_ratio: 90%
 
 ![The ▦ Add-to-dashboard dialog showing ready-to-paste iframe card YAML with a Copy YAML button](/images/bruh-insights/dashboard-card-dialog.png)
 
-Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. The card always shows the **latest run** and reloads every 15 minutes. The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
+<Detail inline min={2}>Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. </Detail>The card always shows the **latest run** and reloads every 15 minutes. <Detail inline min={3}>The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. </Detail>Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
 
 ## Privacy & security
 
 - Home data is sent to Anthropic's API only when an insight is generated; nothing else leaves your machine, and nothing is sent on a schedule unless auto-refresh is enabled and an account is connected.
 - Person **GPS coordinates are not included** in snapshots — only zone/state and areas. Device-context expansion does include the *states* of phone sensors such as the geocoded-address sensor; disable those sensors in the companion app or hide the entities in HA to exclude them.
-- Generated visualizations render in **sandboxed iframes** (`sandbox="allow-scripts"`) — they cannot touch your HA session, cookies, or the panel.
+- Generated visualizations render in **sandboxed iframes**<Detail inline min={3}> (`sandbox="allow-scripts"`)</Detail> — they cannot touch your HA session, cookies, or the panel.
 - The panel is reachable only through **HA Ingress** (admin users). The add-on exposes no host ports; dashboard-card files embed the per-install token in their unguessable `/local` file names.
 - Under `/config` the add-on writes only the home memory file (`/config/.bruh_claude/memory/memory.md`) and — once dashboard cards are first used — the card mirror (`/config/www/bruh_insights/`); `/share` is writable solely for the memory-inbox drop-files.
 
