@@ -10,7 +10,32 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.7.0" date="July 29, 2026" latest>
+<Release version="1.8.0" date="July 29, 2026" latest>
+
+The two app sections became one: **BRUH Terminal** and **BRUH Insights** were merged into a single add-on, [**BRain**](/brain/), so their docs merged too.
+
+<Changes type="added">
+
+- **[BRain docs](/brain/)** — Overview, Quick Start, Memory & Learning, Insights, Voice, Automations, MCP Tools, The CLI, Power Tools, and a Reference covering every option of the merged add-on. New pages for what BRain added: the study-first onboarding that replaces default cards, the guess-and-settle memory model, the `brain`/`ha` CLI split, and `brain undo`.
+- **A [BRain changelog](/brain/changelog/)** starting at 1.0.0 — BRain is a clean start, so its version numbers begin again rather than continuing either predecessor's.
+- **Archived changelogs** for [BRUH Terminal](/brain/archive/bruh-terminal-changelog/) (1.0.0–3.6.0) and [BRUH Insights](/brain/archive/bruh-insights-changelog/) (1.0.0–1.7.0), kept in full and clearly marked, so the history of both add-ons stays readable.
+
+</Changes>
+<Changes type="changed">
+
+- **Every `/bruh-claude/…` and `/bruh-insights/…` URL redirects** to its successor. Those links are in add-on changelogs, video descriptions, and bookmarks; pages with no direct successor land on the section that now covers them rather than a bare index.
+- **New BRain artwork** in the hero and the sidebar, replacing the separate Terminal and Insights icons.
+- **"Using with Insights" is gone**, along with the whole idea of connecting two add-ons — one login and one memory is now just how it works, documented where it belongs.
+
+</Changes>
+<Changes type="fixed">
+
+- **Docs that described removed behaviour** — git config backups (replaced by an edit journal and `brain undo`), the retired `ha-*` script pile, and the nine default insight categories.
+
+</Changes>
+</Release>
+
+<Release version="1.7.0" date="July 29, 2026">
 <Changes type="changed">
 
 - **Leaner changelogs** — the "Release notes" eyebrow, the Keep a Changelog / Semantic Versioning boilerplate, and the empty *Unreleased* sections are gone from all four changelogs (site, Terminal, Insights, Minecraft); every changelog now opens straight into its latest release card.

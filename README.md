@@ -44,8 +44,8 @@ src/
 │   ├── index.astro             # Standalone landing page
 │   └── bruh-minecraft/command-generator.astro
 ├── content/docs/
-│   ├── bruh-claude/            # BRUH Terminal app docs
-│   ├── bruh-insights/          # BRUH Insights app docs
+│   ├── brain/                  # BRain app docs (+ archive/ for the two
+│   │                           #   add-ons it replaced)
 │   ├── bruh-minecraft/         # BRUH Minecraft app docs
 │   ├── smart-home-projects/    # Smart home project pages
 │   ├── home-projects/          # Home/maker project pages
