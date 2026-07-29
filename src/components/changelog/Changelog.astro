@@ -1,8 +1,6 @@
 ---
 /**
- * Changelog wrapper. Renders the "Release notes · vX" eyebrow and the
- * Keep a Changelog / Semantic Versioning intro, then a container for the
- * <Release> cards passed as children.
+ * Changelog wrapper: the styled container for <Release> cards.
  *
  * Usage (in an .mdx page with `title: Changelog` frontmatter):
  *
@@ -10,7 +8,7 @@
  *   import Release from '../../../components/changelog/Release.astro';
  *   import Changes from '../../../components/changelog/Changes.astro';
  *
- *   <Changelog project="BRUH Claude" version="3.2.0">
+ *   <Changelog>
  *     <Release version="3.2.0" date="June 23, 2026" latest>
  *       <Changes type="fixed">
  *
@@ -20,30 +18,9 @@
  *     </Release>
  *   </Changelog>
  */
-interface Props {
-	project: string;
-	version?: string;
-}
-
-const { project, version } = Astro.props;
 ---
 
 <div class="changelog">
-	{version && <p class="changelog-eyebrow">Release notes · v{version}</p>}
-	<p class="changelog-intro">
-		All notable changes to <strong>{project}</strong> are recorded here.
-	</p>
-	<p class="changelog-intro changelog-intro--muted">
-		The format follows <a
-			href="https://keepachangelog.com/en/1.1.0/"
-			target="_blank"
-			rel="noopener">Keep a Changelog</a
-		> and this project follows <a
-			href="https://semver.org/"
-			target="_blank"
-			rel="noopener">Semantic Versioning</a
-		>.
-	</p>
 	<div class="changelog-releases">
 		<slot />
 	</div>

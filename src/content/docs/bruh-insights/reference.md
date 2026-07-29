@@ -3,7 +3,7 @@ title: Reference
 description: Every configuration option, auth method, panel feature, and privacy detail for the BRUH Insights Home Assistant add-on — in one place.
 ---
 
-Everything you might need to look up. The defaults work out of the box, and since 1.7.0 the primary place to tune Insights is the panel's **⚙ Settings** dialog — the add-on's Configuration tab (**Settings → Add-ons → BRUH Insights → Configuration**) provides the fallback values below, all of which except `log_level` can be overridden live from ⚙ Settings without a restart.
+Everything you might need to look up. Configure from **Settings → Add-ons → BRUH Insights → Configuration**. The defaults work out of the box; the table below mirrors `config.yaml` as shipped.
 
 ## Configuration options
 
@@ -36,11 +36,8 @@ The **⚙ Settings** button in the panel controls how much of your Claude subscr
 | **Automatic insights** | Master switch. Off pauses every scheduled run (nothing spends tokens); manual **Generate**, **Refresh all**, and **Ask** still work. A topbar chip reminds you it's off. |
 | **Your Claude subscription** | Pro, Max 5×, or Max 20× — sizes the estimate of your 5-hour session window. |
 | **Session usage budget** | A slider: *let Insights use up to N% of each 5-hour session.* Once the window's usage reaches the budget, automatic runs pause until it rolls over (topbar chip says so). Manual clicks are never blocked. |
-| **Generation defaults** | Live overrides of the Configuration-tab options: default refresh interval (the "default" the ✎ editor refers to), days of history analyzed, Claude model override, generation timeout, and run-history retention. Empty field = use the Configuration value (shown grayed). |
 
 The dialog shows a live usage meter, and a **topbar chip** keeps the session's usage and reset time in view at all times ("34% used · resets 3:15 PM" — tap to open Settings; warning-colored once the budget is reached). With [BRUH Terminal](/bruh-claude/) installed, the meter, chip, and budget use your **real Anthropic account utilization** (its usage-limits tracker at `/config/.bruh_claude/usage_limits.json` — all Claude use counts, so Insights backs off when *you* are using Claude). Without it, Insights counts its own runs' tokens against a rough per-plan session estimate, and the reset time reflects when the oldest counted run ages out of the 5-hour window.
-
-![The ⚙ Settings dialog: the Automatic insights master switch, subscription picker, session-usage-budget slider with a live usage meter, and the Generation defaults overrides](/images/bruh-insights/settings-dialog.png)
 
 ## Connecting a Claude account
 
@@ -61,8 +58,6 @@ The dialog shows a live usage meter, and a **topbar chip** keeps the session's u
 - **✎ prompt editor** per card: analysis focus (with "custom prompt" badge and **Restore default**), enable/disable, a per-category refresh interval (`0` = manual only, empty = add-on default), or **fixed daily run times** (e.g. `07:00, 19:00`, 24h clock, up to 6) which take precedence over the interval — the card regenerates right after each listed time and spends nothing in between. Each stored insight records the focus it was generated with (`focus_used`).
 - **＋ New insight** creates up to **24 custom recurring insights** — name, icon, analysis prompt, optional refresh interval or daily run times. They behave exactly like shipped categories: auto-refresh, "Refresh all", run history, feedback.
 - **＋ Make recurring** in any Ask card's footer promotes a one-off question into a recurring insight.
-
-![A custom insight card generated from an Ask question about energy trends — written analysis, highlight stats, a bespoke chart, and the ＋ Make recurring button in the footer](/images/bruh-insights/custom-insight-card.png)
 
 ### Insight history
 
@@ -90,8 +85,6 @@ url: /local/bruh_insights/energy-<your-card-token>.html
 title: Energy
 aspect_ratio: 90%
 ```
-
-![The ▦ Add-to-dashboard dialog showing ready-to-paste iframe card YAML with a Copy YAML button](/images/bruh-insights/dashboard-card-dialog.png)
 
 Insight HTML is mirrored into `/config/www/bruh_insights/` (created the first time you open the ▦ dialog), where Home Assistant itself serves it at `/local/…` — same origin as every dashboard, so cards work on HTTP, HTTPS, and Nabu Casa alike. The card always shows the **latest run** and reloads every 15 minutes. The card token is a per-install random secret (`/data/secrets/card_token`) embedded in the file name; the mirror holds *only* insight HTML — no API, no credentials, no controls. Anyone with the exact URL can view that insight, so treat the token like any dashboard-level secret.
 

@@ -252,30 +252,11 @@ iframe {
 	--cl-security: #8250df;
 }
 
-.changelog-eyebrow {
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	font-size: var(--sl-text-xs);
-	font-weight: 700;
-	color: var(--sl-color-accent);
-	margin: 0 0 0.75rem;
-}
-
-.changelog-intro {
-	color: var(--sl-color-gray-2);
-	margin: 0.35rem 0;
-	max-width: 70ch;
-}
-.changelog-intro--muted {
-	font-size: var(--sl-text-sm);
-	color: var(--sl-color-gray-3);
-}
-
 .changelog-releases {
 	display: flex;
 	flex-direction: column;
 	gap: 1.25rem;
-	margin-top: 2.25rem;
+	margin-top: 1.5rem;
 }
 
 /* Release card */

@@ -180,8 +180,6 @@ Since 1.8.0 the split is simple:
 
 Each profile is a full server root at `/config/minecraft-worlds/<name>/` with its own world, `server.properties`, plugins, and backups. Only one is active at a time.
 
-![The Worlds tab: each profile listed with size, per-world settings, and Switch / Download / Delete actions — plus one-click Featured world installs below](/images/bruh-minecraft/panel-worlds.webp)
-
 **Switch:** Panel → **Worlds tab → Switch**. Writes `active_world`, full restart, ~30 s.
 
 **Per-profile:** world files, `server.properties`, plugins folder, ops/whitelist/bans, backup history.
@@ -228,8 +226,6 @@ There's no config option for this — the behaviour kicks in automatically based
 | **Worlds** | List, switch, create, delete profiles. |
 
 Header buttons (always visible): **Backup** • **Update** • **Restart** (JVM-only, ~15 s) • **Stop** (sets `no_restart`).
-
-![The Backups tab: git snapshots with SHA, timestamp, subject, and a one-click Restore button per snapshot](/images/bruh-minecraft/panel-backups.webp)
 
 ## Home Assistant entities
 

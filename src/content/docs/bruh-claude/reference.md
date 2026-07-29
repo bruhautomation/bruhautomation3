@@ -144,8 +144,6 @@ service: bruh_claude.clear_conversation
 
 Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every ~2 minutes; the sensors poll it every 30 seconds.
 
-![The Claude Terminal device page in Home Assistant, showing the Session Usage, Session Usage Resets At, Weekly Usage, and Weekly Usage Resets At sensors](/images/bruh-claude/usage-sensors.png)
-
 | Sensor | Tracks | Key attributes |
 |--------|--------|----------------|
 | Session Usage | Percent of the current 5-hour session window used | `resets_at`, `data_source`, `last_updated` |
@@ -180,8 +178,6 @@ Available in the terminal.
 | `persist-install apk\|pip <packages>` / `list` / `remove` | Manage persistent packages. |
 | `ha-selftest` | End-to-end diagnostic: API auth, the MCP server over stdio, the integration, listeners, login, sensors — PASS/FAIL with fix hints. |
 | `ha-entity` / `ha-service` / `ha-yaml-check` / `ha-notify` / `ha-share` / `ha-addon` | Focused helpers for entity state, service calls, YAML validation, notifications, the share folder, and add-on info. |
-
-![ha-selftest output with every check green: HA API auth, the MCP server over stdio, CLI smoke tests, the deployed integration, background listeners, the worker pool, and the usage sensors](/images/bruh-claude/selftest.png)
 
 ## Transport & health
 

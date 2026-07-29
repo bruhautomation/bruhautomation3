@@ -8,11 +8,17 @@ import Changelog from '../../components/changelog/Changelog.astro';
 import Release from '../../components/changelog/Release.astro';
 import Changes from '../../components/changelog/Changes.astro';
 
-<Changelog project="the BRUH Automation site" version="1.6.0">
+<Changelog>
 
-<Release version="Unreleased" />
+<Release version="1.7.0" date="July 29, 2026" latest>
+<Changes type="changed">
 
-<Release version="1.6.0" date="July 21, 2026" latest>
+- **Leaner changelogs** — the "Release notes" eyebrow, the Keep a Changelog / Semantic Versioning boilerplate, and the empty *Unreleased* sections are gone from all four changelogs (site, Terminal, Insights, Minecraft); every changelog now opens straight into its latest release card.
+
+</Changes>
+</Release>
+
+<Release version="1.6.0" date="July 21, 2026">
 <Changes type="added">
 
 - **Complete [BRUH Insights](/bruh-insights/) documentation** — Overview, Quick Start, Reference, and a full changelog for the AI insights dashboard add-on, now the third documented app alongside BRUH Terminal and BRUH Minecraft.
