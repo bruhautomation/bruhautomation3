@@ -7,7 +7,7 @@ sidebar:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**BRUH Power Tools** are 56 admin services, registered by the BRain integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
+**BRUH Power Tools** are 56 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
 
 They exist for one reason: **so nothing ever has to touch `/config/.storage` by hand.** Every call is validated before anything changes, requires admin rights, and runs through Home Assistant's own registry APIs. Claude uses them when you ask it to reorganize your home; your automations and scripts can use them too — every service shows up in **Developer Tools → Actions** with full field pickers.
 
@@ -98,8 +98,8 @@ So *"move the office lamp to the bedroom and label everything battery-powered"* 
 
 What Power Tools deliberately **don't** do: add or remove integrations (config flows are interactive), touch credentials or auth internals, or modify YAML-defined dashboards, helpers, and persons — YAML belongs to your config files, which Claude edits directly in the terminal.
 
-A well-organized registry also improves every analysis [BRain](/brain/) generates — it reads your areas, labels, and statistics.
+A well-organized registry also improves every analysis [brAIn](/brain/) generates — it reads your areas, labels, and statistics.
 
 ## Credit where due
 
-Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed). BRain renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you don't run BRain, use Spook directly — it's excellent.
+Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed). brAIn renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you don't run brAIn, use Spook directly — it's excellent.

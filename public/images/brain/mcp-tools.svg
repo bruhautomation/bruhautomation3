@@ -9,9 +9,9 @@
   <rect width="840" height="480" rx="12" fill="url(#bg3)"/>
   <text x="420" y="34" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="600">MCP Server — 36 Home Assistant Tools</text>
 
-  <!-- BRain center -->
+  <!-- brAIn center -->
   <rect x="310" y="58" width="220" height="46" rx="23" fill="#f0883e" fill-opacity="0.2" stroke="#f0883e" stroke-width="1.5" stroke-opacity="0.5"/>
-  <text x="420" y="86" text-anchor="middle" fill="#f0883e" font-size="14" font-weight="600">BRain + MCP Server</text>
+  <text x="420" y="86" text-anchor="middle" fill="#f0883e" font-size="14" font-weight="600">brAIn + MCP Server</text>
 
   <!-- Connection lines -->
   <line x1="370" y1="104" x2="112" y2="128" stroke="#1e90ff" stroke-width="1" stroke-opacity="0.3"/>

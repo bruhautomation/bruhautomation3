@@ -1,9 +1,9 @@
 ---
 title: Insights
-description: How BRain's insight cards work — the study-first onboarding, the generation pipeline, schedules, feedback, run history, and dashboard cards.
+description: How brAIn's insight cards work — the study-first onboarding, the generation pipeline, schedules, feedback, run history, and dashboard cards.
 ---
 
-The **Insights** tab is BRain acting as your home's analyst: it reads your Home Assistant data and renders it as self-contained interactive cards with sharp written analysis, highlight stats, hover tooltips, light & dark mode, and a colorblind-safe palette — designed for *your* data, not a template.
+The **Insights** tab is brAIn acting as your home's analyst: it reads your Home Assistant data and renders it as self-contained interactive cards with sharp written analysis, highlight stats, hover tooltips, light & dark mode, and a colorblind-safe palette — designed for *your* data, not a template.
 
 ## It learns before it reports
 
@@ -13,19 +13,19 @@ Those cards generated before the add-on knew anything about the house. They said
 
 So the first run is a **study**, not a report:
 
-1. **BRain studies the home** one topic at a time — naming and areas, occupancy rhythms, energy, climate, device reliability — and files what it finds in [memory](/brain/memory/).
+1. **brAIn studies the home** one topic at a time — naming and areas, occupancy rhythms, energy, climate, device reliability — and files what it finds in [memory](/brain/memory/).
 2. **It proposes cards** grounded in what it actually found, each with a one-line reason citing the evidence. A proposal that could have been written for a different house isn't a proposal.
 3. **You pick.** Nothing generates, and the scheduler stays idle, until you do.
 
 The flow is **resumable** — close the panel mid-study and come back — and re-running it never re-studies a topic it already covered, because a study session is expensive.
 
 :::note[If your home is too sparse]
-BRain says what's missing and stops. There is deliberately **no canned fallback**: generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard. Add more entities, let history accumulate, and run it again.
+brAIn says what's missing and stops. There is deliberately **no canned fallback**: generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard. Add more entities, let history accumulate, and run it again.
 :::
 
 ## The pipeline
 
-For each card (and every Ask question), BRain:
+For each card (and every Ask question), brAIn:
 
 1. **Collects a slimmed snapshot** of your home through the Supervisor API — entity states with areas and friendly names, recent history for relevant sensors, long-term statistics for energy, and the home memory document. GPS coordinates never leave the house; only zone/state and areas are included.
 2. **Sends it to Claude** with a strict design system — colorblind-safe palette, proper chart rules, dark & light mode, hover interactivity.
@@ -55,11 +55,11 @@ Three open at a time, 14-day expiry, never re-proposed in any wording. The full 
 
 ## Deep presence
 
-Presence analysis goes beyond `home`/`not_home`: BRain walks the device registry and includes sibling entities from each presence tracker's physical device — the companion app's WiFi SSID, geocoded address, activity, battery and charging state, with recent history. It must **cite its evidence** (*"phone on home WiFi and charging since 10:41 PM"*) rather than parrot a state string.
+Presence analysis goes beyond `home`/`not_home`: brAIn walks the device registry and includes sibling entities from each presence tracker's physical device — the companion app's WiFi SSID, geocoded address, activity, battery and charging state, with recent history. It must **cite its evidence** (*"phone on home WiFi and charging since 10:41 PM"*) rather than parrot a state string.
 
 ## Token budget
 
-The panel's **Settings** dialog caps how much of each 5-hour session window BRain may spend on scheduled work. Automatic runs pause at the budget; manual clicks never do. The meter uses your **real Anthropic account utilization** — all Claude use counts, so BRain backs off when *you* are using Claude elsewhere — and a topbar chip keeps usage and reset time in view. Every control: [Reference](/brain/reference/#token-budget).
+The panel's **Settings** dialog caps how much of each 5-hour session window brAIn may spend on scheduled work. Automatic runs pause at the budget; manual clicks never do. The meter uses your **real Anthropic account utilization** — all Claude use counts, so brAIn backs off when *you* are using Claude elsewhere — and the topbar pill keeps both the session and the week in view, with their reset times in the hover. Every control: [Reference](/brain/reference/#token-budget).
 
 ## Dashboard cards
 

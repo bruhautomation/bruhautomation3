@@ -19,7 +19,7 @@ const showDrafts =
 		: process.env.VERCEL_ENV !== 'production';
 
 // BRUH Terminal (`/bruh-claude/`) and BRUH Insights (`/bruh-insights/`) were
-// merged into BRain (`/brain/`). Those URLs are in the wild — in the add-on
+// merged into brAIn (`/brain/`). Those URLs are in the wild — in the add-on
 // changelogs, in YouTube descriptions, in people's bookmarks — so every one of
 // them keeps working. Old pages with no direct successor land on the section of
 // the merged docs that now covers them, never on a bare index.
@@ -205,7 +205,7 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{
-							label: 'BRain',
+							label: 'brAIn',
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
@@ -213,7 +213,7 @@ export default defineConfig({
 								{ label: 'Insights', slug: 'brain/insights' },
 								{ label: 'Voice Assistant', slug: 'brain/voice' },
 								{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
-								{ label: 'How BRain Controls HA', slug: 'brain/how-brain-controls-ha' },
+								{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
 								{
 									label: 'Power Tools',
 									collapsed: true,

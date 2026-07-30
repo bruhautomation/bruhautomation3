@@ -1,9 +1,9 @@
 ---
 title: Memory & Learning
-description: How BRain builds long-term memory about your home — what it learns, where it lives, how guesses get settled, and how to view, edit, or erase any of it.
+description: How brAIn builds long-term memory about your home — what it learns, where it lives, how guesses get settled, and how to view, edit, or erase any of it.
 ---
 
-BRain keeps one small, human-readable document about your home at `/config/.brain/memory/memory.md` — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and every surface in the add-on reads and writes it: the terminal, voice, insight runs, study sessions.
+brAIn keeps one small, human-readable document about your home at `/config/.brain/memory/memory.md` — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and every surface in the add-on reads and writes it: the terminal, voice, insight runs, study sessions.
 
 The whole design answers one question: **what, exactly, has it learned?** If you can't point at a line and say "it knows that", it isn't memory.
 
@@ -19,6 +19,8 @@ The whole design answers one question: **what, exactly, has it learned?** If you
 
 Only the queues are ever written to directly. **Nothing writes `memory.md` except the consolidator**, which folds the inbox in once a day (or early when 20+ facts are pending), deduping, resolving contradictions newest-wins, and enforcing the size cap. One writer means no races, and it means the document stays a document rather than an append-only log.
 
+**⇪ File into memory now** on the Memory tab runs that same pass immediately — same script, same safety checks. It empties **Waiting to be filed**; what was in it moves to the collapsed *Already in memory* group below, where ✕ still works if brAIn wrote down something wrong. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
+
 The inbox, the hypothesis queue, and the change log are **never injected into prompts**. They're plumbing, not knowledge.
 
 ## How it learns
@@ -30,7 +32,7 @@ The inbox, the hypothesis queue, and the change log are **never injected into pr
 
 ## Guesses, not questions
 
-Earlier versions asked open-ended questions, which piled up unanswered and left you reading raw Q&A transcripts. BRain instead states what it **believes**, phrased for a yes/no:
+Earlier versions asked open-ended questions, which piled up unanswered and left you reading raw Q&A transcripts. brAIn instead states what it **believes**, phrased for a yes/no:
 
 > *"The garage fridge is meant to run 24/7 — right?"*
 
@@ -49,7 +51,7 @@ The rules are enforced in code, not merely requested in a prompt — a model tha
 
 ## Learning you can see from outside the panel
 
-- **`brain_learned`** fires as a logbook event for every new fact, so *"BRain learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
+- **`brain_learned`** fires as a logbook event for every new fact, so *"brAIn learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
 - **`sensor.brain_facts_learned`** — how many things it knows.
 - **`sensor.brain_last_learned`** — the most recent one, with the text as an attribute.
 

@@ -45,7 +45,7 @@ A synchronous question → answer call, ideal inside scripts that need Claude's 
 
 Scheduled reports rendered to **sensors** — the dashboard-native sibling of the panel's [insight cards](/brain/insights/).
 
-Create them from the integration: **Settings → Devices & Services → BRain → Add service → Insight job**. Pick a shipped template — daily briefing, anomaly watch, battery & maintenance, camera check — or write a custom prompt. Custom prompts can embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
+Create them from the integration: **Settings → Devices & Services → brAIn → Add service → Insight job**. Pick a shipped template — daily briefing, anomaly watch, battery & maintenance, camera check — or write a custom prompt. Custom prompts can embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
 
 - **Scheduling**: an interval, a daily time (HH:MM), both, or manual-only. Every job also gets a **Run now** button, and `brain.run_insight` triggers by name from automations.
 - **Reading it**: the report lives in the sensor's attributes — `preview`, full `markdown`, and ready-to-paste `card_yaml`. After the first successful run you get a notification containing the dashboard card.
