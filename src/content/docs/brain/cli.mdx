@@ -5,7 +5,7 @@ description: Two commands, brain and ha — memory, learning, undo and diagnosti
 
 The terminal ships **two commands**, split by what they act on:
 
-- **`brain`** — BRain's own faculties: memory, learning, undo, diagnostics.
+- **`brain`** — brAIn's own faculties: memory, learning, undo, diagnostics.
 - **`ha`** — Home Assistant operations: logs, reloads, entities, services, add-ons.
 
 The split exists so that *"which log?"* is never a question anyone has to ask. `brain help` and `ha help` list everything; typing a subcommand into the wrong dispatcher tells you which one it belongs to rather than failing quietly.
@@ -48,7 +48,7 @@ brain undo --all-today             # revert everything Claude changed today
 | `ha help` | The full list |
 
 :::note[If `ha` is already taken]
-If some other `ha` command is ever present on `PATH` inside the container, BRain installs its own as **`hass`** instead rather than shadowing it. The startup log says so when this happens.
+If some other `ha` command is ever present on `PATH` inside the container, brAIn installs its own as **`hass`** instead rather than shadowing it. The startup log says so when this happens.
 :::
 
 ## Also on `PATH`
@@ -66,8 +66,8 @@ Inside a Claude Code session, two shortcuts do the same work without leaving the
 
 ## There is no backup command
 
-BRain doesn't version your configuration; **Home Assistant's own backups** do that job, whole-system and restorable. What it keeps instead is an edit journal — a snapshot of any file *before* Claude writes to it — which `brain undo` restores from. See [Undo](/brain/reference/#undo).
+brAIn doesn't version your configuration; **Home Assistant's own backups** do that job, whole-system and restorable. What it keeps instead is an edit journal — a snapshot of any file *before* Claude writes to it — which `brain undo` restores from. See [Undo](/brain/reference/#undo).
 
-## Everything is BRain-usable
+## Everything is brAIn-usable
 
 The generated context lists both dispatchers, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"what did you learn last week?"* resolve to the right command without you naming it.

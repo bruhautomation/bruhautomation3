@@ -1,6 +1,6 @@
 ---
 title: Changelog
-description: Release notes for the BRain Home Assistant add-on — every notable change, newest first.
+description: Release notes for the brAIn Home Assistant add-on — every notable change, newest first.
 tableOfContents: false
 ---
 
@@ -10,16 +10,76 @@ import Changes from '../../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.5.0" date="July 29, 2026" latest>
+<Release version="1.8.0" date="July 29, 2026" latest>
+
+**It's brAIn.** The name is spelled that way everywhere now — add-on, panel, integration, sensors, CLI help, and these docs. The wordmark never needed changing: the gable already doubles as the `A`, and the `A` and the `I` were already the one part drawn in the accent colour.
+
+<Changes type="fixed">
+
+- **"⇪ File into memory now" empties the list.** It filed the queue and then showed you the same discoveries with the same "2 things waiting" underneath, because the list was reading the dedup ledger — the record of what has already been announced, which by design keeps entries forever. It is split now: **Waiting to be filed** is only what is genuinely still queued, and everything already folded into the document moves into a collapsed *Already in memory* group below it. ✕ still works in both.
+- **A pass that filed nothing no longer reports success.** The consolidator exits 0 in cases where it deliberately keeps the facts, and being skipped because another pass held the lock exited 0 too. The queue is now counted either side of the pass, so "the queue didn't move" and "another consolidation is already running" are things the panel can tell you instead of "Filed 2 things" over an unchanged list.
+
+</Changes>
+<Changes type="changed">
+
+- **The usage pill shows both windows** — `19% session · 64% week`. The seven-day limit is the one that actually ends your week on a Claude plan. Reset times moved into the hover, where a value that changes once per window belongs; the numbers, which change all day, stay in the bar. The ⚙ dialog states the week too. Both readings come from your Anthropic account, so they need a subscription login rather than an API key.
+- **The "Claude · subscription" pill is gone.** A green pill labelling a state that never changes, in a bar where width is the scarce thing. The auth chip now appears only when there is something to say — verifying, failed, or not connected — which paid for the second usage number twice over. On a narrow phone the weekly number steps aside, and below 410px so does the whole pill if a trouble chip needs the room.
+- **Display names follow the spelling.** The conversation agent, the system health sensor and the usage sensors read "brAIn" in Home Assistant. Entity IDs are unchanged, so nothing in your automations or dashboards breaks.
+
+</Changes>
+</Release>
+
+<Release version="1.7.0" date="July 29, 2026">
+
+**Findings — memory you can act on.** Memory tells you what is *true* of your home, and a guess asks whether brAIn has something *wrong*. Neither had anywhere to put the third thing: something that is **broken**.
+
+<Changes type="added">
+
+- **A [Findings](/brain/insights/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
+- **✦ Fix it** sends Claude to make the change in your actual Home Assistant: confirm the problem is still real, find the cause rather than the symptom, make the smallest change that resolves it, verify it took, and report exactly what it touched. Bounded hard — one finding per run, never deletes what it didn't create, never restarts Home Assistant, never touches secrets, and nothing runs until you press it.
+- **Not a problem** dismisses a finding permanently, and the dismissal is fed into every future analysis. If the garage freezer is *supposed* to sit at -30°C, one press ends that conversation for good. Anything needing hands is marked **needs you** rather than offered a fix, and **✓ I did it** closes those.
+- **A second verb in the ask bar.** Start a line with "learn about…" or "study…" and brAIn runs a study session instead of drawing a card, digging through the registry, history and long-term statistics for that corner of the house. It was previously reachable only from the terminal, which meant nobody ran one.
+- **⇪ File into memory now** on the Memory tab runs a consolidation immediately rather than waiting for the daily one — same script, same safety checks.
+
+</Changes>
+<Changes type="changed">
+
+- **Tags are yours to edit.** Press ✎ on a card's tag row to drop a tag or add your own. What's stored is a diff, not a list: your removals stick across regeneration, but a genuinely new tag a later run discovers still appears.
+- **The header carries the real wordmark** as one piece of art rather than the gable beside live text, in three brand roles so a single file works in both themes.
+- **Learned and found are separate.** What a run learns about the home (durable facts → memory) is now a different field from what it finds wrong (→ Findings). They were one, which is why nothing was ever actionable.
+
+</Changes>
+<Changes type="removed">
+
+- **The "New insight" dialog.** Asking a question already made a card, and any card becomes recurring with ＋ Make recurring — a blank prompt dialog was a second, harder path to somewhere you had already been taken.
+- **The removed-cards graveyard** in ⚙ Settings. That belonged to a version that shipped nine cards to every house; this one proposes cards for *your* home, so the way to get one back is to ask for it again. ✕ now means the same thing for every card: gone.
+
+</Changes>
+</Release>
+
+<Release version="1.6.0" date="July 29, 2026">
+
+**A new mark.** brAIn's logo is now a descendant of the BRUH Automation logo rather than a cousin of it: the `BR` ligature, the gable and the signal motif are lifted unmodified from the parent mark, and only the `A`, `I` and `N` are newly drawn, on the parent's own ratios. The gable *is* the `A`. The old mark was a generic neural-mesh glyph that could have belonged to any AI product — and was never really chosen, it won by being first in a folder.
+
+<Changes type="changed">
+
+- **New art everywhere it appears** — the panel's top bar, the favicon, the add-on store icon and logo, and the home-assistant/brands assets, all re-rendered from one set of SVGs so they can't drift.
+- **The sidebar icon is `mdi:home-analytics`**, replacing an icon picked to rhyme with a mesh that no longer exists.
+- **Wide lockups are 4:3 rather than 640×200** — the new mark is near enough square that a banner shape either stranded it in empty plate or cropped it.
+
+</Changes>
+</Release>
+
+<Release version="1.5.0" date="July 29, 2026">
 
 **No default cards — it learns your home first.**
 
-BRain used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Presence, Media, Device Health, Automations), all enabled from the moment you installed it. They generated before BRain knew anything about the house, so they said generic things about a home it had never looked at — and cost tokens doing it, on every schedule, forever.
+brAIn used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Presence, Media, Device Health, Automations), all enabled from the moment you installed it. They generated before brAIn knew anything about the house, so they said generic things about a home it had never looked at — and cost tokens doing it, on every schedule, forever.
 
 <Changes type="changed">
 
 - **A fresh install now has no cards at all.** The first run studies the home — naming, occupancy, energy, climate, device reliability — and only then proposes cards grounded in what it actually found, each with a one-line reason citing the evidence. You pick which to keep. Nothing generates, and the scheduler stays idle, until you do.
-- **There is no canned fallback.** If the home is too sparse to learn from, BRain says what's missing and stops. Generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard.
+- **There is no canned fallback.** If the home is too sparse to learn from, brAIn says what's missing and stops. Generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard.
 - **The flow is resumable** — close the panel mid-study and come back — and re-running it never re-studies a topic it already covered, because a study session is expensive.
 
 </Changes>
@@ -66,7 +126,7 @@ BRain used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Pr
 </Changes>
 <Changes type="added">
 
-- **Logbook events.** Every new fact fires `brain_learned`, so *"BRain learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
+- **Logbook events.** Every new fact fires `brain_learned`, so *"brAIn learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
 - **`sensor.brain_facts_learned`** and **`sensor.brain_last_learned`**.
 - **`binary_sensor.brain_waiting_on_you`** — on when a guess needs an answer, with the text in `pending`. This exists to be automated: a guess sitting in a panel nobody has open expires unanswered, but pushed to a phone it costs one tap.
 - **`brain.study`** service — with a topic, or without one to study whatever has gone stalest. Returns immediately; results arrive in memory, not in a response.
@@ -111,15 +171,15 @@ BRain used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Pr
 </Changes>
 <Changes type="fixed">
 
-- **The panel still said "BRUH Insights" in its header, and drew the Insights bar-chart glyph.** The wordmark is split across HTML tags (`BRUH <span>Insights</span>`), so the rename never matched it. It now reads **BRain** with the neural-mesh mark. A test now strips tags before checking, so this class of miss can't come back.
-- **Several hints told you to go run a command in "the BRain add-on" — from inside BRain.** They were inherited from when Terminal and Insights were separate. They now point at the Terminal tab.
+- **The panel still said "BRUH Insights" in its header, and drew the Insights bar-chart glyph.** The wordmark is split across HTML tags (`BRUH <span>Insights</span>`), so the rename never matched it. It now reads **brAIn** with the neural-mesh mark. A test now strips tags before checking, so this class of miss can't come back.
+- **Several hints told you to go run a command in "the brAIn add-on" — from inside brAIn.** They were inherited from when Terminal and Insights were separate. They now point at the Terminal tab.
 - **Retired CLI names in the UI.** `ha-share-login` and `ha-memory` no longer exist; the panel referenced both.
-- **A new agent defaulted to the name "Claude Agent"** instead of "BRain Agent".
+- **A new agent defaulted to the name "Claude Agent"** instead of "brAIn Agent".
 
 </Changes>
 <Changes type="changed">
 
-- Added `logo.png` / `logo@2x.png` for the home-assistant/brands submission. Until that PR merges, Home Assistant has no artwork for the `brain` domain and shows the raw domain beside the name — which is why a fresh install reads "brain BRain".
+- Added `logo.png` / `logo@2x.png` for the home-assistant/brands submission. Until that PR merges, Home Assistant has no artwork for the `brain` domain and shows the raw domain beside the name — which is why a fresh install reads "brain brAIn".
 
 </Changes>
 </Release>
@@ -132,7 +192,7 @@ BRain used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Pr
 </Changes>
 <Changes type="changed">
 
-- **BRUH Terminal and BRUH Insights are removed.** BRain replaces both; their test suites now cover BRain.
+- **BRUH Terminal and BRUH Insights are removed.** brAIn replaces both; their test suites now cover brAIn.
 - **Renamed the files that were ours rather than Claude Code's**: `claude_client.py` is now `panel/engine.py`, and the session picker and auth helper are `brain-menu.sh` and `brain-auth-helper.sh`. `CLAUDE.md`, `CLAUDE_CONFIG_DIR`, the `claude` user, and the `claude-run` wrapper keep the name — they *are* Claude Code's own file, env var, user, and binary.
 
 </Changes>
@@ -140,7 +200,7 @@ BRain used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Pr
 
 <Release version="1.0.0" date="July 28, 2026">
 
-First release. BRain replaces **[BRUH Terminal](/brain/archive/bruh-terminal-changelog/)** and **[BRUH Insights](/brain/archive/bruh-insights-changelog/)**, which are now deprecated. It is a clean install — there is no migration from either add-on.
+First release. brAIn replaces **[BRUH Terminal](/brain/archive/bruh-terminal-changelog/)** and **[BRUH Insights](/brain/archive/bruh-insights-changelog/)**, which are now deprecated. It is a clean install — there is no migration from either add-on.
 
 <Changes type="added">
 
@@ -152,9 +212,9 @@ First release. BRain replaces **[BRUH Terminal](/brain/archive/bruh-terminal-cha
 <Changes type="changed">
 
 - **The assist worker pool moved to port 8098**, since 8099 now belongs to the panel. Nothing hardcodes it — the integration reads the port from the endpoint file the pool publishes.
-- **Integration domain is `brain`**: services are `brain.send_prompt`, `brain.run_task`, and the rest, including all 56 Power Tools. Shared state moved from `/config/.bruh_claude/` to **`/config/.brain/`**, environment variables use the `BRAIN_` prefix, and the conversation agent appears as **BRain** in Settings → Voice Assistants.
-- **`assist_learning` is now just `learning`** — it governs everything BRain learns, not only the voice channel.
-- **Fourteen `ha-*` scripts collapse into two dispatchers**, split by what they act on: **`brain`** for its own faculties (`memory`, `learn`, `ask`, `undo`, `doctor`) and **`ha`** for Home Assistant operations (`log`, `reload`, `entity`, `service`, `addon`, `notify`, `share`, `check`, `context`). If a pre-existing `ha` command is ever found on `PATH`, BRain installs its own as `hass` instead rather than shadowing it.
+- **Integration domain is `brain`**: services are `brain.send_prompt`, `brain.run_task`, and the rest, including all 56 Power Tools. Shared state moved from `/config/.bruh_claude/` to **`/config/.brain/`**, environment variables use the `BRAIN_` prefix, and the conversation agent appears as **brAIn** in Settings → Voice Assistants.
+- **`assist_learning` is now just `learning`** — it governs everything brAIn learns, not only the voice channel.
+- **Fourteen `ha-*` scripts collapse into two dispatchers**, split by what they act on: **`brain`** for its own faculties (`memory`, `learn`, `ask`, `undo`, `doctor`) and **`ha`** for Home Assistant operations (`log`, `reload`, `entity`, `service`, `addon`, `notify`, `share`, `check`, `context`). If a pre-existing `ha` command is ever found on `PATH`, brAIn installs its own as `hass` instead rather than shadowing it.
 
 </Changes>
 <Changes type="removed">
@@ -166,9 +226,9 @@ First release. BRain replaces **[BRUH Terminal](/brain/archive/bruh-terminal-cha
 
 </Changelog>
 
-## Before BRain
+## Before brAIn
 
-BRain is a clean start, so its version numbers begin again at 1.0.0. The two add-ons it replaces kept their own histories, preserved in full:
+brAIn is a clean start, so its version numbers begin again at 1.0.0. The two add-ons it replaces kept their own histories, preserved in full:
 
 - **[BRUH Terminal changelog](/brain/archive/bruh-terminal-changelog/)** — 1.0.0 through 3.6.0
 - **[BRUH Insights changelog](/brain/archive/bruh-insights-changelog/)** — 1.0.0 through 1.7.0

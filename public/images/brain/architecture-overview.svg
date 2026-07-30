@@ -39,7 +39,7 @@
   <rect width="900" height="520" rx="12" fill="url(#bgGrad)"/>
 
   <!-- Title -->
-  <text x="450" y="36" text-anchor="middle" fill="#e6edf3" font-size="18" font-weight="600">BRain — Architecture Overview</text>
+  <text x="450" y="36" text-anchor="middle" fill="#e6edf3" font-size="18" font-weight="600">brAIn — Architecture Overview</text>
 
   <!-- HA Core box -->
   <rect x="30" y="60" width="250" height="200" rx="10" fill="url(#blueGrad)" stroke="#1e90ff" stroke-width="1.5" stroke-opacity="0.4"/>

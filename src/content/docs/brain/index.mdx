@@ -1,11 +1,11 @@
 ---
-title: BRain
+title: brAIn
 description: Your home's brain. A Claude Code terminal, an AI insights dashboard, and one shared memory that learns your house over time — one Home Assistant add-on, one panel, one login.
 template: splash
 hero:
   tagline: "A Claude Code terminal, an AI insights dashboard, and one shared memory that learns your house — in one add-on, behind one sidebar panel, on one login."
   # The full wordmark, not the icon: at hero size there is room for it, and
-  # the mark only reads as "BRain" when the gable is doing its job as the A.
+  # the mark only reads as "brAIn" when the gable is doing its job as the A.
   # Its B/R/N flip between ink and paper, so it needs both grounds.
   image:
     light: ../../../assets/brain-logo-onlight.svg
@@ -34,24 +34,24 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 A Home Assistant add-on that runs **Claude Code** inside HA and gives it a memory of your house. One ingress panel carries three faces — an **insights dashboard**, a **full terminal**, and the **memory** itself — plus a voice assistant, scheduled reports, and 56 admin services. It reads your entities, services, automations, traces, history, cameras, and logs through a built-in MCP server, so it actually knows your setup rather than guessing at it.
 
-BRain replaces **BRUH Terminal** and **BRUH Insights**, which were two add-ons, two logins, and two memories racing on one file.
+brAIn replaces **BRUH Terminal** and **BRUH Insights**, which were two add-ons, two logins, and two memories racing on one file.
 
-![BRain architecture: the Home Assistant core on the left, the add-on container with the ingress panel, Claude Code, the MCP server, listeners and background services on the right, over shared file IPC and persistent storage](/images/brain/architecture-overview.svg)
+![brAIn architecture: the Home Assistant core on the left, the add-on container with the ingress panel, Claude Code, the MCP server, listeners and background services on the right, over shared file IPC and persistent storage](/images/brain/architecture-overview.svg)
 
 ## What you can do
 
 <CardGrid>
   <Card title="It learns your home" icon="open-book">
-    One **memory document** — preferences, nicknames, household rhythms, device quirks — written by everything BRain does and read by everything BRain does. Plain markdown, in a tab, yours to edit.
+    One **memory document** — preferences, nicknames, household rhythms, device quirks — written by everything brAIn does and read by everything brAIn does. Plain markdown, in a tab, yours to edit.
   </Card>
   <Card title="Insight cards, specific to you" icon="star">
-    No canned categories. BRain **studies your house first**, then proposes cards grounded in what it found, each with a reason citing the evidence. You pick which to keep.
+    No canned categories. brAIn **studies your house first**, then proposes cards grounded in what it found, each with a reason citing the evidence. You pick which to keep.
   </Card>
   <Card title="A full terminal" icon="laptop">
     Claude Code as a tab in the same panel. Ask it to fix your YAML, chase a bug through automation traces, or explain what a sensor is doing — and watch it work.
   </Card>
   <Card title="Fast voice assistant" icon="comment-alt">
-    Pick **BRain** in **Settings → Voice Assistants**. Typical commands answer in ~3–5 s, replies stream for TTS, and follow-ups remember the conversation.
+    Pick **brAIn** in **Settings → Voice Assistants**. Typical commands answer in ~3–5 s, replies stream for TTS, and follow-ups remember the conversation.
   </Card>
   <Card title="Reorganize by asking" icon="puzzle">
     **[Power Tools](/brain/power-tools/)**: 56 admin services for areas, labels, entities, helpers, dashboards, zones, and users. *"Rename all the Shellys"*, *"build me a guest-mode toggle"* — validated, admin-gated, no `.storage` edits.
@@ -60,14 +60,14 @@ BRain replaces **BRUH Terminal** and **BRUH Insights**, which were two add-ons, 
     Every file Claude writes to is snapshotted first. **`brain undo`** lists the edits in plain English and puts one back.
   </Card>
   <Card title="See your cameras" icon="seti:image">
-    BRain looks at a camera and tells you what it sees: *"is the garage door actually closed?"* — by voice or in an automation.
+    brAIn looks at a camera and tells you what it sees: *"is the garage door actually closed?"* — by voice or in an automation.
   </Card>
   <Card title="Trigger from automations" icon="setting">
     `brain.run_task` runs a background job — error-log digests, config audits, morning summaries — with an optional done-notification.
   </Card>
 </CardGrid>
 
-![BRain selected as the conversation agent in Home Assistant Settings → Voice Assistants](/images/brain/voice-assistant-agent.webp)
+![brAIn selected as the conversation agent in Home Assistant Settings → Voice Assistants](/images/brain/voice-assistant-agent.webp)
 
 ## The learning loop
 
@@ -84,7 +84,7 @@ This is the part that makes it more than a chat window:
 
 In the terminal, by voice, or on a schedule:
 
-```text title="In the BRain terminal"
+```text title="In the brAIn terminal"
 > Show me automations that haven't triggered in 30 days
 
 Found 4:
@@ -101,7 +101,7 @@ Want me to disable the unused ones?
 What makes this different from running Claude Code on a regular machine:
 
 - **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your usage; an API key works too. **One login** covers the panel, the terminal, voice, insights, and memory.
-- **[36 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras, history and statistics, registries, dashboards, traces, templates, logs, reloads. How the layers fit: [How BRain controls your home](/brain/how-brain-controls-ha/).
+- **[36 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras, history and statistics, registries, dashboards, traces, templates, logs, reloads. How the layers fit: [How brAIn controls your home](/brain/how-brain-controls-ha/).
 - **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of your install that Claude reads at the start of each session.
 - **Usage-limit sensors** — the same session/weekly utilization as claude.ai → Settings → Usage, as HA sensors with reset times.
 - **Safe by default** — voice agents get HA tools but no shell, file, or web access; per-agent blocked-services lists; non-root sandbox.
@@ -109,10 +109,10 @@ What makes this different from running Claude Code on a regular machine:
 
 ## What it doesn't do
 
-Honesty up front. BRain **can't add or remove integrations** (config flows are interactive — OAuth, pairing buttons — so it walks you to the right screen and you click), **never touches credentials** (API keys, tokens, MFA), and **won't edit YAML-mode dashboards through services** (it edits the YAML itself instead).
+Honesty up front. brAIn **can't add or remove integrations** (config flows are interactive — OAuth, pairing buttons — so it walks you to the right screen and you click), **never touches credentials** (API keys, tokens, MFA), and **won't edit YAML-mode dashboards through services** (it edits the YAML itself instead).
 
-It also **doesn't back up your configuration** — Home Assistant's own backups already do that, whole-system and restorable. What BRain keeps is an edit journal of the files *it* touched, so `brain undo` can put one back.
+It also **doesn't back up your configuration** — Home Assistant's own backups already do that, whole-system and restorable. What brAIn keeps is an edit journal of the files *it* touched, so `brain undo` can put one back.
 
-The full scorecard: [what BRain can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
+The full scorecard: [what brAIn can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
 
 **[Quick Start →](/brain/quickstart/)** — add the repo, install, restart HA once, sign in, press **Start learning**. About five minutes, plus a few minutes of study in the background.

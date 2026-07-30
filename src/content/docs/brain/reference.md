@@ -1,9 +1,9 @@
 ---
 title: Reference
-description: Every configuration option, service, sensor, CLI command, and MCP capability for the BRain add-on — in one place.
+description: Every configuration option, service, sensor, CLI command, and MCP capability for the brAIn add-on — in one place.
 ---
 
-Everything you might need to look up. Configure from **Settings → Add-ons → BRain → Configuration**. The defaults work out of the box; the tables below mirror `config.yaml` as shipped.
+Everything you might need to look up. Configure from **Settings → Add-ons → brAIn → Configuration**. The defaults work out of the box; the tables below mirror `config.yaml` as shipped.
 
 ## Configuration options
 
@@ -32,13 +32,13 @@ One ingress panel serves everything; these turn either face off. The panel itsel
 | `enable_ha_mcp_server` | `true` | The MCP server that gives Claude live entities, device control, cameras, history, traces, logs, templates, and reloads. |
 | `enable_assist_integration` | `true` | Run as a conversation agent in HA Voice Assistants. |
 | `assist_fast_mode` | `true` | Keep pre-warmed Claude workers alive for voice (one per active conversation plus a hot spare) so turns skip the CLI boot and MCP handshake. ~150–300 MB RAM per warm worker (max 3). `false` uses the classic spawn-per-request listener. |
-| `enable_automation_integration` | `true` | Trigger BRain tasks from automations via `brain.run_task`. |
+| `enable_automation_integration` | `true` | Trigger brAIn tasks from automations via `brain.run_task`. |
 
 ### Memory and learning
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `learning` | `true` | Master switch for **everything** BRain learns: the end-of-conversation reflection pass, the consolidator, and study sessions. Turning it off leaves existing memory in place and still used. |
+| `learning` | `true` | Master switch for **everything** brAIn learns: the end-of-conversation reflection pass, the consolidator, and study sessions. Turning it off leaves existing memory in place and still used. |
 | `memory_injection` | `true` | Splice learned memory into voice prompts. |
 | `memory_max_kb` | `8` (1–64) | Size cap for the memory document. |
 | `study_max_turns` | `60` (0–500) | Turn cap for a study session. **`0` removes the cap.** |
@@ -46,7 +46,7 @@ One ingress panel serves everything; these turn either face off. The panel itsel
 
 ### Turn budgets
 
-These cap how many agentic loops BRain runs before returning.
+These cap how many agentic loops brAIn runs before returning.
 
 | Option | Default | What it does |
 |--------|---------|--------------|
@@ -150,7 +150,7 @@ One ingress panel with four tabs.
 
 ### Insights
 
-A fresh install has **no cards**. The first run studies your home, then proposes cards grounded in what it found, each with a one-line reason citing the evidence; you pick which to keep. Nothing generates, and the scheduler stays idle, until you do. If the home is too sparse to learn from, BRain says what's missing rather than inventing generic cards — see [Quick Start](/brain/quickstart/#let-it-learn-your-home).
+A fresh install has **no cards**. The first run studies your home, then proposes cards grounded in what it found, each with a one-line reason citing the evidence; you pick which to keep. Nothing generates, and the scheduler stays idle, until you do. If the home is too sparse to learn from, brAIn says what's missing rather than inventing generic cards — see [Quick Start](/brain/quickstart/#let-it-learn-your-home).
 
 - **Ask anything** — type a question and get a bespoke card back. **＋ Make recurring** promotes it onto its own schedule.
 - **✎ per card** — edit that card's analysis focus, its refresh interval, or **fixed daily run times** (e.g. `07:00, 19:00`, up to 6) which take precedence over the interval and spend nothing in between.
@@ -172,15 +172,15 @@ The built-in guide, searchable, with the matched term highlighted in the page.
 
 ### Token budget
 
-The panel's **Settings** dialog caps how much of each 5-hour session window BRain may spend on scheduled work; automatic runs pause at the budget, manual clicks never do. The meter uses your **real Anthropic account utilization** from the usage-limits tracker, so BRain backs off when *you* are using Claude elsewhere. A topbar chip keeps the session's usage and reset time in view.
+The panel's **Settings** dialog caps how much of each 5-hour session window brAIn may spend on scheduled work; automatic runs pause at the budget, manual clicks never do. The meter uses your **real Anthropic account utilization** from the usage-limits tracker, so brAIn backs off when *you* are using Claude elsewhere. The topbar pill keeps both windows in view — `19% session · 64% week` — with each window's reset time in its hover. Only the session is budgeted against; the week is shown because a session that looks fine says nothing about a week that doesn't. Neither number exists without a subscription login, so with an API key the session falls back to an estimate of brAIn's own spending and the week isn't shown at all.
 
 ## Voice assistant (Assist)
 
-Select **BRain** as a conversation agent in **Settings → Voice Assistants**. Each agent has its own name, model, personality, and blocked-services list. New agents default to Claude Haiku (`Default` inherits the terminal's model); `brain.clear_conversation` resets conversation memory (omit `conversation_id` to reset all). How it works — fast mode, the area map, personalities: [Voice Assistant](/brain/voice/).
+Select **brAIn** as a conversation agent in **Settings → Voice Assistants**. Each agent has its own name, model, personality, and blocked-services list. New agents default to Claude Haiku (`Default` inherits the terminal's model); `brain.clear_conversation` resets conversation memory (omit `conversation_id` to reset all). How it works — fast mode, the area map, personalities: [Voice Assistant](/brain/voice/).
 
 ## Insight jobs
 
-Scheduled reports rendered to **sensors**, created from **Settings → Devices & Services → BRain → Add Service → Insight job**. The report lands in the sensor's attributes: `preview` (first lines), `markdown` (full report), `card_yaml` (ready-to-paste card). A `brain_insight_complete` event fires after every run with `name`, `entity_id`, `success`, and `preview`. Templates, scheduling, and dashboard recipes: [Automations & Insight Jobs](/brain/automations/#insight-jobs).
+Scheduled reports rendered to **sensors**, created from **Settings → Devices & Services → brAIn → Add Service → Insight job**. The report lands in the sensor's attributes: `preview` (first lines), `markdown` (full report), `card_yaml` (ready-to-paste card). A `brain_insight_complete` event fires after every run with `name`, `entity_id`, `success`, and `preview`. Templates, scheduling, and dashboard recipes: [Automations & Insight Jobs](/brain/automations/#insight-jobs).
 
 ## HA services
 
@@ -228,7 +228,7 @@ Plus the **56 [Power Tools](/brain/power-tools/)** services for registry adminis
 
 | Entity | Reports |
 |--------|---------|
-| `sensor.brain_facts_learned` | How many things BRain knows |
+| `sensor.brain_facts_learned` | How many things brAIn knows |
 | `sensor.brain_last_learned` | The most recent fact, with the text as an attribute |
 | `binary_sensor.brain_waiting_on_you` | On when a guess needs a yes/no, with the text in `pending` |
 
@@ -261,7 +261,7 @@ The built-in MCP server gives Claude **36 tools** against your live install — 
 
 ## CLI
 
-Two dispatchers in the terminal — `brain` for BRain's own faculties, `ha` for Home Assistant operations. `brain help` and `ha help` list everything; the full tables are on [The CLI](/brain/cli/).
+Two dispatchers in the terminal — `brain` for brAIn's own faculties, `ha` for Home Assistant operations. `brain help` and `ha help` list everything; the full tables are on [The CLI](/brain/cli/).
 
 ```bash
 brain memory list        brain learn energy      brain undo      brain doctor
@@ -270,7 +270,7 @@ ha log                   ha reload automations   ha check        ha context
 
 ## Undo
 
-BRain **does not back up your configuration.** Home Assistant's own backups are whole-system and restorable, and versioning `/config` inside `/config` only made those backups bigger.
+brAIn **does not back up your configuration.** Home Assistant's own backups are whole-system and restorable, and versioning `/config` inside `/config` only made those backups bigger.
 
 What it keeps instead is an **edit journal**: before Claude writes to any file under `/config`, the previous contents are snapshotted to `/data/.brain/edits/`.
 
@@ -280,7 +280,7 @@ brain undo 3              # revert edit #3
 brain undo --all-today    # revert everything Claude changed today
 ```
 
-Snapshots are pruned after `edit_journal_days` and capped by total size. **`secrets.yaml` is never snapshotted.** An existing `/config/.git` directory from an older add-on is left strictly alone — BRain never writes to it; delete it yourself if you don't want it.
+Snapshots are pruned after `edit_journal_days` and capped by total size. **`secrets.yaml` is never snapshotted.** An existing `/config/.git` directory from an older add-on is left strictly alone — brAIn never writes to it; delete it yourself if you don't want it.
 
 ## Transport & health
 
@@ -379,7 +379,7 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 | Cards look thin | The card found few matching entities — check areas are assigned and the relevant sensors enabled in HA. |
 | Generation timed out | Raise `generation_timeout_minutes`, or set a faster `model`. |
 | Usage sensors *unavailable* | They need an OAuth/subscription login, not an API key (see above). |
-| Anything else | **Settings → Add-ons → BRain → Log**, with `log_level: debug`. |
+| Anything else | **Settings → Add-ons → brAIn → Log**, with `log_level: debug`. |
 
 ### Per-request debug logs
 
@@ -394,4 +394,4 @@ Set `log_level: debug` in the add-on config before reproducing a bug for maximum
 
 ## Disclaimer
 
-BRain is an independent project, not affiliated with, endorsed by, or sponsored by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic, PBC. The add-on runs the official Claude Code CLI under your own Anthropic account; your use of Claude through it is governed by [Anthropic's terms](https://www.anthropic.com/legal/consumer-terms).
+brAIn is an independent project, not affiliated with, endorsed by, or sponsored by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic, PBC. The add-on runs the official Claude Code CLI under your own Anthropic account; your use of Claude through it is governed by [Anthropic's terms](https://www.anthropic.com/legal/consumer-terms).
