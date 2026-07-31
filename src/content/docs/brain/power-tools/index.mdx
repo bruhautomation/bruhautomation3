@@ -98,7 +98,9 @@ In the terminal, Claude pairs Power Tools with two MCP tools:
 
 So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back. No file edits, no restarts, no guesswork. The same services power [voice](/brain/voice/) requests and [automation tasks](/brain/automations/) — and because they're real HA services, your automations can call them with no Claude in the loop. Where this layer sits relative to the MCP and CLI tools: [How Claude controls your home](/brain/how-brain-controls-ha/).
 
-What Power Tools deliberately **don't** do: add or remove integrations (config flows are interactive), touch credentials or auth internals, or modify YAML-defined dashboards, helpers, and persons — YAML belongs to your config files, which Claude edits directly in the terminal.
+What Power Tools deliberately **don't** do: add an integration (config flows are interactive, so Claude walks you to the screen and you click — removing one it can do), or touch credentials and auth internals.
+
+They also don't reach objects defined in YAML rather than through the UI, and that is a routing detail rather than a limit. A `brain.*` service edits the registry, and a YAML-defined dashboard, helper or person isn't in the registry — so brAIn edits the file instead, validates it, and reloads the domain. It gets there either way; only the layer changes. See [how the layers fit](/brain/how-brain-controls-ha/#yaml-config-is-not-an-exception).
 
 A well-organized registry also improves every analysis [brAIn](/brain/) generates — it reads your areas, labels, and statistics.
 
