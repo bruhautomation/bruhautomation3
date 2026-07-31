@@ -66,5 +66,15 @@ The goal is an instance where Claude can do essentially everything — here's th
 - **Adding an integration** — config flows are interactive (OAuth, discovery, pairing buttons), so Claude walks you to the right screen and you click. *Removing* one it can do: `brain.delete_integration` drops the config entry and reports the entities and devices that went with it.
 - **Credentials and auth internals** — API keys inside `core.config_entries`, tokens, MFA. Never read, never written, never snapshotted into the edit journal.
 - **Backing up your configuration** — that's Home Assistant's own backups' job. brAIn keeps an [edit journal](/brain/reference/#undo) of the files it touched so `brain undo` can revert one, and nothing more.
-- **YAML-mode dashboards/helpers/persons** via services — those belong to your configuration files, which Claude edits directly in the terminal instead.
 - **HA Core/OS updates and add-on installs** — Supervisor territory; `ha addon` covers restarts and logs, but installs stay a human decision.
+
+### YAML config is not an exception
+
+Nothing on your disk is off limits. If a dashboard, helper or person is defined in YAML
+rather than through the UI, the registry *service* for it declines — a `brain.*` service
+edits the registry, and a YAML-defined object isn't in the registry. brAIn just takes the
+other route: it opens the file, edits it, validates it, and reloads the domain. Same
+outcome, and the same edit journal behind it, so `brain undo` still puts it back.
+
+That is the routing rule doing its job, not a gap in what brAIn can reach. The only thing
+you'll notice is which layer the work happened in.

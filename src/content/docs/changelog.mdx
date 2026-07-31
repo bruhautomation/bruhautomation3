@@ -10,7 +10,26 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.11.0" date="July 31, 2026" latest>
+<Release version="1.12.0" date="July 31, 2026" latest>
+
+New lead copy on the [brAIn overview](/brain/), matching the READMEs and the add-on's own documentation, plus a correction to what the docs claimed brAIn can't do to YAML.
+
+<Changes type="changed">
+
+- **The overview leads with the pitch, not the parts list.** *Your house already has nerves. Now give it a brAIn.* The "What it is" section that follows says what the thing does in four short paragraphs — sees the whole system and can change any of it, keeps a memory you can open and edit, reachable as a conversation agent or a chat interface or native Claude Code, callable from your automations.
+- **This changelog moved out of the sidebar and into the header.** A page about what changed on the docs site had the same weight in the nav as the projects people actually come here for. It is now the small version number beside the social icons — click it and you land here. The version is read from `package.json` at build time, so it can't disagree with the release it shipped in. It hides below 50rem, where the header is already tight.
+- **Changelog cards are a lighter grey in light mode.** They used Starlight's `--sl-color-gray-6`, a blue-tinted `#edeef3` that on a white page read as a shaded panel rather than a card. Now a plain neutral `#fafafa` with the border defining the edge. Dark mode is unchanged — there, a lifted surface is what makes a card read as one.
+
+</Changes>
+<Changes type="fixed">
+
+- **brAIn can edit YAML-defined dashboards, helpers and persons** — the docs implied otherwise in four places. The registry *services* decline them, because a `brain.*` service edits the registry and a YAML-defined object isn't in it; brAIn then opens the file, edits it, validates it and reloads the domain. Same outcome, different layer, and `brain undo` covers both. It was listed under "deliberately excluded", which read as a gap in what brAIn can reach rather than the routing detail it is. Now explained at [YAML config is not an exception](/brain/how-brain-controls-ha/#yaml-config-is-not-an-exception).
+- **The dashboards page no longer promises a git config backup** that was removed from the add-on some releases ago. Dashboard edits are covered by the automatic per-dashboard config backup and by `brain undo`.
+
+</Changes>
+</Release>
+
+<Release version="1.11.0" date="July 31, 2026">
 
 The brAIn docs were describing version 1.8 of an add-on that is now on 1.14. Two of the five panel tabs had no page at all, the site's most-repeated number was wrong in six places, and there was not a single picture of the product anywhere. All three are fixed.
 

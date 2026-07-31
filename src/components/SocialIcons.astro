@@ -1,0 +1,82 @@
+---
+/**
+ * Starlight's SocialIcons, with the site version in front of it.
+ *
+ * The site changelog used to be a top-level sidebar entry, which gave a
+ * "what changed on the docs site" page the same weight in the nav as the
+ * projects people actually come here for. It is now this: a small version
+ * number in the header that links to /changelog/. Anyone who wonders what
+ * "v1.12.0" means clicks it and finds out; nobody else has to step over it.
+ *
+ * The version is read from package.json at build time so it can never
+ * disagree with the release it shipped in.
+ */
+import config from 'virtual:starlight/user-config';
+import { Icon } from '@astrojs/starlight/components';
+import { version } from '../../package.json';
+
+const links = config.social || [];
+---
+
+<a class="site-version" href="/changelog/" title={`Site v${version} — what's changed`}>
+	<span class="sr-only">Changelog, site version </span>v{version}
+</a>
+
+{
+	links.length > 0 && (
+		<>
+			{links.map(({ label, href, icon }) => (
+				<a {href} rel="me" class="sl-flex social-icon">
+					<span class="sr-only">{label}</span>
+					<Icon name={icon} />
+				</a>
+			))}
+		</>
+	)
+}
+
+<style>
+	@layer starlight.core {
+		.social-icon {
+			color: var(--sl-color-text-accent);
+			padding: 0.5em;
+			margin: -0.5em;
+		}
+		.social-icon:hover {
+			opacity: 0.66;
+		}
+	}
+
+	/* Deliberately quiet: it is a footnote in the header, not an action.
+	   Still a real target — 44px tall on touch, where the header is
+	   thumb-height and a 16px link is a coin toss. */
+	.site-version {
+		display: inline-flex;
+		align-items: center;
+		font-size: var(--sl-text-xs);
+		font-variant-numeric: tabular-nums;
+		color: var(--sl-color-gray-3);
+		text-decoration: none;
+		padding-inline: 0.5rem;
+		white-space: nowrap;
+	}
+	.site-version:hover,
+	.site-version:focus-visible {
+		color: var(--sl-color-text-accent);
+		text-decoration: underline;
+	}
+
+	@media (pointer: coarse) {
+		.site-version {
+			min-height: 44px;
+		}
+	}
+
+	/* The header is tight on a phone — search, theme toggle and two social
+	   icons already compete there. The version is the first thing to go. */
+	@media (max-width: 50rem) {
+		.site-version {
+			display: none;
+		}
+	}
+</style>

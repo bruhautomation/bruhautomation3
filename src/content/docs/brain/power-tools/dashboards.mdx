@@ -7,7 +7,11 @@ sidebar:
 
 Claude edits dashboards through a fetch-modify-save flow instead of touching `.storage` files: read the config with the `get_dashboard` MCP tool (`list_dashboards` enumerates them), change the JSON, and save the complete object back with `update_dashboard`.
 
-Every update automatically backs up the previous configuration first (the last 20 per dashboard are kept), and `restore_dashboard` undoes a bad edit with one call. Only storage-mode dashboards can be edited; YAML-mode dashboards are refused with a clear error. Dashboard files are also part of the Terminal's git config backup.
+Every update automatically backs up the previous configuration first (the last 20 per dashboard are kept), and `restore_dashboard` undoes a bad edit with one call.
+
+:::note[A YAML-mode dashboard is edited, just not through here]
+These services edit the registry, so a dashboard defined in YAML isn't something they can reach — they decline with an error naming the file. brAIn then does the obvious thing: it opens that file in the [terminal](/brain/terminal/), edits it, validates it and reloads Lovelace. Both routes end with your dashboard changed, and both are covered by `brain undo`.
+:::
 
 ## Create dashboard
 
@@ -37,7 +41,7 @@ data:
 
 `brain.update_dashboard`
 
-Replace a storage-mode dashboard's configuration. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. YAML-mode dashboards are refused.
+Replace a storage-mode dashboard's configuration. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. A YAML-mode dashboard is declined here and edited as a file instead.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
