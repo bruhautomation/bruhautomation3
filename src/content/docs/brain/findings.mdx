@@ -102,19 +102,19 @@ a problem *in your house*, and told to change nothing, because "explain this to 
 change my house" are different permissions.
 
 The decisions come with you: while you're talking it over, a strip above the message box keeps
-**Fix it**, **I've fixed it**, **Later** and **Not a problem here** one press away.
+**Fix it**, **I fixed it**, **Later** and **Ignore** one press away.
 
 ## The two endings
 
 Ending a finding **removes it**. Which ending you pick matters, because each one teaches brAIn
 something different:
 
-**✓ I've fixed it** — it was a real problem and it's sorted now. Memory records
+**✓ I fixed it** — it was a real problem and it's sorted now. Memory records
 *"Fixed by the homeowner: the back door sensor battery was replaced."*
 
-**Not a problem here** — it was never a problem; it's normal in this house. If the garage
-freezer is *supposed* to sit at −30 °C, one press ends that conversation for good. Memory
-records *"Not a problem in this home: the garage freezer runs at −30 °C."*
+**✕ Ignore** — it was never a problem; it's normal in this house. If the garage freezer is
+*supposed* to sit at −30 °C, one press ends that conversation for good. Memory records
+*"Not a problem in this home: the garage freezer runs at −30 °C."*
 
 Both do the same three things: the answer goes into memory as a plain fact about your home,
 the wording is remembered so the problem is never reported at you again, and the row is
@@ -133,11 +133,20 @@ A fixed card **stays on the list** and turns green, with what changed and which 
 touched. That's deliberate: brAIn altered something in your house, and news you haven't read
 is not settled. **✓ Got it** clears it once you have.
 
-The **Answered** filter is the record of everything you've ended — one line each, saying
-whether you dealt with it or told brAIn it was never a problem. It isn't an archive of cards;
-the cards are gone. If you change your mind, **Let brAIn raise it again** stops suppressing
-that one. Nothing comes back on its own: the next analysis is simply free to find it again,
-and if it has genuinely stopped happening, nothing does.
+## Where answered findings go
+
+Nowhere, and that's the design. Ending one writes the answer into
+[memory](/brain/memory/) and deletes the row — so memory is the record, and the tab has two
+filters rather than an archive: **Needs you**, and **Later** once something is waiting in it.
+
+brAIn still remembers what you answered. A settled finding's wording is kept in a ledger the
+analyst consults before reporting anything, so the same problem is never raised at you twice,
+however it gets reworded. That ledger isn't a screen — it's the reason the list stays short.
+
+:::caution[Ignore is permanent]
+There is no undo and no archive to fish it back out of. Use **Remind me later** for anything
+you actually intend to deal with; **Ignore** is for things that were never problems.
+:::
 
 ## Getting them to your phone
 
