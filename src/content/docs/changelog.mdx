@@ -17,6 +17,8 @@ New lead copy on the [brAIn overview](/brain/), matching the READMEs and the add
 <Changes type="changed">
 
 - **The overview leads with the pitch, not the parts list.** *Your house already has nerves. Now give it a brAIn.* The "What it is" section that follows says what the thing does in four short paragraphs — sees the whole system and can change any of it, keeps a memory you can open and edit, reachable as a conversation agent or a chat interface or native Claude Code, callable from your automations.
+- **This changelog moved out of the sidebar and into the header.** A page about what changed on the docs site had the same weight in the nav as the projects people actually come here for. It is now the small version number beside the social icons — click it and you land here. The version is read from `package.json` at build time, so it can't disagree with the release it shipped in. It hides below 50rem, where the header is already tight.
+- **Changelog cards are a lighter grey in light mode.** They used Starlight's `--sl-color-gray-6`, a blue-tinted `#edeef3` that on a white page read as a shaded panel rather than a card. Now a plain neutral `#fafafa` with the border defining the edge. Dark mode is unchanged — there, a lifted surface is what makes a card read as one.
 
 </Changes>
 <Changes type="fixed">

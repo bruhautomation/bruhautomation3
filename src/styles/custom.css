@@ -249,6 +249,14 @@ img[src$="-phone.webp"] {
 	--cl-deprecated-bg: rgba(144, 157, 171, 0.14);
 	--cl-security: #a371f7;
 	--cl-security-bg: rgba(163, 113, 247, 0.14);
+
+	/* Card surface. On a dark page a slightly lifted surface is what makes
+	   a card read as one, so dark keeps Starlight's grays; light overrides
+	   them below. */
+	--cl-card-bg: var(--sl-color-gray-6);
+	--cl-card-border: var(--sl-color-gray-5);
+	--cl-card-border-hover: var(--sl-color-gray-4);
+	--cl-card-rule: var(--sl-color-gray-5);
 }
 
 :root[data-theme='light'] .changelog {
@@ -258,6 +266,14 @@ img[src$="-phone.webp"] {
 	--cl-removed: #cf222e;
 	--cl-deprecated: #57606a;
 	--cl-security: #8250df;
+	/* Starlight's gray-6 is a blue-tinted #edeef3, which on a white page
+	   reads as a shaded panel rather than a card. These are a plain warm-
+	   neutral gray, light enough that the card sits *on* the page instead
+	   of denting it, with the border doing the work of defining the edge. */
+	--cl-card-bg: #fafafa;
+	--cl-card-border: #e3e3e6;
+	--cl-card-border-hover: #c9c9cf;
+	--cl-card-rule: #ececef;
 }
 
 .changelog-releases {
@@ -269,16 +285,16 @@ img[src$="-phone.webp"] {
 
 /* Release card */
 .changelog .changelog-release {
-	border: 1px solid var(--sl-color-gray-5);
+	border: 1px solid var(--cl-card-border);
 	border-radius: 14px;
-	background: var(--sl-color-gray-6);
+	background: var(--cl-card-bg);
 	padding: 1.5rem 1.75rem;
 	transition:
 		border-color 0.2s ease,
 		box-shadow 0.2s ease;
 }
 .changelog .changelog-release:hover {
-	border-color: var(--sl-color-gray-4);
+	border-color: var(--cl-card-border-hover);
 }
 .changelog .changelog-release.is-unreleased {
 	border-style: dashed;
@@ -293,7 +309,7 @@ img[src$="-phone.webp"] {
 	flex-wrap: wrap;
 	padding-bottom: 0.9rem;
 	margin-bottom: 1.25rem;
-	border-bottom: 1px solid var(--sl-color-gray-5);
+	border-bottom: 1px solid var(--cl-card-rule);
 }
 .changelog-release-heading {
 	display: flex;

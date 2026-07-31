@@ -75,6 +75,11 @@ export default defineConfig({
 			lastUpdated: true,
 			components: {
 				ThemeSelect: './src/components/ThemeToggle.astro',
+				// Adds the site version to the header, linking to /changelog/.
+				// The changelog is not in the sidebar: a "what changed on the
+				// docs site" page does not deserve the same weight as the
+				// projects people come here for.
+				SocialIcons: './src/components/SocialIcons.astro',
 			},
 			logo: {
 				dark: './src/assets/bruh-logo-light.svg',
@@ -300,10 +305,10 @@ export default defineConfig({
 							},
 						]
 					: []),
-				{
-					label: 'Changelog',
-					slug: 'changelog',
-				},
+				// The site's own changelog is deliberately NOT here. It is
+				// reached from the version number in the header (see the
+				// SocialIcons override) — a page about what changed on the
+				// docs site does not belong beside the projects.
 			],
 		}),
 	],
