@@ -146,33 +146,47 @@ learning: true
 
 ## The panel
 
-One ingress panel with four tabs.
+One ingress panel on port **8099**, with five tabs. Each has its own page:
 
-### Insights
+| Tab | What it is | |
+|-----|-----------|---|
+| **Insights** | Cards proposed for your home, and an ask bar with two verbs | [Insights](/brain/insights/) |
+| **Findings** | The work list: what brAIn thinks is broken, and the fix | [Findings](/brain/findings/) |
+| **Terminal** | Claude Code as a chat or as a true terminal, one session | [Terminal](/brain/terminal/) |
+| **Memory** | The document, the guesses, and the queue behind them | [Memory & Learning](/brain/memory/) |
+| **Docs** | The same guide, shipped inside the add-on and searchable offline | |
 
-A fresh install has **no cards**. The first run studies your home, then proposes cards grounded in what it found, each with a one-line reason citing the evidence; you pick which to keep. Nothing generates, and the scheduler stays idle, until you do. If the home is too sparse to learn from, brAIn says what's missing rather than inventing generic cards — see [Quick Start](/brain/quickstart/#let-it-learn-your-home).
+A number on the **Findings** tab means something is waiting on your decision; a number on
+**Memory** means a guess is waiting on a yes/no.
 
-- **Ask anything** — type a question and get a bespoke card back. **＋ Make recurring** promotes it onto its own schedule.
-- **✎ per card** — edit that card's analysis focus, its refresh interval, or **fixed daily run times** (e.g. `07:00, 19:00`, up to 6) which take precedence over the interval and spend nothing in between.
-- **💬 feedback** — standing instructions (*"show costs in dollars"*) injected into every future run of that card until removed.
-- **Run history** — every run is stored per `history_keep_runs` / `history_keep_days`, with a run selector and prev-run comparisons on highlight stats.
-- **Tags** — cards are tagged by what was found (`#anomaly`, `#batteries`, `#left-on`); the chip row filters live.
+### Panel settings
 
-### Terminal
+These live in the panel's **⚙ Settings** dialog, not the add-on Configuration tab, and take
+effect without a restart. Anything left unset falls back to the add-on option of the same
+name.
 
-The same ttyd terminal the add-on runs, reverse-proxied through the panel at `/terminal/`, so it's a tab rather than a second sidebar entry. The frame only connects the first time you open the tab — no shell session is started for someone who never does. Port 7681 stays published for direct access (a kiosk, a bookmarked full-screen terminal).
-
-### Memory
-
-An editor over `memory.md`, plus any pending guesses awaiting a yes/no. The tab shows a count when guesses are waiting. Full model: [Memory & Learning](/brain/memory/).
-
-### Docs
-
-The built-in guide, searchable, with the matched term highlighted in the page.
+| Setting | Values | What it does |
+|---------|--------|--------------|
+| `auto_enabled` | on / off | Master pause for all *scheduled* work. Manual presses always run. |
+| `plan` | `pro`, `max5`, `max20` | Which Claude plan you're on — only used to estimate a session window when there's no real utilisation to read. |
+| `budget_percent` | 5–100 (default 25) | How much of each 5-hour session window scheduled work may spend. |
+| `terminal_ui` | `chat`, `classic` | Which face the Terminal tab opens in. Default `chat`. |
+| `model` | preset or a custom model id | The model insight generation uses. |
+| `refresh_hours`, `history_days`, `history_keep_runs`, `history_keep_days`, `timeout_minutes` | | Same meaning as the add-on options below. |
 
 ### Token budget
 
-The panel's **Settings** dialog caps how much of each 5-hour session window brAIn may spend on scheduled work; automatic runs pause at the budget, manual clicks never do. The meter uses your **real Anthropic account utilization** from the usage-limits tracker, so brAIn backs off when *you* are using Claude elsewhere. The topbar pill keeps both windows in view — `19% session · 64% week` — with each window's reset time in its hover. Only the session is budgeted against; the week is shown because a session that looks fine says nothing about a week that doesn't. Neither number exists without a subscription login, so with an API key the session falls back to an estimate of brAIn's own spending and the week isn't shown at all.
+`budget_percent` caps how much of each 5-hour session window brAIn may spend on **scheduled**
+work; automatic runs pause at the budget, manual presses never do. The meter uses your **real
+Anthropic account utilisation** from the usage-limits tracker, so brAIn backs off when *you*
+are using Claude elsewhere.
+
+The topbar pill keeps both windows in view — `Session 19% · Week 46%`. **Press it** for the
+reset times and what the budget gates; it's a press rather than a hover because a tooltip is
+unreadable on the device where that pill matters most. Only the session is budgeted against;
+the week is shown because a session that looks fine says nothing about a week that doesn't.
+Neither number exists without a subscription login, so with an API key the session falls back
+to an estimate of brAIn's own spending and the week isn't shown at all.
 
 ## Voice assistant (Assist)
 
@@ -215,12 +229,18 @@ data:
   fact: "The garage fridge is meant to run 24/7"
   confidence: high         # high | medium | low
 
+# Answer one of brAIn's open questions — recorded, and queued as a fact
+action: brain.answer_question
+data:
+  question: "Is the garage fridge meant to run 24/7?"
+  answer: "Yes, it holds the overflow from the kitchen."
+
 # Reset conversation memory
 action: brain.clear_conversation
 # data: { conversation_id: "..." }   # omit to clear all
 ```
 
-Plus the **56 [Power Tools](/brain/power-tools/)** services for registry administration.
+Plus the **65 [Power Tools](/brain/power-tools/)** services for registry administration.
 
 ## Sensors
 
@@ -342,15 +362,28 @@ Insight HTML is mirrored into `/config/www/brain/`, where Home Assistant itself 
 - The panel is reachable only through **HA Ingress** (admin users).
 - `secrets.yaml` is never snapshotted into the edit journal, and credentials are never read, written, or included in any snapshot.
 
-## Mobile UI
+## Mobile
 
-The terminal auto-detects touch devices and shows an on-screen toolbar above the keyboard.
+The whole panel is built for a phone, not just shrunk to fit one: every tab and button is at
+least 44px, no width collapses the tabs into a row of bare glyphs, and no text control is
+under 16px (below that, iOS Safari zooms in on focus and never zooms back out, which strands
+an ingress panel at an arbitrary scale).
 
-- **`ESC` / `Tab` / `Ctrl` / arrows / `PgUp` / `PgDn` / `^C` / `Paste`** — the keys iOS doesn't give you, plus paging Claude Code's chat history.
-- **Scroll chat history** by swiping up/down with one finger (or the mouse wheel on desktop) — translated to PgUp/PgDn, so long-press text selection still works for copying an OAuth URL.
+The **Terminal** tab folds the top bar away while the software keyboard is up and restores it
+when you dismiss it; **⤢** folds it away for good and brings it back.
+
+In the terminal's **Classic** face, a one-tap toolbar sits above the keyboard:
+
+- **21 keys** — `ESC`, `▾ Kbd`, `Tab`, `⇧Tab`, the four arrows, `PgUp`, `PgDn`, `^C`, `^D`,
+  `^L`, `^U`, `/`, `@`, `#`, `!`, `|`, `Paste`, `×`. No sticky modifiers.
+- **Swipe to scroll** — one-finger up/down (or the wheel on desktop) is translated to
+  PgUp/PgDn proportionally, so long-press text selection still works.
+- **Copying works** — OSC 52 clipboard sequences are intercepted and buffered across
+  WebSocket frames, which is what lets you copy an OAuth URL out of the terminal on iOS.
 - **Add to Home Screen** for a full-screen launcher without Safari chrome.
-- **Voice dictation:** turn off iOS **Voice Control** (Settings → Accessibility) to avoid double-submission.
-- Disable the whole mobile UI with `enable_mobile_ui: false`.
+- **Voice dictation:** turn off iOS **Voice Control** (Settings → Accessibility) to avoid
+  double-submission.
+- Disable the whole classic-terminal toolbar with `enable_mobile_ui: false`.
 
 ## When to restart Home Assistant
 
@@ -369,7 +402,7 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 
 | Symptom | Fix |
 |---------|-----|
-| Add-on won't start | Check the **Log** tab. Architecture mismatch or a port 7681 conflict. |
+| Add-on won't start | Check the **Log** tab. Usually an architecture mismatch — the add-on builds for `amd64` and `aarch64` only. |
 | Integration not discovered | Restart HA after the first add-on start. Add manually via **Settings → Devices & Services** if needed. |
 | The terminal asks for a second login | One credential is shared with the CLI in both directions; if it doesn't take, `brain doctor`'s auth check names the file it found and the one it expected. |
 | It can't see entities | `enable_ha_mcp_server: true`? Run **`brain doctor`** — it reports any tool that errors. |

@@ -57,16 +57,40 @@ If some other `ha` command is ever present on `PATH` inside the container, brAIn
 |---------|--------------|
 | `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts (`list`, `remove` too) |
 
-## Slash commands in the terminal
+## Undo
 
-Inside a Claude Code session, two shortcuts do the same work without leaving the conversation:
+Before Claude writes to any file under `/config`, the previous version is snapshotted. Only
+`/config` is journalled, and **`secrets.yaml` is never snapshotted**. Snapshots are kept for
+`edit_journal_days` (default 14).
 
-- **`/learn [topic]`** — start a study session and watch it work, correcting it mid-flight.
-- **`/memory`** — show what it knows right now.
+```bash
+brain undo                    # list what Claude edited, newest first, in plain English
+brain undo 3                  # put edit #3 back, byte for byte
+brain undo --all-today        # revert everything Claude changed today
+```
 
-## There is no backup command
+```text title="brain undo"
+ 1  14:22  automations.yaml       modified   (added brightness to the hallway action)
+ 2  14:19  scripts.yaml           modified
+ 3  09:41  packages/energy.yaml   created
+```
 
-brAIn doesn't version your configuration; **Home Assistant's own backups** do that job, whole-system and restorable. What it keeps instead is an edit journal — a snapshot of any file *before* Claude writes to it — which `brain undo` restores from. See [Undo](/brain/reference/#undo).
+The hook that takes the snapshot can never block an edit: if it fails for any reason it exits
+quietly and Claude carries on. A journal that stops you working is worse than no journal.
+
+This is **not a backup system**. brAIn doesn't version your configuration — Home Assistant's
+own backups do that job, whole-system and restorable. The edit journal only covers files
+brAIn itself touched. See [Reference](/brain/reference/#undo).
+
+## In the terminal, they're a palette
+
+You don't have to remember any of this. In the [Terminal](/brain/terminal/) tab, typing
+`brain` or `ha` opens a palette of every subcommand your install actually has — read from
+what the dispatchers print, so it can't go stale — and `/` lists Claude Code's own commands,
+including anything you've dropped in `/config/.claude/commands`.
+
+Two of those are worth knowing: **`/learn [topic]`** starts a study session you can watch and
+correct mid-flight, and **`/memory`** shows what it knows right now.
 
 ## Everything is brAIn-usable
 

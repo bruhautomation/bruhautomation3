@@ -18,7 +18,7 @@ brAIn gives itself three ways to touch Home Assistant, and at first glance they 
 
 **MCP is Claude's only pair of hands.** Everything Claude does to your live home — reading a sensor, turning on a light, looking at a camera, calling *any* service — goes through the MCP server's 36 tools. That single funnel is what makes safety enforceable: per-agent service deny-lists and voice tool-scoping are applied at that chokepoint, once, and cover everything.
 
-**Power Tools are not a second pair of hands — they're verbs installed into HA itself.** Registering the 56 admin operations as real `brain.*` services (instead of private Claude abilities) is a deliberate choice with three payoffs:
+**Power Tools are not a second pair of hands — they're verbs installed into HA itself.** Registering the 65 admin operations as real `brain.*` services (instead of private Claude abilities) is a deliberate choice with three payoffs:
 
 1. **Claude reaches them through MCP** like any other service (`call_service` → `brain.create_area`), so the same deny-lists and budgets apply.
 2. **Your automations and scripts get the same superpowers** with no Claude in the loop — a nightly automation can call `find_orphaned_references` by itself.
@@ -48,30 +48,22 @@ So the flow for any request is:
         └── ha reload automations                                  (CLI tool)
 ```
 
-## Is there redundancy?
-
-A little, and it's intentional — same verb, different caller:
-
-| Looks duplicated | Actually |
-|---|---|
-| `ha service call` (CLI) vs `call_service` (MCP) | Same HA endpoint. CLI version exists so *you* can call services from the shell; Claude always uses MCP (that's where deny-lists live). |
-| `ha entity get` (CLI) vs `get_entity_state` (MCP) | Same read. One for humans at a prompt, one for Claude. |
-| `get_areas` (MCP) vs `get_registry areas` (MCP) | `get_areas` is the voice-optimized room→entities map; `get_registry` is the admin view with ids. Different questions. |
-
-Nothing here is a dead layer to remove. Collapsing to "just one layer" would mean either taking services away from your automations (making them Claude-only), or pushing file/YAML work through an API that can't do it. The rule of thumb:
+The rule of thumb:
 
 > **Files → CLI. Live home → MCP. Admin changes → Power Tools (via MCP).**
 
 brAIn's generated context teaches it this routing, so you never have to think about it — you just ask.
 
+A few verbs appear in two layers on purpose — `ha service call` and `call_service` hit the same HA endpoint, one for you at a shell prompt and one for Claude (which always goes through MCP, because that's where the deny-lists live). Collapsing to a single layer would mean either taking services away from your automations or pushing YAML editing through an API that can't do it.
+
 ## What brAIn can and can't reach
 
 The goal is an instance where Claude can do essentially everything — here's the honest scorecard:
 
-**Fully covered:** entity/device control for every major domain; cameras; history and statistics; automations, scripts, and scenes (YAML + reload); areas, floors, labels; entity naming, ids, aliases, icons, visibility; helpers (all 8 types); zones; persons; users; dashboards including custom-card resources; blueprints; statistics backfill; integration enable/disable/reload; repairs; logs, traces, templates; and undo of any file it edited.
+**Fully covered:** entity/device control for every major domain; cameras; history and statistics; automations, scripts, and scenes (YAML + reload); areas, floors, labels; entity naming, ids, aliases, icons, visibility; helpers (all 8 types); zones; persons; users; dashboards including custom-card resources; blueprints; statistics backfill; integration enable/disable/reload **and removal**; device and entity deletion, including orphan sweeps that dry-run by default; repairs; logs, traces, templates; and undo of any file it edited.
 
 **Deliberately excluded:**
-- **Adding or removing integrations** — config flows are interactive (OAuth, discovery, pairing buttons). Claude walks you to the right screen; you click.
+- **Adding an integration** — config flows are interactive (OAuth, discovery, pairing buttons), so Claude walks you to the right screen and you click. *Removing* one it can do: `brain.delete_integration` drops the config entry and reports the entities and devices that went with it.
 - **Credentials and auth internals** — API keys inside `core.config_entries`, tokens, MFA. Never read, never written, never snapshotted into the edit journal.
 - **Backing up your configuration** — that's Home Assistant's own backups' job. brAIn keeps an [edit journal](/brain/reference/#undo) of the files it touched so `brain undo` can revert one, and nothing more.
 - **YAML-mode dashboards/helpers/persons** via services — those belong to your configuration files, which Claude edits directly in the terminal instead.

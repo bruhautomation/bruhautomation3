@@ -28,7 +28,7 @@ Five minutes from zero to an AI that knows your house.
 
 3. **Restart Home Assistant** — required on first install so HA loads the brAIn integration: **Settings → System → Restart**. A persistent notification tells you whenever a restart is needed (first install and add-on version upgrades); add-on restarts within the same version don't need one.
 
-4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, and the `brain.send_prompt` / `run_task` / `run_insight` / `add_memory` / `clear_conversation` services.
+4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, the seven `brain.*` core services, and the 65 [Power Tools](/brain/power-tools/) admin services.
 
 5. **Sign in with Anthropic.** Open **brAIn** in the HA sidebar and complete the sign-in. This is the **only** login — the terminal, insight generation, voice, and memory consolidation all share it.
 
@@ -52,16 +52,21 @@ A fresh install has **no cards**, on purpose. A generic "Energy" or "Climate" ca
 
 ## Try it
 
-Switch to the **Terminal** tab and type:
+Switch to the **[Terminal](/brain/terminal/)** tab — it opens as a chat — and ask for
+something you'd otherwise have gone digging for:
 
 ```text title="In the brAIn terminal"
-> How many entities do I have?
-> Which lights are on right now?
-> How cold did it get last night?
-> Show me automations that haven't run in 30 days
+Why did the hallway light come on at 3am?
+Which of my devices have stopped reporting?
+Write me an automation that turns the towel rail on when the shower humidity spikes
+Rename the switches in the garage to what they actually control
 ```
 
-Or ask the same thing from the **Insights** tab's *Ask* box and get an answer card back — same engine, same memory. Keep the ones you like as recurring cards, or drop any of them on a dashboard.
+Or ask from the **Insights** tab's *Ask* box and get a card back instead — same engine, same
+memory. Keep the ones you like as recurring cards, or drop any of them on a dashboard.
+
+Then look at the **[Findings](/brain/findings/)** tab. The number on it is what brAIn
+already thinks is broken in your house.
 
 ## Next steps
 
@@ -75,7 +80,7 @@ Or ask the same thing from the **Insights** tab's *Ask* box and get an answer ca
 
 | Symptom | Fix |
 |---------|-----|
-| Add-on won't start | Check the **Log** tab. Almost always an architecture mismatch (only `amd64`/`aarch64`) or a port 7681 conflict. |
+| Add-on won't start | Check the **Log** tab. Almost always an architecture mismatch — the add-on builds for `amd64` and `aarch64` only. |
 | Integration not discovered | You probably skipped step 3. Restart HA, then check **Settings → Devices & Services** (or add **brAIn** manually). |
 | Sign-in fails | Verify the HA host can reach `console.anthropic.com`. After updates, you may need to re-authenticate. |
 | The terminal asks for a second login | It shouldn't — one credential is shared with the CLI both ways. If it does, run `brain doctor`; the auth check names the file it found and the one it expected. |

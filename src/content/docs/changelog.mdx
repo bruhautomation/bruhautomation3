@@ -10,7 +10,39 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.10.0" date="July 29, 2026" latest>
+<Release version="1.11.0" date="July 31, 2026" latest>
+
+The brAIn docs were describing version 1.8 of an add-on that is now on 1.14. Two of the five panel tabs had no page at all, the site's most-repeated number was wrong in six places, and there was not a single picture of the product anywhere. All three are fixed.
+
+<Changes type="added">
+
+- **[Findings](/brain/findings/)** — a page for the tab that had none. What a finding is and how it differs from a memory line or a guess, the kinds of thing it actually catches, what **Fix it** is allowed to do (and the five things it will never do), **Discuss**, **Remind me later**, and why the two endings delete the card instead of filing it somewhere.
+- **[Terminal](/brain/terminal/)** — the other missing tab. The two faces and the one session behind them, the switch that carries the conversation both ways, the command palette, the ⋯ menu, and what the tab does on a phone.
+- **Screenshots.** Insights, Findings, Memory, the Terminal in chat mode, and the panel on a phone — on the [overview](/brain/) and on each feature page.
+- **Panel settings are documented as a group** in the [Reference](/brain/reference/#panel-settings): what lives in ⚙ rather than the add-on Configuration tab, and takes effect without a restart.
+- **`brain.answer_question`**, the [undo journal](/brain/cli/#undo) with worked output, `brain memory undo`, and the nine [Power Tools](/brain/power-tools/) that shipped in 1.9.0 — `rename_label`, `update_label`, `delete_device`, `delete_orphaned_devices`, `delete_integration`, `set_area_icon`, `update_floor`, `rename_person` — all previously undocumented.
+
+</Changes>
+<Changes type="changed">
+
+- **The overview leads with what brAIn *does*.** It used to open with an inventory of parts ("a terminal, a dashboard, and a memory") and a block diagram of the container's IPC. It now opens with the product's own line — *give your smart home a mind* — a screenshot, and one card per thing it does.
+- **The sidebar follows the product.** The four panel tabs are grouped under **The Panel** in the order they appear in the panel, voice and automations under **Beyond the Panel**, and the architecture pages under a collapsed **Under the Hood**.
+- **65 Power Tools, not 56** — corrected in all six places it was stated, along with the stale per-family counts.
+- **The Reference stops duplicating the feature pages.** Its panel tour was where "four tabs" and the ttyd-only Terminal description had been quietly rotting; it is now a table that points at the four pages that own those subjects.
+
+</Changes>
+<Changes type="fixed">
+
+- **The brAIn changelog runs to 1.14.0 again**, nine releases on from where it stopped — including the two memory fixes worth knowing about ([1.11.2](/brain/changelog/) and 1.12.1).
+- **The usage pill is a press, not a hover.** Three pages said hover; the control has been a press-to-open popover since 1.8.0, deliberately, because a tooltip is unreadable on a phone.
+- **Memory docs no longer describe a group that was deleted.** The "Already in memory" list went away in 1.9.0; the docs still told you to use a ✕ that isn't there.
+- **brAIn *can* remove an integration** — `brain.delete_integration` shipped in 1.9.0, but the scorecard still listed removal alongside adding as something it can't do.
+- **A dead stylesheet rule** targeting `data-page-slug="bruh-claude"` has not applied since the rename; removed rather than revived.
+
+</Changes>
+</Release>
+
+<Release version="1.10.0" date="July 29, 2026">
 <Changes type="changed">
 
 - **The add-on is spelled [brAIn](/brain/)**, everywhere on the site. The mark already read that way — the gable is the `A`, and the `A` and `I` are the one part drawn in the accent colour — so this is the text catching up with the logo.

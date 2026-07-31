@@ -1,6 +1,6 @@
 ---
 title: Devices & Integrations
-description: Rename and enable/disable devices, and enable, disable, or reload integration config entries with brain services.
+description: Rename, enable, disable, and delete devices, and enable, disable, reload, or delete integration config entries with brain services.
 sidebar:
   order: 5
 ---
@@ -67,6 +67,61 @@ data:
 
 > 🗣️ *"Disable the old motion sensor I unplugged."*
 
+## Delete device
+
+`brain.delete_device`
+
+Remove one or more devices from the registry, along with their entities. Returns what went (or would go) as response data: each device's name, the entities removed with it, its child devices, and the config entries still providing it. A device its integration still provides comes straight back on the next reload — `live_config_entries` in the response is how you see that before you delete rather than after.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `device_id` | device (list) | yes | Devices to delete. |
+| `dry_run` | boolean | no | When on, only report what would be removed — nothing is deleted. Defaults to **off**. |
+
+```yaml
+# Preview first
+service: brain.delete_device
+data:
+  device_id:
+    - a1b2c3d4e5f6
+  dry_run: true
+response_variable: going
+
+# Then for real
+service: brain.delete_device
+data:
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"That old thermostat is gone — show me what deleting its device would take with it, then do it."*
+
+## Delete orphaned devices
+
+`brain.delete_orphaned_devices`
+
+Remove devices no loaded integration claims any more — either they have no config entry at all, or the config entry itself is gone. Runs as a dry run by default and returns the list of affected devices as response data. Optionally scoped to specific devices: each one is re-checked, and anything a live config entry still claims is skipped and reported under `skipped_not_orphaned`, never deleted.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `dry_run` | boolean | no | When on (default), only report what would be removed. |
+| `device_id` | device (list) | no | Restrict the cleanup to these devices. Each is re-checked; anything a live config entry still claims is skipped and reported in skipped_not_orphaned. Omit to target every orphaned device. |
+
+```yaml
+# Report only — nothing is deleted
+service: brain.delete_orphaned_devices
+response_variable: orphans
+
+# Delete only the ones you reviewed; live devices are skipped, never deleted
+service: brain.delete_orphaned_devices
+data:
+  dry_run: false
+  device_id:
+    - a1b2c3d4e5f6
+```
+
+> 🗣️ *"Are there devices left behind by integrations I removed? Clean them up."*
+
 ## Enable integration
 
 `brain.enable_integration`
@@ -120,3 +175,30 @@ data:
 ```
 
 > 🗣️ *"The Hue integration is acting up — reload it."*
+
+## Delete integration
+
+`brain.delete_integration`
+
+Remove one or more integration config entries completely, along with their devices and entities. This is not reversible — [`disable_integration`](/brain/power-tools/devices-and-integrations/#disable-integration) is. Returns the domain and title of each entry and how many entities and devices go with it; after a real removal, `require_restart` says whether Home Assistant needs restarting to finish.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `config_entry_id` | config entry (list) | yes | The config entries to remove. |
+| `dry_run` | boolean | no | When on, only report what would be removed — nothing is deleted. Defaults to **off**. |
+
+```yaml
+# Preview first
+service: brain.delete_integration
+data:
+  config_entry_id: 1234abcd5678efgh
+  dry_run: true
+response_variable: going
+
+# Then for real
+service: brain.delete_integration
+data:
+  config_entry_id: 1234abcd5678efgh
+```
+
+> 🗣️ *"I've sold the Sonos speakers — how much goes if I remove that integration?"*
