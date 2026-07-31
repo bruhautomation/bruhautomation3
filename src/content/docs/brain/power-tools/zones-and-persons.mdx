@@ -1,6 +1,6 @@
 ---
 title: Zones & Persons
-description: Create and delete zones, and attach or detach device trackers from persons with brain services.
+description: Create, update, and delete zones, manage persons, and attach or detach their device trackers with brain services.
 sidebar:
   order: 7
 ---
@@ -119,6 +119,26 @@ data:
 ```
 
 > 🗣️ *"Remove the old roommate from presence tracking."*
+
+## Rename person
+
+`brain.rename_person`
+
+Rename a person. Only people created in the UI can be renamed; YAML-defined ones are refused.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The person entity. |
+| `name` | text | yes | The new name. |
+
+```yaml
+service: brain.rename_person
+data:
+  entity_id: person.alex
+  name: Alexandra
+```
+
+> 🗣️ *"Alex goes by Alexandra now — rename them."*
 
 ## Add device tracker to person
 

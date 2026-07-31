@@ -91,6 +91,26 @@ data:
 
 > 🗣️ *"Make the living room also answer to 'lounge' and 'front room'."*
 
+## Set area icon
+
+`brain.set_area_icon`
+
+Set or clear the icon shown for an area. Omit the icon to clear it.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `area_id` | area | yes | The area to update. |
+| `icon` | icon | no | The new icon, e.g. `mdi:sofa`. Leave it out to clear the icon. |
+
+```yaml
+service: brain.set_area_icon
+data:
+  area_id: living_room
+  icon: mdi:sofa
+```
+
+> 🗣️ *"Give the living room a sofa icon."*
+
 ## Add device to area
 
 `brain.add_device_to_area`
@@ -231,6 +251,29 @@ data:
 ```
 
 > 🗣️ *"Rename Upstairs to First Floor."*
+
+## Update floor
+
+`brain.update_floor`
+
+Change a floor's icon, level, or aliases — use `rename_floor` for the name. Pass at least one field; anything you leave out is left as it is.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `floor_id` | floor | yes | The floor to update. |
+| `icon` | icon | no | The new icon, e.g. `mdi:home-floor-2`. |
+| `level` | number | no | The storey number — 0 for the ground floor, negative for a basement. |
+| `aliases` | text (list) | no | The full new list of aliases, used by voice assistants. |
+
+```yaml
+service: brain.update_floor
+data:
+  floor_id: basement
+  level: -1
+  icon: mdi:home-floor-negative-1
+```
+
+> 🗣️ *"The basement is level -1, not 0 — fix it."*
 
 ## Add area to floor
 

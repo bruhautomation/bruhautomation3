@@ -7,6 +7,26 @@ brAIn keeps one small, human-readable document about your home at `/config/.brai
 
 The whole design answers one question: **what, exactly, has it learned?** If you can't point at a line and say "it knows that", it isn't memory.
 
+![The brAIn Memory tab: two guesses awaiting a yes/no, three discoveries waiting to be filed, a "Teach it something" box, and the home memory document below with sections on the household, the house, and device quirks](/images/brain/panel-memory.webp)
+
+## What ends up in it
+
+Real lines from a real document — the kind of thing that changes an answer rather than
+padding a profile:
+
+- *"The office" means the upstairs back bedroom, not the study downstairs.*
+- *Sarah is a light sleeper. Nothing in the hallway should go above 15% brightness between
+  23:00 and 06:00.*
+- *Heating is an 8 kW air-source heat pump on weather compensation. It is not a boiler, so
+  "boost the heating" means raising the flow temperature.*
+- *The garage fridge is meant to run 24/7. Its draw looking abnormal at 3 am is the defrost
+  cycle, not a fault.*
+- *Never rename an entity_id without asking — several are referenced in a Node-RED flow I
+  cannot see.*
+
+That last kind matters more than it looks: memory is where you put the rules you'd
+otherwise have to repeat in every request.
+
 ## One document, one writer
 
 | What | Where | Is it memory? |
@@ -19,9 +39,15 @@ The whole design answers one question: **what, exactly, has it learned?** If you
 
 Only the queues are ever written to directly. **Nothing writes `memory.md` except the consolidator**, which folds the inbox in once a day (or early when 20+ facts are pending), deduping, resolving contradictions newest-wins, and enforcing the size cap. One writer means no races, and it means the document stays a document rather than an append-only log.
 
-**⇪ File into memory now** on the Memory tab runs that same pass immediately — same script, same safety checks. It empties **Waiting to be filed**; what was in it moves to the collapsed *Already in memory* group below, where ✕ still works if brAIn wrote down something wrong. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
+**⇪ File into memory now** on the Memory tab runs that same pass immediately — same script, same safety checks. It empties **Waiting to be filed**, and what was in it is now in the document, which is the one place it's read and edited from. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
 
 The inbox, the hypothesis queue, and the change log are **never injected into prompts**. They're plumbing, not knowledge.
+
+:::note[A consolidation can't quietly erase what it knows]
+A pass that would drop more than 60% of the document's content lines is refused outright,
+and any failure leaves memory untouched with the inbox still pending. Nothing is ever
+half-written: both `memory.md` and `voice.md` are replaced atomically or not at all.
+:::
 
 ## How it learns
 
@@ -57,7 +83,9 @@ The rules are enforced in code, not merely requested in a prompt — a model tha
 
 ## Viewing, editing, undoing
 
-The **Memory** tab is a text editor over `memory.md` plus the pending guesses. Everything there is also on the command line:
+The **Memory** tab shows the document formatted, with **✎ Edit markdown** for the raw file
+and a **Teach it something** box that merges a new fact straight in. Everything there is
+also on the command line:
 
 ```bash
 brain memory list                        # what it knows
@@ -66,6 +94,8 @@ brain memory inbox                       # facts awaiting consolidation
 brain memory hypotheses                  # pending guesses
 brain memory consolidate                 # run a consolidation pass now
 brain memory log                         # what changed recently, and why
+brain memory undo 2                      # revert memory change #2 from that log
+brain memory forget "the loft is warm"   # queue a line for removal
 brain memory edit                        # open memory.md in $EDITOR
 brain memory clear --confirm             # reset (old file kept as memory.md.bak)
 
@@ -73,7 +103,13 @@ brain learn energy                       # study a topic now
 brain learn                              # study whatever is stalest
 ```
 
-`memory.md` is yours. Edit it freely — **your edits are the source of truth**, and the consolidator merges around them rather than over them. `brain memory log` shows every change the consolidator made, in plain English, and can revert one.
+`memory.md` is yours. Edit it freely — **your edits are the source of truth**, and the consolidator merges around them rather than over them. `brain memory log` shows every change the consolidator made, in plain English, and `brain memory undo <n>` reverts one.
+
+:::note[Two different undos]
+`brain memory undo` reverts a change to what brAIn *knows*. Plain
+[`brain undo`](/brain/cli/#undo) reverts a change Claude made to a *file* in your `/config`.
+They're separate journals, and neither can touch the other's.
+:::
 
 ## Services
 

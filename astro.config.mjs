@@ -209,11 +209,24 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
-								{ label: 'Memory & Learning', slug: 'brain/memory' },
-								{ label: 'Insights', slug: 'brain/insights' },
-								{ label: 'Voice Assistant', slug: 'brain/voice' },
-								{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
-								{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
+								// The panel's own tabs, in the order they sit in the
+								// panel — Insights opens first, so it leads here too.
+								{
+									label: 'The Panel',
+									items: [
+										{ label: 'Insights', slug: 'brain/insights' },
+										{ label: 'Findings', slug: 'brain/findings' },
+										{ label: 'Terminal', slug: 'brain/terminal' },
+										{ label: 'Memory & Learning', slug: 'brain/memory' },
+									],
+								},
+								{
+									label: 'Beyond the Panel',
+									items: [
+										{ label: 'Voice Assistant', slug: 'brain/voice' },
+										{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
+									],
+								},
 								{
 									label: 'Power Tools',
 									collapsed: true,
@@ -231,8 +244,15 @@ export default defineConfig({
 										{ label: 'Diagnostics & Repairs', slug: 'brain/power-tools/diagnostics-and-repairs' },
 									],
 								},
-								{ label: 'MCP Tools', slug: 'brain/mcp' },
-								{ label: 'The CLI', slug: 'brain/cli' },
+								{
+									label: 'Under the Hood',
+									collapsed: true,
+									items: [
+										{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
+										{ label: 'MCP Tools', slug: 'brain/mcp' },
+										{ label: 'The CLI', slug: 'brain/cli' },
+									],
+								},
 								{ label: 'Reference', slug: 'brain/reference' },
 								{ label: 'Changelog', slug: 'brain/changelog' },
 								{

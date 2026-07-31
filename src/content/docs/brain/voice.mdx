@@ -25,6 +25,30 @@ Without a personality, a built-in default applies ("helpful, efficient, 1–2 sh
 
 New agents default to **Claude Haiku** for snappy responses; pick any model per agent in the integration options.
 
+You can run several at once, each with its own name, model, personality and deny-list:
+
+```text title="Two agents, one house"
+"Jarvis"        You are Jarvis, a dry British butler. Address me as "sir".
+                However excited you get, keep spoken replies under two sentences.
+                Blocked: nothing.
+
+"Kids' speaker" You are a cheerful helper for a 7-year-old. Short, simple words.
+                Never mention alarms or locks; if asked, say you'll fetch a grown-up.
+                Blocked: lock.unlock, lock.open, alarm_control_panel.*, script.*
+```
+
+The deny-list is enforced where every control tool funnels through, so it holds no matter
+how the request is phrased.
+
+Because voice reads the same [memory](/brain/memory/) as everything else, an agent already
+knows the house it's talking about:
+
+> **"Turn on the beacon."** → memory says the beacon is the office lamp.
+>
+> **"It's too cold in here."** → memory says the heating is a heat pump on weather
+> compensation, not a boiler, so it raises the flow temperature instead of asking for a
+> target temperature that would do nothing.
+
 ## Conversation memory
 
 While the same Assist chat or voice session stays open, Home Assistant keeps the same `conversation_id` — and the add-on **resumes the same Claude session** for each turn, so follow-ups genuinely remember the conversation. A new session starts a clean slate; `brain.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.

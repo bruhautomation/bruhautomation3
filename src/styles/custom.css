@@ -144,9 +144,9 @@ iframe {
 	margin: 1.5rem 0;
 }
 
-/* ─── BRUH Claude product page ─── */
+/* ─── Product (splash) pages ─── */
 
-/* Feature cards on BRUH Claude landing page — tighter, more polished */
+/* Feature cards on a product landing page — tighter, more polished */
 [data-page-type="splash"] .card {
 	border: 1px solid rgba(30, 144, 255, 0.15);
 	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -163,15 +163,23 @@ iframe {
 	border-radius: 8px;
 }
 
-/* SVG architecture diagrams — responsive with subtle border */
-[data-page-type="splash"] img[src*=".svg"] {
+/* Diagrams and app screenshots — responsive, with a subtle border so a
+   light-UI screenshot doesn't bleed into a light page background. */
+[data-page-type="splash"] img[src*=".svg"],
+[data-page-type="splash"] img[src*=".webp"] {
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	border-radius: 8px;
 }
+[data-page-type="splash"] img[src*=".webp"] {
+	border-color: var(--sl-color-gray-5);
+}
 
-/* BRUH Claude splash: remove max-width constraint for wider layout */
-[data-page-slug="bruh-claude"] .sl-container {
-	max-width: 80ch;
+/* A phone screenshot is 1:2; full prose width makes it a tower. Any
+   screenshot named *-phone.webp is capped and centred instead. */
+img[src$="-phone.webp"] {
+	display: block;
+	max-width: min(320px, 100%);
+	margin-inline: auto;
 }
 
 /* ─── Sidebar category icons ─── */

@@ -1,13 +1,13 @@
 ---
 title: Power Tools
-description: 56 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, devices, integrations, zones, users, and more.
+description: 65 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, devices, integrations, zones, users, and more.
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**BRUH Power Tools** are 56 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
+**BRUH Power Tools** are 65 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
 
 They exist for one reason: **so nothing ever has to touch `/config/.storage` by hand.** Every call is validated before anything changes, requires admin rights, and runs through Home Assistant's own registry APIs. Claude uses them when you ask it to reorganize your home; your automations and scripts can use them too — every service shows up in **Developer Tools → Actions** with full field pickers.
 
@@ -31,46 +31,48 @@ Each service page below shows a 🗣️ line: a natural-language phrasing that w
 
 <CardGrid>
   <Card title="Areas & Floors" icon="puzzle">
-    13 services: create, delete, rename, voice aliases, and device/entity assignment.
+    15 services: create, delete, rename, icons, voice aliases, floor levels, and device/entity assignment.
     [Reference →](/brain/power-tools/areas-and-floors/)
   </Card>
   <Card title="Labels" icon="seti:notebook">
-    Create and delete labels; apply or remove them on entities, devices, and areas **in one call**.
+    6 services: create, rename, restyle, and delete labels; apply or remove them on entities, devices, and areas **in one call**.
     [Reference →](/brain/power-tools/labels/)
   </Card>
   <Card title="Entities" icon="pencil">
-    Rename, change entity IDs, enable/disable, hide/unhide, and clean up orphaned registry entries (dry-run by default).
+    9 services: rename, change entity IDs, enable/disable, hide/unhide, voice aliases and icons, and clean up orphaned registry entries (dry-run by default).
     [Reference →](/brain/power-tools/entities/)
   </Card>
   <Card title="Devices & Integrations" icon="setting">
-    Rename and enable/disable devices (with parent-hub cascade); enable, disable, or reload integrations.
+    9 services: rename and enable/disable devices (with parent-hub cascade); enable, disable, reload, or remove integrations; delete devices and sweep out orphaned ones.
     [Reference →](/brain/power-tools/devices-and-integrations/)
   </Card>
   <Card title="Helpers" icon="seti:config">
-    Create and delete all 8 helper types — toggles, sliders, selects, timers, schedules — so an automation and its helpers arrive together.
+    2 services: create and delete all 8 helper types — toggles, sliders, selects, timers, schedules — so an automation and its helpers arrive together.
     [Reference →](/brain/power-tools/helpers/)
   </Card>
   <Card title="Zones & Persons" icon="star">
-    Create, move, and delete zones; create/delete persons and manage their device trackers.
+    8 services: create, move, and delete zones; create, rename, and delete persons and manage their device trackers.
     [Reference →](/brain/power-tools/zones-and-persons/)
   </Card>
   <Card title="Blueprints & Statistics" icon="download">
-    Import blueprints from URLs; import or backfill long-term statistics.
+    2 services: import blueprints from URLs; import or backfill long-term statistics.
     [Reference →](/brain/power-tools/blueprints-and-statistics/)
   </Card>
   <Card title="Dashboards" icon="laptop">
-    Create, edit, restore, and delete dashboards — automatic backup before every change — and register custom-card resources.
+    7 services: create, edit, restore, and delete dashboards — automatic backup before every change — and register custom-card resources.
     [Reference →](/brain/power-tools/dashboards/)
   </Card>
   <Card title="Users" icon="approve-check">
-    Create, delete, enable, and disable accounts — with a guard that makes locking yourself out impossible.
+    4 services: create, delete, enable, and disable accounts — with a guard that makes locking yourself out impossible.
     [Reference →](/brain/power-tools/users/)
   </Card>
   <Card title="Diagnostics & Repairs" icon="magnifier">
-    Find references to dead entities; raise and clear custom repair issues.
+    3 services: find references to dead entities; raise and clear custom repair issues.
     [Reference →](/brain/power-tools/diagnostics-and-repairs/)
   </Card>
 </CardGrid>
+
+**Nothing is create-only.** Every attribute a `create_*` service accepts has a service that changes it later, and every registry object that can be created can also be renamed and deleted — so a label created with `create_label` can be renamed, recoloured, and removed again without ever touching `.storage`. That isn't a promise, it's a test: [`tests/test_power_tools.py`](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/tests/test_power_tools.py) asserts the `rename_*` and `delete_*` families are complete, so a `create_*` service can't ship without its counterparts. And an `update_*` writes only the fields you name — pass just `color` and the icon and description stay exactly as they were.
 
 ## The safety model
 
@@ -80,7 +82,7 @@ Power Tools are powerful by design, so the guardrails are built into the service
 |-----------|---------------|
 | **Admin-gated** | Calls from non-admin HA users are rejected. Claude, automations, and scripts run as admin. |
 | **Validated first** | Every referenced area/floor/label/device/entity/integration id is checked **before** any change is applied. A typo fails loudly; it never half-applies. |
-| **Dry-run defaults** | `delete_orphaned_entities` only reports unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. |
+| **Dry-run defaults** | Both sweeps — `delete_orphaned_entities` and `delete_orphaned_devices` — only *report* unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. The targeted deletes (`delete_device`, `delete_integration`, `delete_label`, `delete_floor`, `delete_person`) and `disable_integration` also accept `dry_run`, but act by default: you named the thing, so it's not a sweep. |
 | **Lockout-proof** | `disable_user` refuses owner accounts and system-generated users. |
 | **Response data** | Creation services return the new id (`area_id`, `floor_id`, `label_id`, …) so multi-step workflows chain without guessing. |
 | **Namespaced** | Everything lives under `brain.*` — no core services are overridden, and running [Spook](https://github.com/frenck/spook) alongside is perfectly fine. |

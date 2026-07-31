@@ -1,6 +1,6 @@
 ---
 title: Labels
-description: Create labels and apply them to entities, devices, and areas in bulk with brain.add_label and friends.
+description: Create, rename, and update labels, and apply them to entities, devices, and areas in bulk with brain.add_label and friends.
 sidebar:
   order: 3
 ---
@@ -31,6 +31,49 @@ data:
 ```
 
 > 🗣️ *"Create an amber 'Battery powered' label."*
+
+## Rename label
+
+`brain.rename_label`
+
+Rename an existing label. Everything carrying it keeps it.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label_id` | label | yes | The label to rename. |
+| `name` | text | yes | The new name. |
+
+```yaml
+service: brain.rename_label
+data:
+  label_id: battery_powered
+  name: Battery
+```
+
+> 🗣️ *"Rename the 'Battery powered' label to just 'Battery'."*
+
+## Update label
+
+`brain.update_label`
+
+Change a label's icon, colour, or description — use `rename_label` for the name. Pass at least one field; anything you leave out is left as it is.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label_id` | label | yes | The label to update. |
+| `icon` | icon | no | The new icon, e.g. `mdi:lightbulb`. |
+| `color` | text | no | A theme color name (primary, red, green, …) or a hex color. |
+| `description` | text | no | What the label is for. |
+
+```yaml
+service: brain.update_label
+data:
+  label_id: battery_powered
+  color: red
+  description: Anything that runs on a battery and needs watching
+```
+
+> 🗣️ *"Make the battery label red and say what it's for."*
 
 ## Delete label
 
