@@ -1,0 +1,408 @@
+---
+title: Changelog
+description: Release notes for the brAIn Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="1.14.0" date="July 31, 2026" latest>
+
+**Switching to chat brought a fraction of the conversation** — and on a phone, an insight card gave its title away to its buttons. Both are the same mistake: something that doesn't matter crowding out something that does.
+
+<Changes type="fixed">
+
+- **A conversation carried across to the chat is now budgeted on what was said.** Measured on a real transcript: 1,844 replay events, of which 1,701 were tool calls and their results — 92%. The window that carries a conversation across is 400 events and it was filled newest-first, so it carried **3 of the 17 things the person had said** and 24 of 126 replies. That is what "not all the messages come over" actually was: they hadn't. Every word either party said is kept first now, and the most recent tool calls get whatever is left — 17 of 17 and 128 of 128 on that same transcript. A call and its result are also kept or dropped together, because half a pair renders as a spinner that never stops.
+- **The docs tab could zoom the panel in and leave it that way.** Not the docs — the search box. iOS Safari zooms the whole page in when you focus a text control whose font is under 16px, and does *not* zoom back out when you leave it; inside an ingress iframe that strands the panel at some arbitrary scale with the bar off screen. Text controls are 16px on touch devices now, asked for once rather than per control, so anything added later is covered by having been added. Pointer devices keep the density they were designed at.
+- **Long paths in inline code wrap** instead of pushing the column sideways.
+
+</Changes>
+<Changes type="changed">
+
+- **On an insight card, the title gets the row.** The head was one line — icon, category, title and *six* icon buttons — and the buttons don't shrink, so on a phone they took about 250px of a 390px card and left the words 120px. The category spent that on three lines while the title was cut to "Upstair…". Backwards: the eyebrow is the part you can afford to lose. The title now wraps to two lines and is never truncated, and the category is the one line that gives way.
+- **⤢ Expand stays on the card; everything else moved into ⋯.** Expand is the only button that acts on what is on screen rather than on the card's definition. Regenerate, Edit, Give feedback, Add to dashboard and Delete now each have their name and a line saying what they do — which a row of six unlabelled glyphs never had room for.
+- **Tag filters are one scrolling row.** Sixteen chips wrapping was four rows and most of a phone screen, before the first card. **✦ All** is pinned to the left, so clearing a filter is always one press.
+- **The hint under the ask bar is one line** naming the second verb, rather than a four-line paragraph teaching three features. The in-panel guide now describes the buttons that exist.
+
+</Changes>
+<Changes type="removed">
+
+- **The top bar's ⟳.** An unlabelled circular arrow that read like a page reload and in fact queued a Claude run for **every card you have** — minutes of work and a real bite out of the usage the pill beside it was reporting. Cards run on their own schedule, and ⋯ → Regenerate does one on demand.
+
+</Changes>
+</Release>
+
+<Release version="1.13.0" date="July 31, 2026">
+
+**Findings end, instead of piling up.** "I did it" beside "Not a problem" looked like two ways to make a card go away, and both of them left it lying there under a filter forever. That is two problems in one: you couldn't tell which button to press, and pressing either one didn't finish anything.
+
+<Changes type="changed">
+
+- **A finding now ends, and ending it deletes the row.** Every ending does the same three things: the answer goes into `memory.md` as a plain fact about your home, the wording is remembered so the same problem is never reported at you twice, and the card is gone.
+- **The two buttons say what each one *teaches* brAIn**, which is the only difference that ever mattered. **✓ I've fixed it** — it was a real problem and it's sorted now. **Not a problem here** — it was never a problem; this is normal in this house.
+- **An automated fix is the third ending, and works differently on purpose.** The card stays and turns green with what brAIn changed and which files it touched. It altered something in your house, and news you haven't read is not settled. **✓ Got it** clears it once you have — no second memory line, because the fix already wrote one when it made the change.
+- **The Dismissed and Fixed filters are replaced by Answered** — one line per ending, what it was, which answer you gave, when — with **Let brAIn raise it again** if you change your mind. That press stops the suppression and nothing more: nothing comes back on its own, the next analysis is simply free to find it, and if it has genuinely stopped happening, nothing does. Dismissals you made before this release are folded into the same record at startup, so nothing you had already waved off comes back.
+- **The terminal switch carries the conversation, both ways.** Switching between Chat and Classic used to change the renderer and leave the conversation behind, which made two faces of one Claude Code feel like two rooms — and the separate "Continue in the terminal" button that *did* carry it only went one way, so neither control was obviously the one that moved you. The switch is the only control now: to Classic, the chat releases its session and the terminal opens already inside that conversation; back to Chat, it picks up whatever the terminal was last doing, transcript and all. One honest limit — only one Claude Code process can own a conversation at a time, so this is a hand-off, not a mirror. Your shell in the terminal is never killed to make it happen, and switching is refused mid-answer rather than throwing away an answer being written.
+
+</Changes>
+<Changes type="fixed">
+
+- **The floating buttons over the terminal could vanish for good.** Raising the software keyboard hid them — including ⤢, the way back out of a folded bar — and they only returned when something noticed the keyboard had gone, which on iOS frequently never fired. They are never hidden now: the escape hatch may not be behind the state it escapes from.
+- **The slash palette stopped filling in.** Typing past the end of the filtered list left the highlight pointing at a row that no longer existed, and Enter/Tab silently did nothing from then on.
+- **Two scrollbars in one pane.** The page scrolled behind the terminal, and the memory editor scrolled inside its own already-scrolling box.
+
+</Changes>
+</Release>
+
+<Release version="1.12.1" date="July 31, 2026">
+
+**Memory was never being consolidated at all.** If your memory document had gone stale and the queue of things waiting to be filed only ever grew, this is why — and it had been true for weeks. **Update, and the facts that piled up while it was broken are filed on the next pass.** Nothing was lost; it was queued.
+
+<Changes type="fixed">
+
+- **The consolidator's lock was never obtainable, so no consolidation ever ran.** It took the lock with `flock -w 600`, and `-w` is util-linux's flag. This add-on runs on Alpine, whose `flock` is BusyBox's, and BusyBox accepts only `-sxun`. Handed an option it doesn't know, BusyBox prints usage and exits **1** — which is the exact status `flock` uses for *"the lock is held"*. So every pass, from the daily daemon and from **⇪ File into memory now** alike, failed to take a lock nobody held, decided another pass must be running, and did nothing. The inbox grew, the document went stale, and the only trace was one line in the add-on log. Only portable flags are used now, and whether flock can be used at all is probed with the same flag the real call uses. If it genuinely can't lock, the pass runs anyway and says so, because refusing forever is the worse failure. (The guards added in 1.11.2 were real — they just sat behind a gate that never opened.)
+- **A wedged consolidator is now visible.** The reason this hid for weeks is that nothing on any screen said anything; the queue just sat there looking like a queue. The Memory tab now says so when facts have been waiting appreciably longer than the daily pass, with what to try and where to look if that doesn't clear it. It deliberately doesn't detect *this* bug — it detects the symptom every cause of it shares: facts waiting, and no pass landing.
+
+</Changes>
+</Release>
+
+<Release version="1.12.0" date="July 31, 2026">
+
+**The two terminals are now one terminal with two faces.** Chat and Classic already ran the same Claude Code. What they did not do was let you move a conversation between them, which made them two places rather than two views.
+
+<Changes type="added">
+
+- **⟲ lists every conversation** in the project directory — started in the chat, started in the terminal, it makes no difference — with its opening line and when it was last touched. Pick one and it replays into the chat pane and carries on. Not a blank box with a promise that Claude remembers: the actual conversation, rendered through the same code as a live turn.
+- **Continue in the terminal** now opens the terminal *inside* the conversation rather than handing you a command to paste. The chat releases its session, leaves a handoff for the terminal's launcher, and — if the terminal is already attached — opens it in a new tmux window there and then. A terminal that has never been opened still comes up in the right conversation, because the handoff is a file its launcher reads rather than keystrokes typed at whatever happens to be in front. It expires after ten minutes, so a restart tomorrow does not silently reopen today's chat.
+- **💬 Discuss** hands a finding to the chat with everything it knows about it — the detail, the suggested fix, the entity, the severity — and asks Claude to say plainly whether it really is a problem *here*. The prompt tells it explicitly not to change anything: "explain this to me" and "go change my house" are different consents, and **✦ Fix it** is still the only button that gives the second. While you're discussing, a strip above the composer names the finding and keeps Fix it, I did it, Later and Not a problem one press away, and it survives a reload.
+- **⏰ Remind me later** takes a finding off the list for an hour, until tomorrow, next week or next month. It is deliberately *not* a status change: dismissing is permanent and fed back into every future analysis, and using that for "not right now" would quietly throw away a real problem you meant to come back to. It sits under a **Later** filter while it waits, with the date it returns and a "bring it back now".
+- **The slash palette knows `brain` and `ha`.** Type **/** and you get Claude Code's commands; type **brain** or **ha** and you get brAIn's own — `brain memory add`, `ha reload`, all of them, with the same descriptions and argument hints the dispatchers print. The list is parsed from `brain help` and `ha help`, so a subcommand added to a dispatcher appears without anything in the panel being touched.
+
+</Changes>
+<Changes type="changed">
+
+- **The chat had five buttons floating over your output.** Five translucent squares stacked on the text you came to read is exactly what this view exists to get away from. There are two now: **⤢**, which keeps its own place because it is also the way back from a folded bar, and **⋯**, which holds New chat, Conversations, Session details and the switch to the classic terminal.
+- **The top bar stopped saying the same thing twice.** "Usage budget reached" was a chip sitting immediately beside a usage pill already reporting the very number it was about — and on a phone the pair wrapped the bar onto a third row. The pill carries that state itself now: its dot goes warning-coloured, and pressing it says plainly that automatic insights are paused, what the budget is, and when the window rolls over. What is left beside it is the one thing a press can undo: **Auto insights off**.
+
+</Changes>
+<Changes type="fixed">
+
+- **Any control other than a top-bar chip that opened a popover had it closed again by the same press** — the dismiss-on-outside-click listener only recognised the chips as legitimate openers.
+
+</Changes>
+</Release>
+
+<Release version="1.11.2" date="July 31, 2026">
+
+**Home memory cannot be erased by a consolidation any more.** This is the important one: a consolidation pass could replace a year of learned facts with the blank template, and nothing would object.
+
+<Changes type="fixed">
+
+- **A consolidation that came back with an empty document is refused.** The consolidator asks Claude for the whole updated `memory.md` and then checks the answer before writing it: not empty, still has its `##` headings, still under the size cap. A document that came back as *nothing but those headings* passed every one of those checks — it is not empty, it has headings, and it is very much under the cap. So a pass where the model rewrote instead of merging wiped the lot. Two guards now stand in front of that write: coming back with no content at all, over a document that had some, is refused outright at any size; and losing most of the content in one pass is refused while the document is comfortably under its cap, which is the only case where consolidation should ever shed lines. Either way the document is left exactly as it was and the inbox stays pending, so the next pass tries again. A stale memory is recoverable; a wiped one is not.
+- **A failed write no longer eats the facts.** The script runs without `set -e`, so if writing `memory.md` failed — a full disk, a permission problem — execution fell straight through to the step that archives the inbox. The document would be unchanged and the queue emptied: the one combination where nothing anywhere says something went wrong. The write is checked now, and a failure leaves both alone.
+
+</Changes>
+<Changes type="changed">
+
+- **The Memory tab says when it is filing.** Consolidation runs daily, and early once the queue passes 20 facts, and none of that reached the panel — only passes you started with the button did — so the queue could empty while you were looking at it with nothing on screen accounting for where the facts went. The tab now shows a running pass whoever started it, with a line saying whether it is yours or the schedule's.
+
+</Changes>
+</Release>
+
+<Release version="1.11.1" date="July 31, 2026">
+
+**The terminal now stands where the chat does.** Claude Code files every conversation under the working directory it was started in, and `claude --resume` only lists the ones belonging to the directory you are standing in — so when the two faces of one tab disagreed about that directory, neither could see the other's conversations.
+
+<Changes type="fixed">
+
+- **Every session the terminal starts is pinned to `/config`.** The chat terminal always ran there; the tmux session inherited whatever directory the add-on's init happened to give it, which is why a chat conversation could not be resumed from the terminal. The same directory is what makes `/config/CLAUDE.md` load and what makes `/config/.claude/settings.local.json` the project settings the whole add-on is documented as running under, so inheriting it by luck was never a good idea either.
+- **No more price tag on a subscription.** Every answer ended with something like `$0.012` — what those tokens would have cost had you bought them from the API. On a Pro or Max plan that is not a charge, and printing it after every message is a number that looks like money and isn't. The CLI tells us which case it is, so the figure now appears only when an API key is genuinely being billed per token. On a subscription you get the duration and the turn count, which are the parts that mean something.
+
+</Changes>
+<Changes type="added">
+
+- **Slash commands in the chat terminal.** Type **/** and the palette lists what *your* install actually has — including anything in `/config/.claude/commands` — with descriptions and argument hints. ↑/↓ to move, Enter or Tab to pick. The list is never hardcoded, so a command you add appears without brAIn being told about it. A few commands are REPL-only (`/help` among them) and say so politely rather than failing.
+- **ⓘ shows the session id, the model, the project directory and how you are being billed**, with **Copy the command** and **Continue in the terminal**. The second one releases the session first, because while the panel holds a conversation open the terminal is being asked to resume something still in use.
+
+</Changes>
+</Release>
+
+<Release version="1.11.0" date="July 30, 2026">
+
+**The terminal stops being a window inside a window.** A terminal is a grid of fixed-width cells. On a phone that grid is about 40 columns wide, and a grid cannot reflow — so sentences broke mid-word, a single tool call spent twenty lines saying what one line could say, and the whole thing sat inside ttyd inside tmux inside an iframe.
+
+<Changes type="added">
+
+- **The Terminal tab has two faces**, and a button on the tab switches between them (⚙ Settings has the same control). Both run the same Claude Code, on the same login, in the same `/config`, under the same permissions — the difference is entirely how you see it.
+- **Chat is the new default**: Claude Code's own streamed output rendered as ordinary DOM. Text reflows to the screen it is on. Code blocks keep their grid, inside their own horizontal scroller, so a 200-column log line never makes the page slide sideways. Tool calls fold into one line each — `Read /config/automations.yaml` with a dot that goes green or red — and a failed one opens itself, because it is the reason the next thing Claude says will look strange. Reasoning folds away behind a "Thinking" line.
+- **The composer is a real text box**, so dictation, autocorrect and selection behave — there is no hidden terminal helper element to fight with. **⏹ stops an answer** and **＋ starts a new chat**; stopping asks the CLI politely first and kills it if it does not answer, and either way the conversation survives, because Claude Code is what persisted it. The transcript survives a reload, a locked phone, and an add-on restart.
+- **Classic is the terminal exactly as it was** — ttyd over tmux — and is the right answer for anything that draws its own screen: a TUI, `htop`, an installer, or running shell commands yourself.
+
+</Changes>
+<Changes type="changed">
+
+- **Nothing about what Claude may do changed.** The chat session runs in `/config` under the same `settings.local.json` permissions as the Assist listener, the Automation listener and the Findings fixer, so there is still one answer to "what may Claude do here" rather than two.
+
+</Changes>
+</Release>
+
+<Release version="1.10.0" date="July 30, 2026">
+
+**The bar is one size now**, and every control in it does its own job.
+
+<Changes type="changed">
+
+- **The third bar shape is gone.** Between roughly 960 and 1240 pixels the top bar had one row with the tab labels deleted and the tabs shrunk to bare glyphs. That is the width a laptop with the Home Assistant sidebar open actually renders at — so the compromise was the shape most people saw, and widening the window made the tabs *grow*, which reads as a bug whatever the intent. There are two shapes and no third: one labelled row at 1240px and up, and the two-row bar below it, with all five tabs still named. Tabs stop growing at 168px and centre themselves.
+- **The usage pill opens its own numbers.** Press it and you get both windows with when each one resets, and what the budget actually gates. A press rather than a hover, because the reset times used to live in a tooltip — a fact that exists and cannot be read on a phone, which is where that pill is most often the only thing worth reading.
+- **"Auto insights off" is now the switch.** One press turns them back on and the chip goes away, because the thing it was reporting is no longer true. A usage budget that has been reached isn't a switch, so that one explains itself instead. **⚙ is the one route to Settings** — three controls used to open it, so a bar reporting three different things answered all of them with the same dialog.
+- **The terminal gets the screen back on a phone.** With the keyboard up it was getting about a third of the display. The bar now folds away while you're typing and comes back when you dismiss the keyboard, and **⤢** over the terminal folds it away for good — the same button brings it back. tmux also drops its status line below 90 columns.
+- **The documentation says what brAIn actually is** — rewritten around the whole capability rather than around three components: brAIn administers Home Assistant, every entity, device, area, floor, label, dashboard, helper, automation and add-on, with the native tools, the registry services and the shell all in one place. A new **What brAIn can do** section opens the in-panel guide, and references to the two add-ons brAIn replaced are gone.
+
+</Changes>
+</Release>
+
+<Release version="1.9.0" date="July 30, 2026">
+
+**A top bar you can actually hit.** The bar was a fixed 48px row at every width, and it stayed one row by deleting text until it fit — tab labels first, then the words inside the status chips. On a phone that left five unlabelled glyphs and a bare amber dot, with the only explanation in a hover, on the one device that cannot hover.
+
+<Changes type="changed">
+
+- **The bar has two shapes.** On a desktop it is a single 56px row. On a phone the tabs move to a full-width strip of their own with **each name under its icon**, and every target — tab, button, status pill — is at least 44px. Nothing hides its words to fit any more; what gives way is the row.
+- **The usage pill says which number is which.** It read `19% · 100%`: two percentages, a dot between them, and nothing saying that the first is your 5-hour session and the second is your week. It now reads **Session 19% · Week 100%**, labelled in the bar itself. The amber dot beside it is gone — that was the "auto insights off" / "budget reached" chip with its words hidden, which is a warning that declines to say what is wrong. Hovering the pill gives you the reset times and nothing else, rather than reciting three facts already on screen.
+- **The Memory tab stops repeating itself.** "Already in memory — 23 discoveries" is gone. Once a discovery is filed it is part of the memory document on the right, and that is where you read it, edit it, or take it out; listing it a second time underneath the queue meant a drained queue never looked drained. Nothing was deleted — the dedup ledger still holds every announced fact, so brAIn still can't tell you the same thing twice. The four explanatory paragraphs came down with it; the long version is still in the **Docs** tab.
+
+</Changes>
+<Changes type="added">
+
+- **Nine Power Tools services, closing every gap where you could create something and then never change or remove it.** `rename_label` and `update_label` — a label was create-only, and its colour, the thing a label is mostly for, could not be changed after the fact. `delete_device`, with `dry_run` to preview the entities that go with it and name the config entries that would recreate it, so a delete that won't stick is visible before you make it. `delete_orphaned_devices`, the device counterpart of the entity cleanup, dry-run by default. `delete_integration`, removing a config entry with its devices and entities — disable was reversible and there was no delete at all. `set_area_icon` and `update_floor`, for attributes that could be set at creation and never afterwards. And `rename_person`, for the same reason as all the others.
+- **`update_*` services write only the fields you actually name**, so changing a label's colour doesn't blank its description. That is now a test, along with the rule these services came from: every registry object brAIn can create, it can also rename and delete.
+
+</Changes>
+</Release>
+
+<Release version="1.8.0" date="July 29, 2026">
+
+**It's brAIn.** The name is spelled that way everywhere now — add-on, panel, integration, sensors, CLI help, and these docs. The wordmark never needed changing: the gable already doubles as the `A`, and the `A` and the `I` were already the one part drawn in the accent colour.
+
+<Changes type="fixed">
+
+- **"⇪ File into memory now" empties the list.** It filed the queue and then showed you the same discoveries with the same "2 things waiting" underneath, because the list was reading the dedup ledger — the record of what has already been announced, which by design keeps entries forever. It is split now: **Waiting to be filed** is only what is genuinely still queued, and everything already folded into the document moves into a collapsed *Already in memory* group below it. ✕ still works in both.
+- **A pass that filed nothing no longer reports success.** The consolidator exits 0 in cases where it deliberately keeps the facts, and being skipped because another pass held the lock exited 0 too. The queue is now counted either side of the pass, so "the queue didn't move" and "another consolidation is already running" are things the panel can tell you instead of "Filed 2 things" over an unchanged list.
+
+</Changes>
+<Changes type="changed">
+
+- **The usage pill shows both windows** — `19% session · 64% week`. The seven-day limit is the one that actually ends your week on a Claude plan. Reset times moved into the hover, where a value that changes once per window belongs; the numbers, which change all day, stay in the bar. The ⚙ dialog states the week too. Both readings come from your Anthropic account, so they need a subscription login rather than an API key.
+- **The "Claude · subscription" pill is gone.** A green pill labelling a state that never changes, in a bar where width is the scarce thing. The auth chip now appears only when there is something to say — verifying, failed, or not connected — which paid for the second usage number twice over. On a narrow phone the weekly number steps aside, and below 410px so does the whole pill if a trouble chip needs the room.
+- **Display names follow the spelling.** The conversation agent, the system health sensor and the usage sensors read "brAIn" in Home Assistant. Entity IDs are unchanged, so nothing in your automations or dashboards breaks.
+
+</Changes>
+</Release>
+
+<Release version="1.7.0" date="July 29, 2026">
+
+**Findings — memory you can act on.** Memory tells you what is *true* of your home, and a guess asks whether brAIn has something *wrong*. Neither had anywhere to put the third thing: something that is **broken**.
+
+<Changes type="added">
+
+- **A [Findings](/brain/findings/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
+- **✦ Fix it** sends Claude to make the change in your actual Home Assistant: confirm the problem is still real, find the cause rather than the symptom, make the smallest change that resolves it, verify it took, and report exactly what it touched. Bounded hard — one finding per run, never deletes what it didn't create, never restarts Home Assistant, never touches secrets, and nothing runs until you press it.
+- **Not a problem** dismisses a finding permanently, and the dismissal is fed into every future analysis. If the garage freezer is *supposed* to sit at -30°C, one press ends that conversation for good. Anything needing hands is marked **needs you** rather than offered a fix, and **✓ I did it** closes those.
+- **A second verb in the ask bar.** Start a line with "learn about…" or "study…" and brAIn runs a study session instead of drawing a card, digging through the registry, history and long-term statistics for that corner of the house. It was previously reachable only from the terminal, which meant nobody ran one.
+- **⇪ File into memory now** on the Memory tab runs a consolidation immediately rather than waiting for the daily one — same script, same safety checks.
+
+</Changes>
+<Changes type="changed">
+
+- **Tags are yours to edit.** Press ✎ on a card's tag row to drop a tag or add your own. What's stored is a diff, not a list: your removals stick across regeneration, but a genuinely new tag a later run discovers still appears.
+- **The header carries the real wordmark** as one piece of art rather than the gable beside live text, in three brand roles so a single file works in both themes.
+- **Learned and found are separate.** What a run learns about the home (durable facts → memory) is now a different field from what it finds wrong (→ Findings). They were one, which is why nothing was ever actionable.
+
+</Changes>
+<Changes type="removed">
+
+- **The "New insight" dialog.** Asking a question already made a card, and any card becomes recurring with ＋ Make recurring — a blank prompt dialog was a second, harder path to somewhere you had already been taken.
+- **The removed-cards graveyard** in ⚙ Settings. That belonged to a version that shipped nine cards to every house; this one proposes cards for *your* home, so the way to get one back is to ask for it again. ✕ now means the same thing for every card: gone.
+
+</Changes>
+</Release>
+
+<Release version="1.6.0" date="July 29, 2026">
+
+**A new mark.** brAIn's logo is now a descendant of the BRUH Automation logo rather than a cousin of it: the `BR` ligature, the gable and the signal motif are lifted unmodified from the parent mark, and only the `A`, `I` and `N` are newly drawn, on the parent's own ratios. The gable *is* the `A`. The old mark was a generic neural-mesh glyph that could have belonged to any AI product — and was never really chosen, it won by being first in a folder.
+
+<Changes type="changed">
+
+- **New art everywhere it appears** — the panel's top bar, the favicon, the add-on store icon and logo, and the home-assistant/brands assets, all re-rendered from one set of SVGs so they can't drift.
+- **The sidebar icon is `mdi:home-analytics`**, replacing an icon picked to rhyme with a mesh that no longer exists.
+- **Wide lockups are 4:3 rather than 640×200** — the new mark is near enough square that a banner shape either stranded it in empty plate or cropped it.
+
+</Changes>
+</Release>
+
+<Release version="1.5.0" date="July 29, 2026">
+
+**No default cards — it learns your home first.**
+
+brAIn used to ship nine cards (Overview, Energy, Climate, Lighting, Security, Presence, Media, Device Health, Automations), all enabled from the moment you installed it. They generated before brAIn knew anything about the house, so they said generic things about a home it had never looked at — and cost tokens doing it, on every schedule, forever.
+
+<Changes type="changed">
+
+- **A fresh install now has no cards at all.** The first run studies the home — naming, occupancy, energy, climate, device reliability — and only then proposes cards grounded in what it actually found, each with a one-line reason citing the evidence. You pick which to keep. Nothing generates, and the scheduler stays idle, until you do.
+- **There is no canned fallback.** If the home is too sparse to learn from, brAIn says what's missing and stops. Generic cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard.
+- **The flow is resumable** — close the panel mid-study and come back — and re-running it never re-studies a topic it already covered, because a study session is expensive.
+
+</Changes>
+</Release>
+
+<Release version="1.4.1" date="July 29, 2026">
+<Changes type="fixed">
+
+- **Answering a guess from an insight card never settled it.** When hypotheses replaced open questions in 1.3.0, the Memory tab was updated but the card renderer and its endpoints were not. Cards still showed a free-text "Answer" box — asking for an essay where the answer is yes or no — and the handler wrote to the old question ledger instead of the queue. The card looked answered while the guess stayed **open in Memory until it expired a fortnight later**. Cards now show the same two-tap ✓/✗, and settle the queue by resolving the claim's text (a card carries the text, not the id).
+- **Removed the "Answered questions" section from Memory.** It belonged to the model this release replaced, rendered `Q: … A: …` — exactly the format removed from memory — and nothing populated it any more.
+
+</Changes>
+</Release>
+
+<Release version="1.4.0" date="July 29, 2026">
+
+**A single, compact bar** — and the guess you click is the guess that gets settled.
+
+<Changes type="fixed">
+
+- **Clicking ✓ on the second or third pending guess settled the first one.** Hypotheses used the current epoch second as their id, and a study session proposes several claims inside the same second — so they collided, and settling matched whichever came first in the file. Ids are now unique per entry. (`knowledge_store` had guarded against exactly this; the hypothesis queue didn't inherit it.)
+
+</Changes>
+<Changes type="changed">
+
+- **One 48px bar instead of two stacked bars plus a row of labelled buttons.** Roughly 110px of fixed furniture sat above every view, which on the **terminal** — where each pixel is a line of output — cost real content. The bar now carries the mark, the tabs, status and actions.
+- **Monochrome line icons**, inline SVG inheriting `currentColor`, so they follow tab state rather than competing with it. Azure is the only colour in the chrome and it marks only what is active.
+- Toolbar actions are **icon-only** — the labels were noise beside four tabs. On narrow screens the tab labels drop and the icons stay, so all four still fit.
+- **The Memory tab shows a count** when guesses are waiting. A guess nobody sees is a guess that expires unanswered.
+
+</Changes>
+</Release>
+
+<Release version="1.3.0" date="July 29, 2026">
+
+**Guesses instead of questions.** Insight runs no longer ask open-ended questions. They state what they **believe**, phrased for a yes/no: *"The garage fridge is meant to run 24/7 — right?"*
+
+<Changes type="changed">
+
+- **Two taps settle it.** **Yes** files it as a plain memory line; **No** records a dead end that is never revisited. The cap is enforced in code, not just asked for in the prompt — a model that ignores the budget still cannot grow the queue. Three open at once, 14-day expiry, and a claim already proposed is never proposed again in any wording.
+- **Turn limits were too tight, and failed badly.** A turn cap does not degrade — it **truncates**. A run that hits one stops mid-thought and produces nothing parseable, so the tokens are spent and the result is lost. That made a tight cap the most expensive setting in the add-on. Study sessions: 14 turns → **60**, timeout 10 → **30 minutes**, and `study_max_turns: 0` now removes the cap entirely. `brain ask`: 8 → **30**. Automation tasks: 10 → **30**. Voice: 5 → **8**, deliberately still modest, because latency *is* the product for voice.
+- Hitting the limit is now **reported as** hitting the limit, rather than as unparseable output — blaming the model for a limit we imposed sends you looking in the wrong place. Study prompts also tell the model to land its result if it senses it is running short, so a long session degrades to partial instead of losing everything.
+
+</Changes>
+<Changes type="added">
+
+- **Logbook events.** Every new fact fires `brain_learned`, so *"brAIn learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
+- **`sensor.brain_facts_learned`** and **`sensor.brain_last_learned`**.
+- **`binary_sensor.brain_waiting_on_you`** — on when a guess needs an answer, with the text in `pending`. This exists to be automated: a guess sitting in a panel nobody has open expires unanswered, but pushed to a phone it costs one tap.
+- **`brain.study`** service — with a topic, or without one to study whatever has gone stalest. Returns immediately; results arrive in memory, not in a response.
+- **`/learn`** and **`/memory`** slash commands in the terminal, where you can watch a session work and correct it mid-flight.
+
+</Changes>
+</Release>
+
+<Release version="1.2.0" date="July 29, 2026">
+<Changes type="added">
+
+- **A Docs tab**, next to Memory: getting started, the three tabs, how memory works, the command line, undo, voice, cost control, and troubleshooting. Searchable, with the matched term highlighted in the page. The nav, the search index, and the body all come from one source, so navigation can't drift out of sync with the content.
+
+</Changes>
+<Changes type="fixed">
+
+- **`brain doctor` reported the Assist worker pool as failing when it was healthy.** The probe was pinned to port 8099, which the panel took over when the two add-ons merged; the panel answered — with a 404 — so the check failed against a perfectly working pool. It now reads the port the pool publishes instead of assuming one.
+- **`brain doctor` smoke-tested CLI names that no longer exist** (`ha-entity`, `ha-addon`, `ha-service`, `ha-yaml-check`), producing five warnings for tools that were fine. It now exercises the `ha` dispatcher.
+- **The generated `/config/CLAUDE.md` still documented the retired hyphenated commands**, including `ha-backup`, which no longer exists at all. That file is how Claude learns its own tooling, so a stale entry is a command it will actually try to run. Rewritten for the two dispatchers, and a test now fails if a retired name reappears.
+- **Removed the Memory button from the header** — it duplicated the tab.
+
+</Changes>
+</Release>
+
+<Release version="1.1.1" date="July 29, 2026">
+<Changes type="fixed">
+
+- **Signing in once is now enough.** Signing in through the panel still left the terminal asking for a login. Credential sharing was built when Terminal and Insights were separate add-ons and only ran one way: the terminal's `ha login` published a credential the panel read. Merged into one add-on the panel became the primary sign-in surface, so the arrow has to point both ways. A single resolver now hands whatever credential exists to the CLI — used by both the `claude-run` wrapper and interactive shells. If the CLI already holds its own OAuth login it is left strictly alone: it refreshes that credential itself, and injecting a token over the top would break the refresh.
+
+</Changes>
+</Release>
+
+<Release version="1.1.0" date="July 29, 2026">
+
+**The panel is finally one product.**
+
+<Changes type="added">
+
+- **Three tabs: Insights, Terminal, Memory.** The terminal is the same ttyd the add-on already ran, reverse-proxied through the panel, so it is a tab rather than a second sidebar entry. The frame only connects when you first open the tab — no shell session is started for someone who never does.
+- **Memory is a tab, not a dialog.** The same pane, promoted out of the modal it was hidden in.
+
+</Changes>
+<Changes type="fixed">
+
+- **The panel still said "BRUH Insights" in its header, and drew the Insights bar-chart glyph.** The wordmark is split across HTML tags (`BRUH <span>Insights</span>`), so the rename never matched it. It now reads **brAIn** with the neural-mesh mark. A test now strips tags before checking, so this class of miss can't come back.
+- **Several hints told you to go run a command in "the brAIn add-on" — from inside brAIn.** They were inherited from when Terminal and Insights were separate. They now point at the Terminal tab.
+- **Retired CLI names in the UI.** `ha-share-login` and `ha-memory` no longer exist; the panel referenced both.
+- **A new agent defaulted to the name "Claude Agent"** instead of "brAIn Agent".
+
+</Changes>
+<Changes type="changed">
+
+- Added `logo.png` / `logo@2x.png` for the home-assistant/brands submission. Until that PR merges, Home Assistant has no artwork for the `brain` domain and shows the raw domain beside the name — which is why a fresh install reads "brain brAIn".
+
+</Changes>
+</Release>
+
+<Release version="1.0.1" date="July 29, 2026">
+<Changes type="fixed">
+
+- **The panel's login failed with `su-exec: claude: No such file or directory`.** The CLI was looked up with the root user's `PATH` and then executed as the `claude` user. The binary lives at `/root/.local/bin/claude`, which is on neither user's `PATH`, so the lookup fell through to the bare name `claude` and su-exec couldn't find it. The panel now prefers the `claude-run` wrapper and otherwise resolves an absolute path.
+
+</Changes>
+<Changes type="changed">
+
+- **BRUH Terminal and BRUH Insights are removed.** brAIn replaces both; their test suites now cover brAIn.
+- **Renamed the files that were ours rather than Claude Code's**: `claude_client.py` is now `panel/engine.py`, and the session picker and auth helper are `brain-menu.sh` and `brain-auth-helper.sh`. `CLAUDE.md`, `CLAUDE_CONFIG_DIR`, the `claude` user, and the `claude-run` wrapper keep the name — they *are* Claude Code's own file, env var, user, and binary.
+
+</Changes>
+</Release>
+
+<Release version="1.0.0" date="July 28, 2026">
+
+First release. brAIn replaces **[BRUH Terminal](/brain/archive/bruh-terminal-changelog/)** and **[BRUH Insights](/brain/archive/bruh-insights-changelog/)**, which are now deprecated. It is a clean install — there is no migration from either add-on.
+
+<Changes type="added">
+
+- **The terminal and the insights dashboard now share a process.** They were two containers, which meant authenticating Claude twice, two Claude clients, two settings stores, and two writers racing on one memory file. Now it's one of each.
+- **One ingress panel** serves everything. The panel owns port 8099 and reverse-proxies `/terminal/` through to ttyd (HTTP + WebSocket), so the terminal is a tab rather than a second sidebar entry. Port 7681 is still published for direct access. `enable_terminal` / `enable_insights` turn either face off.
+- **An edit journal, replacing git backups.** A `PreToolUse` hook snapshots a file's prior contents before Claude writes to it, and **`brain undo`** lists those edits in plain English and restores one. It records only what Claude touched, lives under `/data` so it never pollutes the config directory, and prunes on `edit_journal_days` (default 14).
+
+</Changes>
+<Changes type="changed">
+
+- **The assist worker pool moved to port 8098**, since 8099 now belongs to the panel. Nothing hardcodes it — the integration reads the port from the endpoint file the pool publishes.
+- **Integration domain is `brain`**: services are `brain.send_prompt`, `brain.run_task`, and the rest, including all 56 Power Tools. Shared state moved from `/config/.bruh_claude/` to **`/config/.brain/`**, environment variables use the `BRAIN_` prefix, and the conversation agent appears as **brAIn** in Settings → Voice Assistants.
+- **`assist_learning` is now just `learning`** — it governs everything brAIn learns, not only the voice channel.
+- **Fourteen `ha-*` scripts collapse into two dispatchers**, split by what they act on: **`brain`** for its own faculties (`memory`, `learn`, `ask`, `undo`, `doctor`) and **`ha`** for Home Assistant operations (`log`, `reload`, `entity`, `service`, `addon`, `notify`, `share`, `check`, `context`). If a pre-existing `ha` command is ever found on `PATH`, brAIn installs its own as `hass` instead rather than shadowing it.
+
+</Changes>
+<Changes type="removed">
+
+- **Git auto-backup** — `auto_backup`, `backup_interval_minutes`, the 30-minute commit watcher, and the `.gitignore` management that came with them. Versioning the whole of `/config` inside `/config` duplicated what a real Home Assistant backup already does, and the repo it grew was then swept into those backups. Existing `/config/.git` directories are left strictly alone; delete yours if you don't want it. The `git` binary is still installed — it's useful in a terminal.
+
+</Changes>
+</Release>
+
+</Changelog>
+
+## Before brAIn
+
+brAIn is a clean start, so its version numbers begin again at 1.0.0. The two add-ons it replaces kept their own histories, preserved in full:
+
+- **[BRUH Terminal changelog](/brain/archive/bruh-terminal-changelog/)** — 1.0.0 through 3.6.0
+- **[BRUH Insights changelog](/brain/archive/bruh-insights-changelog/)** — 1.0.0 through 1.7.0

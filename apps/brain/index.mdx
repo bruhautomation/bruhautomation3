@@ -1,0 +1,183 @@
+---
+title: brAIn
+description: Your house already has nerves. Now give it a brAIn. A Home Assistant add-on that runs Claude Code inside HA, sees your whole system, can change any of it, and builds a permanent memory of your house.
+template: splash
+hero:
+  tagline: "Your house already has nerves. Now give it a brAIn. Claude plus a suite of new tools hands it the keys. Stop programming your house — let it think."
+  # The full wordmark, not the icon: at hero size there is room for it, and
+  # the mark only reads as "brAIn" when the gable is doing its job as the A.
+  # Its B/R/N flip between ink and paper, so it needs both grounds.
+  image:
+    light: ./brain-logo-onlight.svg
+    dark: ./brain-logo-ondark.svg
+  actions:
+    - text: Quick Start
+      link: /brain/quickstart/
+      icon: right-arrow
+    - text: Configuration Reference
+      link: /brain/reference/
+      icon: open-book
+      variant: minimal
+    - text: Changelog
+      link: /brain/changelog/
+      icon: list-format
+      variant: minimal
+    - text: GitHub
+      link: https://github.com/bruhautomation/BRUH-HA-Apps
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What it is
+
+A Home Assistant add-on that runs **Claude Code** and a suite of tools inside HA, which
+builds a permanent memory of your house.
+
+It sees the whole system — every entity, device, area, floor, dashboard, helper and
+automation — and it can change any of it. Explain a broken automation. Fix it. Write a new
+one. Remember why, next time.
+
+That memory isn't a black box. Open it, read it, edit it, correct it. An insights panel
+shows what it knows about your house and what it's done there — in the sidebar, or embedded
+straight into your dashboards.
+
+Reach it however you want: as your conversation agent, through a full-featured chat
+interface, or from native Claude Code. Your automations can call it too — which means your
+house can ask for help before you notice anything's wrong.
+
+One install, one sidebar panel, one login. Runs on the Claude **Pro** or **Max**
+subscription — or your own API key.
+
+![The brAIn Insights tab: an ask bar across the top, tag filters, and four insight cards — one answering "Why did the hallway light come on at 3 am?" with a trace timeline, one showing a month of electricity by device as a bar chart](./images/panel-insights.webp)
+
+<CardGrid>
+  <Card title="It runs Home Assistant" icon="setting">
+    Not just "turn on a light" — **[65 admin services](/brain/power-tools/)** reach the
+    parts of HA that normally live behind the Settings UI, plus **36 native tools** and a
+    real shell in `/config`. [What it can reach →](/brain/how-brain-controls-ha/)
+  </Card>
+  <Card title="It finds what's broken" icon="magnifier">
+    A dying battery, a sensor that stopped reporting three weeks ago, an automation
+    whose trigger can never fire. Press **Fix it** and it makes the change.
+    [Findings →](/brain/findings/)
+  </Card>
+  <Card title="It remembers your house" icon="open-book">
+    One plain-markdown document of durable facts — nicknames, rhythms, the devices
+    that are *meant* to behave oddly. Everything brAIn does reads it.
+    [Memory →](/brain/memory/)
+  </Card>
+  <Card title="It explains your house" icon="star">
+    Insight cards with real interactive charts, proposed for **your** home rather
+    than shipped as defaults. Ask anything, get a card. [Insights →](/brain/insights/)
+  </Card>
+  <Card title="It talks, in a voice you choose" icon="comment-alt">
+    Pick brAIn in **Settings → Voice assistants**. Give it a personality, or run
+    several agents with different names and permissions. [Voice →](/brain/voice/)
+  </Card>
+  <Card title="It has a terminal" icon="laptop">
+    The real Claude Code CLI with your `/config` in front of it, as a chat or as a
+    true terminal — same session, one button between them.
+    [Terminal →](/brain/terminal/)
+  </Card>
+  <Card title="It works from automations" icon="puzzle">
+    `brain.run_task` for background jobs, scheduled insight reports rendered to
+    sensors, and events your automations can trigger on.
+    [Automations →](/brain/automations/)
+  </Card>
+  <Card title="It can be undone" icon="seti:config">
+    Every file Claude writes to is snapshotted first. **`brain undo`** lists the
+    edits in plain English and puts one back. [The CLI →](/brain/cli/)
+  </Card>
+</CardGrid>
+
+## It administers your setup
+
+Most AI integrations can turn on a light. brAIn runs the installation. It reaches Home
+Assistant three ways at once — native tools for reading and controlling, admin services
+for the registry, and a shell for everything that is still a YAML file.
+
+- **Organisation** — create, rename and delete areas, floors and labels; set icons and
+  voice aliases; move devices and entities between them. *"Put every upstairs room on a
+  floor called Upstairs and rename the Shellys to what they actually control."*
+- **Devices and entities** — rename either, change an `entity_id`, hide, unhide, enable,
+  disable. Find references to things that no longer exist and clean them up — dry-run
+  first, so you see the list before anything goes.
+- **Dashboards** — read, create, rewrite, restore a previous version. It can build a
+  dashboard from a sentence.
+- **Automations, scripts and scenes** — it edits the YAML, validates it, reloads the
+  domain, then reads the **traces** to see whether the thing actually fired and why it
+  didn't. That last part is what makes *"write me an automation"* work on the second try
+  instead of never.
+- **The house's own record** — history and long-term statistics, the logbook, the error
+  log, your other add-ons, weather, camera snapshots it can actually *see*, and every
+  service any integration exposes.
+
+**Nothing is create-only.** Everything that can be created can be renamed and deleted,
+and every attribute a `create_` service accepts has a service that changes it later.
+
+## It fixes what it finds
+
+A **finding** is something wrong with your house, filed by brAIn on its own while it was
+looking at something else. Each one carries the evidence — the entity, the number, the
+day it started — and the specific change that would resolve it.
+
+![The brAIn Findings tab, headed "What brAIn thinks is broken", listing thirteen orphaned entities, two loft sensors that never rejoined after a Zigbee channel change, and a dead back-door battery sensor — each with Fix it, Discuss, I fixed it, Remind me later and Ignore](./images/panel-findings.webp)
+
+Press **Fix it** and Claude makes the change, verifies it, and reports what it touched.
+Press **Discuss** to talk it over first, changing nothing. **I fixed it** and **Ignore** are
+endings: the answer becomes a fact in memory, and the row is gone for good rather than
+joining a pile of dismissed cards.
+
+## It learns, and everything reads what it learned
+
+Memory is one markdown document you can open and edit. brAIn writes to it from
+conversations, insight runs and background study sessions — and voice, insights and the
+terminal all read it. Tell the voice assistant something and the cards know it.
+
+![The brAIn Memory tab: two guesses awaiting a yes/no answer, three discoveries waiting to be filed, and the home memory document below with sections on the household, the house, and device quirks](./images/panel-memory.webp)
+
+When brAIn believes something it can't confirm, it says so as a **guess** you answer with
+one tap — *"The garage fridge is meant to run 24/7 — right?"* Three open at a time, never
+more. **Yes** files it as a fact; **No** records a dead end that is never revisited.
+
+## It works from the sofa
+
+The panel is one ingress page with five tabs, built for a phone as seriously as a
+desktop: every target is at least 44px, no width gets a row of bare glyphs, and the
+terminal folds the chrome away when the keyboard comes up.
+
+![The brAIn panel on a phone, showing the two-row top bar with all five tabs named beneath the status row](./images/panel-phone.webp)
+
+## Built for Home Assistant
+
+What makes this different from running Claude Code on a regular machine:
+
+- **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your
+  usage; an API key works too. One login covers the panel, the terminal, voice,
+  insights and memory.
+- **[36 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
+  history and statistics, registries, dashboards, traces, templates, logs, reloads.
+- **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of
+  your install that Claude reads at the start of each session.
+- **Usage-limit sensors** — the same session and weekly utilisation as claude.ai, as HA
+  sensors with reset times, plus a budget that pauses *scheduled* work before it eats
+  your week. Manual presses are never blocked.
+- **Safe by default** — voice agents get HA tools but no shell, file or web access;
+  per-agent blocked-service lists; a non-root sandbox; `secrets.yaml` is never
+  snapshotted and never edited.
+- **Two CLI commands, not fourteen** — `brain` for its own faculties, `ha` for Home
+  Assistant chores. [The CLI](/brain/cli/).
+
+## What it doesn't do
+
+brAIn can't *add* an integration (config flows are interactive, so it walks you to the right
+screen and you click — removing one it can do), never touches credentials, and doesn't back up your
+configuration — Home Assistant's own backups already do that. What it keeps is an edit
+journal of the files *it* touched, so `brain undo` can put one back. The full scorecard:
+[what brAIn can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
+
+**[Quick Start →](/brain/quickstart/)** — add the repo, install, restart HA once, sign in,
+press **Start learning**. About five minutes, plus a few minutes of study in the
+background.

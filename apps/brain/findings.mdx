@@ -1,0 +1,171 @@
+---
+title: Findings
+description: brAIn's work list — the things it thinks are broken in your home, each with the evidence, the fix it has in mind, and a button that sends it to make the change.
+---
+
+A **finding** is something wrong with your house. A dead battery. A sensor that hasn't
+changed value in six days. A device stuck unavailable. An automation whose trigger entity
+was renamed, so it can never fire again.
+
+brAIn files them on its own, while it was looking at something else — findings come out of
+the same insight runs and study sessions that fill memory. You never ask for them.
+
+![The brAIn Findings tab, headed "What brAIn thinks is broken", with three findings: a back-door battery sensor that has reported nothing since 26 July, thirteen entities belonging to devices that no longer exist, and two loft sensors that never rejoined after a Zigbee channel change](./images/panel-findings.webp)
+
+## Three kinds of knowledge, and they don't mix
+
+|  | The question it answers | How it ends |
+| --- | --- | --- |
+| **Memory** | What is *true* of this home? | It's a document; it just gets better |
+| **Guesses** | What might brAIn have *wrong*? | Yes or No, once |
+| **Findings** | What is *broken* in this home? | Fixed, or dismissed |
+
+A finding is never just an observation. "The dryer used 3 kWh" is an insight. "The dryer's
+energy sensor has read exactly 3 kWh for six days" is a finding — something is wrong and
+somebody has to do something about it.
+
+Each one names the entity, the number and the day it started, because a work list item you
+can't check is just a worry.
+
+## What findings actually look like
+
+These are the kinds of thing that show up in a real house:
+
+- **A sensor that died quietly.** *"`sensor.back_door_battery` has reported nothing since
+  26 July. Last reading 8% at 04:11. The door sensor still reports state, so this is the
+  battery entity only — but your low-battery automation can no longer see it."*
+- **An automation that can never fire.** *"`automation.morning_lights` triggers on
+  `binary_sensor.hall_motion_old`, which was renamed three weeks ago. It has not run since."*
+- **A device that came back wrong.** *"Two Aqara loft sensors have been silent since 24 July
+  at 14:30 — the same minute your Zigbee coordinator moved from channel 15 to 20."*
+- **Something that contradicts itself.** *"`automation.away_lights` is gated on presence, but
+  the living-room motion sensor keeps the house 'occupied' all day. It has not fired this
+  month."*
+- **Tidy-up.** *"13 entities belong to devices that no longer exist. They show as unavailable
+  on three dashboards."*
+
+:::note[The same problem is never raised twice]
+Findings are deduplicated by meaning, not by wording. A problem reported in one run and
+described differently in the next is recognised and dropped, so the list stays a list of
+distinct things rather than a rolling feed.
+:::
+
+## Fix it
+
+**✦ Fix it** sends Claude to make the change, in your actual Home Assistant. It confirms the
+problem is still real, finds the cause rather than the symptom, makes the smallest change
+that resolves it, verifies the change took, and reports back with exactly what it touched.
+
+A real one, end to end:
+
+```text title="A finding, fixed"
+FINDING   automation.morning_lights can never fire
+          Its trigger references binary_sensor.hall_motion_old,
+          renamed to binary_sensor.hall_motion on 8 July.
+          Last run: 23 days ago.
+
+✦ Fix it
+
+          Read automations.yaml — trigger entity confirmed stale
+          Edited the trigger to binary_sensor.hall_motion
+          Validated automations.yaml — OK
+          Reloaded the automation domain
+          Re-read the config — trigger now resolves
+
+FIXED     1 file changed: /config/automations.yaml
+```
+
+It is bounded on purpose:
+
+- **One finding per run.** Anything else it notices along the way becomes its own finding
+  rather than an edit you didn't ask for.
+- **It never deletes** an entity, automation, dashboard or file it didn't create — it
+  disables or corrects instead.
+- **It never restarts Home Assistant.** Reloading one config domain is fine; a restart is
+  your call.
+- **It never touches secrets** or credentials.
+- **Nothing runs until you press it.** brAIn will not change your house on a schedule.
+
+Every file it writes is snapshotted first, so [`brain undo`](/brain/cli/) puts one back if a
+fix goes wrong.
+
+Some things software can't fix — a flat CR2032, a device that needs re-pairing from the loft
+hatch. Those are marked **needs you** and offered without a Fix it button, because inventing a
+software substitute for a dead battery is worse than saying so.
+
+## Discuss it first
+
+**💬 Discuss** opens the finding as a conversation in the [Terminal](/brain/terminal/) tab,
+with everything brAIn knows already in the question — the detail, the fix it had in mind, the
+entity, the severity. It is asked to look into the thing and say plainly whether it really is
+a problem *in your house*, and told to change nothing, because "explain this to me" and "go
+change my house" are different permissions.
+
+The decisions come with you: while you're talking it over, a strip above the message box keeps
+**Fix it**, **I fixed it**, **Later** and **Ignore** one press away.
+
+## The two endings
+
+Ending a finding **removes it**. Which ending you pick matters, because each one teaches brAIn
+something different:
+
+**✓ I fixed it** — it was a real problem and it's sorted now. Memory records
+*"Fixed by the homeowner: the back door sensor battery was replaced."*
+
+**✕ Ignore** — it was never a problem; it's normal in this house. If the garage freezer is
+*supposed* to sit at −30 °C, one press ends that conversation for good. Memory records
+*"Not a problem in this home: the garage freezer runs at −30 °C."*
+
+Both do the same three things: the answer goes into memory as a plain fact about your home,
+the wording is remembered so the problem is never reported at you again, and the row is
+deleted. There is no pile of dismissed cards to scroll past — a list of things nobody has to
+look at again is not a work list.
+
+## Dismiss, which is neither
+
+**⌫ Dismiss** clears the row and teaches brAIn nothing. No memory line, no suppression — so
+the next analysis is free to find the same thing again, and probably will if it's still
+there.
+
+That's the difference from Ignore, and it's why both exist:
+
+| | What you're saying | What brAIn learns |
+| --- | --- | --- |
+| **✕ Ignore** | This is normal here | Never raise it again |
+| **⌫ Dismiss** | Not now, and I'm not promising anything | Nothing |
+| **⏰ Remind me later** | Yes, but not yet | Nothing — it comes back on your date |
+
+Use Dismiss when you're clearing the board rather than answering it.
+
+**⏰ Remind me later** is the answer for "yes, but not now" — an hour, tomorrow, next week,
+next month. It is not a decision and settles nothing: the finding stays exactly as open as it
+was and simply stops asking. Use it instead of dismissing something you actually intend to
+deal with, because dismissing is permanent. While it waits it sits under **Later**, showing
+when it comes back, with a button to bring it back sooner.
+
+## After brAIn fixes something
+
+A fixed card **stays on the list** and turns green, with what changed and which files were
+touched. That's deliberate: brAIn altered something in your house, and news you haven't read
+is not settled. **✓ Got it** clears it once you have.
+
+## Where answered findings go
+
+Nowhere, and that's the design. Ending one writes the answer into
+[memory](/brain/memory/) and deletes the row — so memory is the record, and the tab has two
+filters rather than an archive: **Needs you**, and **Later** once something is waiting in it.
+
+brAIn still remembers what you answered. A settled finding's wording is kept in a ledger the
+analyst consults before reporting anything, so the same problem is never raised at you twice,
+however it gets reworded. That ledger isn't a screen — it's the reason the list stays short.
+
+:::caution[Ignore is permanent]
+There is no undo and no archive to fish it back out of. Use **Remind me later** for anything
+you actually intend to deal with; **Ignore** is for things that were never problems.
+:::
+
+## Getting them to your phone
+
+Findings live in the panel, but the count is on the tab badge and the underlying state is
+available to automations through the [integration](/brain/automations/) — so a weekly
+*"brAIn has 3 things waiting"* notification is a few lines of YAML.

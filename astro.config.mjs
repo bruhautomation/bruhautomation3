@@ -2,21 +2,37 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
+import { groupByCategory, readProjects } from './site/catalog.mjs';
 
-// Draft workflow (see scripts/build.mjs and src/content.config.ts):
+// Draft workflow (see site/scripts/build.mjs and site/content.config.ts):
 // A page with `draft: true` is HIDDEN on the Vercel production deployment (the
 // live site) and VISIBLE on every Vercel Preview deployment and in local dev.
 // Page visibility is enforced by Starlight via the Astro build mode
-// (scripts/build.mjs maps the deploy env to `--mode`); this flag only mirrors
-// that decision for the dev-only "In Development" sidebar group below, so the
-// nav matches the pages that were actually built. The build wrapper exports
-// SHOW_DRAFTS during builds; force it manually with SHOW_DRAFTS=true|false. To
-// take a draft live: set `draft: false` and move its sidebar entry into the
-// matching category group.
+// (site/scripts/build.mjs maps the deploy env to `--mode`); this flag only
+// mirrors that decision for the dev-only "In Development" sidebar group below,
+// so the nav matches the pages that were actually built. The build wrapper
+// exports SHOW_DRAFTS during builds; force it manually with
+// SHOW_DRAFTS=true|false. To take a draft live, set `draft: false` — it moves
+// into its category group on its own.
 const showDrafts =
 	process.env.SHOW_DRAFTS != null
 		? process.env.SHOW_DRAFTS === 'true'
 		: process.env.VERCEL_ENV !== 'production';
+
+// The project sidebar is read from the project folders themselves: each
+// project's README says which category it belongs to, so adding a project is
+// adding a folder and nothing else, and re-filing one is a one-line edit
+// inside that folder. See site/catalog.mjs.
+const allProjects = readProjects().filter((p) => p.guide);
+const projectGroups = groupByCategory(allProjects.filter((p) => !p.draft)).map((group) => ({
+	label: group.label,
+	collapsed: true,
+	items: group.projects.map((p) => ({ label: p.title, slug: `projects/${p.slug}` })),
+}));
+const draftProjects = allProjects
+	.filter((p) => p.draft)
+	.sort((a, b) => a.title.localeCompare(b.title))
+	.map((p) => ({ label: p.title, slug: `projects/${p.slug}` }));
 
 // BRUH Terminal (`/bruh-claude/`) and BRUH Insights (`/bruh-insights/`) were
 // merged into brAIn (`/brain/`). Those URLs are in the wild — in the add-on
@@ -63,10 +79,59 @@ for (const page of powerToolsPages) {
 		`/brain/power-tools/${page}/`;
 }
 
+// Projects used to be filed by three sections — `/smart-home-projects/`,
+// `/home-projects/`, `/lab-projects/` — with a `3d-prints/` sub-section under
+// two of them, so a project's URL encoded both what it was for and how it was
+// made. Every project now lives at `/projects/<folder>/`, flat, because the
+// category is frontmatter: re-filing a project is a one-line edit and the link
+// people saved still works. These are in the wild — in YouTube descriptions,
+// in the GitHub READMEs, in bookmarks — so every one of them keeps working.
+const retiredProjectUrls = {
+	'/smart-home-projects/bruh-playhouse/': '/projects/playhouse/',
+	'/smart-home-projects/hype-button/': '/projects/hype-button/',
+	'/smart-home-projects/irrigation-system/': '/projects/irrigation-system/',
+	'/smart-home-projects/smart-candlet/': '/projects/smart-candle/',
+	'/home-projects/beautiful-childproof-doorknob/': '/projects/childproof-doorknob/',
+	'/home-projects/tablet-wall-mount/': '/projects/tablet-wall-mount/',
+	'/home-projects/led-light-for-lawnmower/': '/projects/lawnmower-led-light/',
+	'/home-projects/3d-prints/couch-cupholder/': '/projects/couch-cupholder/',
+	'/home-projects/3d-prints/magnetic-ring-unlocker/': '/projects/magnetic-ring-unlocker/',
+	'/lab-projects/50ml-tube-mixer/': '/projects/50ml-tube-mixer/',
+	'/lab-projects/96-well-plate-inverter/': '/projects/96-well-plate-inverter/',
+	'/lab-projects/cellcube-bioreactor-controller/': '/projects/cellcube-bioreactor-controller/',
+	'/lab-projects/peristaltic-dosing-pump/': '/projects/peristaltic-dosing-pump/',
+	'/lab-projects/3d-prints/10ml-syringe-puller/': '/projects/syringe-puller/',
+	'/lab-projects/3d-prints/15ml-tube-megarack/': '/projects/15ml-tube-megarack/',
+	'/lab-projects/3d-prints/bsc-bottle-holder/': '/projects/bsc-bottle-holder/',
+	'/lab-projects/3d-prints/lab-tape-dispenser-clip/': '/projects/tape-dispenser-clip/',
+	'/lab-projects/3d-prints/tube-rack-for-cedex-bioht/': '/projects/cedex-tube-rack/',
+	'/lab-projects/3d-prints/uv-flashlight/': '/projects/uv-flashlight/',
+	// The two "3D prints" index pages were link lists of the pages either side
+	// of them. The project list is generated from the projects themselves now,
+	// so it can never fall behind the way a hand-written list did.
+	'/home-projects/3d-prints/overview/': '/project-list/',
+	'/lab-projects/3d-prints/overview/': '/project-list/',
+};
+
+// A redirect to a page this build didn't produce lands people on the 404 by way
+// of a stop they didn't need. The old URLs of pages that are still drafts were
+// never live either, so on production they simply stay 404 — and the redirect
+// switches itself on with the page the day the draft ships.
+const draftSlugs = new Set(draftProjects.map((p) => p.slug.replace(/^projects\//, '')));
+const liveProjectUrls = Object.fromEntries(
+	Object.entries(retiredProjectUrls).filter(
+		([, to]) => showDrafts || !draftSlugs.has(to.replace(/^\/projects\/|\/$/g, ''))
+	)
+);
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://bruhautomation.com',
-	redirects: retiredAppUrls,
+	// The repo is sorted by project: `projects/` and `apps/` hold the words,
+	// pictures and files; `site/` holds the machinery that renders them.
+	srcDir: './site',
+	publicDir: './site/public',
+	redirects: { ...retiredAppUrls, ...liveProjectUrls },
 	integrations: [
 		starlight({
 			plugins: [starlightImageZoom()],
@@ -74,16 +139,16 @@ export default defineConfig({
 			editLink: { baseUrl: 'https://github.com/bruhautomation/bruhautomation3/edit/main/' },
 			lastUpdated: true,
 			components: {
-				ThemeSelect: './src/components/ThemeToggle.astro',
+				ThemeSelect: './site/components/ThemeToggle.astro',
 				// Adds the site version to the header, linking to /changelog/.
 				// The changelog is not in the sidebar: a "what changed on the
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
-				SocialIcons: './src/components/SocialIcons.astro',
+				SocialIcons: './site/components/SocialIcons.astro',
 			},
 			logo: {
-				dark: './src/assets/bruh-logo-light.svg',
-				light: './src/assets/bruh-logo-dark.svg',
+				dark: './site/assets/bruh-logo-light.svg',
+				light: './site/assets/bruh-logo-dark.svg',
 				replacesTitle: true,
 			},
 			social: [
@@ -91,7 +156,7 @@ export default defineConfig({
 				{ icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@BRUHAutomation' },
 			],
 			customCss: [
-				'./src/styles/custom.css',
+				'./site/styles/custom.css',
 			],
 			head: [
 				// Note: no global `description` meta — every page (docs frontmatter,
@@ -177,34 +242,11 @@ export default defineConfig({
 						{ label: 'Smart Home Fundamentals', slug: 'smart-home-fundamentals' },
 					],
 				},
-				{
-					label: 'Smart Home',
-					collapsed: true,
-					items: [
-						{ label: 'BRUH Playhouse', slug: 'smart-home-projects/bruh-playhouse' },
-						{ label: 'Hype Button', slug: 'smart-home-projects/hype-button' },
-						{ label: 'Irrigation System', slug: 'smart-home-projects/irrigation-system' },
-						{ label: 'Smart Candle', slug: 'smart-home-projects/smart-candlet' },
-					],
-				},
-				{
-					label: 'Maker',
-					collapsed: true,
-					items: [
-						{ label: 'Childproof Doorknob', slug: 'home-projects/beautiful-childproof-doorknob' },
-						{ label: 'Couch Cupholder', slug: 'home-projects/3d-prints/couch-cupholder' },
-						{ label: 'Tablet Wall Mount', slug: 'home-projects/tablet-wall-mount' },
-					],
-				},
-				{
-					label: 'Lab',
-					collapsed: true,
-					items: [
-						{ label: '10mL Syringe Puller', slug: 'lab-projects/3d-prints/10ml-syringe-puller' },
-						{ label: 'BSC Bottle Holder', slug: 'lab-projects/3d-prints/bsc-bottle-holder' },
-						{ label: 'Tape Dispenser Clip', slug: 'lab-projects/3d-prints/lab-tape-dispenser-clip' },
-					],
-				},
+				// Home Automation, Mounts & Enclosures, Around the House,
+				// Workshop & Garage, Lab & Science — generated from the projects
+				// themselves, so a new project folder is a new sidebar entry and
+				// a category with nothing published in it does not appear at all.
+				...projectGroups,
 				{
 					label: 'Apps',
 					collapsed: true,
@@ -285,23 +327,12 @@ export default defineConfig({
 				},
 				// Dev-only: in-development (draft) pages, visible under `npm run dev`,
 				// omitted from production builds. See `showDrafts` at the top.
-				...(showDrafts
+				...(showDrafts && draftProjects.length > 0
 					? [
 							{
 								label: '🚧 In Development',
 								badge: { text: 'Dev only', variant: 'caution' },
-								items: [
-									{ label: 'LED Light for Lawnmower', slug: 'home-projects/led-light-for-lawnmower' },
-									{ label: 'Magnetic Ring Unlocker', slug: 'home-projects/3d-prints/magnetic-ring-unlocker' },
-									{ label: '3D Prints Overview', slug: 'home-projects/3d-prints/overview' },
-									{ label: '15mL Tube Megarack', slug: 'lab-projects/3d-prints/15ml-tube-megarack' },
-									{ label: '50mL Tube Mixer', slug: 'lab-projects/50ml-tube-mixer' },
-									{ label: '96-Well Plate Inverter', slug: 'lab-projects/96-well-plate-inverter' },
-									{ label: 'CEDEX BioHT Tube Rack', slug: 'lab-projects/3d-prints/tube-rack-for-cedex-bioht' },
-									{ label: 'Cellcube Bioreactor Controller', slug: 'lab-projects/cellcube-bioreactor-controller' },
-									{ label: 'Peristaltic Dosing Pump', slug: 'lab-projects/peristaltic-dosing-pump' },
-									{ label: 'UV Flashlight', slug: 'lab-projects/3d-prints/uv-flashlight' },
-								],
+								items: draftProjects,
 							},
 						]
 					: []),

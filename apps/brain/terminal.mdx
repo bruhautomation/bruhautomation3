@@ -1,0 +1,139 @@
+---
+title: Terminal
+description: The real Claude Code CLI in your browser with your /config in front of it — as a chat, or as a true terminal. Same session, same login, one button between them.
+---
+
+The Terminal tab is Claude Code itself, running inside the add-on with your Home Assistant
+config in front of it and native access to your house: read states, call services, check
+history and traces, edit YAML, reload a domain.
+
+It's the same terminal the add-on runs, served through the same panel — so there's no second
+sidebar entry and no second login.
+
+![The brAIn Terminal tab in chat mode: the question "The hallway light came on at 3am again. Find out why and fix it", a folded Thinking line, five folded tool calls including get_logbook and get_automation_trace, and Claude's explanation and confirmation that it edited the automation, validated the YAML and reloaded](./images/panel-terminal.webp)
+
+## What you'd actually use it for
+
+The terminal is the right tab when the job is *do this to my house*, rather than *tell me
+about my house*.
+
+- **"Why did the hallway light come on at 3am?"** — it reads the logbook, finds the
+  automation, pulls the trace, and shows you the trigger that fired and the condition that
+  passed.
+- **"Write me an automation that turns the towel rail on when the shower humidity spikes."**
+  — it writes the YAML, validates it, reloads the domain, and then reads the trace to check
+  it actually fires.
+- **"Rename every switch in the garage to what it actually controls."** — it lists them,
+  proposes names from what each one is wired to, and renames the lot.
+- **"Something's wrong with my energy dashboard."** — it reads the dashboard, the statistics
+  behind it, and the error log, and tells you which sensor stopped feeding it.
+- **"Clean up the entities left behind by the Hue bridge I removed."** — dry run first, so
+  you see the list before anything goes.
+
+Anything it writes to under `/config` is snapshotted first, so
+[`brain undo`](/brain/cli/#undo) puts a file back if you don't like the result.
+
+## Two faces, one session
+
+The button in the corner switches between them, and so does **⚙ Settings**. Both run the
+same Claude Code, on the same login, in the same `/config`, with the same permissions — the
+difference is entirely how you see it.
+
+**Chat** is the default. Claude Code's output rendered as a conversation: text that reflows
+to your screen, code blocks that scroll inside their own box, tool calls folded into one line
+each (tap one for its arguments and result), reasoning behind a *Thinking* line, and a real
+text box so dictation and autocorrect behave. **⏹** stops an answer in progress; **＋**
+starts a new chat. It survives a reload, a locked phone, and the add-on restarting.
+
+**Classic** is a true terminal — ttyd over tmux. Use it for anything that draws its own
+screen (a TUI, `htop`, an installer), for running shell commands yourself, or just because
+you prefer it.
+
+:::note[The switch carries the conversation, both ways]
+Going to Classic releases the chat's session and opens the terminal already inside it.
+Coming back picks up whatever the terminal was last doing, transcript and all. You don't
+have to finish a thought in the face you started it in.
+
+One honest limit: only one Claude Code process can own a conversation at a time, so this is a
+hand-off, not a mirror — the face you leave lets go, the face you arrive in takes over with
+the full history. Your shell in the classic terminal is never killed to make that work; if
+you had something running, it's still sitting there.
+:::
+
+## The command palette
+
+Type **`/`** for Claude Code's own commands, or **`brain`** / **`ha`** for brAIn's.
+
+The palette lists what *your* install actually has — including anything you've put in
+`/config/.claude/commands`, and every subcommand the two [CLI dispatchers](/brain/cli/)
+print. Neither list is written down in the panel, so neither can go stale. ↑/↓ to move,
+Enter or Tab to pick. A few Claude Code commands are REPL-only (`/help` among them) and say
+so rather than failing.
+
+## On a wide screen, a rail of conversations
+
+From about **1100px** the chat grows a column down the left listing every conversation in
+`/config` — whichever face made it — with **＋** for a new one and the one you're in marked
+rather than hidden. Picking one resumes it.
+
+It's the same list and the same resume as the ⋯ menu, so nothing lives only in the rail.
+Below that width it isn't drawn at all: 248px of conversations is most of a phone, and
+**⋯ → Conversations** is still the way in.
+
+:::note[A new chat doesn't lose the old one]
+Claude Code keeps the conversation and it stays in the list. What a new chat costs is that
+the next thing you say belongs to a separate conversation — not that anything was forgotten.
+:::
+
+## Which model, and how full
+
+Under the message box, quietly: the model that's actually answering, and how much of the
+context window the conversation is using — `42k / 200k context · 21%`, turning amber past
+80%.
+
+The number is the CLI's own report of what it sent on the last turn, and what it sent *is*
+the conversation so far, so it's measured rather than estimated. Cached parts count: a
+cached prompt still occupies the window, it's only cheaper to send. For a model with no
+published window, you get the token count and no percentage — a percentage of a guessed
+denominator is worse than none.
+
+## The ⋯ menu
+
+- **New chat** — start again in a separate conversation.
+- **Conversations** — the same list as the rail: every conversation in `/config`, started in either face. Pick one and
+  it replays into the pane and carries on. Both faces stand in the same directory, which is
+  what lets each see the other's conversations at all: Claude Code files them per working
+  directory.
+- **Session details** — the model, the project directory, how you're being billed, and this
+  conversation's id. Copy the id to resume the same conversation from an SSH session or
+  another machine.
+- **Switch face** — the same switch as the corner button.
+
+:::tip[A per-message price only appears if an API key is paying]
+On a Pro or Max subscription those tokens are already bought, so there is nothing to charge
+— the footnote shows the duration and turn count instead.
+:::
+
+## On a phone
+
+The terminal takes the room it needs. The bar above folds away by itself while the software
+keyboard is up and comes back when you dismiss it; **⤢** in the corner folds it away for
+good, and the same button brings it back. tmux drops its status line on a narrow terminal
+too — one row out of about twenty, spent on the date.
+
+In Classic, a one-tap toolbar sits above the keyboard with the keys a terminal needs and a
+touchscreen doesn't have: `ESC`, `Tab`, arrows, `PgUp`/`PgDn`, `^C`, `^D`, `^L`, `^U`, and
+the punctuation that's two keyboard layers deep on iOS — `/`, `@`, `#`, `!`, `|`. Copying an
+OAuth URL out of the terminal works, which on iOS it normally doesn't.
+
+## Permissions
+
+The terminal runs with the same pre-approved tool permissions as the rest of brAIn, written
+to `/config/.claude/settings.local.json` at startup — MCP tools, Bash, Read, Write, Edit,
+WebFetch and WebSearch. Claude Code runs as a non-root user, and `secrets.yaml` is never
+snapshotted and never edited.
+
+If you'd rather not be asked at all, `dangerously_skip_permissions` in the add-on
+configuration turns the prompts off for the interactive terminal only. It's **off** by
+default and it's the one option worth thinking about before you change it. See
+[Reference](/brain/reference/).
