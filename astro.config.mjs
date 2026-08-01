@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
-import { groupByCategory, readProjects } from './site/catalog.mjs';
+import { APPS, groupByCategory, iconMaskUrl, readProjects } from './site/catalog.mjs';
 
 // Draft workflow (see site/scripts/build.mjs and site/content.config.ts):
 // A page with `draft: true` is HIDDEN on the Vercel production deployment (the
@@ -24,7 +24,8 @@ const showDrafts =
 // adding a folder and nothing else, and re-filing one is a one-line edit
 // inside that folder. See site/catalog.mjs.
 const allProjects = readProjects().filter((p) => p.guide);
-const projectGroups = groupByCategory(allProjects.filter((p) => !p.draft)).map((group) => ({
+const publishedGroups = groupByCategory(allProjects.filter((p) => !p.draft));
+const projectGroups = publishedGroups.map((group) => ({
 	label: group.label,
 	collapsed: true,
 	items: group.projects.map((p) => ({ label: p.title, slug: `projects/${p.slug}` })),
@@ -33,6 +34,39 @@ const draftProjects = allProjects
 	.filter((p) => p.draft)
 	.sort((a, b) => a.title.localeCompare(b.title))
 	.map((p) => ({ label: p.title, slug: `projects/${p.slug}` }));
+
+// Sidebar group icons.
+//
+// Starlight gives a sidebar group no hook of its own — no id, no class, nothing
+// a stylesheet can match on — so the only way to reach one from CSS is by
+// position. That is fine as long as the positions are counted from the same
+// list that builds the sidebar, and a disaster when they are typed into a
+// stylesheet by hand: adding Mounts & Enclosures and Workshop & Garage slid
+// every icon one group along (Around the House wore the flask) and pushed the
+// Apps icon off the end, where it silently rendered as nothing.
+//
+// So the rules are generated here. `sidebarIcons` is the running order of the
+// top-level groups — Welcome first with no icon, then the categories that have
+// something published, then Apps — and the nth-child index falls out of it.
+const sidebarIcons = [null, ...publishedGroups.map((g) => g.icon), APPS.icon];
+const sidebarIconCss = sidebarIcons
+	.map((icon, i) =>
+		icon
+			? `.top-level > li:nth-child(${i + 1}) > details > summary > .group-label > .large::before {
+	content: '';
+	display: inline-block;
+	width: 1.1em;
+	height: 1.1em;
+	flex-shrink: 0;
+	background-color: currentColor;
+	opacity: 0.6;
+	-webkit-mask: ${iconMaskUrl(icon)} center / contain no-repeat;
+	mask: ${iconMaskUrl(icon)} center / contain no-repeat;
+}`
+			: ''
+	)
+	.filter(Boolean)
+	.join('\n');
 
 // BRUH Terminal (`/bruh-claude/`) and BRUH Insights (`/bruh-insights/`) were
 // merged into brAIn (`/brain/`). Those URLs are in the wild — in the add-on
@@ -159,6 +193,9 @@ export default defineConfig({
 				'./site/styles/custom.css',
 			],
 			head: [
+				// The sidebar group icons, generated above from the sidebar's own
+				// running order so the two can never drift apart again.
+				{ tag: 'style', content: sidebarIconCss },
 				// Note: no global `description` meta — every page (docs frontmatter,
 				// index.astro, command-generator.astro) sets its own, so a global one
 				// here would emit a duplicate <meta name="description"> on every page.

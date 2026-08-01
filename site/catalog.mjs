@@ -41,28 +41,59 @@ export const CATEGORIES = [
 		id: 'home-automation',
 		label: 'Home Automation',
 		blurb: 'Connected devices built with ESPHome and Home Assistant.',
+		icon: `<path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5z"/><path d="M9 16.5a4 4 0 0 1 6 0"/><path d="M7.5 14a7 7 0 0 1 9 0"/><circle cx="12" cy="19" r="0.5" fill="currentColor"/>`,
 	},
 	{
 		id: 'mounts-enclosures',
 		label: 'Mounts & Enclosures',
 		blurb: 'Mounts, brackets, and cases for gear you already own.',
+		icon: `<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>`,
 	},
 	{
 		id: 'around-the-house',
 		label: 'Around the House',
 		blurb: 'Fixes, organisers, and upgrades for everyday household annoyances.',
+		icon: `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>`,
 	},
 	{
 		id: 'workshop-garage',
 		label: 'Workshop & Garage',
 		blurb: 'Tool holders, jigs, and vehicle parts for the shop.',
+		// A hammer, not a second wrench: Around the House already has the wrench,
+		// and two entries with the same glyph read as one category split in half.
+		icon: `<path d="M14.5 5.5 18 2l4 4-3.5 3.5-1.8-1.8-2.4 2.4-2-2 2.4-2.4z"/><path d="m13.3 8.7-9.6 9.6a1.7 1.7 0 0 0 2.4 2.4l9.6-9.6"/>`,
 	},
 	{
 		id: 'lab-science',
 		label: 'Lab & Science',
 		blurb: 'Bench equipment and automation for the biotech lab.',
+		icon: `<path d="M9 3h6v6l3 9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2l3-9V3z"/><line x1="8" y1="3" x2="16" y2="3"/><path d="M10 15h4"/>`,
 	},
 ];
+
+/** The add-ons. Not a project category, but it sits beside them in the nav. */
+export const APPS = {
+	id: 'apps',
+	label: 'Apps',
+	blurb: 'Home Assistant add-ons — brAIn and BRUH Minecraft.',
+	icon: `<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>`,
+};
+
+/**
+ * An icon's paths wrapped into a full SVG, as a CSS `url()` for `mask-image`.
+ *
+ * The same markup draws the card on the landing page and the glyph in the
+ * sidebar. They were separate copies before, pinned to sidebar positions in a
+ * stylesheet — so adding two categories silently slid every sidebar icon one
+ * place along and pushed the Apps icon off the end entirely.
+ */
+export function iconMaskUrl(icon) {
+	const svg =
+		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" ` +
+		`stroke="currentColor" stroke-width="2" stroke-linecap="round" ` +
+		`stroke-linejoin="round">${icon}</svg>`;
+	return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
 
 export const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
 
