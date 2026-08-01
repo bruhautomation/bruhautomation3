@@ -71,20 +71,30 @@ export const CATEGORIES = [
 	},
 ];
 
-/**
- * The apps. Not a project category, but it sits beside them in the nav.
- *
- * Two kinds, and the difference is what you do with them: the add-ons are
- * installed into a Home Assistant and documented here, and the web apps are
- * links out to something already running. Nothing about a web app is in this
- * repo, so they are links and never pages — a stub page for an app documented
- * on its own site is a second copy to keep true.
- */
+/** The add-ons. Not a project category, but it sits beside them in the nav. */
 export const APPS = {
 	id: 'apps',
 	label: 'Apps',
-	blurb: 'Home Assistant add-ons, and web apps that need nothing installed.',
+	blurb: 'Home Assistant add-ons — brAIn and BRUH Minecraft.',
 	icon: `<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>`,
+};
+
+/**
+ * Work that isn't a BRUH project, and isn't in this repo — it just gets a link.
+ *
+ * Everything else in the nav is something this repo holds: a project folder, or
+ * an add-on's docs under `apps/`. These are finished sites that document
+ * themselves, so they are links and never pages — a stub page for an app
+ * explained better on its own site is a second copy to keep true. It sits last
+ * for the same reason, after everything the repo can actually show you.
+ */
+export const OTHER_PROJECTS = {
+	id: 'other-projects',
+	label: 'Other Projects',
+	blurb: "Other projects I've worked on.",
+	// An arrow leaving a box: every item under this heading goes off-site, and
+	// it is the one group in the nav where that is true of all of it.
+	icon: `<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6"/>`,
 };
 
 /**
