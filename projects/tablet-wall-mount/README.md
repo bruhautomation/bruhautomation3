@@ -14,6 +14,7 @@ Flush magnetic tablet mount built around a keystone jack plate.
 
 - `models/` — print-ready STL files (these are what the site previews)
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
+- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 - `images/` — photos and diagrams
 
 ## Hardware

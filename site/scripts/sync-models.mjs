@@ -1,6 +1,7 @@
 /**
- * Mirrors every `projects/<slug>/models/` folder into `site/public/models/<slug>/`
- * so the 3D viewer and the download links can reach them.
+ * Mirrors every `projects/<slug>/models/` and `projects/<slug>/preview/` folder
+ * into `site/public/models/<slug>/` so the 3D viewer and the download links can
+ * reach them.
  *
  * The STL that a page previews and the STL you print are the same file, and it
  * lives in the project folder with the CAD it was exported from. Astro can only
@@ -26,24 +27,37 @@ let files = 0;
 let projects = 0;
 
 for (const slug of readdirSync(projectsDir)) {
-	const src = join(projectsDir, slug, 'models');
-	if (!existsSync(src) || !statSync(src).isDirectory()) continue;
+	// `models/` is what the author exported; `preview/` is tessellated from the
+	// CAD by site/scripts/build-cad-previews.py. They keep separate URL prefixes
+	// so a preview can never be mistaken for the real export — including when a
+	// project has both under the same part name.
+	let synced = false;
 
-	const dest = join(outDir, slug);
-	mkdirSync(dest, { recursive: true });
-	projects++;
+	for (const [folder, prefix] of [
+		['models', ''],
+		['preview', 'preview'],
+	]) {
+		const src = join(projectsDir, slug, folder);
+		if (!existsSync(src) || !statSync(src).isDirectory()) continue;
 
-	for (const name of readdirSync(src)) {
-		const from = join(src, name);
-		if (!statSync(from).isFile()) continue;
-		const to = join(dest, name);
-		try {
-			linkSync(from, to);
-		} catch {
-			copyFileSync(from, to); // different filesystem, or a platform without links
+		const dest = join(outDir, slug, prefix);
+		mkdirSync(dest, { recursive: true });
+		synced = true;
+
+		for (const name of readdirSync(src)) {
+			const from = join(src, name);
+			if (!statSync(from).isFile()) continue;
+			const to = join(dest, name);
+			try {
+				linkSync(from, to);
+			} catch {
+				copyFileSync(from, to); // different filesystem, or a platform without links
+			}
+			files++;
 		}
-		files++;
 	}
+
+	if (synced) projects++;
 }
 
 console.log(`sync-models: ${files} model${files === 1 ? '' : 's'} from ${projects} project${projects === 1 ? '' : 's'} → site/public/models/`);
