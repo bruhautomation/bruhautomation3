@@ -1,0 +1,204 @@
+---
+title: Changelog
+description: Release notes for the BRUH Minecraft Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="1.14.3" date="July 20, 2026" latest>
+<Changes type="changed">
+
+- **Sidebar naming**: the ingress panel is now titled "BRUH Minecraft" (was "Minecraft") to match the BRUH family branding.
+
+</Changes>
+</Release>
+
+<Release version="1.14.2" date="July 18, 2026">
+<Changes type="changed">
+
+- **Renamed the add-on to BRUH Minecraft** as part of the unified BRUH Apps branding; new "Solid Blocks" icon, logo, and panel favicon from the BRUH Automation brand system. No functional changes.
+
+</Changes>
+</Release>
+
+<Release version="1.14.1" date="July 6, 2026">
+<Changes type="fixed">
+
+- **The add-on can be built and updated again on current Home Assistant.** Supervisor 2026.04.0 retired the legacy add-on builder: `build.yaml` is ignored and the `BUILD_FROM` build argument is no longer passed, so the Dockerfile's `FROM ${BUILD_FROM}` resolved to an empty base image and the build failed before it started. The Dockerfile now carries its own default (`ghcr.io/home-assistant/base:3.24`, the official multi-arch base); older Supervisors keep overriding it through `build.yaml`.
+
+</Changes>
+<Changes type="changed">
+
+- **Base image: Alpine 3.19 → 3.24.** Java still comes bundled from Eclipse Temurin, so the server runtime is unchanged.
+- **The volume map uses the current `homeassistant_config` type** instead of the legacy `config` alias, with an explicit `path: /config` so worlds, backups, and the panel keep their long-standing mount point (requires Supervisor 2023.09+).
+
+</Changes>
+</Release>
+
+<Release version="1.14.0" date="June 23, 2026">
+<Changes type="added">
+
+- **Featured worlds — one-click, fully server-side installs.** The Worlds tab gained a **Featured worlds** section, starting with **Drehmal: APOTHEOSIS**. Click **Install** and the add-on downloads the complete community world (save plus bundled datapacks) onto the server and stages it as a new switchable world — your current world is untouched until you **Switch** to it.
+- **Zero local installs for everyone, including iPad / iPhone over Geyser.** Because the world and its datapacks live entirely server-side, anyone can join and explore with nothing to download. Switching pins the server to the software + Minecraft version the world needs (Drehmal needs **Paper 1.20.1**) and turns Bedrock support on automatically.
+- **Java resource pack auto-converted to a Bedrock pack** that Geyser pushes to phones and tablets on join, so iPads get the custom textures with no manual step (best-effort — custom 3D models and animated textures don't convert). Drehmal's optional Fabric mods are client-side only and are simply skipped on Bedrock.
+
+</Changes>
+</Release>
+
+<Release version="1.13.0">
+<Changes type="added">
+
+- **New-world setup wizard.** The Worlds tab's "Create a new world" form is now a multi-step wizard (name + seed → gameplay → rules → players & access → review) that stages every per-world setting in one go — gamemode, force-gamemode, difficulty, terrain, PVP, hardcore, max-players, whitelist, spawn protection. On submit it asks "Switch to it now?" so you don't end up editing the *old* active world's settings.
+- **"World-generation only" badges.** `level-seed`, `level-type`, `level-name`, `initial-enabled-packs`, and `initial-disabled-packs` are baked into a world at generation time; the Server Properties tab now shows an inline `world-gen only` badge on those rows with a hover explanation.
+- **Headline gameplay keys pulled to the top** of the Server Properties table, plus an "Editing world X" context line so edits never feel like they applied to the wrong world.
+
+</Changes>
+<Changes type="fixed">
+
+- **The "creative doesn't stick" trap for returning players.** Editing `gamemode` in the panel now also auto-sets `force-gamemode=true`, so the change applies to returning players, not just brand-new ones (surfaced in the save response; you can flip it back off explicitly).
+- **World name ≠ level-name confusion.** New worlds created via either wizard now set `level-name=<profile name>`, so you see one name everywhere (Worlds tab, Server Properties, Minecraft's F3 debug). Existing worlds are unchanged.
+- **Tune dialog said "memory: unset" when memory was set.** The Supervisor only stores user-overridden values, so a default `memory_mb` wasn't in the file; the dialog now falls back to the schema default when the key is absent.
+
+</Changes>
+</Release>
+
+<Release version="1.12.0">
+<Changes type="added">
+
+- **9-step setup wizard.** Expanded from 7 steps with a dedicated **Connectivity** step (audience + Bedrock cross-play), a **Players & access** step (max-players, whitelist, spawn protection), and a **Performance** step with a live capacity preview and sanity warnings (heap-vs-host, sim>view).
+- **World export.** A **Download** button on every Worlds-tab row streams a zip of that world's save data plus its `server.properties` — works on the active world too.
+- **Per-world gameplay settings shown inline** on the Worlds tab (gamemode / difficulty / terrain / online-mode / whitelist), and **Tune for my hardware** now shows only the delta from your current values.
+
+</Changes>
+<Changes type="fixed">
+
+- **OP / kick / ban rejected Bedrock players** like `.Ben13765`. Floodgate prefixes Bedrock usernames with `.`; the Players-tab regex rejected the leading dot and returned 400. It now accepts `.`, `*`, and `_` while staying tightly bounded against injection.
+- **Server Properties showed `minecraft\:normal` literally.** Minecraft re-saves `server.properties` with Java's escaping; `_read_properties` now unescapes Java values (`\:`, `\=`, `\#`, `\!`, `\\`, `\n`, `\t`, `\r`, `\uXXXX`).
+- **Server Properties text fields were guess-the-shape.** The panel now renders `<select>` for enums and bools and `<input type="number">` with schema bounds for ints, driven by type metadata from `/api/properties`.
+
+</Changes>
+</Release>
+
+<Release version="1.11.0">
+<Changes type="changed">
+
+- **The setup wizard is now a real 7-step walkthrough** — EULA, server software (with TPS-vs-vanilla detail), audience (online vs offline mode), first world, performance (auto-detects host RAM and CPU), plugins, and review & start — driving the whole first-run shape from one place instead of leaving it for the user to hunt down.
+- **`/api/setup` accepts the full wizard body**, writing install-level options via the Supervisor and per-world gameplay keys into the named world's `server.properties`, staging the world skeleton if it doesn't exist yet.
+
+</Changes>
+<Changes type="fixed">
+
+- **The wizard appeared on every page load.** Its `display: flex` rule beat the browser's default `[hidden] { display: none }`; an explicit `.setup-overlay[hidden] { display: none !important; }` fixes it.
+- **Dark-text-on-dark wizard in light mode.** The wizard CSS referenced a non-existent variable and dark literals; every rule now uses the real theme tokens and sets `color` explicitly on text-bearing elements.
+- **"Is this a first run?" detection hardened** to gate on *two* signals — a persistent `/data/panel/.setup-completed` marker and an unset EULA — so the wizard can't reappear after a config edit or an upgrade from a pre-wizard release.
+
+</Changes>
+</Release>
+
+<Release version="1.10.0">
+<Changes type="added">
+
+- **First-run wizard.** Install, start, open the panel, and a welcome overlay walks you through accepting the EULA, choosing **Internet / public** or **LAN / family** mode, and picking a server type. The add-on now idles cleanly when the EULA is unset instead of hard-exiting, so the panel can run the wizard.
+- **Import an existing world.** The Worlds tab takes a `.zip` (up to 2 GB), finds the directory containing `level.dat` automatically, and stages it as a switchable world.
+- **Resource-pack hosting.** A new **Resource Packs** tab serves an uploaded `.zip` on your LAN and writes the URL + SHA-1 straight into the active world's `server.properties`.
+- **Crash banner + smart performance hints** on the dashboard — the last few error lines surface in a red banner on an unexpected JVM exit, and a slipping TPS suggests the most useful knob to turn first.
+
+</Changes>
+</Release>
+
+<Release version="1.9.0">
+<Changes type="added">
+
+- **"Tune for my hardware" + TPS health badge.** The Performance card colours each TPS value (green 19.5+, yellow 17–19.5, red below 17) with an at-a-glance healthy / degraded / struggling badge, and a one-click button inspects host RAM and CPU count to propose `memory_mb`, `view-distance`, and `simulation-distance`.
+
+</Changes>
+<Changes type="changed">
+
+- **Popular-plugin tidy-up.** Removed the `install_worldguard` and `install_multiverse_core` checkboxes (both overlapped confusingly with existing features; still installable by URL), auto-enabled plugin dependencies (EssentialsX Chat → EssentialsX, ViaBackwards → ViaVersion), made the duplicate-jar quarantine name what it cleaned up, and improved the in-config docs.
+
+</Changes>
+</Release>
+
+<Release version="1.8.0">
+<Changes type="changed">
+
+- **Per-world settings — every world is now independent.** Gameplay settings are no longer global add-on options: each world owns its own `server.properties`, so a creative world and a survival world can sit side by side and switching loads each world's real settings. The HA **Configuration** tab now holds only install/container-level options; everything gameplay/world is edited from the panel's **Server Properties** tab. Migration is seamless — your current world keeps its exact settings.
+
+</Changes>
+<Changes type="removed">
+
+- **The `allow_cheats` and `initial_ops` options** (and the per-boot OP helper) — toggle command blocks / op level per-world in the panel, and op players from the Players tab, where ops now persist per-world in `ops.json`.
+
+</Changes>
+</Release>
+
+<Release version="1.7.0">
+<Changes type="fixed">
+
+- **Creative (and other gamemodes) finally stick.** A new `force_gamemode` option (default `true`) writes `force-gamemode`, putting every player into the configured gamemode on join instead of only brand-new players.
+- **The panel's Server Properties tab is now permanent** — edits write back to the add-on Configuration via the Supervisor API instead of being re-rendered away on the next restart.
+- **World switching** does exactly one clean Supervisor restart (not three racing actions), detects the active world from the add-on option, and honours the create-world seed on first boot.
+
+</Changes>
+<Changes type="changed">
+
+- **PaperMC downloads use the new v3 "fill" API** (`fill.papermc.io/v3`, sha256-verified), falling back to v2 only if v3 is unreachable.
+
+</Changes>
+</Release>
+
+<Release version="1.5.0">
+<Changes type="added">
+
+- **One-click popular plugins** (1.4.0): curated `install_<name>` checkboxes that resolve the latest Paper-compatible jar via Modrinth on every boot.
+- **Cross-version protocol bridges** (1.5.2): `install_viaversion` and `install_viabackwards` ship enabled so a Mojang release that outpaces the matching Paper build (the "Outdated server!" / "does not support Java Edition X.Y" kick) no longer locks players out.
+
+</Changes>
+<Changes type="changed">
+
+- **Curated plugin set tightened** to in-game-useful, no-extra-port tools — added GriefPrevention, mcMMO, ChestSort, and VeinMiner; dropped the web-map and voice-chat checkboxes whose default ports collided with Home Assistant.
+
+</Changes>
+<Changes type="fixed">
+
+- **A run of "Outdated server!" / version-resolution bugs** — `LATEST` resolving to bogus non-Minecraft rebuild markers on Purpur (1.5.1) and to pre-releases / RCs on Paper (1.2.7), now numerically semver-sorted with a stable-shape filter.
+- **Eclipse Temurin JRE 25** (1.5.3) replaces Alpine's JDK 21 so ViaVersion and other Java-25 plugins load, and **duplicate plugin jars are auto-quarantined** (1.5.4) to silence Paper's "Ambiguous plugin name" errors.
+- **Panel reliability** — Configuration-tab edits now re-render on the panel's Restart button (1.5.5), the nav bar stays pinned on every tab via an inner-scroll-wrapper layout (1.5.6–1.5.7), and a cache-buster ensures CSS/JS fixes actually reach users (1.5.8).
+
+</Changes>
+</Release>
+
+<Release version="1.2.0">
+<Changes type="added">
+
+- **Offline / cracked-login mode just works.** Setting `online_mode: false` accepts any Java username without an Xbox/Microsoft account; the add-on auto-forces `enforce-secure-profile=false` and the matching Geyser/Floodgate auth path so Bedrock kids join too — the whole "no-Xbox family mode" story.
+- **`geyser_mtu`, ghost-session auto-kick, connection-throttle, and idle-timeout** controls (1.2.4) tame the iOS "Connecting to multiplayer server…" hang and the "You are already connected" reconnect loop.
+
+</Changes>
+<Changes type="fixed">
+
+- **A long chain of "Please log into Xbox to join this server" fixes** (1.0.6 → 1.2.3) — patching Geyser's `auth-type`, skipping Floodgate in offline mode, and ultimately flipping Geyser's `validate-bedrock-login` so LAN-only Bedrock devices stop being kicked before any auth logic runs.
+- **A thread-safe RCON client** (`scripts/rcon_client.py`) replaces `mcrcon`, fixing the `signal only works in main thread` crash when sending console commands from the panel or HA.
+
+</Changes>
+</Release>
+
+<Release version="1.0.0">
+<Changes type="added">
+
+- **Initial release** — Paper / Purpur / Folia / Vanilla / Fabric / Forge with `LATEST` / `SNAPSHOT` / pinned versions and jar caching; an ingress panel with dashboard, live console, player management, editable server properties, plugin install/delete, and a backup browser; git-based world version control with UI restore; crash auto-restart with a rolling rate-limit; graceful RCON shutdown; loopback-only RCON with an auto-generated password; and a Home Assistant integration (12 sensors, 2 binary sensors, 4 buttons, 13 services) auto-deployed via Supervisor discovery.
+- **Bedrock cross-play** followed close behind (1.0.3–1.0.5): `enable_bedrock_support` auto-installs Geyser + Floodgate, and `host_network: true` lets the server appear in the Bedrock **Friends** tab on the LAN.
+
+</Changes>
+</Release>
+
+</Changelog>
+
+:::note
+This page highlights notable releases. The complete, unabridged history lives in the [`CHANGELOG.md`](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/bruh-minecraft-server/CHANGELOG.md) in the add-on repository.
+:::

@@ -1,0 +1,27 @@
+---
+title: Irrigation System
+description: Large-scale automated irrigation system with flow monitoring and zone control.
+---
+
+Large-scale automated irrigation system covering 1500ft with 7 independent zones, real-time flow monitoring, manifold pressure/temperature/TDS sensors, and fertilizer dosing control. Perfect for garden beds, raised planters, orchards, and complete landscape automation.
+
+## How It Works
+
+An ESP32 controls multiple irrigation zones via I2C relay expander (PCF8574) while monitoring flow rates through each zone with pulse counters. The ADS1115 ADC measures manifold pressure, temperature (via NTC thermistor), and TDS (total dissolved solids) for nutrient tracking. Separate flow meters on the fertilizer inflow and outflow allow precise nutrient metering.
+
+## Hardware
+
+- **Board:** ESP32
+- **Flow Sensors:** Pulse counters (10 total: 7 zones + 1 manifold + 2 fertilizer)
+- **ADC:** ADS1115 for analog sensors (pressure, temperature, TDS)
+- **Relay Expander:** PCF8574 I2C I/O expander (7 zones + 2 valves)
+- **Sensors:** Pressure transducer, NTC thermistor, TDS electrode
+- **Control:** 7 zone solenoid valves + pump valve + fertilizer valve
+
+## Firmware
+
+This project runs [ESPHome](https://esphome.io/). The full configuration is available on [GitHub](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/irrigation-system).
+
+## Downloads
+
+[Download on GitHub](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/irrigation-system)

@@ -1,6 +1,6 @@
 {
   "name": "bruhautomation",
-  "description": "BRUH Automation docs site — DIY smart home, maker, and lab projects",
+  "description": "BRUH Automation — DIY smart home devices, 3D prints, workshop builds, and biotech lab tools",
   "author": "BRUH Automation",
   "homepage": "https://bruhautomation.com",
   "repository": {
@@ -8,11 +8,11 @@
     "url": "https://github.com/bruhautomation/bruhautomation3.git"
   },
   "type": "module",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "node scripts/build.mjs",
+    "dev": "node site/scripts/sync-models.mjs && astro dev",
+    "start": "node site/scripts/sync-models.mjs && astro dev",
+    "build": "node site/scripts/sync-models.mjs && node site/scripts/build.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
