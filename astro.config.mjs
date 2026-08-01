@@ -360,6 +360,20 @@ export default defineConfig({
 								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
 							],
 						},
+						// The web apps are links out, not docs. Everything above
+						// this line has pages in `apps/`; these two are running
+						// sites that document themselves, so the nav sends people
+						// there rather than to a stub that would need keeping true.
+						// They open in the same tab and carry no external marker,
+						// which is what every other off-site link here does — the
+						// group label is what says these two leave the docs.
+						{
+							label: 'Web Apps',
+							items: [
+								{ label: 'Endless', link: 'https://endless-devotional.vercel.app/' },
+								{ label: 'Pray His Promises', link: 'https://prayhispromises.com/' },
+							],
+						},
 					],
 				},
 				// Dev-only: in-development (draft) pages, visible under `npm run dev`,

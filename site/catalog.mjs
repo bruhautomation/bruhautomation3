@@ -71,11 +71,19 @@ export const CATEGORIES = [
 	},
 ];
 
-/** The add-ons. Not a project category, but it sits beside them in the nav. */
+/**
+ * The apps. Not a project category, but it sits beside them in the nav.
+ *
+ * Two kinds, and the difference is what you do with them: the add-ons are
+ * installed into a Home Assistant and documented here, and the web apps are
+ * links out to something already running. Nothing about a web app is in this
+ * repo, so they are links and never pages — a stub page for an app documented
+ * on its own site is a second copy to keep true.
+ */
 export const APPS = {
 	id: 'apps',
 	label: 'Apps',
-	blurb: 'Home Assistant add-ons — brAIn and BRUH Minecraft.',
+	blurb: 'Home Assistant add-ons, and web apps that need nothing installed.',
 	icon: `<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>`,
 };
 
