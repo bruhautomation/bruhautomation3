@@ -4,11 +4,11 @@ description: A flush, magnetic, universal tablet wall mount built around a stand
 ---
 
 import { Image } from 'astro:assets';
-import StlViewer from '../../site/components/StlViewer.astro';
 import tabletFront from './images/tablet-front.png';
 import tabletSide from './images/tablet-side.png';
 import tabletInstalled from './images/tablet-installed.jpg';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 ## Background
 
@@ -29,7 +29,7 @@ After a few prototypes, I landed on a design built around a keystone jack plate.
 
 ## Design
 
-[View 3D model on Autodesk](https://a360.co/3OQe1ig) | [Download files below](#make-your-own)
+[Download the files below](#make-your-own)
 
 <div class="image-grid">
   <figure>
@@ -67,7 +67,7 @@ Trace the interior outline of the bracket onto the wall. I installed mine about 
 3. **Route the USB cable** through the low-voltage bracket, plug it into the keystone, and **screw the plate to the bracket** with standard wall-plate screws.
 4. Mount the tablet over the plate and dress the slack back into the wall cavity.
 
-STL files for the plate (1- and 2-gang) and every keystone angle are in the [GitHub repo](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/tablet-wall-mount), and the models are previewable below.
+STL files for the plate (1- and 2-gang) and every keystone angle are in [Make Your Own](#make-your-own) below — pick a part in the viewer to spin it before you print.
 
 ## Bezel Variant
 
@@ -75,11 +75,9 @@ I also designed a bezel version when helping my parents replace old Crestron CT-
 
 ## Make Your Own
 
-STL and STEP files are in the [GitHub repo](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/tablet-wall-mount). Feel free to remix for your tablet and preferences.
+Remix it for your tablet and preferences — every part has a STEP export beside its STL in the project folder.
 
-### 3D Model Preview
-
-<StlViewer src="/models/tablet-wall-mount/keystone_plate_1_gang.stl" />
+<ProjectFiles slug="tablet-wall-mount" />
 
 ## Dashboard Setup
 

@@ -4,7 +4,6 @@ description: A low-profile, 3D printed child-proof cover for Schlage Bowery door
 ---
 
 import { Image } from 'astro:assets';
-import StlViewer from '../../site/components/StlViewer.astro';
 import doorknobBase from './images/doorknob-base.jpg';
 import doorknobTrim from './images/doorknob-trim.jpg';
 import doorknobClip from './images/doorknob-clip.jpg';
@@ -14,6 +13,7 @@ import doorknobDetail3 from './images/doorknob-detail-3.jpg';
 import doorknobCover from './images/doorknob-cover.jpg';
 import doorknobPrototypes from './images/doorknob-prototypes.jpg';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 ## The Problem
 
@@ -66,10 +66,6 @@ Best results came from an MSLA printer ([Elegoo Mars](https://amzn.to/3r8xZge)),
 
 ## Make Your Own
 
-STL and STEP files are in the [GitHub repo](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/childproof-doorknob). Feel free to remix for your knob model and printer tolerances.
+Remix it for your knob model and printer tolerances — the STEP file is in the project folder alongside the STL.
 
-[View 3D model on Autodesk](https://a360.co/44T0XOZ) | [Download on GitHub](https://github.com/bruhautomation/bruhautomation3/tree/main/projects/childproof-doorknob)
-
-### 3D Model Preview
-
-<StlViewer src="/models/childproof-doorknob/bruh_schlage_bowery_child_proof_door_knob.stl" />
+<ProjectFiles slug="childproof-doorknob" />

@@ -1,0 +1,277 @@
+---
+/**
+ * Everything a reader needs to actually build the project: the printable parts
+ * in a viewer they can spin, the firmware config in full, and one link to the
+ * folder holding the rest.
+ *
+ * It reads the project folder at build time rather than being told what's
+ * there, so a part added to `projects/<slug>/models/` shows up in the preview
+ * and a config edited on GitHub shows up in the code block — the site rebuilds
+ * on every push, so the page can never quote a file that no longer exists. A
+ * client-side fetch of raw.githubusercontent.com would be no fresher between
+ * pushes (a push is what changes the file), and would cost the syntax
+ * highlighting, a round trip, and eventually a rate limit. The "View on
+ * GitHub" link next to each file is there for anyone who wants the byte-exact
+ * current version anyway.
+ */
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { Code } from 'astro-expressive-code/components';
+import StlViewer from './StlViewer.astro';
+
+interface Props {
+	/** The project folder name, e.g. "tablet-wall-mount". */
+	slug: string;
+}
+
+const { slug } = Astro.props;
+
+const REPO = 'https://github.com/bruhautomation/bruhautomation3';
+const projectDir = join(process.cwd(), 'projects', slug);
+
+if (!existsSync(projectDir)) {
+	throw new Error(
+		`<ProjectFiles slug="${slug}"> — there is no projects/${slug}/ folder. ` +
+			`The slug must match the folder name.`
+	);
+}
+
+const folderUrl = `${REPO}/tree/main/projects/${slug}`;
+const blobUrl = (path: string) => `${REPO}/blob/main/projects/${slug}/${path}`;
+const rawUrl = (path: string) => `${REPO}/raw/main/projects/${slug}/${path}`;
+
+type Entry = { name: string; path: string; size: number };
+
+function filesIn(sub: string, extensions: string[]): Entry[] {
+	const dir = join(projectDir, sub);
+	if (!existsSync(dir)) return [];
+	return readdirSync(dir)
+		.filter((name) => extensions.some((ext) => name.toLowerCase().endsWith(ext)))
+		// Sort on the stem, so `part.stl` and `part_insert.stl` land in that
+		// order rather than however the locale ranks `.` against `_`.
+		.sort((a, b) =>
+			a.replace(/\.[^.]+$/, '').localeCompare(b.replace(/\.[^.]+$/, ''), undefined, { numeric: true })
+		)
+		.map((name) => ({ name, path: `${sub}/${name}`, size: statSync(join(dir, name)).size }));
+}
+
+/**
+ * How many matching files a folder holds, including nested ones — an Arduino
+ * sketch lives in a directory of its own, so `firmware/` is usually a folder of
+ * folders and a flat read of it finds nothing.
+ */
+function countFiles(sub: string, extensions: string[]): number {
+	const dir = join(projectDir, sub);
+	if (!existsSync(dir)) return 0;
+	let count = 0;
+	const walk = (current: string) => {
+		for (const entry of readdirSync(current, { withFileTypes: true })) {
+			if (entry.isDirectory()) walk(join(current, entry.name));
+			else if (extensions.some((ext) => entry.name.toLowerCase().endsWith(ext))) count++;
+		}
+	};
+	walk(dir);
+	return count;
+}
+
+function formatSize(bytes: number) {
+	return bytes >= 1024 * 1024
+		? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+		: `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+const models = filesIn('models', ['.stl']);
+const configs = filesIn('esphome', ['.yaml', '.yml']).map((entry) => {
+	const code = readFileSync(join(projectDir, entry.path), 'utf8').replace(/\s+$/, '');
+	return { ...entry, code, lines: code.split('\n').length };
+});
+
+// The rest of the folder, counted rather than listed. A project can carry
+// dozens of STEP exports and cut files, and a wall of download rows is not a
+// better answer than one link to the folder they all live in.
+const otherFolders = [
+	{ dir: 'cad', label: 'CAD source', exts: ['.f3d', '.step', '.stp'] },
+	{ dir: 'laser-cut', label: 'laser-cut vectors', exts: ['.dxf', '.svg'] },
+	{ dir: 'firmware', label: 'firmware', exts: ['.ino', '.h', '.cpp'] },
+	{ dir: 'arduino-legacy', label: 'legacy Arduino sketches', exts: ['.ino', '.h'] },
+	{ dir: 'fritzing', label: 'wiring diagrams', exts: ['.fzz'] },
+	{ dir: 'nextion-hmi', label: 'Nextion display projects', exts: ['.hmi'] },
+]
+	.map((group) => ({ ...group, count: countFiles(group.dir, group.exts) }))
+	.filter((group) => group.count > 0);
+
+// Long lists get truncated to the folder link; short ones are all shown.
+const MODEL_ROWS = 12;
+const shownModels = models.slice(0, MODEL_ROWS);
+const hiddenModels = models.length - shownModels.length;
+
+// A config short enough to take in at a glance is open; anything longer starts
+// folded, because a 400-line YAML between two paragraphs is a page break.
+const OPEN_UNDER_LINES = 60;
+const configsToRender = configs.map((config) => ({ ...config, open: config.lines < OPEN_UNDER_LINES }));
+---
+
+<div class="project-files" data-project={slug}>
+	{
+		models.length > 0 && (
+			<>
+				<h3 id="printable-parts">Printable parts</h3>
+				<StlViewer
+					models={models.map((model) => ({
+						name: model.name.replace(/\.stl$/i, ''),
+						src: `/models/${slug}/${model.name}`,
+					}))}
+				/>
+				<ul class="file-list">
+					{shownModels.map((model) => (
+						<li>
+							<a href={`/models/${slug}/${model.name}`} download>
+								{model.name}
+							</a>
+							<span class="file-meta">{formatSize(model.size)}</span>
+						</li>
+					))}
+				</ul>
+				{hiddenModels > 0 && (
+					<p class="file-more">
+						<a href={folderUrl}>
+							{hiddenModels} more {hiddenModels === 1 ? 'part' : 'parts'} in the project folder
+							on GitHub
+						</a>
+					</p>
+				)}
+			</>
+		)
+	}
+
+	{
+		configs.length > 0 && (
+			<>
+				<h3 id="esphome-configuration">
+					ESPHome configuration
+					{configs.length > 1 ? `s (${configs.length})` : ''}
+				</h3>
+				<p>
+					Copy this into your ESPHome directory and adjust the substitutions at the top.
+					Secrets are referenced by name — see{' '}
+					<a href={`${REPO}/blob/main/projects/secrets.yaml.example`}>
+						<code>secrets.yaml.example</code>
+					</a>
+					.
+				</p>
+				{configsToRender.map((config) => (
+					<details class="config" open={config.open}>
+						<summary>
+							<code>{config.name}</code>
+							<span class="file-meta">{config.lines} lines</span>
+						</summary>
+						<Code code={config.code} lang="yaml" meta={`title="${config.name}"`} />
+						<p class="file-more">
+							<a href={blobUrl(config.path)}>View on GitHub</a> ·{' '}
+							<a href={rawUrl(config.path)}>Download raw</a>
+						</p>
+					</details>
+				))}
+			</>
+		)
+	}
+
+	{
+		models.length === 0 && configs.length === 0 && otherFolders.length === 0 && (
+			<p class="file-empty">
+				The source files for this project aren't in the repo yet — there's nothing to download
+				beyond the notes. They land in <code>projects/{slug}/</code> when they do, and this
+				section fills itself in.
+			</p>
+		)
+	}
+
+	<p class="project-folder">
+		<a href={folderUrl}>
+			<strong>Every file for this project on GitHub →</strong>
+		</a>
+		{otherFolders.length > 0 && (
+			<span class="file-meta">
+				{'Also in the folder: '}
+				{otherFolders.map((group, i) => (
+					<>
+						<code>{group.dir}/</code>
+						{` — ${group.label}, ${group.count} ${group.count === 1 ? 'file' : 'files'}` +
+							(i < otherFolders.length - 1 ? '; ' : '.')}
+					</>
+				))}
+			</span>
+		)}
+	</p>
+</div>
+
+<style>
+	.project-files {
+		margin-top: 1rem;
+	}
+	.project-files :global(h3) {
+		margin-top: 1.5rem;
+	}
+
+	.file-list {
+		list-style: none;
+		padding: 0;
+		margin: 0.75rem 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	.file-list li {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0.35rem 0.7rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 6px;
+		background: var(--sl-color-gray-6);
+		font-size: var(--sl-text-xs);
+	}
+	.file-list a {
+		font-family: var(--sl-font-system-mono, monospace);
+	}
+
+	.file-meta {
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-xs);
+	}
+	.file-empty {
+		margin-top: 0.75rem;
+		color: var(--sl-color-gray-2);
+	}
+	.file-more {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+	}
+
+	.config {
+		margin-top: 1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 8px;
+		padding: 0.5rem 0.75rem;
+	}
+	.config > summary {
+		cursor: pointer;
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		/* 44px of target: this is the control that opens a 400-line file. */
+		min-height: 44px;
+		align-content: center;
+		flex-wrap: wrap;
+	}
+	.config[open] > summary {
+		margin-bottom: 0.5rem;
+	}
+
+	.project-folder {
+		margin-top: 1.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--sl-color-gray-5);
+	}
+</style>
