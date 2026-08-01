@@ -10,7 +10,25 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.13.0" date="July 31, 2026" latest>
+<Release version="1.14.0" date="August 1, 2026" latest>
+
+Catches the docs up with brAIn 1.16.0 — a conversations rail, a model and context readout, and a third way off the findings list.
+
+<Changes type="added">
+
+- **[Dismiss](/brain/findings/#dismiss-which-is-neither)** on the Findings page. It clears a card and teaches brAIn nothing, so the next analysis is free to find the same thing again — as opposed to **Ignore**, which is a judgement that the thing is normal here. A table now says plainly what each of the three exits teaches brAIn, because that is the only difference between them that matters.
+- **[The conversations rail](/brain/terminal/#on-a-wide-screen-a-rail-of-conversations)** — from about 1100px the chat grows a column listing every conversation, with the one you're in marked. Same list and same resume as the ⋯ menu; below that width it isn't drawn and the menu is still the way in.
+- **[Which model, and how full](/brain/terminal/#which-model-and-how-full)** — the model answering and the context in use, under the message box. The number is what the CLI reports it sent on the last turn, so it's measured rather than estimated; cached parts count, because a cached prompt still occupies the window.
+
+</Changes>
+<Changes type="changed">
+
+- **"A new chat doesn't lose the old one."** The docs, and the panel's own prompt, used to say the conversation was cleared and Claude forgot its context. Claude Code keeps it and it stays in the list — what a new chat actually costs is that the next thing you say belongs to a separate conversation.
+
+</Changes>
+</Release>
+
+<Release version="1.13.0" date="July 31, 2026">
 
 Catches the docs up with brAIn 1.15.0, and reshoots the screenshots against a demo home whose numbers survive being checked.
 
