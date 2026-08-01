@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
-import { APPS, groupByCategory, iconMaskUrl, readProjects } from './site/catalog.mjs';
+import { APPS, OTHER_PROJECTS, groupByCategory, iconMaskUrl, readProjects } from './site/catalog.mjs';
 
 // Draft workflow (see site/scripts/build.mjs and site/content.config.ts):
 // A page with `draft: true` is HIDDEN on the Vercel production deployment (the
@@ -47,8 +47,15 @@ const draftProjects = allProjects
 //
 // So the rules are generated here. `sidebarIcons` is the running order of the
 // top-level groups — Welcome first with no icon, then the categories that have
-// something published, then Apps — and the nth-child index falls out of it.
-const sidebarIcons = [null, ...publishedGroups.map((g) => g.icon), APPS.icon];
+// something published, then Apps, then Other Projects — and the nth-child index
+// falls out of it. The dev-only drafts group is last and iconless, so it needs
+// no entry; anything added *between* these does, or the glyphs slide again.
+const sidebarIcons = [
+	null,
+	...publishedGroups.map((g) => g.icon),
+	APPS.icon,
+	OTHER_PROJECTS.icon,
+];
 const sidebarIconCss = sidebarIcons
 	.map((icon, i) =>
 		icon
@@ -360,6 +367,19 @@ export default defineConfig({
 								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
 							],
 						},
+					],
+				},
+				// Not a BRUH project and not in this repo — just a link out, so
+				// there is no page here to send anyone to. Last, after everything
+				// the repo can actually show you. These open in the same tab and
+				// carry no external marker, which is what every other off-site
+				// link here does; the heading is what says they leave the docs.
+				{
+					label: OTHER_PROJECTS.label,
+					collapsed: true,
+					items: [
+						{ label: 'Endless', link: 'https://endless-devotional.vercel.app/' },
+						{ label: 'Pray His Promises', link: 'https://prayhispromises.com/' },
 					],
 				},
 				// Dev-only: in-development (draft) pages, visible under `npm run dev`,

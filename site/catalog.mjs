@@ -80,6 +80,24 @@ export const APPS = {
 };
 
 /**
+ * Work that isn't a BRUH project, and isn't in this repo — it just gets a link.
+ *
+ * Everything else in the nav is something this repo holds: a project folder, or
+ * an add-on's docs under `apps/`. These are finished sites that document
+ * themselves, so they are links and never pages — a stub page for an app
+ * explained better on its own site is a second copy to keep true. It sits last
+ * for the same reason, after everything the repo can actually show you.
+ */
+export const OTHER_PROJECTS = {
+	id: 'other-projects',
+	label: 'Other Projects',
+	blurb: "Other projects I've worked on.",
+	// An arrow leaving a box: every item under this heading goes off-site, and
+	// it is the one group in the nav where that is true of all of it.
+	icon: `<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6"/>`,
+};
+
+/**
  * An icon's paths wrapped into a full SVG, as a CSS `url()` for `mask-image`.
  *
  * The same markup draws the card on the landing page and the glyph in the
