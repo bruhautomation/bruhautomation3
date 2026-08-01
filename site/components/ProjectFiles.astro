@@ -81,16 +81,34 @@ function formatSize(bytes: number) {
 }
 
 const models = filesIn('models', ['.stl']);
+
+// Tessellated from the CAD by site/scripts/build-cad-previews.py, for parts
+// that were never exported to STL by hand. They go in the viewer so a project
+// that only ships CAD can still be looked at, but they are never offered as a
+// download: the tessellation is approximate where the STEP is exact, and
+// handing someone a mesh labelled like an export is how a bad print happens.
+const previews = filesIn('preview', ['.stl']);
+
 const configs = filesIn('esphome', ['.yaml', '.yml']).map((entry) => {
 	const code = readFileSync(join(projectDir, entry.path), 'utf8').replace(/\s+$/, '');
 	return { ...entry, code, lines: code.split('\n').length };
 });
 
-// The rest of the folder, counted rather than listed. A project can carry
-// dozens of STEP exports and cut files, and a wall of download rows is not a
-// better answer than one link to the folder they all live in.
+// CAD gets named rows rather than a count: a STEP opens in anything and is the
+// exact model, which makes it the most useful file in the folder for anyone
+// who wants to change the design rather than print it as-is.
+const CAD_KINDS = {
+	'.step': 'STEP — opens in Fusion 360, FreeCAD, Onshape, SolidWorks',
+	'.stp': 'STEP — opens in Fusion 360, FreeCAD, Onshape, SolidWorks',
+	'.f3d': 'Fusion 360 archive — the editable design, with its history',
+};
+const cad = filesIn('cad', Object.keys(CAD_KINDS)).map((entry) => ({
+	...entry,
+	kind: CAD_KINDS[entry.name.slice(entry.name.lastIndexOf('.')).toLowerCase()] ?? 'CAD file',
+}));
+
+// The rest of the folder, counted rather than listed.
 const otherFolders = [
-	{ dir: 'cad', label: 'CAD source', exts: ['.f3d', '.step', '.stp'] },
 	{ dir: 'laser-cut', label: 'laser-cut vectors', exts: ['.dxf', '.svg'] },
 	{ dir: 'firmware', label: 'firmware', exts: ['.ino', '.h', '.cpp'] },
 	{ dir: 'arduino-legacy', label: 'legacy Arduino sketches', exts: ['.ino', '.h'] },
@@ -99,6 +117,16 @@ const otherFolders = [
 ]
 	.map((group) => ({ ...group, count: countFiles(group.dir, group.exts) }))
 	.filter((group) => group.count > 0);
+
+// Everything the viewer can show, authored exports first. A preview carries the
+// label into the picker so you always know which one you are looking at.
+const viewable = [
+	...models.map((model) => ({ name: model.name.replace(/\.stl$/i, ''), src: `/models/${slug}/${model.name}` })),
+	...previews.map((model) => ({
+		name: `${model.name.replace(/\.stl$/i, '')} (from CAD)`,
+		src: `/models/${slug}/preview/${model.name}`,
+	})),
+];
 
 // Long lists get truncated to the folder link; short ones are all shown.
 const MODEL_ROWS = 12;
@@ -113,31 +141,41 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 
 <div class="project-files" data-project={slug}>
 	{
-		models.length > 0 && (
+		viewable.length > 0 && (
 			<>
-				<h3 id="printable-parts">Printable parts</h3>
-				<StlViewer
-					models={models.map((model) => ({
-						name: model.name.replace(/\.stl$/i, ''),
-						src: `/models/${slug}/${model.name}`,
-					}))}
-				/>
-				<ul class="file-list">
-					{shownModels.map((model) => (
-						<li>
-							<a href={`/models/${slug}/${model.name}`} download>
-								{model.name}
-							</a>
-							<span class="file-meta">{formatSize(model.size)}</span>
-						</li>
-					))}
-				</ul>
+				<h3 id="the-parts">{models.length > 0 ? 'Printable parts' : 'The parts'}</h3>
+				<StlViewer models={viewable} />
+				{models.length > 0 && (
+					<ul class="file-list">
+						{shownModels.map((model) => (
+							<li>
+								<a href={`/models/${slug}/${model.name}`} download>
+									{model.name}
+								</a>
+								<span class="file-meta">{formatSize(model.size)}</span>
+							</li>
+						))}
+					</ul>
+				)}
 				{hiddenModels > 0 && (
 					<p class="file-more">
 						<a href={folderUrl}>
 							{hiddenModels} more {hiddenModels === 1 ? 'part' : 'parts'} in the project folder
 							on GitHub
 						</a>
+					</p>
+				)}
+				{previews.length > 0 && (
+					<p class="file-meta">
+						{models.length > 0 ? (
+							<>
+								Parts marked <em>from CAD</em> are tessellated
+							</>
+						) : (
+							'These are tessellated'
+						)}
+						{' from the STEP files below, for previewing only — approximate where the STEP is '}
+						exact. Download the STEP for the real model.
 					</p>
 				)}
 			</>
@@ -177,7 +215,29 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 	}
 
 	{
-		models.length === 0 && configs.length === 0 && otherFolders.length === 0 && (
+		cad.length > 0 && (
+			<>
+				<h3 id="cad-source">CAD source</h3>
+				<p>
+					The design itself, if you want to change it rather than print it. A STEP file is
+					exact geometry and opens in almost anything; a Fusion 360 archive keeps the
+					modelling history, so you can go back and edit the sketch that made the part.
+				</p>
+				<ul class="cad-list">
+					{cad.map((file) => (
+						<li>
+							<a href={rawUrl(file.path)}>{file.name}</a>
+							<span class="file-meta">{formatSize(file.size)}</span>
+							<span class="cad-kind">{file.kind}</span>
+						</li>
+					))}
+				</ul>
+			</>
+		)
+	}
+
+	{
+		models.length === 0 && previews.length === 0 && configs.length === 0 && cad.length === 0 && otherFolders.length === 0 && (
 			<p class="file-empty">
 				The source files for this project aren't in the repo yet — there's nothing to download
 				beyond the notes. They land in <code>projects/{slug}/</code> when they do, and this
@@ -237,6 +297,32 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 	}
 
 	.file-meta {
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-xs);
+	}
+
+	.cad-list {
+		list-style: none;
+		padding: 0;
+		margin: 0.75rem 0 0;
+	}
+	.cad-list li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin: 0 0 0.4rem;
+		padding: 0.5rem 0.7rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 6px;
+		background: var(--sl-color-gray-6);
+		font-size: var(--sl-text-sm);
+	}
+	.cad-list a {
+		font-family: var(--sl-font-system-mono, monospace);
+	}
+	.cad-kind {
+		flex-basis: 100%;
 		color: var(--sl-color-gray-3);
 		font-size: var(--sl-text-xs);
 	}

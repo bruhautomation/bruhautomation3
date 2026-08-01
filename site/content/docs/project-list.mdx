@@ -16,10 +16,11 @@ export const projects = readProjects().map((p) => ({ ...p, guide: p.guide && (sh
 export const groups = groupByCategory(projects);
 export const written = projects.filter((p) => p.guide).length;
 
-Every project lives in its own folder in the <a href={`${REPO_URL}/tree/main/projects`}>GitHub repo</a> —
-the guide, the photos, the print files, the CAD source and the firmware, all in one
-place. {projects.length} projects so far, {written} of them with a full build guide.
-The rest are files you can download and notes you can read today.
+All {projects.length} of them. Every project lives in its own folder in the
+<a href={`${REPO_URL}/tree/main/projects`}>GitHub repo</a> — the write-up, the photos, the print
+files, the CAD source and the firmware, all in one place — and every one has a page here with
+its parts in a 3D viewer and its files ready to download. Some are full build guides; some are
+a paragraph and the files, which is the honest length for a bracket.
 
 {groups.map((group) => (
 	<section>

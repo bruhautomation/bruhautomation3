@@ -22,7 +22,9 @@ bruhautomation3/
 │       ├── index.mdx        # the build guide → /projects/tablet-wall-mount/
 │       ├── images/          # photos the guide uses
 │       ├── models/          # print-ready STL (the site's 3D viewer loads these)
-│       └── cad/             # Fusion 360 sources and STEP exports
+│       ├── cad/             # Fusion 360 sources and STEP exports
+│       └── preview/         # meshes generated from the CAD, so parts that were
+│                            #   never exported to STL are still previewable
 ├── apps/                    # Home Assistant add-on docs
 │   ├── brain/               # → /brain/
 │   └── bruh-minecraft/      # → /bruh-minecraft/

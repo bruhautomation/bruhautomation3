@@ -12,6 +12,7 @@ MAX7219 seven-segment display that shows Home Assistant data.
 
 - `models/` — print-ready STL files (these are what the site previews)
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
+- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 - `esphome/` — ESPHome configuration
 
 ## Hardware

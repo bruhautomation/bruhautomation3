@@ -10,7 +10,26 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.16.0" date="August 1, 2026" latest>
+<Release version="1.17.0" date="August 1, 2026" latest>
+
+Every project in the repo now has a page, and parts that only exist as CAD can be spun on it.
+
+<Changes type="added">
+
+- **A page for every project.** 45 projects had files in the repo and nothing on the site; they have pages now, each with its parts in the 3D viewer and its files ready to download. The [project list](/project-list/) is all 64 of them.
+- **CAD gets previewed.** A part that was never exported to STL is tessellated from its STEP file and loaded into the viewer, labelled *from CAD* — so projects that only ever shipped Fusion files can be looked at before you download anything. Previews are approximate where the STEP is exact, so they are shown but never offered as a download.
+- **CAD source is listed by name.** Every `.step` and `.f3d` is a download row saying what opens it, instead of a line counting how many are in the folder.
+
+</Changes>
+<Changes type="changed">
+
+- **Everything that was in development is live.** The ten in-development guides are published. Where a photo is still to come, the author's placeholder is gone rather than shipped — a page shouldn't tell a reader what its writer still has to do.
+- **Workshop & Garage has its own icon.** It was sharing the wrench with Around the House, which read as one category cut in half.
+
+</Changes>
+</Release>
+
+<Release version="1.16.0" date="August 1, 2026">
 
 Every project page now ends with the files you came for.
 
