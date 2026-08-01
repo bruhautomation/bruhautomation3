@@ -1,0 +1,123 @@
+# BRUH Sound Machine
+# ────────────────────────────────────────────────────────────
+# MP3 sound player with DFPlayer module. Supports
+# playing audio files from TF card via UART interface.
+#
+# Hardware:
+#   - Board: ESP32
+#   - Audio: DFPlayer Mini (MP3 module)
+# ────────────────────────────────────────────────────────────
+
+substitutions:
+  device_name: "BRUH Sound Machine"
+  device_id: "bruh-sound-machine"
+  uart_b_rx: GPIO16
+  uart_b_tx: GPIO17
+
+esphome:
+  name: ${device_id}
+
+esp32:
+  board: nodemcu-32s
+
+uart:
+  tx_pin: ${uart_b_tx}
+  rx_pin: ${uart_b_rx}
+  id: uart_b
+  baud_rate: 9600
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+ota:
+  password: !secret ota_password
+  platform: esphome
+
+logger:
+
+api:
+  services:
+    - service: dfplayer_play_1
+      then:
+        - dfplayer.play:
+            file: 1
+            loop: false
+    - service: dfplayer_next
+      then:
+        - dfplayer.play_next:
+    - service: dfplayer_previous
+      then:
+        - dfplayer.play_previous:
+    - service: dfplayer_play
+      variables:
+        file: int
+      then:
+        - dfplayer.play: !lambda 'return file;'
+    - service: dfplayer_play_loop
+      variables:
+        file: int
+        loop_: bool
+      then:
+        - dfplayer.play:
+            file: !lambda 'return file;'
+            loop: !lambda 'return loop_;'
+    - service: dfplayer_play_folder
+      variables:
+        folder: int
+        file: int
+      then:
+        - dfplayer.play_folder:
+            folder: !lambda 'return folder;'
+            file: !lambda 'return file;'
+    - service: dfplayer_play_loop_folder
+      variables:
+        folder: int
+      then:
+        - dfplayer.play_folder:
+            folder: !lambda 'return folder;'
+            loop: true
+    - service: dfplayer_set_volume
+      variables:
+        volume: int
+      then:
+        - dfplayer.set_volume: !lambda 'return volume;'
+    - service: dfplayer_volume_down
+      then:
+        - dfplayer.volume_down
+    - service: dfplayer_volume_up
+      then:
+        - dfplayer.volume_up
+    - service: dfplayer_set_eq
+      variables:
+        preset: int
+      then:
+        - dfplayer.set_eq: !lambda 'return static_cast<dfplayer::EqPreset>(preset);'
+    - service: dfplayer_sleep
+      then:
+        - dfplayer.sleep
+    - service: dfplayer_reset
+      then:
+        - dfplayer.reset
+    - service: dfplayer_start
+      then:
+        - dfplayer.start
+    - service: dfplayer_pause
+      then:
+        - dfplayer.pause
+    - service: dfplayer_stop
+      then:
+        - dfplayer.stop
+    - service: dfplayer_random
+      then:
+        - dfplayer.random
+
+binary_sensor:
+  - platform: status
+    name: "${device_name} Status"
+
+dfplayer:
+  uart_id: uart_b
+  on_finished_playback:
+    then:
+      - logger.log: 'Playback finished event'

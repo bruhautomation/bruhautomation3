@@ -1,0 +1,69 @@
+# BRUH 7-Segment Display
+# ────────────────────────────────────────────────────────────
+# MAX7219-based 7-segment display showing data from
+# Home Assistant (e.g., YouTube subscriber count).
+#
+# Hardware:
+#   - Board: ESP32
+#   - Display: MAX7219 8-digit 7-segment
+# ────────────────────────────────────────────────────────────
+
+substitutions:
+  device_name: "BRUH 7 Segment"
+  device_id: "bruh-7-seg"
+
+esphome:
+  name: ${device_id}
+
+esp32:
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+ota:
+  password: !secret ota_password
+  platform: esphome
+
+api:
+
+status_led:
+  pin:
+    number: GPIO2
+
+logger:
+
+sensor:
+  - platform: homeassistant
+    name: "Subscribers"
+    entity_id: sensor.youtube_subscribers
+    id: subscribers
+
+  - platform: wifi_signal
+    name: "${device_name} WiFi Signal"
+    update_interval: 300s
+
+binary_sensor:
+  - platform: status
+    name: "${device_name} Status"
+
+switch:
+  - platform: restart
+    name: "${device_name} Restart"
+
+spi:
+  clk_pin: GPIO21
+  mosi_pin: GPIO22
+
+display:
+  - platform: max7219
+    cs_pin: GPIO23
+    intensity: 8
+    num_chips: 1
+    lambda: |-
+      it.printf(0, "%.0f", id(subscribers).state);
+
+time:
+  - platform: sntp
+    id: sntp_time

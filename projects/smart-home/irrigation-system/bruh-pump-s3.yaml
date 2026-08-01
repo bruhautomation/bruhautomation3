@@ -1,0 +1,236 @@
+# BRUH Irrigation Pump Controller S3
+# ────────────────────────────────────────────────────────────
+# ESP32-S3 variant of the pump controller with similar
+# functionality to bruh-pump.yaml. Uses ADS1115 and PCF8574
+# I2C expanders for expanded I/O capacity.
+#
+# Hardware:
+#   - Board: ESP32-S3
+# ────────────────────────────────────────────────────────────
+
+substitutions:
+  device_name: "Pump Box S3"
+  device_id: "pump-box-s3"
+  manifold_sensor_power: GPIO38
+  i2c_sda: GPIO1
+  i2c_scl: GPIO2
+  light_pin: GPIO48
+  zone_1_name: Garden
+  zone_2_name: Blueberries
+  zone_3_name: Trees
+  zone_4_name: Blackberries
+  zone_5_name: Misters
+  zone_6_name: Wood Hose
+  zone_7_name: Front
+  fertilizer_inflow_pulse: GPIO4
+  fertilizer_outflow_pulse: GPIO5
+  zone_1_pulse: GPIO6
+  zone_2_pulse: GPIO7
+  zone_3_pulse: GPIO15
+  zone_4_pulse: GPIO16
+  zone_5_pulse: GPIO17
+  zone_6_pulse: GPIO18
+  zone_7_pulse: GPIO9
+  manifold_pulse: GPIO10
+
+esphome:
+  name: ${device_id}
+  friendly_name: "${device_name}"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Bruh-Pump-S3 Fallback Hotspot"
+    password: "Uk3a7WP1Skr6"
+
+captive_portal:
+
+i2c:
+  sda: ${i2c_sda}
+  scl: ${i2c_scl}
+  scan: true
+  id: bus_a
+
+ads1115:
+  - address: 0x48
+    i2c_id: bus_a
+    id: ads1115_1
+
+pcf8574:
+  - id: 'pcf8574_hub_1'
+    i2c_id: bus_a
+    address: 0x27
+    pcf8575: true
+
+sensor:
+  - platform: pulse_counter
+    name: "Manifold Flow Rate"
+    id: manifold_flow_rate
+    pin:
+      number: ${manifold_pulse}
+      mode:
+        input: true
+        pullup: true
+    update_interval: 10s
+    filters:
+      - lambda: return (x / 483);
+    unit_of_measurement: "L/min"
+    device_class: volume_flow_rate
+    state_class: measurement
+    total:
+      name: "Manifold Total"
+      id: manifold_total
+      filters:
+        - lambda: return (x / 483);
+      unit_of_measurement: "L"
+      device_class: water
+      state_class: total_increasing
+
+  - platform: pulse_counter
+    name: "EZ-Flo Inflow Rate"
+    id: ez_flo_inflow_rate
+    pin:
+      number: ${fertilizer_inflow_pulse}
+      mode:
+        input: true
+        pullup: true
+    update_interval: 10s
+    filters:
+      - lambda: return (x / 898);
+    unit_of_measurement: "L/min"
+    state_class: measurement
+    device_class: volume_flow_rate
+    total:
+      name: 'EZ-Flo Inflow Total'
+      id: ez_flo_inflow_total
+      filters:
+        - lambda: return (x / 898);
+      unit_of_measurement: "L"
+      device_class: volume
+      state_class: total_increasing
+
+  - platform: pulse_counter
+    name: "EZ-Flo Outflow Rate"
+    id: ez_flo_outflow_rate
+    pin:
+      number: ${fertilizer_outflow_pulse}
+      mode:
+        input: true
+        pullup: true
+    update_interval: 10s
+    filters:
+      - lambda: return (x / 898);
+    unit_of_measurement: "L/min"
+    device_class: volume_flow_rate
+    state_class: measurement
+    total:
+      name: 'EZ-Flo Outflow Total'
+      id: ez_flow_outflow_total
+      filters:
+        - lambda: return (x / 898);
+      unit_of_measurement: "L"
+      device_class: volume
+      state_class: total_increasing
+
+switch:
+  - platform: gpio
+    name: "Zone 1"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 0
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 2"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 1
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 3"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 2
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 4"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 3
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 5"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 4
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 6"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 5
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Zone 7"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 6
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Pump Water Valve"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 14
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Fertilizer Output Valve"
+    pin:
+      pcf8574: pcf8574_hub_1
+      number: 15
+      mode:
+        output: true
+      inverted: true
+
+output:
+  - platform: ledc
+    pin: ${light_pin}
+    id: light_pin
+    frequency: "19531Hz"
+
+light:
+  - platform: monochromatic
+    output: light_pin
+    name: "Pump Box"
+    id: cob_panel
+    default_transition_length: 0.5s

@@ -1,0 +1,36 @@
+# BRUH Playhouse Mini Controller
+# ────────────────────────────────────────────────────────────
+# Simplified version of the full playhouse controller.
+# Focuses on core features with reduced complexity for
+# smaller installations or testing.
+#
+# Hardware:
+#   - Board: ESP32
+# ────────────────────────────────────────────────────────────
+
+esphome:
+  name: bruh-playground-mini
+  friendly_name: "Playhouse Mini"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+status_led:
+  pin:
+    number: GPIO2

@@ -1,0 +1,223 @@
+# BRUH Smart Candle
+# ────────────────────────────────────────────────────────────
+# Auto-igniting and auto-extinguishing smart candle controller.
+# Features arc lighter ignition, diaphragm pump for extinguishing,
+# ST7789V TFT display, and multiple relay-controlled mechanisms.
+#
+# Hardware:
+#   - Board: ESP32 Feather
+#   - Display: ST7789V TFT 320x240
+#   - Output: 2 relays (igniter and pump)
+#   - Controls: Manual buttons and capacitive touch sensor
+# ────────────────────────────────────────────────────────────
+
+substitutions:
+  device_name: "BRUH Candle"
+  device_id: "bruh-candle"
+  switch_1: GPIO21
+  switch_2: GPIO22
+  relay_1: GPIO15
+  relay_2: GPIO12
+  pin_tft_mosi: GPIO19
+  pin_tft_sclk: GPIO18
+  pin_tft_cs: GPIO5
+  pin_tft_dc: GPIO16
+  pin_tft_rst: GPIO23
+  pin_tfl_bl: GPIO4
+  pin_button_1: GPIO35
+  pin_button_0: GPIO0
+  pin_adc_power: GPIO14
+  pin_adc_in: GPIO34
+
+esphome:
+  name: ${device_id}
+
+esp32:
+  board: featheresp32
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+ota:
+  password: !secret ota_password
+  platform: esphome
+
+api:
+
+status_led:
+  pin:
+    number: GPIO2
+
+logger:
+
+switch:
+  - platform: gpio
+    pin: ${relay_1}
+    id: relay_1
+    name: "${device_name} Relay 1"
+
+  - platform: gpio
+    pin: ${relay_2}
+    id: relay_2
+    name: "${device_name} Relay 2"
+
+  - platform: template
+    name: "${device_name} Make Fire"
+    id: make_fire
+    optimistic: true
+    turn_on_action:
+      - switch.turn_on: relay_2
+      - delay: 1666ms
+      - switch.turn_off: relay_2
+      - switch.turn_off: make_fire
+
+  - platform: template
+    name: "${device_name} Blow Out"
+    id: blow_out
+    optimistic: true
+    turn_on_action:
+      - switch.turn_on: relay_1
+      - delay: 800ms
+      - switch.turn_off: relay_1
+      - switch.turn_off: blow_out
+
+  - platform: gpio
+    pin: ${pin_tfl_bl}
+    name: "${device_name} Backlight"
+    id: backlight
+
+  - platform: restart
+    name: "${device_name} Restart"
+
+sensor:
+  - platform: wifi_signal
+    name: "${device_name} WiFi Signal"
+    update_interval: 300s
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: ${switch_1}
+      inverted: yes
+    id: switch_1
+    name: "${device_name} Switch 1"
+    on_press:
+      if:
+        condition:
+          - switch.is_off: make_fire
+        then:
+          - switch.turn_on: relay_1
+    on_release:
+      if:
+        condition:
+          - switch.is_off: make_fire
+        then:
+          - switch.turn_off: relay_1
+
+  - platform: gpio
+    pin:
+      number: ${switch_2}
+      inverted: yes
+    id: switch_2
+    name: "${device_name} Switch 2"
+    on_press:
+      if:
+        condition:
+          - switch.is_off: blow_out
+        then:
+          - switch.turn_on: relay_2
+    on_release:
+      if:
+        condition:
+          - switch.is_off: blow_out
+        then:
+          - switch.turn_off: relay_2
+
+  - platform: gpio
+    pin:
+      number: ${pin_button_0}
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "${device_name} T-Display Button Input 0"
+    id: tdisplay_button_input_0
+    on_press:
+      then:
+        - display.page.show_next: my_display
+        - component.update: my_display
+
+  - platform: gpio
+    pin:
+      number: ${pin_button_1}
+      inverted: true
+    name: "${device_name} T-Display Button Input 1"
+    id: tdisplay_button_input_1
+    on_press:
+      then:
+        - display.page.show_previous: my_display
+        - component.update: my_display
+  - platform: status
+    name: "${device_name} Status"
+
+spi:
+  clk_pin: ${pin_tft_sclk}
+  mosi_pin: ${pin_tft_mosi}
+
+color:
+  - id: my_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: my_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: my_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: my_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: my_gray
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: my_black
+    red: 0%
+    green: 0%
+    blue: 0%
+
+font:
+  - file: "Roboto-Medium.ttf"
+    id: roboto_48
+    size: 48
+  - file: "Roboto-Medium.ttf"
+    id: roboto_24
+    size: 24
+  - file: "Roboto-Medium.ttf"
+    id: roboto_12
+    size: 12
+
+display:
+  - platform: st7789v
+    id: my_display
+    backlight_pin: ${pin_tfl_bl}
+    cs_pin: ${pin_tft_cs}
+    dc_pin: ${pin_tft_dc}
+    reset_pin: ${pin_tft_rst}
+    rotation: 270
+    pages:
+      - id: page1
+        lambda: |-
+          it.fill(my_black);
+          it.print(45, 40, id(roboto_48), "Ready");
+      - id: page2
+        lambda: |-
+          it.fill(my_red);
+          it.print(55, 40, id(roboto_48), "FIRE!");
+      - id: page3
+        lambda: |-
+          it.fill(my_blue);
+          it.print(35, 40, id(roboto_48), "WOOSH!");
