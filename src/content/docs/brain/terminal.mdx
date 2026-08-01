@@ -70,10 +70,37 @@ print. Neither list is written down in the panel, so neither can go stale. ↑/�
 Enter or Tab to pick. A few Claude Code commands are REPL-only (`/help` among them) and say
 so rather than failing.
 
+## On a wide screen, a rail of conversations
+
+From about **1100px** the chat grows a column down the left listing every conversation in
+`/config` — whichever face made it — with **＋** for a new one and the one you're in marked
+rather than hidden. Picking one resumes it.
+
+It's the same list and the same resume as the ⋯ menu, so nothing lives only in the rail.
+Below that width it isn't drawn at all: 248px of conversations is most of a phone, and
+**⋯ → Conversations** is still the way in.
+
+:::note[A new chat doesn't lose the old one]
+Claude Code keeps the conversation and it stays in the list. What a new chat costs is that
+the next thing you say belongs to a separate conversation — not that anything was forgotten.
+:::
+
+## Which model, and how full
+
+Under the message box, quietly: the model that's actually answering, and how much of the
+context window the conversation is using — `42k / 200k context · 21%`, turning amber past
+80%.
+
+The number is the CLI's own report of what it sent on the last turn, and what it sent *is*
+the conversation so far, so it's measured rather than estimated. Cached parts count: a
+cached prompt still occupies the window, it's only cheaper to send. For a model with no
+published window, you get the token count and no percentage — a percentage of a guessed
+denominator is worse than none.
+
 ## The ⋯ menu
 
-- **New chat** — start again with a clean context.
-- **Conversations** — every conversation in `/config`, started in either face. Pick one and
+- **New chat** — start again in a separate conversation.
+- **Conversations** — the same list as the rail: every conversation in `/config`, started in either face. Pick one and
   it replays into the pane and carries on. Both faces stand in the same directory, which is
   what lets each see the other's conversations at all: Claude Code files them per working
   directory.
