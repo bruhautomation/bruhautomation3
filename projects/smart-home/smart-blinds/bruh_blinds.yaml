@@ -1,0 +1,160 @@
+# Reusable blinds/cover configuration with servo and touch sensor
+# Configure substitutions for: device_name, device_id, servo_pin, esp_32_touch_pin,
+# touch_threshold, open_setpoint_servo, open_setpoint_tilt
+
+esphome:
+  name: ${device_id}
+  platform: ESP32
+  board: nodemcu-32s
+  on_boot:
+    priority: -10
+    then:
+      - servo.write:
+          id: my_servo
+          level: !lambda "return -1.0;"
+      - cover.template.publish:
+          id: cover_1
+          tilt: 0.0
+          state: CLOSED
+      - delay: 1.0s
+      - servo.detach: my_servo
+
+  platformio_options:
+    lib_deps:
+      - NeoPixelBus@2.6.0
+      - AsyncTCP
+
+globals:
+  - id: hold_float
+    type: float
+    restore_value: no
+    initial_value: "0.0"
+
+api:
+  password: !secret api_password
+
+logger:
+
+esp32_touch:
+
+binary_sensor:
+  - platform: status
+    name: "${device_name} Status"
+
+  - platform: esp32_touch
+    pin: ${esp_32_touch_pin}
+    threshold: ${touch_threshold}
+    id: sensor_1
+    name: "${device_name} Button"
+    on_multi_click:
+      - timing:
+          - ON for at most 0.75s
+          - OFF for at least 0.2s
+        then:
+          - logger.log: "Single Click"
+          - servo.write:
+              id: my_servo
+              level: !lambda "return ${open_setpoint_servo};"
+          - cover.template.publish:
+              id: cover_1
+              tilt: ${open_setpoint_tilt}
+          - delay: 4.0s
+          - servo.detach: my_servo
+      - timing:
+          - ON for at least 0.75s
+          - OFF for at least 0.5s
+        then:
+          - logger.log: "Long Press"
+          - servo.write:
+              id: my_servo
+              level: !lambda "return -1.0;"
+          - cover.template.publish:
+              id: cover_1
+              tilt: 0.0
+          - delay: 4.0s
+          - servo.detach: my_servo
+
+ota:
+  password: !secret ota_password
+
+status_led:
+  pin:
+    number: GPIO2
+
+wifi:
+  ssid: !secret wifi_ssid_iot
+  password: !secret wifi_password_iot
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    pin: ${led_pin}
+    id: led_strip
+    num_leds: 24
+    name: "${device_name} LED"
+    variant: 800KBPS
+    method: ESP32_I2S_0
+    effects:
+      - flicker:
+      - strobe:
+      - random:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_color_wipe:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+      - wled:
+
+servo:
+  - id: my_servo
+    output: pwm_output
+
+output:
+  - platform: ledc
+    pin: ${servo_pin}
+    id: pwm_output
+    frequency: 50 Hz
+
+cover:
+  - platform: template
+    name: "${device_name}"
+    id: cover_1
+    lambda: |-
+      if (id(cover_1).tilt > 0.1) {
+        return COVER_OPEN;
+      } else {
+        return COVER_CLOSED;
+      }
+    has_position: false
+    assumed_state: false
+    open_action:
+      - servo.write:
+          id: my_servo
+          level: !lambda "return ${open_setpoint_servo};"
+      - cover.template.publish:
+          id: cover_1
+          tilt: ${open_setpoint_tilt}
+      - delay: 4.0s
+      - servo.detach: my_servo
+    close_action:
+      - servo.write:
+          id: my_servo
+          level: !lambda "return -1.0;"
+      - cover.template.publish:
+          id: cover_1
+          tilt: 0.0
+      - delay: 4.0s
+      - servo.detach: my_servo
+    tilt_action:
+      - servo.write:
+          id: my_servo
+          level: !lambda "return tilt * 2.0 - 1.0;"
+      - cover.template.publish:
+          id: cover_1
+          tilt: !lambda "return tilt;"
+      - delay: 4.0s
+      - servo.detach: my_servo
+
+wled:

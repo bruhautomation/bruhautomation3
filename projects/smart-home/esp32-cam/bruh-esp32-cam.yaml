@@ -1,0 +1,84 @@
+# BRUH ESP32-CAM
+# ────────────────────────────────────────────────────────────
+# ESP32-CAM module with OLED display status and motion detection.
+# Captures video/photos and provides real-time monitoring.
+#
+# Hardware:
+#   - Board: ESP32 with integrated OV2640 camera
+#   - Sensor: PIR motion detector
+#   - Display: SSD1306 OLED for status
+# ────────────────────────────────────────────────────────────
+
+esphome:
+  name: esp32-cam-1
+  friendly_name: "ESP32 Camera"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Esp32-Cam-1 Fallback Hotspot"
+    password: "qBmvElSjwwOz"
+
+captive_portal:
+
+i2c:
+  sda: 21
+  scl: 22
+
+font:
+  - file: "Roboto-Medium.ttf"
+    id: roboto
+    size: 14
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    rotation: 180
+    lambda: |-
+      it.print(0, 10, id(roboto), "Hello World!");
+
+esp32_camera:
+  name: Camera
+  external_clock:
+    pin: 32
+    frequency: 20MHz
+  i2c_pins:
+    sda: 13
+    scl: 12
+  data_pins:
+    - 5
+    - 14
+    - 4
+    - 15
+    - 18
+    - 23
+    - 36
+    - 39
+  vsync_pin: 27
+  href_pin: 25
+  pixel_clock_pin: 19
+  resolution: 640x480
+
+binary_sensor:
+  - platform: gpio
+    pin: 33
+    name: "PIR Sensor"
+    device_class: motion
+  - platform: gpio
+    pin: 34
+    name: "Button"

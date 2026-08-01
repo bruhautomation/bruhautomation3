@@ -1,0 +1,164 @@
+# BRUH Nightlight RGB
+# ────────────────────────────────────────────────────────────
+# RGB LED strip nightlight with addressable color effects.
+# Multiple RGB lighting modes with pulse and custom effects.
+#
+# Hardware:
+#   - Board: ESP32-S3
+#   - Output: RMT LED strip (WS2812/NeoPixel)
+#   - Additional: LEDC PWM monochromatic LED
+# ────────────────────────────────────────────────────────────
+
+esphome:
+  name: lev-nightlight
+  friendly_name: "Lev Nightlight"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  password: !secret ota_password
+  platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+output:
+  - platform: ledc
+    pin: GPIO20
+    frequency: 1000hz
+    id: bulb_leds
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: board_light
+    rgb_order: GRB
+    pin: GPIO48
+    num_leds: 1
+    rmt_channel: 0
+    chipset: ws2812
+    name: "Board Light"
+    effects:
+      - pulse:
+          transition_length: 550ms
+          update_interval: 550ms
+
+  - platform: monochromatic
+    output: bulb_leds
+    name: "Lev Nightlight"
+
+  - platform: esp32_rmt_led_strip
+    id: led_strip_roof
+    rgb_order: GRB
+    is_rgbw: true
+    pin: GPIO21
+    num_leds: 54
+    rmt_channel: 1
+    chipset: SK6812
+    name: "Lev Nightlight Fill"
+    effects:
+      - addressable_color_wipe:
+      - addressable_color_wipe:
+          name: "Color Wipe Mist"
+          colors:
+            - red: 0%
+              green: 15%
+              blue: 100%
+              white: 0%
+              num_leds: 3
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              white: 0%
+              gradient: true
+              num_leds: 3
+          add_led_interval: 30ms
+          reverse: true
+      - addressable_color_wipe:
+          name: "Color Wipe Custom"
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              white: 0%
+              num_leds: 5
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              white: 0%
+              num_leds: 1
+          add_led_interval: 100ms
+          reverse: false
+      - addressable_color_wipe:
+          name: "Police"
+          colors:
+            - red: 100%
+              green: 0%
+              blue: 0%
+              white: 0%
+              num_leds: 6
+            - red: 0%
+              green: 0%
+              blue: 100%
+              white: 0%
+              num_leds: 6
+          add_led_interval: 30ms
+          reverse: false
+      - addressable_fireworks:
+      - addressable_fireworks:
+          name: "Fireworks Custom"
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
+      - addressable_flicker:
+      - addressable_flicker:
+          name: "Addressable Flicker BRUH"
+          update_interval: 25ms
+          intensity: 15%
+      - addressable_rainbow:
+      - addressable_random_twinkle:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_twinkle:
+          name: "Twinkle BRUH"
+          twinkle_probability: 80%
+          progress_interval: 4ms
+      - flicker:
+      - flicker:
+          name: "Flicker BRUH"
+          alpha: 92%
+          intensity: 4%
+      - random:
+      - strobe:
+      - strobe:
+          name: "Strobe Custom"
+          colors:
+            - state: true
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              white: 0%
+              duration: 500ms
+            - state: false
+              duration: 250ms
+            - state: true
+              brightness: 100%
+              red: 0%
+              green: 100%
+              blue: 0%
+              white: 0%
+              duration: 500ms
+      - wled:

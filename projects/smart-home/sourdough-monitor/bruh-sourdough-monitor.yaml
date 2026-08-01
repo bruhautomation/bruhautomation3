@@ -1,0 +1,213 @@
+# BRUH Sourdough Starter Monitor
+# ────────────────────────────────────────────────────────────
+# Smart jar monitor for sourdough starter fermentation tracking.
+# Features TFT display with historical graphs, temperature and
+# humidity monitoring, with Home Assistant integration.
+#
+# Hardware:
+#   - Board: ESP32-S3
+#   - Display: TFT screen
+#   - Sensors: Temperature, humidity, pressure sensors
+#   - PSRAM: Octal mode for data buffering
+# ────────────────────────────────────────────────────────────
+
+esphome:
+  name: smart-jar-2
+  friendly_name: Sourdough Monitor
+  on_boot:
+    priority: -100
+    then:
+      - wait_until:
+          api.connected:
+      - delay: 2s
+      - homeassistant.event:
+          event: esphome.smart_jar_request_history
+          data:
+            device: "smart_jar_2"
+            hours: !lambda 'return id(chart_hours);'
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+  services:
+    - service: force_display_update
+      then:
+        - logger.log: "Force display update requested"
+        - component.update: smart_jar_display
+
+    - service: set_chart_hours
+      variables:
+        hours: int
+      then:
+        - logger.log:
+            format: "Setting chart hours to: %d"
+            args: ['hours']
+        - globals.set:
+            id: chart_hours
+            value: !lambda 'return hours;'
+        - homeassistant.event:
+            event: esphome.smart_jar_request_history
+            data:
+              device: "smart_jar_2"
+              hours: !lambda 'return hours;'
+
+    - service: set_brightness
+      variables:
+        level: float
+      then:
+        - output.set_level:
+            id: backlight_pwm
+            level: !lambda 'return level;'
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Smart-Jar-2 Fallback Hotspot"
+    password: "QZMRwrW2FYJB"
+
+captive_portal:
+
+globals:
+  - id: history_data
+    type: float[48]
+    restore_value: no
+
+  - id: history_count
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: history_min
+    type: float
+    restore_value: no
+    initial_value: '0.0'
+
+  - id: history_max
+    type: float
+    restore_value: no
+    initial_value: '100.0'
+
+  - id: history_loaded
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+  - id: last_display_value
+    type: float
+    restore_value: no
+    initial_value: '-999.0'
+
+  - id: last_display_minute
+    type: int
+    restore_value: no
+    initial_value: '-1'
+
+  - id: last_temp
+    type: float
+    restore_value: no
+    initial_value: '-999.0'
+
+  - id: last_humidity
+    type: float
+    restore_value: no
+    initial_value: '-999.0'
+
+  - id: chart_hours
+    type: int
+    restore_value: yes
+    initial_value: '8'
+
+  - id: display_update_pending
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+script:
+  - id: update_display_debounced
+    mode: restart
+    then:
+      - delay: 100ms
+      - component.update: smart_jar_display
+
+output:
+  - platform: ledc
+    pin: GPIO14
+    id: backlight_pwm
+    frequency: 1000Hz
+
+light:
+  - platform: monochromatic
+    output: backlight_pwm
+    name: "Display Backlight"
+    id: backlight
+    restore_mode: RESTORE_DEFAULT_ON
+
+font:
+  - file: 'gfonts://Roboto'
+    id: font_chart
+    size: 14
+
+  - file: 'gfonts://Roboto'
+    id: font_label
+    size: 16
+
+  - file: 'gfonts://Roboto@medium'
+    id: font_status
+    size: 18
+
+  - file: 'gfonts://Roboto@bold'
+    id: font_top_row
+    size: 28
+
+  - file: 'gfonts://Roboto@bold'
+    id: font_env
+    size: 28
+
+color:
+  - id: color_black
+    hex: '000000'
+  - id: color_white
+    hex: 'FFFFFF'
+  - id: color_gray
+    hex: '888888'
+  - id: color_dark_gray
+    hex: '444444'
+
+  - id: color_chart_line
+    hex: '64B5F6'
+  - id: color_chart_dot
+    hex: '2196F3'
+
+  - id: color_temp_cold
+    hex: '2196F3'
+  - id: color_temp_cool
+    hex: '4FC3F7'
+  - id: color_temp_ideal
+    hex: '4CAF50'
+  - id: color_temp_warm
+    hex: 'FF9800'
+  - id: color_temp_hot
+    hex: 'F44336'
+
+  - id: color_humid_dry
+    hex: 'F44336'
+  - id: color_humid_low
+    hex: 'FF9800'
+  - id: color_humid_ok
+    hex: 'FFEB3B'

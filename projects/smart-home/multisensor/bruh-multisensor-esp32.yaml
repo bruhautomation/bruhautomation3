@@ -1,0 +1,163 @@
+# BRUH Multisensor ESP32
+# ────────────────────────────────────────────────────────────
+# ESP32 variant with BME280, TSL2561 ambient light,
+# PIR motion detection, and RGBW neopixel status LED.
+# Includes computed sensors: altitude, dew point,
+# absolute humidity, heat index.
+#
+# Hardware:
+#   - Board: NodeMCU-32S (ESP32)
+#   - Sensor: BME280 on I2C (temperature, pressure, humidity)
+#   - Sensor: TSL2561 on I2C (ambient light)
+#   - Sensor: PIR motion on GPIO18
+#   - Output: SK6812 RGBW LED (4 pixels) on GPIO19
+# ────────────────────────────────────────────────────────────
+
+substitutions:
+  device_name: "BRUH Multisensor 2"
+  device_id: "bruh-multisensor-2"
+  i2c_sda_pin: GPIO5
+  i2c_scl_pin: GPIO4
+  led_pin: GPIO19
+  pir_pin: GPIO18
+
+esphome:
+  name: ${device_id}
+
+esp32:
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+ota:
+  password: !secret ota_password
+  platform: esphome
+
+api:
+
+status_led:
+  pin:
+    number: GPIO2
+
+logger:
+
+sensor:
+  - platform: bme280_i2c
+    temperature:
+      name: "${device_name} BME280 Temperature"
+      oversampling: 16x
+      filters:
+        - offset: -5.3
+      id: bme280_temperature
+    pressure:
+      name: "${device_name} BME280 Pressure"
+      oversampling: 16x
+      id: bme280_pressure
+    humidity:
+      name: "${device_name} BME280 Humidity"
+      oversampling: 16x
+      filters:
+        - offset: 29
+      id: bme280_humidity
+    address: 0x76
+    update_interval: 30s
+
+  - platform: template
+    name: "Altitude"
+    unit_of_measurement: "ft"
+    icon: mdi:signal
+    accuracy_decimals: 0
+    update_interval: 15s
+    lambda: |-
+      const float STANDARD_SEA_LEVEL_PRESSURE = 1013.25f;
+      float T = id(bme280_temperature).state;
+      float P = id(bme280_pressure).state;
+      if (isnan(T) || isnan(P) || P <= 0) return NAN;
+      float alt_m = ((T + 273.15f) / 0.0065f) * (powf((STANDARD_SEA_LEVEL_PRESSURE / P), 0.190234f) - 1.0f);
+      return alt_m * 3.28084f;
+
+  - platform: absolute_humidity
+    name: "Absolute Humidity"
+    temperature: bme280_temperature
+    humidity: bme280_humidity
+    accuracy_decimals: 2
+
+  - platform: template
+    name: "Dew Point"
+    unit_of_measurement: "°F"
+    icon: mdi:thermometer-alert
+    accuracy_decimals: 1
+    lambda: |-
+      float t = id(bme280_temperature).state;
+      float h = id(bme280_humidity).state;
+      if (isnan(t) || isnan(h) || h <= 0) return NAN;
+      if (h < 1.0f) h = 1.0f;
+      if (h > 100.0f) h = 100.0f;
+      const float a = 17.62f;
+      const float b = 243.12f;
+      float gamma = logf(h / 100.0f) + (a * t) / (b + t);
+      float dew_c = (b * gamma) / (a - gamma);
+      return dew_c * 9.0f / 5.0f + 32.0f;
+
+  - platform: tsl2561
+    name: "${device_name} TSL2561 Ambient Light"
+    address: 0x39
+    update_interval: 60s
+
+  - platform: wifi_signal
+    name: "${device_name} WiFi Signal"
+    update_interval: 300s
+
+binary_sensor:
+  - platform: gpio
+    name: "Motion"
+    id: motion
+    pin: ${pir_pin}
+    device_class: motion
+    filters:
+      - delayed_on: 300ms
+  - platform: status
+    name: "${device_name} Status"
+
+i2c:
+  sda: ${i2c_sda_pin}
+  scl: ${i2c_scl_pin}
+  scan: true
+
+light:
+  - platform: neopixelbus
+    variant: SK6812
+    pin: ${led_pin}
+    num_leds: 4
+    type: GRBW
+    name: "${device_name} LED"
+    method: ESP32_I2S_1
+    effects:
+      - flicker:
+      - flicker:
+          name: "Flicker BRUH"
+          alpha: 92%
+          intensity: 4%
+      - strobe:
+      - random:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_color_wipe:
+      - addressable_twinkle:
+      - addressable_twinkle:
+          name: "Twinkle BRUH"
+          twinkle_probability: 80%
+          progress_interval: 4ms
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+      - addressable_flicker:
+          name: "Addressable Flicker BRUH"
+          update_interval: 25ms
+          intensity: 15%
+
+switch:
+  - platform: restart
+    name: "${device_name} Restart"

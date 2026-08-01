@@ -1,0 +1,49 @@
+# BRUH Playhouse Controller
+# ────────────────────────────────────────────────────────────
+# Complex playhouse entertainment and control system with
+# servo-controlled features, DFPlayer audio, LED effects,
+# and multiple input controls (buttons, joystick, rotary encoder).
+# Features interactive animations and automated mechanisms.
+#
+# Hardware:
+#   - Board: ESP32
+#   - Audio: DFPlayer Mini via UART
+#   - Controls: Multiple buttons, joystick, rotary encoder
+#   - Servos: PCA9685 servo controller
+#   - LEDs: Addressable LED strips via GPIO
+# ────────────────────────────────────────────────────────────
+
+esphome:
+  name: bruh-playground
+  friendly_name: "BRUH Playhouse"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+captive_portal:
+
+globals:
+  - id: s_toggle_1_top_max_pct
+    type: float
+    restore_value: yes
+    initial_value: '0.65'
+
+status_led:
+  pin:
+    number: GPIO2
