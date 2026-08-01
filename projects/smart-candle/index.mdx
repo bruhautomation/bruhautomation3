@@ -8,6 +8,7 @@ banner:
 
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
 import candleIgnition from './images/candle-arc-ignition.gif';
+import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 A WiFi-connected candle that ignites and extinguishes itself on command via Home Assistant. Arc lighter for ignition, diaphragm pump for blowout.
 
@@ -57,12 +58,12 @@ The controller is an ESP32 running ESPHome. Here's the parts list:
 - [Diaphragm pump](https://amzn.to/3PIcYTg)
 - [Copper tube](https://amzn.to/3RsNtXs) + [silicone tubing](https://amzn.to/44YBIeb) + 3D-printed base
 
-### Code
-
-See the [ESPHome YAML on GitHub](https://github.com/bruhautomation/bruhautomation3/blob/main/projects/smart-candle/esphome/bruh-candle.yaml).
-
 ### Safety
 
 I added a physical power switch between the battery and ESP32. The candle has to be manually armed before it can be remotely ignited — it can't accidentally turn on from a stray automation or API call.
 
 <iframe width="315" height="560" src="https://www.youtube.com/embed/AcJ1OWoMghA" title="Smart Candle Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Files & downloads
+
+<ProjectFiles slug="smart-candle" />

@@ -1,174 +1,343 @@
 ---
-interface Props {
-  src: string;
-  height?: string;
-  color?: string;
+/**
+ * Interactive STL preview.
+ *
+ * Takes either a single `src` or a list of `models`. With more than one model
+ * the viewer grows a picker and swaps the mesh in the scene it already has —
+ * one WebGL context per project page, not one per part. Browsers cap live
+ * contexts at around 16, and a project like the Cellcube stand has 62 parts.
+ *
+ * A handful of parts gets buttons, because seeing the names is the fastest way
+ * to pick one. Past that the names stop fitting and it becomes a select.
+ */
+interface Model {
+	name: string;
+	src: string;
 }
 
-const { src, height = '400px', color = '#1e90ff' } = Astro.props;
+interface Props {
+	src?: string;
+	models?: Model[];
+	height?: string;
+	color?: string;
+}
+
+const { src, models, height = '400px', color = '#1e90ff' } = Astro.props;
+
+const list: Model[] = models?.length
+	? models
+	: src
+		? [{ name: src.split('/').pop() ?? 'Model', src }]
+		: [];
+
+if (list.length === 0) {
+	throw new Error('<StlViewer> needs either a `src` or a non-empty `models` list.');
+}
+
+const BUTTON_LIMIT = 6;
+const first = list[0];
+// Precomputed: the Astro compiler reads a bare `<=` inside a template
+// expression as the start of a tag.
+const showButtons = list.length > 1 && list.length < BUTTON_LIMIT + 1;
+const showSelect = list.length > BUTTON_LIMIT;
+const selectId = `stl-select-${Math.abs(
+	first.src.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)
+).toString(36)}`;
 ---
 
 <div class="stl-viewer-container">
-  <div class="stl-viewer" style={`height: ${height};`} data-stl-src={src} data-stl-color={color}>
-    <div class="stl-loading">Loading 3D model…</div>
-  </div>
-  <div class="stl-controls">
-    Drag to rotate · Scroll to zoom · Right-click to pan
-  </div>
+	{
+		showButtons && (
+			<div class="stl-picker" role="group" aria-label="Choose a part to preview">
+				{list.map((model, i) => (
+					<button type="button" data-stl-pick={model.src} aria-pressed={i === 0 ? 'true' : 'false'}>
+						{model.name}
+					</button>
+				))}
+			</div>
+		)
+	}
+	{
+		showSelect && (
+			<div class="stl-picker stl-picker-select">
+				<label for={selectId}>Part ({list.length})</label>
+				<select id={selectId} data-stl-select>
+					{list.map((model) => (
+						<option value={model.src}>{model.name}</option>
+					))}
+				</select>
+			</div>
+		)
+	}
+	<div
+		class="stl-viewer"
+		style={`height: ${height};`}
+		data-stl-src={first.src}
+		data-stl-color={color}
+	>
+		<div class="stl-loading">Loading 3D model…</div>
+	</div>
+	<div class="stl-controls">Drag to rotate · Scroll to zoom · Right-click to pan</div>
 </div>
 
 <script>
-  import * as THREE from 'three';
-  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+	import * as THREE from 'three';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+	import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
-  function initViewer(container: HTMLElement) {
-    if (container.querySelector('canvas')) return;
+	function initViewer(container: HTMLElement) {
+		if (container.querySelector('canvas')) return;
 
-    const src = container.dataset.stlSrc;
-    const color = container.dataset.stlColor || '#1e90ff';
-    if (!src) return;
+		const src = container.dataset.stlSrc;
+		const color = container.dataset.stlColor || '#1e90ff';
+		if (!src) return;
 
-    container.innerHTML = '';
+		container.innerHTML = '';
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    if (width === 0 || height === 0) return;
+		const width = container.clientWidth;
+		const height = container.clientHeight;
+		if (width === 0 || height === 0) return;
 
-    const scene = new THREE.Scene();
+		const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+		const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.domElement.setAttribute('role', 'img');
-    renderer.domElement.setAttribute(
-      'aria-label',
-      'Interactive 3D model preview. Drag to rotate, scroll to zoom, right-click to pan.'
-    );
-    container.appendChild(renderer.domElement);
+		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(width, height);
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.domElement.setAttribute('role', 'img');
+		renderer.domElement.setAttribute(
+			'aria-label',
+			'Interactive 3D model preview. Drag to rotate, scroll to zoom, right-click to pan.'
+		);
+		container.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.1;
+		const status = document.createElement('div');
+		status.className = 'stl-loading';
+		status.textContent = 'Loading 3D model…';
+		container.appendChild(status);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+		const controls = new OrbitControls(camera, renderer.domElement);
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.1;
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight1.position.set(1, 1, 1);
-    scene.add(dirLight1);
+		scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
-    dirLight2.position.set(-1, -0.5, -1);
-    scene.add(dirLight2);
+		const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+		dirLight1.position.set(1, 1, 1);
+		scene.add(dirLight1);
 
-    const loader = new STLLoader();
-    loader.load(
-      src,
-      (geometry) => {
-        const material = new THREE.MeshPhongMaterial({
-          color: new THREE.Color(color),
-          specular: 0x222222,
-          shininess: 40,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
+		const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+		dirLight2.position.set(-1, -0.5, -1);
+		scene.add(dirLight2);
 
-        geometry.computeBoundingBox();
-        const center = new THREE.Vector3();
-        geometry.boundingBox!.getCenter(center);
-        mesh.position.sub(center);
+		const loader = new STLLoader();
+		let mesh: THREE.Mesh | null = null;
+		// The last part asked for. A slow file must not overwrite a newer pick
+		// that has already finished — clicking down a list of parts is exactly
+		// how two loads end up in flight at once.
+		let wanted = '';
 
-        const size = new THREE.Vector3();
-        geometry.boundingBox!.getSize(size);
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 100 / maxDim;
-        mesh.scale.set(scale, scale, scale);
+		function clearMesh() {
+			if (!mesh) return;
+			scene.remove(mesh);
+			mesh.geometry.dispose();
+			(mesh.material as THREE.Material).dispose();
+			mesh = null;
+		}
 
-        scene.add(mesh);
+		function loadModel(nextSrc: string) {
+			wanted = nextSrc;
+			status.textContent = 'Loading 3D model…';
+			status.style.display = '';
+			loader.load(
+				nextSrc,
+				(geometry) => {
+					if (wanted !== nextSrc) {
+						geometry.dispose();
+						return;
+					}
+					clearMesh();
 
-        camera.position.set(80, 80, 80);
-        camera.lookAt(0, 0, 0);
-        controls.update();
-      },
-      undefined,
-      (err) => {
-        container.innerHTML =
-          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:red;">Failed to load 3D model</div>';
-        console.error('STL load error:', err);
-      }
-    );
+					const material = new THREE.MeshPhongMaterial({
+						color: new THREE.Color(color),
+						specular: 0x222222,
+						shininess: 40,
+					});
+					// Centre the geometry itself rather than counter-offsetting the
+					// mesh. A mesh's scale multiplies its vertices but not its
+					// position, so `position.sub(center)` only lands on the origin
+					// when the scale is 1 — a part exported far from its own origin
+					// (which is most of a Fusion assembly) got flung off camera and
+					// the viewer showed an empty grid.
+					geometry.center();
+					geometry.computeBoundingBox();
+					mesh = new THREE.Mesh(geometry, material);
 
-    const grid = new THREE.GridHelper(200, 20, 0x444444, 0x333333);
-    grid.position.y = -50;
-    scene.add(grid);
+					const size = new THREE.Vector3();
+					geometry.boundingBox!.getSize(size);
+					const maxDim = Math.max(size.x, size.y, size.z) || 1;
+					const scale = 100 / maxDim;
+					mesh.scale.set(scale, scale, scale);
 
-    let frameHandle = 0;
-    function animate() {
-      frameHandle = requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
+					scene.add(mesh);
+					status.style.display = 'none';
 
-    const resizeObserver = new ResizeObserver(() => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      if (w === 0 || h === 0) return;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    });
-    resizeObserver.observe(container);
+					camera.position.set(80, 80, 80);
+					camera.lookAt(0, 0, 0);
+					controls.target.set(0, 0, 0);
+					controls.update();
+				},
+				undefined,
+				(err) => {
+					if (wanted !== nextSrc) return;
+					status.textContent = 'Failed to load 3D model';
+					status.style.display = '';
+					status.style.color = 'var(--sl-color-red)';
+					console.error('STL load error:', err);
+				}
+			);
+		}
 
-    // Tear down the render loop and free the WebGL context when this viewer's
-    // container leaves the page (Astro client navigation). Browsers cap live
-    // WebGL contexts (~16), so leaking one per navigation eventually breaks
-    // every viewer on the site.
-    function cleanup() {
-      cancelAnimationFrame(frameHandle);
-      resizeObserver.disconnect();
-      controls.dispose();
-      renderer.dispose();
-      document.removeEventListener('astro:before-swap', cleanup);
-    }
-    document.addEventListener('astro:before-swap', cleanup);
-  }
+		loadModel(src);
 
-  function initAllViewers() {
-    document.querySelectorAll<HTMLElement>('.stl-viewer[data-stl-src]').forEach(initViewer);
-  }
+		// The picker sits outside the canvas container but inside the same
+		// wrapper, so it is found from here rather than bound globally.
+		const wrapper = container.closest('.stl-viewer-container');
+		wrapper?.querySelectorAll<HTMLButtonElement>('[data-stl-pick]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const next = button.dataset.stlPick;
+				if (!next || next === wanted) return;
+				wrapper
+					.querySelectorAll<HTMLButtonElement>('[data-stl-pick]')
+					.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+				loadModel(next);
+			});
+		});
+		wrapper?.querySelectorAll<HTMLSelectElement>('[data-stl-select]').forEach((select) => {
+			select.addEventListener('change', () => loadModel(select.value));
+		});
 
-  // Astro scripts with no is:inline are bundled and deferred
-  initAllViewers();
-  document.addEventListener('astro:page-load', initAllViewers);
+		const grid = new THREE.GridHelper(200, 20, 0x444444, 0x333333);
+		grid.position.y = -50;
+		scene.add(grid);
+
+		let frameHandle = 0;
+		function animate() {
+			frameHandle = requestAnimationFrame(animate);
+			controls.update();
+			renderer.render(scene, camera);
+		}
+		animate();
+
+		const resizeObserver = new ResizeObserver(() => {
+			const w = container.clientWidth;
+			const h = container.clientHeight;
+			if (w === 0 || h === 0) return;
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
+			renderer.setSize(w, h);
+		});
+		resizeObserver.observe(container);
+
+		// Tear down the render loop and free the WebGL context when this viewer's
+		// container leaves the page (Astro client navigation). Browsers cap live
+		// WebGL contexts (~16), so leaking one per navigation eventually breaks
+		// every viewer on the site.
+		function cleanup() {
+			cancelAnimationFrame(frameHandle);
+			resizeObserver.disconnect();
+			clearMesh();
+			controls.dispose();
+			renderer.dispose();
+			document.removeEventListener('astro:before-swap', cleanup);
+		}
+		document.addEventListener('astro:before-swap', cleanup);
+	}
+
+	function initAllViewers() {
+		document.querySelectorAll<HTMLElement>('.stl-viewer[data-stl-src]').forEach(initViewer);
+	}
+
+	// Astro scripts with no is:inline are bundled and deferred
+	initAllViewers();
+	document.addEventListener('astro:page-load', initAllViewers);
 </script>
 
 <style>
-  .stl-viewer-container {
-    margin: 1.5rem 0;
-  }
-  .stl-viewer {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid var(--sl-color-gray-5);
-    overflow: hidden;
-    position: relative;
-    background: var(--sl-color-gray-6);
-  }
-  .stl-loading {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-sm);
-  }
-  .stl-controls {
-    text-align: center;
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-    margin-top: 0.5rem;
-  }
+	.stl-viewer-container {
+		margin: 1.5rem 0;
+	}
+	.stl-viewer {
+		width: 100%;
+		border-radius: 8px;
+		border: 1px solid var(--sl-color-gray-5);
+		overflow: hidden;
+		position: relative;
+		background: var(--sl-color-gray-6);
+	}
+	.stl-loading {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-sm);
+		pointer-events: none;
+	}
+	.stl-controls {
+		text-align: center;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		margin-top: 0.5rem;
+	}
+
+	.stl-picker {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+		margin-bottom: 0.6rem;
+	}
+	.stl-picker button {
+		/* 44px tall: this is a target people hit on a phone, one-handed, while
+		   holding the part they just printed in the other hand. */
+		min-height: 44px;
+		padding: 0.35rem 0.75rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 999px;
+		background: var(--sl-color-gray-6);
+		color: var(--sl-color-white);
+		font-size: var(--sl-text-xs);
+		font-family: var(--sl-font-system-mono, monospace);
+		cursor: pointer;
+		line-height: 1.2;
+	}
+	.stl-picker button:hover {
+		border-color: var(--sl-color-accent);
+	}
+	.stl-picker button[aria-pressed='true'] {
+		background: var(--sl-color-accent-low);
+		border-color: var(--sl-color-accent);
+		color: var(--sl-color-white);
+	}
+	.stl-picker-select label {
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-2);
+	}
+	.stl-picker select {
+		flex: 1;
+		min-width: 12rem;
+		/* 16px minimum: below it iOS Safari zooms the page in on focus and never
+		   zooms back out. */
+		font-size: 1rem;
+		min-height: 44px;
+		padding: 0.3rem 0.5rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 6px;
+		background: var(--sl-color-gray-6);
+		color: var(--sl-color-white);
+		font-family: var(--sl-font-system-mono, monospace);
+	}
 </style>

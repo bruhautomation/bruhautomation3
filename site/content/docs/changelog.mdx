@@ -10,7 +10,29 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.15.0" date="August 1, 2026" latest>
+<Release version="1.16.0" date="August 1, 2026" latest>
+
+Every project page now ends with the files you came for.
+
+<Changes type="added">
+
+- **Every printable part is in the viewer.** A project page used to preview one hardcoded STL, if any; it now lists every part in `projects/<project>/models/` and lets you spin any of them — buttons for a handful, a picker for the 62 the Cellcube stand has. Each part is a download link with its size beside it, and the project's folder on GitHub is one link away.
+- **ESPHome configs are on the page.** If a project has YAML, the whole file is now in the guide with syntax highlighting, a line count, and links to view or download it on GitHub. Long files start folded. Nothing is transcribed by hand — the page reads the file out of the project folder when the site builds, so editing the config on GitHub updates the page.
+
+</Changes>
+<Changes type="fixed">
+
+- **Models that sat away from their origin were invisible.** The viewer offset the mesh to centre it but scaled it afterwards, and scale doesn't apply to position — so anything exported out of a Fusion assembly landed off camera and the preview was an empty grid. It centres the geometry now. This is why the tablet mount's keystone plates showed nothing.
+
+</Changes>
+<Changes type="changed">
+
+- **The Autodesk viewer links are gone**, along with the hand-written "STL and STEP files are in the GitHub repo" paragraphs they sat next to. The models are on the page.
+
+</Changes>
+</Release>
+
+<Release version="1.15.0" date="August 1, 2026">
 
 Projects are sorted by project, and filed by what they're for.
 
