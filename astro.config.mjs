@@ -203,6 +203,19 @@ export default defineConfig({
 				// The sidebar group icons, generated above from the sidebar's own
 				// running order so the two can never drift apart again.
 				{ tag: 'style', content: sidebarIconCss },
+				// Amazon OneLink. Product links are written once, tagged for the US
+				// store (`brau01-20`); this rewrites them per reader to whichever
+				// Amazon marketplace actually ships to them. Without it a reader in
+				// the UK follows a link to amazon.com and is told the item cannot be
+				// delivered — most of the audience for a 3D print is not in the US.
+				// `defer` because it only rewrites anchors already in the document.
+				{
+					tag: 'script',
+					attrs: {
+						src: 'https://z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US&adInstanceId=brau01-20',
+						defer: true,
+					},
+				},
 				// Note: no global `description` meta — every page (docs frontmatter,
 				// index.astro, command-generator.astro) sets its own, so a global one
 				// here would emit a duplicate <meta name="description"> on every page.
