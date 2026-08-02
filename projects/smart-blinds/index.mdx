@@ -1,20 +1,450 @@
 ---
 title: Smart Blinds
-description: Servo-driven motorised blinds controller.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: Motorised slat tilt for venetian blinds — an ESPHome servo build with a capacitive touch pad, plus the original Arduino version that closes the loop with a gyro on a slat.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Servo-driven motorised blinds controller.
+This tilts the slats of a venetian blind from Home Assistant. It does not raise
+or lower the blind — it turns the tilt rod, which is the control you actually
+use ten times a day and the one that makes a room usable at 4pm in winter. A
+motor on the tilt rod, a cover entity in Home Assistant, and a tap on the
+housing when you just want it open now.
 
-## Hardware
-- ESP8266 microcontroller
-- Motor driver
-- DC motor for blind control
-- WiFi/MQTT connectivity
+<ImagePlaceholder alt="The BRUH smart blinds motor mounted on a venetian blind headrail, slats half tilted">
+  Hero shot — the printed housing sitting on the headrail with the blind
+  half-tilted, ideally with afternoon light coming through the slats.
+</ImagePlaceholder>
+
+## Two versions in this folder
+
+**The ESPHome one is the one to build.** `bruh_blinds.yaml` runs an ESP32 with a
+hobby servo on the tilt rod and a capacitive touch pad on the housing, and it
+gives Home Assistant a cover entity with no MQTT broker in the middle. It is a
+config file, not a sketch, and it updates over WiFi.
+
+**The Arduino one is the original, and it is the one the rest of the folder is
+about.** `BRUHBlindsV4.ino` drives a 28BYJ-48 geared stepper and reads the slat
+angle back off an MPU-6050 stuck to a slat, so it is closed-loop: you can grab
+the slats and move them by hand and it still knows where they are. The Fritzing
+diagram and every printed part in `models/` belong to *this* build. There is no
+printed part for the servo version — the STL has a coupler with a 3.6 × 5.6 mm
+double-D socket in it, and that is a 28BYJ-48 shaft, not a servo horn.
+
+So: build the ESPHome version if you want the tidier electronics and don't mind
+making your own bracket. Build the stepper version if you want to print the box
+and follow a wiring diagram.
+
+## Parts
+
+<AffiliateDisclosure />
+
+### The ESPHome servo build
+
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — a DevKitC-style board rather than a literal NodeMCU-32S, but the same
+  ESP-WROOM-32 on the same pinout, and the config's `board: nodemcu-32s` key
+  builds for it unchanged. Ships as a 2-pack. It has to be an ESP32 and not an
+  ESP8266: the touch button is `esp32_touch`, which is silicon the ESP8266
+  doesn't have.
+- [MG90S metal-gear micro servo, 180°](https://www.amazon.com/dp/B0925V3X2S?tag=brau01-20)
+  — buy the metal-gear one. A tilt rod that binds at the end of its travel will
+  strip a plastic-gear SG90 in a single move, and the config drives to the stop
+  every time it closes. It must be the **180°** version, not the 360°
+  continuous-rotation one from the same seller; the config commands an angle,
+  not a speed. Ships as a 12-pack, which is annoying for one blind and cheap for
+  four.
+- [WS2812B strip, 30 pixels/m](https://www.amazon.com/dp/B019HAAVLQ?tag=brau01-20)
+  — the config declares `type: GRB` and 24 pixels, so cut 24 off the reel. At
+  30/m that is 80 cm, which is about right laid along a headrail. Don't
+  substitute an SK6812 strip: those are RGBW and the config would need
+  `type: GRBW`.
+- [JST-SM 3-pin pigtails](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20) so
+  the strip unplugs from the box instead of being soldered into it.
+- [5 V 2.5 A supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20) for the
+  board and the servo. See the caution below before you run the pixels off it.
+- [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) or a
+  [perfboard, header and terminal-block kit](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
+  if you're soldering.
+- The touch pad is not a part. It is a length of solid-core wire, a screw head,
+  or a scrap of foil taped behind the wall of the housing, with one wire back to
+  the touch GPIO. That is all `esp32_touch` needs.
+
+:::caution
+**24 WS2812Bs will pull 1.4 A on their own at full white**, and that is not
+going through the dev board's 5 V pin. If you fit the full strip, feed it
+straight off the supply and give the board only the data line and a shared
+ground. The tidy way to get a 5 V rail with screw terminals is a
+[12 V 4 A brick](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) into an
+[MP1495 step-down module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+set to 5 V, with one leg to the strip, one to the servo and one to the board's
+5 V pin.
+:::
+
+### The original stepper build
+
+- [NodeMCU v2 (ESP8266)](https://www.amazon.com/dp/B010O1G1ES?tag=brau01-20) —
+  the sketch is written in `D`-pin names and expects this board.
+- [28BYJ-48 stepper + ULN2003 driver, 12 V, 5 sets](https://www.amazon.com/dp/B01J507JGS?tag=brau01-20)
+  — the 12 V motor, which is what this build wants, because a tilt rod at the
+  end of its travel is real work and the 12 V winding has meaningfully more of
+  it. It does mean a 12 V rail for the driver and something to make 5 V for the
+  NodeMCU. If you'd rather run the whole thing off one 5 V supply, the
+  [5 V 5-set](https://www.amazon.com/dp/B01IP7IOGQ?tag=brau01-20) is
+  mechanically identical and drops straight in — you lose torque, nothing else.
+- [MPU-6050 GY-521 module](https://www.amazon.com/dp/B00KKR9ORI?tag=brau01-20)
+  — this is the position feedback, and it does not live in the box. It goes on a
+  slat.
+- [3M VHB tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) to stick it
+  there. Hot glue works and comes off in a year; VHB does not.
+- [12 V 4 A supply](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) for the
+  driver board and an [MP1495 step-down module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+  to make 5 V for the NodeMCU off the same brick.
+- Optional, and all `#define`-gated at the top of the sketch: a
+  [DHT22 / AM2302 module](https://www.amazon.com/dp/B01N9BA0O4?tag=brau01-20),
+  a [mini PIR module](https://www.amazon.com/dp/B016Y10B3O?tag=brau01-20) and a
+  [photoresistor light module](https://www.amazon.com/dp/B01N1FKS4L?tag=brau01-20).
+  A blind is already in the sunniest spot in the room, so a light level from it
+  is worth having.
+- [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — the
+  ULN2003 board and the GY-521 both take female-to-female straight onto the
+  NodeMCU header.
+
+Either build needs filament for the printed parts:
+[PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) or
+[PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20). Read the print
+section before you choose — this part lives in a window.
+
+## The ESPHome build
+
+### Substitutions
+
+`bruh_blinds.yaml` is a template with nothing filled in. The comment at the top
+lists seven substitutions to set, and **the file uses eight** — `${led_pin}` is
+in the `light:` block and not in the comment, so a first compile fails on an
+undefined substitution and the comment is no help. Define all of these:
+
+| Substitution | What it is |
+|---|---|
+| `device_name` | Friendly name, e.g. `Office Blind` |
+| `device_id` | Hostname, e.g. `office-blind` |
+| `servo_pin` | Any output GPIO; driven through `ledc` at 50 Hz |
+| `led_pin` | Data pin for the pixel strip |
+| `esp_32_touch_pin` | A touch-capable GPIO — see below |
+| `touch_threshold` | The raw value below which a touch registers |
+| `open_setpoint_servo` | Servo level at fully open, from `-1.0` to `1.0` |
+| `open_setpoint_tilt` | Tilt value published at fully open, `0.0` to `1.0` |
+
+The touch pin has to be one of the ESP32's ten touch inputs: GPIO 4, 0, 2, 15,
+13, 12, 14, 27, 33 or 32. Not GPIO2 — `status_led` has claimed it, and that is
+hard-coded rather than substituted.
+
+Secrets are `api_password`, `ota_password`, and — note the names —
+`wifi_ssid_iot` and `wifi_password_iot`, not the usual `wifi_ssid` /
+`wifi_password`. There is a `secrets.yaml.example` in the repo with every key
+the BRUH configs use.
+
+This is a 2019-era config, so on current ESPHome you also need to move the board
+key: delete `platform: ESP32` and `board: nodemcu-32s` from under `esphome:` and
+put a top-level `esp32:` block with `board: nodemcu-32s` in their place. ESPHome
+tells you this the first time you compile. Leave the `lib_deps` pin on
+`NeoPixelBus@2.6.0` alone unless the compiler complains.
+
+### Setting the two setpoints
+
+This is the whole setup, and there is no way to do it from a chair.
+
+`-1.0` is hard-coded as *closed* — it appears in the boot sequence, in
+`close_action`, and in the long-press handler. So mount the servo with the horn
+at one extreme of its travel matching the slats fully closed, then find the
+value at the other end by hand:
+
+<Steps>
+
+1. Flash the config with `open_setpoint_servo` set to `0.0` and
+   `open_setpoint_tilt` to `0.5`.
+
+2. Open the cover from Home Assistant. Note where the slats end up.
+
+3. Walk `open_setpoint_servo` up or down `0.1` at a time until "open" is the
+   slat angle you actually want. Over-driving it into the mechanical stop is
+   what kills servos here, so stop at the first value that looks right rather
+   than the last one that still moves.
+
+4. Set `open_setpoint_tilt` to the tilt percentage that angle represents, as
+   `0.0` to `1.0`. It is cosmetic — it is the number Home Assistant shows — but
+   if it disagrees with reality, every automation you write off tilt will be
+   wrong.
+
+</Steps>
+
+For `touch_threshold`, turn the logger up to `DEBUG`, watch the raw value of the
+touch sensor with your hand off the pad and then on it, and put the threshold
+between the two. On the ESP32 the reading *falls* when touched, so the sensor
+fires below the threshold, not above it.
+
+### What it does once it's running
+
+Home Assistant gets a tilt-only cover — `has_position: false`, so there is no
+up/down, just the tilt slider. A single click on the pad (under 0.75 s) opens,
+a long press (over 0.75 s) closes.
+
+Every move ends with `servo.detach` four seconds later. That is deliberate and
+it is the best thing about this config: the servo is dead quiet and drawing
+nothing between moves, and it isn't fighting the mechanism to hold position.
+It also means **whatever you couple the servo to has to hold its own position**.
+A worm-geared tilt mechanism does this for free. A friction one does not, and
+you will watch the slats sag back over an hour.
+
+On boot it writes `-1.0`, publishes `CLOSED`, waits a second and detaches. If
+the blind was open when the power dropped, the first thing it does when the
+power comes back is drive it shut.
+
+The `wled:` block at the bottom lets the strip take realtime pixel data over UDP
+from WLED-protocol software, on top of the effects the light entity already has.
+Delete it if you don't want that listener running.
+
+## The original stepper build
+
+### Wiring
+
+Every pin is a `#define` at the top of `BRUHBlindsV4.ino`. The GPIO column is
+there because everything except the Arduino IDE talks in GPIO numbers.
+
+| Function | NodeMCU pin | GPIO | Goes to |
+|---|---|---|---|
+| Stepper IN1 | **D4** | 2 | ULN2003 driver board |
+| Stepper IN2 | **D5** | 14 | ULN2003 driver board |
+| Stepper IN3 | **D6** | 12 | ULN2003 driver board |
+| Stepper IN4 | **D7** | 13 | ULN2003 driver board |
+| I²C SDA | **D2** | 4 | GY-521 (MPU-6050) |
+| I²C SCL | **D3** | 0 | GY-521 (MPU-6050) |
+| DHT22 data | **D1** | 5 | Optional |
+| PIR out | **D0** | 16 | Optional |
+| Light module AO | **A0** | ADC | Optional, analogue out |
+| Power | VIN / GND | — | Driver board takes motor power separately |
+
+The MPU-6050 sits at address `0x68`, the default for a GY-521 with AD0 floating.
+
+Two things in that table will confuse you if nobody warns you. **D4 is GPIO2,
+which is also the NodeMCU's onboard blue LED**, so the LED flickers in time with
+the stepper — that is the motor running, not a fault. And **D3 is GPIO0**, the
+pin the ESP8266 samples at reset to decide whether to enter flash mode; if the
+board won't boot with the gyro attached, pull SCL off while you flash.
+
+There is a Fritzing diagram in the project folder if you'd rather work from a
+breadboard layout. It has exactly four parts in it: the NodeMCU, the ULN2003
+board, the 28BYJ-48 and the GY-521.
+
+:::note
+The `AccelStepper` constructor reads `stepper(FULLSTEP, IN1, IN3, IN2, IN4)` —
+the middle two are swapped, and that is not a typo. It is the coil order the
+28BYJ-48 needs. Put them back in 1-2-3-4 order and the motor buzzes and heats up
+instead of turning.
+:::
+
+### How the loop works
+
+There is no step counting. `stepstotake` and `stepsneeded` are declared and
+never used. When a tilt command arrives, the sketch clears `inDeadBand`, jogs
+the stepper at a constant 800 steps/s in whichever direction closes the gap, and
+stops when the gyro says it is within `deadband` of the target. The gyro is the
+encoder.
+
+Two consequences worth knowing. The blind can be tilted by hand and the reported
+position follows it, because position is measured and not remembered. And it
+will not fight you: `inDeadBand` is only cleared by an incoming command, so
+after a manual move it reports the new angle and leaves it alone until you ask
+for something.
+
+The MPU-6050 gets used as a tamper sensor too. It watches all three axes for a
+change greater than `gyrosensitivity` (10) between polls, and publishes `motion`
+on the state topic when the blind gets disturbed while it isn't the one doing
+the disturbing.
+
+### Calibration
+
+Three numbers at the top of the sketch decide everything:
+
+| Constant | Ships as | What it is |
+|---|---|---|
+| `slatsup` | 255 | Gyro y-reading with the slats fully up |
+| `slatsdown` | 110 | Gyro y-reading with the slats fully down |
+| `deadband` | 3 | How close is close enough, in the same units |
+
+Those are one particular blind on one particular window, and they will not be
+yours. Home Assistant's 1–100 tilt is mapped linearly onto `slatsdown`–`slatsup`
+and back again, so if the endpoints are wrong the slider is wrong everywhere.
+
+The awkward part: **the sketch never prints the y value.** `pollGyro()` only
+logs motion alarms. Add a `Serial.println(y)` at the end of `pollGyro()`, flash,
+open the serial monitor at 115200, set the slats fully up by hand and read the
+number, then fully down and read that one. Put both in, take the `println` back
+out, reflash.
+
+With the shipped numbers the range is 145 units wide, so a `deadband` of 3 is
+about 2% of tilt. Tighten it and the motor hunts; loosen it and the last few
+degrees never arrive.
+
+### The Home Assistant side
+
+It talks MQTT, so it needs a broker — Mosquitto as a Home Assistant add-on is
+the normal answer. The sketch uses three topics, all named for `blind2`:
+
+- `bruh/blind2/cover/tilt` — command in, a plain number 1 to 100.
+- `bruh/blind2/cover/tilt-status` — tilt position out, retained.
+- `bruh/blind2/cover/sensor` — a retained JSON payload with `motion` and,
+  depending on which `#define`s you left in, `temperature`, `humidity`,
+  `heatIndex`, `pir` and `ldr`.
+
+Configure it in Home Assistant as an MQTT cover with a tilt command topic, a
+tilt status topic and a 1–100 tilt range, and the readings as MQTT sensors with
+value templates off the JSON. Change `blind2` in the topic names for every blind
+you build, along with `mqtt_client_name` and `SENSORNAME`.
+
+:::caution
+**The sketch ships with working credentials filled in** — WiFi SSID and
+password, MQTT server address, MQTT username and password, and an OTA password.
+They are somebody else's and they are in plain text. Replace every one of them
+before you flash, and replace them before you push the file anywhere.
+:::
+
+### Libraries, and the three things that will not compile
+
+Install ESP8266WiFi, PubSubClient, ArduinoOTA, DHT and AccelStepper from the
+Library Manager, plus ArduinoJson.
+
+**ArduinoJson has to be 5.x.** The sketch uses `StaticJsonBuffer` and
+`root.printTo()`, which ArduinoJson 6 removed. Install the latest 5.13.x and it
+compiles; install whatever the Library Manager offers by default and it does
+not.
+
+**`MQTT_MAX_PACKET_SIZE` does nothing where it is.** The `#define` sits well
+below `#include <PubSubClient.h>`, and the library has already set its own
+default by then. The full state payload with temperature, humidity, heat index,
+PIR, light and motion in it is close to PubSubClient's default limit, so if the
+state topic simply never appears while the tilt topic works fine, that is why —
+move the define above the include.
+
+**Don't turn `BLINDSenabled` off.** The `#else` branch that runs in its place
+reads `sensorRead():` — a colon, not a semicolon. It has never been compiled,
+because that branch is never taken.
+
+## The printed parts
+
+`bruh_blinds_final.stl` is one file with four pieces already laid out flat on a
+plate, 98 × 118 mm of bed and 75 mm tall at the tallest. Slice the whole file
+and you get the lot in one print.
+
+- **The box** — 74 × 57 × 32 mm outside, with cutouts in two walls and a lid.
+  The NodeMCU and the ULN2003 board live in here.
+- **The bracket** — a 23.5 × 52 mm base plate with an arch rising 75 mm off it.
+  The clear span between its legs is about 26 mm, which is a 1-inch mini-blind
+  headrail.
+- **The coupler** — an 8 mm post, 13.85 mm tall, with a 3.6 × 5.6 mm double-D
+  socket in one end and a 2 × 6.6 mm blade on the other. The socket is a
+  28BYJ-48 output shaft with 0.3 mm of clearance a side; the blade drives the
+  tilt rod.
+- **The gyro sleeve** — 35 mm tall with a 22 × 8 mm slot through it. A GY-521
+  board slides in. If yours has taller headers soldered on, open the slot out
+  with a file rather than reprinting.
+
+### Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Infill | 25%, and 50% for the coupler |
+| Perimeters | 3, and 5 for the coupler |
+| Supports | None, but watch the arch |
+| Material | PETG |
+| Orientation | As exported — everything is already flat on the plate |
+
+**PETG, not PLA.** This part sits in a window with the sun on it. A PLA bracket
+on a south-facing window will creep out of shape over one summer, and the first
+thing you'll notice is the coupler no longer lining up with the tilt rod.
+
+**The coupler is the part that fails.** It prints standing up, which puts the
+layer lines exactly where the twisting load wants to peel them apart. Give it
+the extra perimeters and infill in the table, and if it splits anyway, print
+that one piece on its side with supports.
+
+The arch is the only geometry worth watching. It closes gradually rather than
+bridging flat, so most printers manage it unsupported — if your bridging is
+poor, support that one part and leave the rest alone.
+
+<ImagePlaceholder alt="The four printed parts for the smart blinds: enclosure, lid, headrail bracket and shaft coupler">
+  The printed set laid out — box, lid, bracket and the little double-D coupler,
+  with the 28BYJ-48 beside it for scale.
+</ImagePlaceholder>
+
+## Assembly
+
+Written for the stepper build, because that is the one the printed parts fit.
+
+<Steps>
+
+1. **Print everything and dry-fit before you wire.** Push the coupler onto the
+   28BYJ-48 shaft. It should need a firm push and no hammer; if it spins,
+   reprint with a slightly smaller socket, and if it won't start, run a knife
+   round the first layer's elephant foot.
+
+2. **Take the wand off the blind** and see how the tilt rod ends. This is the
+   step people skip and then discover their headrail is nothing like the one the
+   bracket was drawn for. The coupler's blade drives the rod; if your blind ends
+   in something else, this is where you find out and adapt the coupler.
+
+3. **Wire the NodeMCU to the ULN2003 board** — D4/D5/D6/D7 to IN1/IN2/IN3/IN4,
+   and a common ground. Motor power goes to the driver board's own terminals,
+   not through the NodeMCU.
+
+4. **Wire the GY-521** to D2 and D3 with 3V3 and GND, and give it enough lead to
+   reach a slat with slack to spare. It is going on a moving part.
+
+5. **Flash the sketch and calibrate before you close anything up.** Reading the
+   gyro means having the serial monitor attached, and you want the box open
+   while you do it.
+
+6. **Stick the GY-521 to a slat with VHB**, near the middle of the blind and
+   flat against the slat. Then re-run the endpoint calibration, because the
+   numbers you took on the bench are meaningless once the sensor is at its final
+   angle.
+
+7. **Mount the bracket and box on the headrail**, dress the gyro lead so it
+   doesn't foul the slats through their full travel, and put the lid on.
+
+</Steps>
+
+## Troubleshooting
+
+**The tilt slider moves but the blind doesn't.** The motor is turning and the
+coupler isn't. Printed couplers wear their sockets round on a shaft they were a
+bit loose on to begin with — check it by holding the coupler and turning the
+motor by hand.
+
+**It drives to one end and stays there.** `slatsup` and `slatsdown` are still
+somebody else's numbers, so the target angle is outside anything the gyro can
+report and it never reaches the deadband. Calibrate.
+
+**It hunts back and forth and never settles.** `deadband` is smaller than the
+noise on the gyro reading. Take it up a couple of units.
+
+**It reboots whenever the broker hiccups.** That is by design, and it is worth
+knowing about: on losing the MQTT connection the sketch calls `software_Reset()`
+rather than reconnecting. A flaky broker means a blind that reboots all day. If
+that is happening, fix the broker, or swap that call for the `reconnect()`
+function that is already in the file and commented out one line above it.
+
+**The ESPHome version stutters and browns out mid-move.** The servo's stall
+current is going through the dev board. Give it its own leg off the 5 V rail
+with a common ground back to the board.
+
+**The pixels flicker or show the wrong colours.** The ESP32's data line is
+3.3 V and the strip wants 5 V logic. It usually works; when it doesn't, it is
+this. Keep the data lead under about 20 cm, or put a level shifter in it.
 
 ## Files & downloads
 
