@@ -14,8 +14,10 @@ This is a slat panel where the hooks live *inside* the gaps between the boards.
 Pull one down and you have a four-inch peg. Flick it up and the wall is flat
 again.
 
-Sixteen of them, in two rows of eight, all pivoting on two lengths of quarter-inch
-rod that run the full width of the panel behind the slat faces.
+Sixteen of them, in two rows of eight, all pivoting on two lengths of
+quarter-inch steel rod that run the full width of the panel behind the slat
+faces. It is a lumber build with printed hooks, not a printed panel — nothing in
+it is beyond a saw and a drill.
 
 <ImagePlaceholder alt="The folding wall hook panel mounted in a hallway, some hooks folded flat and some pulled down with a coat and a bag hanging on them">
   Hero shot — the panel on a wall with a mix of folded and deployed hooks, and
@@ -25,70 +27,81 @@ rod that run the full width of the panel behind the slat faces.
 
 ## How it works
 
-The hook is a plain square-section bar with a rounded heel at one end, bored on
+The hook is a square-section bar with a big rounded heel at one end, bored on
 its centreline for the pivot rod. It swings through exactly 60°, and both end
-positions are set by geometry rather than by a detent:
+positions are set by geometry rather than by a detent.
 
 **Folded**, the bar stands dead vertical in the gap between two slats. Its back
-face is a flat plane that lands against the backer rail behind the slats, and
-the pivot sits on the bar's centreline, so it is balanced over its own axis with
-its back leaning on the rail. Nothing latches it. Friction in the bore is what
-keeps it there.
+is a flat plane that lands against the backer rail behind the slats, and the
+pivot sits on the bar's centreline, so it is balanced over its own axis with its
+back leaning on the rail. Nothing latches it. Friction in the bore is what keeps
+it there.
 
 **Deployed**, a flat on the heel comes round and lands on that same rail, and
 the bar stops at 30° above horizontal.
 
-The clever part is the tip. The last 34 mm of the bar is cut off at 60° to its
-own axis — which means that when the bar rotates 60° into the deployed position,
-that cut ends up **dead level**. So the peg is a 30° ramp for most of its length
-with a flat landing at the outer end: anything you hang slides inward towards the
-wall and then stops, and there is no lip on the end to snag a coat loop on when
-you take it off.
+In between, the heel *lifts off*. Rotate the profile about the pivot and the
+rearmost point of the hook never goes deeper than where it started — it backs
+away from the rail by up to 1.4 mm halfway through the swing and settles onto it
+again at the far end. The rail needs no relief cut, no notch and no clearance
+pocket. It is a flat board.
 
-Nothing on the hook ever swings behind the plane of the slats. The whole 60°
-sweep stays inside a three-quarter-inch gap.
+The clever part is the tip. The last 34 mm of the bar is a single plane raked
+30° off the bar's own axis, so when the bar rotates 60° into the deployed
+position that plane ends up **dead level**. The peg is a 30° ramp for most of
+its length with a flat landing at the outer end: anything you hang slides inward
+towards the wall and then stops, and there is no lip on the end to snag a coat
+loop on when you take it off.
 
 ## The panel
 
 Every number here is measured off the STEP file in this folder. The whole thing
-is drawn to nominal 1×2 dimensions, so it is a lumber build with printed hooks —
-not a printed panel. Nothing in it is bigger than a table saw and a drill.
+is drawn to nominal 1×2 dimensions.
 
 | Part | Size | Count |
 |---|---|---|
 | Slat | 1-1/2 × 3/4 × 12 in (38.1 × 19.05 × 304.8 mm) | 9 |
-| End stile | 3/4 × 1-1/2 × 12 in (19.05 × 38.1 × 304.8 mm) | 2 |
+| End stile | same stock, turned on edge | 2 |
 | Backer rail | 19-1/2 × 1-1/4 × 3/4 in (495.3 × 31.75 × 18.8 mm) | 4 |
 | Pivot rod | 1/4 in dia × 21 in (6.35 × 533.4 mm) | 2 |
 | Printed hook | see below | up to 16 |
 
 The slats sit on **2-1/4 in (57.15 mm) centres**, which leaves eight gaps of
-exactly 3/4 in — the gap is the hook pocket, and it is why the slat spacing is
-not negotiable. The two end stiles are the same stock turned on edge and sit
-flush against the outermost slats, with no gap either side.
+exactly 3/4 in. The gap is the hook pocket, which is why the slat spacing is not
+negotiable. The two stiles are the same stock turned on edge and sit flush
+against the outermost slats, no gap either side.
 
 Overall the panel is **21 × 13 in and stands 1-1/2 in off the wall**. The slats
-are 12 in long in a 13 in frame, offset down by an inch, so the stiles stand
-proud at the top and the slat ends hang below the bottom rail as a fringe.
+and the stiles are all 12 in long, but they are offset from each other by
+exactly an inch — the stiles sit an inch higher, so they stand proud at the top
+and the slat ends hang below the bottom rail as a fringe. That inch is not
+decoration; see the last section.
 
-Heights, measured from the bottom end of the slats — this is the drilling
-schedule:
+Here is every elevation in the panel, measured from the bottom end of a slat,
+which is the lowest point of the whole thing:
 
 | Feature | Height |
 |---|---|
-| Rail 1 (bottom edge) | 25.4 mm |
+| Slat, bottom to top | 0 → 304.8 mm |
+| Stile, bottom to top | 25.4 → 330.2 mm |
+| Rail 1 | 25.4 → 57.2 mm |
 | **Lower rod centre** | **41.9 mm** |
-| Rail 2 (bottom edge) | 105.8 mm |
-| Rail 3 (bottom edge) | 192.6 mm |
+| Rail 2 | 105.8 → 137.6 mm |
+| Rail 3 | 192.6 → 224.4 mm |
 | **Upper rod centre** | **207.0 mm** |
-| Rail 4 (bottom edge) | 273.1 mm |
+| Rail 4 | 273.1 → 304.8 mm |
 
-The two rods are **165.1 mm (6-1/2 in) apart** and each runs across the middle
-of a rail — rail 1 and rail 3. That is not decoration: the rail is what the
-hook's heel bears against at both ends of its swing, so a rod without a rail
-behind it has no stop.
+The two rods are **165.1 mm (6-1/2 in) apart** and each runs at the mid-height
+of a rail — rail 1 and rail 3. That pairing is the whole mechanism: the rail is
+what the hook's heel bears against at both ends of its swing, so a rod without a
+rail behind it has no stop. Rails 2 and 4 carry no rod and exist only to glue
+slats to.
 
-Both rods sit at **mid-depth of the slats, 9.65 mm back from the front face.**
+:::note
+**The rails are never drilled.** The rods pass through the nine slats and the
+two stiles only, at 9.65 mm back from the front face. The rails sit behind that,
+starting 19.3 mm back. Eleven pieces get holes, four pieces do not.
+:::
 
 ## The hook
 
@@ -97,16 +110,20 @@ there is no overhang anywhere in it.
 
 | Feature | Dimension |
 |---|---|
-| Width (along the pivot axis) | 19.05 mm — the same 3/4 in as the slat gap |
-| Bar section | 19.30 mm across, parallel for 85 mm |
+| Width, along the pivot axis | 19.05 mm — the same 3/4 in as the slat gap |
+| Bar section | 19.30 mm across, parallel for 84.9 mm |
 | Length, pivot centre to tip | 120.0 mm |
-| Pivot centre | on the bar centreline, 15.6 mm up from the heel end |
+| Pivot centre | on the bar centreline, 15.6 mm up from the heel |
 | Overall, folded | 19.3 × 135.3 mm |
 | Overall envelope, deployed | 117.5 × 68.9 mm |
 | Reach in front of the slat face | 98.4 mm (3-7/8 in) |
 | Level landing at the tip | 33.9 mm |
-| Tip | tapers to 2.4 mm, rounded on about a 1.2 mm radius |
+| Tip | tapers to 2.5 mm, rounded on a 1.27 mm radius |
 | Part volume | 42.8 cm³ |
+
+The pivot is at 9.65 mm because that is half the bar's own 19.30 mm section, and
+the hook's front face sits flush with the front of the slats. It lands a tenth
+of a millimetre behind the slats' actual mid-thickness. Nobody has ever noticed.
 
 Printed the way I would print it — five walls, 30% infill — that is a bit over
 30 g each, so a full set of sixteen is roughly half a kilogram of filament. Buy
@@ -119,44 +136,44 @@ the spool before you start, not after hook eleven.
 - [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the default. One kilogram covers a full set of sixteen with room to spare
 - [Matte PLA, light brown](https://www.amazon.com/dp/B08HVP2Q1C?tag=brau01-20) — if you want the hooks to disappear into the boards rather than announce themselves
 - [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — use this instead if the panel is going in a garage or a mudroom that gets hot. PLA creeps under a load that never comes off
-- [1/4 in steel rod, 24 in](https://www.amazon.com/s?k=1%2F4+inch+steel+rod+24+inch&tag=brau01-20) ×2 — cut to 21 in. Steel, not dowel: this is the axle for the whole panel
-- [Walnut 3/4 × 2 × 12 in, 4 pcs](https://www.amazon.com/dp/B07GJBM52K?tag=brau01-20) ×3 packs — ripped to 1-1/2 in it gives you the nine slats and two stiles. A pine 1×2 from the lumber aisle does the same job for a tenth of the money
-- [FastCap 2P-10 wood adhesive](https://www.amazon.com/dp/B0006IUWCM?tag=brau01-20) — CA plus activator, so the slats are stuck before you have finished aligning the next one
+- [1/4 in steel rod, 24 in](https://www.amazon.com/s?k=1%2F4+inch+steel+rod+24+inch&tag=brau01-20) ×2 — cut to 21 in. Steel, not dowel: this is the axle for the whole panel and there is no second one
+- [Walnut 3/4 × 2 × 12 in, 4 pcs](https://www.amazon.com/dp/B07GJBM52K?tag=brau01-20) ×3 packs — twelve pieces ripped to 1-1/2 in gives you the nine slats and two stiles with one spare. A pine 1×2 from the lumber aisle does the same job for a tenth of the money, and is already 3/4 × 1-1/2 so there is nothing to rip
+- One 8 ft 1×2 of anything for the four rails — they are 19-1/2 in long, so they will not come out of the 12 in walnut, and they never show
+- [FastCap 2P-10 wood adhesive](https://www.amazon.com/dp/B0006IUWCM?tag=brau01-20) — CA plus activator, so each slat is stuck before you have finished aligning the next one
 - [Pocket-hole jig kit](https://www.amazon.com/dp/B07SGQ53V7?tag=brau01-20) and [pocket screws](https://www.amazon.com/dp/B0989W4GFZ?tag=brau01-20) — for the four rails into the two stiles, which is the only real joinery in the thing
 - [Right-angle corner clamps](https://www.amazon.com/dp/B0B9X798BD?tag=brau01-20) — hold the ladder frame square while you drive those screws
-- [1/4 in brad-point drill bit](https://www.amazon.com/s?k=1%2F4+inch+brad+point+drill+bit&tag=brau01-20) — the pivot holes go through eleven pieces of wood and have to line up. A brad point will not wander the way a twist bit does
-- [Stud finder](https://www.amazon.com/dp/B0917VXLDK?tag=brau01-20) and [2-1/2 in wood screws](https://www.amazon.com/s?k=%232+1%2F2+inch+wood+screws+construction&tag=brau01-20) — the panel is 1-1/2 in of wood in front of the drywall, so anything shorter never reaches the stud
+- [Speed square and combination square](https://www.amazon.com/dp/B00SOVRPXW?tag=brau01-20) — the combination square is what you set the two rod heights with, off the end of every piece
+- [1/4 in brad-point drill bit](https://www.amazon.com/s?k=1%2F4+inch+brad+point+drill+bit&tag=brau01-20) — twenty-two holes that all have to agree. A brad point starts where you put it; a twist bit wanders
+- [Stud finder](https://www.amazon.com/dp/B0917VXLDK?tag=brau01-20) and [2-1/2 in wood screws](https://www.amazon.com/s?k=%232+1%2F2+inch+wood+screws+construction&tag=brau01-20) — the panel puts 3/4 in of rail plus drywall between the screw head and the stud, so anything shorter never gets there
 - [Drywall and hollow-wall anchors](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20) — for the fixings that miss a stud, which on a 21 in panel is most of them
-- [Rubio Monocoat Oil Plus 2C](https://www.amazon.com/dp/B00OA5V19K?tag=brau01-20) or the [Walnut sample size](https://www.amazon.com/dp/B091G3WM2F?tag=brau01-20) — one coat, no topcoat, and it does not build a film the hooks then have to rub through
+- [Rubio Monocoat Oil Plus 2C](https://www.amazon.com/dp/B00OA5V19K?tag=brau01-20), or the [walnut sample size](https://www.amazon.com/dp/B091G3WM2F?tag=brau01-20) if you only need enough for one panel — one coat, no topcoat, and it does not build a film the hooks then have to rub through
 - [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — you will be checking the bore against the rod
 - [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) and a [deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — for opening the bore and taking the elephant's foot off the hook faces
 - [Assorted sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — a couple of strokes per hook face is the difference between swinging and binding
 
-The rails never show. Use whatever offcut you have for those; save the good wood
-for the nine slats and the two stiles.
-
 ## Getting a printable hook out of the file
 
 :::caution
-The STL in this folder is the **whole assembly** — slats, stiles, rails, rods and
-sixteen hooks in one mesh. Sending it to a slicer as-is will not do anything
-useful. And the rod is drawn passing straight through solid hooks, so **there is
-no pivot bore in the model.** You have to add one.
+The STL in this folder is the **whole assembly** — nine slats, two stiles, four
+rails, two rods and sixteen hooks in one mesh, 33 bodies. Sending it to a slicer
+as-is will not do anything useful. And the rod is drawn passing straight through
+solid hooks, so **there is no pivot bore in the model.** You have to add one.
 :::
 
-Two ways round it, and the second is better:
+Two ways round it, and the second is better.
 
 Load the STL into PrusaSlicer, Orca or Bambu Studio and use **split to objects**.
-You get thirty-three bodies; delete everything but one hook, print sixteen of it,
-and drill the pivot hole afterwards. Workable, but drilling 19 mm of printed
-plastic with a 1/4 in bit wants a slow speed and a pecking action or the bit
-grabs and melts a spiral out of it.
+Delete everything but one hook, print sixteen of it, and drill the pivot hole
+afterwards. Workable, but boring 19 mm of printed plastic with a 1/4 in bit
+wants a slow speed and a pecking action or the bit grabs and melts a spiral out
+of it.
 
 Or open `folding_wall_hooks_v4.f3d` (or the STEP), delete everything except one
 hook, cut a **6.6 mm hole** on the pivot centre — 9.65 mm from each face,
 15.6 mm up from the heel end — and export that. Fifteen minutes, and every hook
 after it comes out right. The extra 0.25 mm over the rod's nominal 6.35 mm is
-what makes it turn rather than seize.
+what makes it turn rather than seize, and a printed hole comes out undersize
+anyway, so expect to run a round needle file through it once.
 
 ## Print settings
 
@@ -169,12 +186,13 @@ what makes it turn rather than seize.
 | Material | PLA+ indoors, PETG anywhere warm |
 | Orientation | Profile flat on the bed, 19.05 mm tall |
 
-**Orientation is the one thing worth getting right.** Lay the profile flat so the
-part is 19.05 mm tall and the pivot bore runs straight up and down. The layers
-then stack along the pivot axis, which means a coat hanging off the tip loads the
-extrusions along their length and never pulls a layer apart. Stand the hook up on
-end instead and you have built a cantilever out of stacked layer joints — it will
-snap at the heel the first time somebody hangs a wet coat on it.
+**Orientation is the one thing worth getting right.** Lay the profile flat so
+the part is 19.05 mm tall and the pivot bore runs straight up and down. The
+layers then stack along the pivot axis, which means a coat hanging off the tip
+loads the extrusions along their length and never pulls a layer apart. Stand the
+hook up on end instead and you have built a cantilever out of stacked layer
+joints — it will snap at the heel the first time somebody hangs a wet coat on
+it.
 
 Wall count is doing the work here, not infill. The bending stress is all in the
 outer skin at the heel, so five perimeters on a 0.4 mm nozzle is worth more than
@@ -187,96 +205,121 @@ fixes it.
 
 ## Drilling
 
-This is the part of the build that has to be right, and it is worth being fussy
-about for twenty minutes.
+Twenty-two holes, and they have to agree with each other. If the eleven holes on
+one rod line are not collinear the rod will not go through at all; if they are
+nearly-but-not-quite collinear the rod goes in bent and every hook on it binds.
 
-The pivot rod passes through nine slats and two stiles, and the sixteen hooks
-have to turn freely on it. If those eleven holes are not collinear the rod will
-not go through at all, and if they are nearly-but-not-quite collinear the rod
-goes in bent and every hook binds.
+Two numbers do all the work. **Every hole is 9.65 mm back from the front face**
+of its piece, and every hole is at one of two heights.
+
+| Piece | Lower hole | Upper hole |
+|---|---|---|
+| Slat ×9 | 41.9 mm from the bottom end | 207.0 mm from the bottom end |
+| Stile ×2 | 16.5 mm from the bottom end | 181.6 mm from the bottom end |
+
+:::caution
+**The stiles are not drilled at the same heights as the slats.** All eleven
+pieces are 12 in long, but the stiles sit an inch higher in the finished panel,
+so their holes are 25.4 mm lower relative to their own ends. Mark all eleven
+pieces laid out in the position they will end up in — stiles an inch proud at
+the top — and the two rod heights become one straight line across the lot.
+Square them all off flush and drill one set of heights and you will have built
+two pieces that cannot go on.
+:::
 
 <Steps>
 
-1. **Cut all eleven pieces to 12 in first**, and square the ends. They will be
-   drilled as a stack, so they need to register against each other.
+1. **Cut all eleven pieces to 12 in** and square the ends. Every measurement
+   below is off an end, so an end that is not square is an error you cannot
+   correct later.
 
-2. **Stack them face to face, ends flush, and clamp hard.** All nine slats and
-   both stiles in one block, on edge.
+2. **Do not try to stack-drill them.** Nine slats face to face is 13-1/2 in of
+   wood and there is no quarter-inch bit that long. Each piece only needs a hole
+   through 38.1 mm of slat, or 19.05 mm of stile, which is nothing.
 
-3. **Mark the two rod heights on the end of the stack** — 41.9 mm and 207.0 mm
-   from the bottom end, centred in the 3/4 in thickness.
+3. **Set up a fence and a stop instead.** Lay the piece down so the hole runs
+   vertically, clamp a straight fence 9.65 mm from the bit centre with the front
+   face against it, and clamp a stop block at the first hole height. Run all nine
+   slats. Move the stop, run all nine again. Then move it 25.4 mm for the two
+   stiles and do both heights again.
 
-4. **Drill both holes right through the stack** on a drill press if you have one,
-   with the block against a fence. A hand drill works if the block is deep enough
-   to guide the bit, but check the exit face before you unclamp.
+4. **No drill press? Make a bushing block.** Drill one offcut of the same stock
+   accurately, then clamp it on top of each piece as a guide and follow it with
+   the bit. A wood guide block keeps a hand drill honest over 38 mm far better
+   than an eye does.
 
-5. **Do not unclamp and re-mark.** Every hole in that stack is now the same hole,
-   which is the entire point of drilling it as one.
+5. **Check the exit face on the first one.** A bit that is 2° off looks fine
+   going in and is 1.3 mm out by the time it comes through the far side. Find
+   that on slat one, not on slat nine.
 
 </Steps>
 
-:::note
-The stiles are drilled in the same stack even though they are used on edge. The
-rod is 21 in long — exactly the panel width — so it ends flush with the outside
-face of each stile and is captive once the frame is together. Nothing retains it
-and nothing needs to.
-:::
+The rod is 21 in long — exactly the panel width — so it ends flush with the
+outside face of each stile and is captive once the frame is together. Nothing
+retains it and nothing needs to.
 
 ## Assembly
 
 <Steps>
 
-1. **Build the ladder frame.** Four rails between the two stiles, pocket screws
-   from behind, corner clamps holding it square. Check the diagonals before the
-   glue grabs — a frame out of square puts the rods out of parallel, and the
-   hooks will tell you about it.
+1. **Build the ladder frame.** Four rails between the two stiles at the heights
+   in the table above, pocket screws from behind, corner clamps holding it
+   square. Check the diagonals before the glue grabs — a frame out of square puts
+   the two rods out of parallel, and the hooks will tell you about it.
 
-2. **Dry-fit the slats** on the front of the rails at 2-1/4 in centres, with the
-   slats sitting an inch lower than the stiles. A 3/4 in offcut makes the perfect
-   spacer: drop it in each gap, push the next slat up to it, pull it out.
+2. **Dry-fit the slats** on the front of the rails at 2-1/4 in centres, sitting
+   an inch lower than the stiles. A 3/4 in offcut is the perfect spacer: drop it
+   in each gap, push the next slat up to it, pull it out.
 
 3. **Thread the lower rod** through the stile, then alternate slat, hook, slat,
-   hook all the way across, and out through the far stile. Do this **before** any
+   hook all the way across and out through the far stile. Do this **before** any
    slat is glued down. There is no way to fit a hook afterwards.
 
 4. **Glue the slats to the rails** with the rod in place holding the spacing.
    2P-10 on the rails, activator on the slats, press and hold for ten seconds
    each.
 
-5. **Thread the upper rod** the same way and check every hook swings its full 60°
-   without touching the slat either side of it.
+5. **Thread the upper rod** the same way and check every hook swings its full
+   60° without touching the slat either side of it.
 
-6. **Finish it** before it goes on the wall — the gaps are impossible to get into
-   once the panel is vertical. Oil the hooks too; it costs nothing and stops the
-   printed faces squeaking on the wood.
+6. **Finish it** before it goes on the wall — the gaps are impossible to get
+   into once the panel is vertical. Oil the hooks too; it costs nothing and stops
+   the printed faces squeaking on the wood.
 
 7. **Hang it** on two screws through the top rail and two through the bottom,
-   into studs where you can find them and anchors where you cannot. The load is
-   pulling the panel off the wall at the top, so the top pair are the ones that
+   into studs where you can find them and anchors where you cannot. The load
+   pulls the panel off the wall at the top, so the top pair are the ones that
    matter.
 
 </Steps>
 
+<ImagePlaceholder alt="Close-up of one printed hook in the slat gap, shown folded flush and pulled down into the deployed position">
+  Detail shot — the same gap twice, folded and deployed, close enough to see the
+  heel sitting on the backer rail and the level landing at the tip.
+</ImagePlaceholder>
+
 ## Two things that will bite you
 
 **The hooks are exactly as wide as the gaps.** 19.05 mm of hook in a 19.05 mm
-slot is zero clearance, and a printed part is always a touch wider than nominal.
-Sand two or three strokes off each face of every hook before assembly, or scale
-the part to 98% along the pivot axis in the slicer. Do it before the panel is
-glued up, not after.
+slot is zero clearance, and a printed part is always a touch wider than nominal —
+especially on the first layer, which here is one of the two faces that has to
+slide. Sand two or three strokes off each face of every hook before assembly, or
+scale the part to 98% along the pivot axis in the slicer. Do it before the panel
+is glued up, not after.
 
 **Bore fit is what holds a folded hook up.** There is no catch, no magnet and no
 spring — the bar simply balances over its pivot with its back against the rail.
 A bore that turns sweetly on the rod stays where you put it. A sloppy one lets
 the hook drift open on its own, and you are back to a wall covered in pegs. Aim
-for a hook you can turn with one finger but that does not fall under its own
+for a hook you can turn with one finger but that will not fall under its own
 weight, and file up to it rather than drilling straight to a number.
 
-One more, less a trap than a quirk of the design: when the top row folds up, the
-hook tips stand **22 mm proud of the top of the slats** and that is your finger
-grip. The bottom row's tips finish flush inside the slot, so they need a
-fingernail to start them. Worth knowing when you decide which row gets the
-things you put up and take down every day.
+One more, less a trap than the reason for that inch of offset: when the top row
+folds up, the hook tips land **22 mm above the slats and 3.5 mm shy of the top of
+the stiles** — right in the notch the offset creates. That is your finger grip,
+and it is why the stiles stand proud. The bottom row's tips finish buried inside
+the slot, so they need a fingernail to start them. Worth knowing when you decide
+which row gets the things you put up and take down every day.
 
 ## Files & downloads
 
