@@ -1,18 +1,250 @@
 ---
 title: Outlet Cover
-description: Adds a switched outlet to an existing one.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed cover that carries a relay in front of an existing wall outlet, so one half of the receptacle switches from Home Assistant and the other stays always on.
+# The write-up below is complete, but the bracket itself isn't in the repo yet —
+# no STL, nothing to print. Published, and marked as pending on the page, in the
+# sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Adds a switched outlet to an existing one.
+Half the reason a room never gets automated is that the lamp is plugged into a
+wall outlet and nobody wants a smart plug sticking out of it. This is the other
+answer: a relay goes behind the outlet, the brass tab on the receptacle gets
+snapped off, and the top socket becomes a Home Assistant switch while the bottom
+one stays live for the vacuum. The printed cover is what carries the relay,
+because a US wall box that already holds a receptacle and two cables has nowhere
+to put one.
 
-## Hardware
-- Outlet cover bracket
-- Control relay
+<ImagePlaceholder alt="A 3D printed outlet cover standing proud of the wall, with a lamp plugged into the switched top socket">
+  Hero shot — the finished cover on the wall with a lamp in the top socket.
+  Worth a second frame with the cover off, showing the relay sitting in it and
+  the receptacle's broken brass tab.
+</ImagePlaceholder>
+
+:::danger
+This is line-voltage work inside a wall box. Kill the breaker, prove it dead
+with a tester, and if any part of that sentence is unfamiliar, stop and get an
+electrician — or plug a [smart plug](https://www.amazon.com/dp/B07BTLHWFM?tag=brau01-20)
+into the outlet instead and get 90% of the same result with none of the risk.
+:::
+
+## How it works
+
+A duplex receptacle is two sockets that only look independent. The two brass
+screws on the hot side are joined by a small break-off tab, and so are the two
+silver screws on the neutral side. Snap the **brass** tab and you have two
+electrically separate sockets sharing one body — which is exactly how a builder
+wires a half-hot bedroom outlet to a wall switch.
+
+Here the wall switch is a WiFi relay. Line feeds the relay, the relay's output
+feeds the top socket, and a pigtail off the same line feeds the bottom socket
+directly. Nothing about the outlet changes from the front except that one of its
+two sockets now answers to Home Assistant.
+
+The relay does not go in the box. A 1-gang box with a receptacle and 14/2 in it
+is already at its fill, and if it is steel it is also a Faraday cage that will
+sit the relay's antenna at two bars for the rest of its life. The printed cover
+stands the whole module off the wall in plastic, in front of the drywall, where
+there is room and where the radio works.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Shelly Plus 1 PM](https://www.amazon.com/dp/B09TS24GCH?tag=brau01-20) — the
+  control relay. 16 A, and the PM half measures what the socket is actually
+  drawing, which turns out to be the more useful feature. It needs a neutral,
+  and an outlet box always has one — this is the reason this job is easier at an
+  outlet than at a light switch. Sold in fours; you will use the other three.
+- [Shelly 2.5](https://www.amazon.com/dp/B08J3QP1SG?tag=brau01-20) — the
+  alternative, if you want *both* sockets switched independently rather than one
+  switched and one always-on. Two channels at 10 A each instead of one at 16 A,
+  and this is the one in the family whose listing carries a UL mark. Check the
+  box of whatever you buy for a UL or ETL mark before it goes in a wall.
+- [Leviton T5320-W duplex receptacle](https://www.amazon.com/dp/B0015R9M2Y?tag=brau01-20)
+  — a dollar fifty, tamper-resistant, and worth fitting a new one rather than
+  reusing what is in the wall. A thirty-year-old receptacle's tab snaps in a way
+  you don't want to find out about, and its back-stab holes are the other reason
+  it should be retired.
+- [#6-32 wall plate screws, 20 mm](https://www.amazon.com/dp/B09BMRZNPJ?tag=brau01-20)
+  — a 100-pack, and the part everyone forgets. The screws that came with your
+  wall plate are about 13 mm and will not reach through a cover that stands off
+  the wall.
+- [Lever-nut wire connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20)
+  — 26 compact splices. They fold flatter than a wire nut, which matters in a
+  box you have just added pigtails to.
+- [Klein 80064 breaker finder kit](https://www.amazon.com/dp/B09WJKKBP2?tag=brau01-20)
+  — breaker finder, non-contact voltage pen and a GFCI receptacle tester in one
+  bag. The finder saves the walk to the panel and back six times; the receptacle
+  tester is how you check your work at the end.
+- [Non-contact voltage tester](https://www.amazon.com/dp/B01N99D3MS?tag=brau01-20)
+  on its own, if you only want the one tool. This is the minimum. Do not do this
+  job without it.
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — not PLA,
+  for the reason under **Print settings**.
+- [Electrical tape](https://www.amazon.com/dp/B07YDRY8ZS?tag=brau01-20) — a wrap
+  around the receptacle's screw terminals before it folds back into the box.
+
+:::caution
+**Don't use a bare relay module for this.** A 5 V hobby relay board switches
+mains happily on a bench and has a few millimetres of creepage between the coil
+side and the contact side, no enclosure, and exposed screw terminals. Inside a
+printed cover, screwed to a wall, in a house — no. The Shelly is the part on
+this list because it arrives in its own moulded case with the terminals
+recessed, and that case is the insulation. Leave it on.
+:::
+
+## Print settings
+
+The cover carries a relay, spans an outlet and is held on by two screws into
+the receptacle's yoke, so it is a structural part in the warmest spot in the
+room's wiring.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 4 |
+| Infill | 40% |
+| Supports | None, printed face down |
+| Material | PETG |
+| Orientation | Visible face on the bed |
+
+Print it with the face that ends up looking at the room on the build plate. That
+gets the one surface anyone sees off the smooth sheet for free and puts the
+screw holes vertical, so nothing needs support.
+
+**PETG, not PLA.** PLA goes soft around 60 °C and creeps under a steady load
+long before that. This part sits over live terminals and a relay that makes its
+own heat, on a wall that may get afternoon sun, and the failure mode is a cover
+that slowly sags off the screws. Neither plastic is flame-rated either way,
+which is the other half of the caution above: the printed part is a mechanical
+cover, not an electrical enclosure. The Shelly's own housing is the enclosure.
+
+## Wiring
+
+| Conductor | Goes to |
+|---|---|
+| Line (black), from the cable feeding the box | Relay supply live, plus a pigtail to the receptacle's **lower** brass screw |
+| Neutral (white) | Relay neutral, plus a pigtail to the receptacle's silver screws |
+| Ground (bare or green) | Receptacle ground screw, and the box if it is metal |
+| Relay switched output | Receptacle's **upper** brass screw |
+| Brass tab between the two brass screws | Snapped off |
+| Silver tab between the two silver screws | Left alone |
+
+Terminal markings differ between Shelly generations, so read the diagram printed
+on the module you actually bought rather than copying a photo off the internet.
+Every one of them has the same three things: a supply pair, a switched output,
+and an input for a physical wall switch that this build leaves empty.
+
+If the box is mid-run — two cables in it rather than one — the incoming line,
+the outgoing line and the relay's supply all land on the same pigtail. Only the
+receptacle's top half comes off the relay output. Get that wrong and you have
+put every outlet downstream behind the relay, which you will discover the first
+time you turn the lamp off and the television goes with it.
+
+<ImagePlaceholder alt="Wiring diagram showing line, neutral and ground pigtailed to a Shelly relay, with the relay output feeding the top half of a duplex receptacle">
+  Wiring diagram — line and neutral pigtailed to the relay, the relay's output
+  going to the upper brass screw, and the broken tab called out. A labelled
+  photo of the real box works as well as a drawing here.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Kill the breaker and prove it.** Test both sockets, both slots, then test
+   again once the receptacle is out of the box. A duplex fed from two different
+   circuits is rare and it is exactly the thing that catches people.
+
+2. **Pull the receptacle and photograph the box before anything moves.** Count
+   the cables. One means you are at the end of the run and nothing is downstream
+   of you. Two or more means other outlets depend on this box staying live.
+
+3. **Snap the brass tab.** Grip it with needle-nose pliers and rock it until it
+   breaks off. **Brass only.** Break the silver one and the switched socket has
+   no return path — it will be dead, it will look like a relay fault, and it
+   will cost you an evening.
+
+4. **Wire it to the table above,** on the screw terminals, not the back-stabs.
+   Wrap the terminals in a turn of tape before anything folds back in.
+
+5. **Dry-fit everything before you commit.** Relay in the cover, conductors
+   folded, cover offered up to the wall. This is the step that tells you whether
+   the cover is deep enough for the module you bought, and it is much easier to
+   find out now. If the cover has to be pulled tight to close, stop — it is
+   levering on live terminals to do it.
+
+6. **Screw the cover on** with the 20 mm 6-32 screws. Snug, then stop; the last
+   quarter turn is what splits a printed boss.
+
+7. **Breaker on, lamp test.** The bottom socket should be live immediately. The
+   top one should be dead until the relay is switched — press the button on the
+   module itself before you involve any software, so you know the wiring is
+   right independently of the network.
+
+8. **Join it to WiFi and label the switched socket.** A strip of tape with
+   "smart" on it saves the next person in the house from unplugging the router
+   into it.
+
+</Steps>
+
+## In Home Assistant
+
+The **Shelly** integration finds it on the network by itself, talks to it
+locally, and gives you a `switch` entity plus power and energy sensors from the
+metering. There is no cloud in that path and no reason to reflash the module —
+the stock firmware is already local.
+
+The metering is what makes this better than a dumb relay. A socket that reports
+watts can automate on what is plugged into it rather than on a clock: a curling
+iron that has drawn nothing for ten minutes gets turned off, a washing machine
+that drops under 5 W has finished, a space heater that has been pulling 1500 W
+for three hours gets a notification. Name the entity after the socket rather
+than the room, because rooms grow second outlets.
+
+Set the relay's power-on default to **on** in its own settings. If the power
+blinks while you are away, the failure you want is a lamp that came back, not a
+socket that quietly stayed dead.
+
+:::caution
+Nothing goes on the switched half that must not lose power. No fridge, no
+freezer, no sump pump, no medical device, no aquarium heater, no network gear
+you would need to fix it remotely. An outlet that can be switched off from a
+phone is a hazard to anything that assumes it can't be — and everyone in the
+house gets to press that button, including the person who doesn't know what it
+does.
+
+Skip this on a GFCI receptacle entirely. Its line and load terminals are not
+interchangeable with a normal duplex, and putting a relay between them defeats
+the protection you were required to have there in the first place. Kitchens,
+bathrooms, garages, basements and anything outdoors — leave those alone.
+:::
+
+## Troubleshooting
+
+**Both sockets switch together.** The brass tab is still intact, or you have
+landed the relay output on both brass screws. Pull it out and look at the tab.
+
+**The switched socket is dead all the time.** Either it is on the relay's supply
+input instead of its output, or the silver tab broke while you were working on
+the brass one. Both look identical from the front.
+
+**The rest of the room goes off with the lamp.** You put the downstream line
+conductor behind the relay. Pigtail so the relay only ever feeds this
+receptacle's top half.
+
+**The relay keeps dropping off WiFi.** A steel box is a radio shield, and this
+is precisely what the printed cover exists to solve. If the module ended up
+tucked into the box because it fit, move it into the cover.
+
+**The cover won't sit flat against the wall.** Stock-length screws, or too much
+wire folded behind. Fold the conductors in a flat concertina behind the
+receptacle rather than a loop, and check you are using the 20 mm screws.
 
 ## Files & downloads
 
