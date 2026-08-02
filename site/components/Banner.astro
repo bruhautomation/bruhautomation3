@@ -1,0 +1,66 @@
+---
+/**
+ * Starlight's banner slot, plus the "write-up pending" notice.
+ *
+ * A project marked `pending: true` has its files in the repo and its prose
+ * unfinished. It is published rather than hidden, so the notice has to say that
+ * on the page itself — someone who lands here from a search should know what
+ * they are looking at before they read a thin page and conclude the project is
+ * thin.
+ *
+ * It lives in an override rather than in each page's `banner` frontmatter
+ * because fifty-six copies of the same paragraph is fifty-six places to edit
+ * when the wording changes, and they would drift.
+ *
+ * A page can still set its own `banner:` — the smart candle's "Don't build
+ * this. It's a bad idea." — and both render, that one first, because it is the
+ * more urgent thing to have read.
+ */
+import Default from '@astrojs/starlight/components/Banner.astro';
+
+const { entry } = Astro.locals.starlightRoute;
+const pending = entry.data.pending === true;
+const hasOwnBanner = Boolean(entry.data.banner);
+---
+
+{hasOwnBanner && <Default><slot /></Default>}
+
+{
+	pending && (
+		<aside class="pending-note" aria-label="Write-up pending">
+			<p>
+				<strong>🚧 Write-up pending.</strong> The files below are ready to use — print
+				files, CAD sources and configs are all here and current. The written guide
+				is still being caught up on.
+			</p>
+			<p>
+				Want this one written up sooner?{' '}
+				<a href="https://github.com/bruhautomation/bruhautomation3/discussions">
+					Say so in Discussions
+				</a>{' '}
+				and I'll bump it up the list.
+			</p>
+		</aside>
+	)
+}
+
+<style>
+	.pending-note {
+		margin-block-end: 1.5rem;
+		padding: 0.9rem 1.1rem;
+		border: 1px solid var(--sl-color-orange);
+		border-inline-start-width: 4px;
+		border-radius: 0.35rem;
+		background: var(--sl-color-orange-low);
+		color: var(--sl-color-white);
+		font-size: var(--sl-text-sm);
+		line-height: 1.6;
+	}
+	.pending-note p + p {
+		margin-block-start: 0.5rem;
+		color: var(--sl-color-gray-2);
+	}
+	.pending-note a {
+		color: var(--sl-color-text-accent);
+	}
+</style>

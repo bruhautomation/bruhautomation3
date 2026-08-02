@@ -28,7 +28,16 @@ const publishedGroups = groupByCategory(allProjects.filter((p) => !p.draft));
 const projectGroups = publishedGroups.map((group) => ({
 	label: group.label,
 	collapsed: true,
-	items: group.projects.map((p) => ({ label: p.title, slug: `projects/${p.slug}` })),
+	// A pending project stays in its own category rather than being herded into
+	// a list of its own: it is a magnetic hook whether or not the write-up is
+	// finished, and someone browsing Around the House is looking for the hook.
+	// The badge is what says the prose is still coming, next to the name, where
+	// it is read before the click rather than after it.
+	items: group.projects.map((p) => ({
+		label: p.title,
+		slug: `projects/${p.slug}`,
+		...(p.pending && { badge: { text: 'Write-up pending', variant: 'caution' } }),
+	})),
 }));
 const draftProjects = allProjects
 	.filter((p) => p.draft)
@@ -189,6 +198,10 @@ export default defineConfig({
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
 				SocialIcons: './site/components/SocialIcons.astro',
+				// Renders the "write-up pending" notice on a project whose files
+				// are published ahead of its prose, and still passes a page's own
+				// `banner:` through.
+				Banner: './site/components/Banner.astro',
 			},
 			logo: {
 				dark: './site/assets/bruh-logo-light.svg',

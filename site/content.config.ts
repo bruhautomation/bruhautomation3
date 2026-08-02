@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
 
@@ -55,6 +55,18 @@ const projectsLoader = glob({
 // project's README.md, next to the files they describe, and are read by
 // site/catalog.mjs. One fact, one place: the sidebar, the project list and the
 // landing page all read that, and a guide page never has to agree with it.
+// `pending: true` means the files are in the repo and the write-up is not
+// finished. It is not `draft:` — a draft is hidden, and these are deliberately
+// published. The point is that someone looking for a part can find it, print it
+// and read the config today, and knows before they start that the prose around
+// it is still coming. The flag drives three things: the banner at the top of the
+// page (site/components/Banner.astro), the badge beside it in the sidebar, and
+// how it is listed on the project list — all read from this one field.
 export const collections = {
-	docs: defineCollection({ loader: projectsLoader, schema: docsSchema() }),
+	docs: defineCollection({
+		loader: projectsLoader,
+		schema: docsSchema({
+			extend: z.object({ pending: z.boolean().default(false) }),
+		}),
+	}),
 };
