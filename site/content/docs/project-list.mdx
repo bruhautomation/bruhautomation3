@@ -46,7 +46,7 @@ a paragraph and the files, which is the honest length for a bracket.
 		)}
 		{group.projects.some((p) => !p.guide && !p.files) && (
 			<p>
-				<strong>In development:</strong>{' '}
+				<strong>Write-up pending:</strong>{' '}
 				{group.projects.filter((p) => !p.guide && !p.files).map((p, i, all) => (
 					<>
 						<a href={`${REPO_URL}/tree/main/projects/${p.slug}`}>{p.title}</a>

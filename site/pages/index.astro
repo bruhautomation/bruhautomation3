@@ -3,29 +3,6 @@
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
 import { APPS, groupByCategory, readProjects } from '../catalog.mjs';
-import { APPS_ONLY, APPS_ONLY_HOME } from '../stage.mjs';
-
-// On the `apps` stage there is no project list to land on and no counts to
-// show, so the root goes where the site's reason for being up is. The redirect
-// lives here rather than in the config's `redirects` map because this file is a
-// real page at `/`, and a page beats a redirect entry.
-// Astro's own `Astro.redirect` renders a meta-refresh with a two-second delay,
-// which is a long time to sit on a blank page at the root of a site. This is
-// the same document without the wait: the refresh fires immediately, and the
-// script beats it and replaces the history entry so Back doesn't bounce.
-if (APPS_ONLY) {
-	return new Response(
-		`<!doctype html><html lang="en"><head><meta charset="utf-8">` +
-			`<title>BRUH Automation</title>` +
-			`<meta http-equiv="refresh" content="0;url=${APPS_ONLY_HOME}">` +
-			`<meta name="robots" content="noindex">` +
-			`<link rel="canonical" href="https://bruhautomation.com${APPS_ONLY_HOME}">` +
-			`<script>location.replace(${JSON.stringify(APPS_ONLY_HOME)})<\/script>` +
-			`</head><body><a href="${APPS_ONLY_HOME}">Continue to the documentation</a>` +
-			`</body></html>`,
-		{ headers: { 'content-type': 'text/html; charset=utf-8' } }
-	);
-}
 
 // Counts come from the project folders, so the numbers on the front page are
 // the repo — not a figure anyone has to remember to bump. A project counts as
@@ -395,11 +372,37 @@ const cards = [...groups, APPS].map((group) => ({
 			}
 
 			/* ── Categories ── */
-			.categories {
+			.catchup {
 				max-width: 1000px;
 				width: 100%;
 				margin: 0 auto;
 				padding: 0 1.5rem 5rem;
+			}
+			.catchup p {
+				background: var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.1rem 1.35rem;
+				color: var(--text-muted);
+				font-size: 0.95rem;
+				line-height: 1.65;
+				text-align: center;
+			}
+			.catchup a {
+				color: var(--accent);
+				font-weight: 600;
+			}
+			.catchup a:hover {
+				text-decoration: underline;
+			}
+
+			.categories {
+				max-width: 1000px;
+				width: 100%;
+				margin: 0 auto;
+				/* The catch-up note carries the bottom padding now, so the cards
+				   stop short of it rather than leaving a gap twice over. */
+				padding: 0 1.5rem 2rem;
 				display: grid;
 				/* Six cards — five categories and the apps — so three across
 				   fills two even rows rather than leaving a short one. */
@@ -668,6 +671,20 @@ const cards = [...groups, APPS].map((group) => ({
 						</a>
 					))
 				}
+			</section>
+
+			{/* Most projects have their files up and their write-up still to come.
+			    Saying so on the front page is better than letting someone find it
+			    one project at a time. */}
+			<section class="catchup">
+				<p>
+					I'm catching up on the documentation for all of these, so expect a lot
+					more soon. If there's one you want sooner, head over to
+					<a
+						href="https://github.com/bruhautomation/bruhautomation3/discussions"
+						>GitHub Discussions</a
+					> and let me know — I'll bump it up the list.
+				</p>
 			</section>
 		</main>
 

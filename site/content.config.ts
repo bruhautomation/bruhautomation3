@@ -1,7 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
-import { APPS_ONLY, APPS_ONLY_PATTERNS } from './stage.mjs';
 
 // Where the words live. Three roots, one collection:
 //
@@ -28,20 +27,13 @@ import { APPS_ONLY, APPS_ONLY_PATTERNS } from './stage.mjs';
 // Only `projects/*/index.md(x)` is a page. A project folder's README.md is for
 // people reading the repo on GitHub and is never published — which is what
 // lets a project keep both without one of them turning into a stray URL.
-// `SITE_STAGE=apps` publishes the add-on docs and nothing else. It gates by
-// deciding which files become pages at all, rather than by marking sixty-four
-// of them draft — see site/stage.mjs for why those are separate axes.
-const patterns = APPS_ONLY
-	? APPS_ONLY_PATTERNS
-	: [
-			'projects/*/index.{md,mdx}',
-			'apps/**/[^_]*.{md,mdx}',
-			'site/content/docs/**/[^_]*.{md,mdx}',
-		];
-
 const projectsLoader = glob({
 	base: '.',
-	pattern: patterns,
+	pattern: [
+		'projects/*/index.{md,mdx}',
+		'apps/**/[^_]*.{md,mdx}',
+		'site/content/docs/**/[^_]*.{md,mdx}',
+	],
 	generateId: ({ entry }) =>
 		entry
 			.replace(/\.(md|mdx)$/, '')
