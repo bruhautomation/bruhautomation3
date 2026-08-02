@@ -1,0 +1,31 @@
+---
+/**
+ * Starlight's sidebar, with the pending-write-ups switch above the list it
+ * filters.
+ *
+ * The switch used to live in the header, inside SocialIcons. Starlight renders
+ * SocialIcons *twice* — once in the header's right group, once in the mobile
+ * menu footer — so the component was on the page twice with the same element
+ * ids in both copies. Below 50rem the header copy is `display: none`, and
+ * `getElementById` returns it first, so on a phone the change handler was bound
+ * to a checkbox nobody could reach and `showModal()` opened a <dialog> inside a
+ * `display: none` ancestor. A dialog in the top layer still needs an ancestor
+ * chain that generates boxes; that one didn't, so the confirmation never
+ * appeared and the visible switch did nothing.
+ *
+ * Rendering it here fixes both by removing the cause: one instance, at every
+ * width, sitting directly above the thing it controls — inside the drawer on a
+ * phone, at the top of the rail on a desktop. A control next to its effect also
+ * needs no explaining, which is most of what the header placement was missing.
+ */
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import PendingToggle from './PendingToggle.astro';
+import { readProjects } from '../catalog.mjs';
+
+// Counted from the same source the sidebar rows are built from, so the number
+// on the switch can never disagree with how many rows it reveals.
+const pending = readProjects().filter((p) => p.guide && !p.draft && p.pending).length;
+---
+
+<PendingToggle count={pending} />
+<Default />

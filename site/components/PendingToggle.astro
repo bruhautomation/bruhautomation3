@@ -1,35 +1,52 @@
 ---
 /**
- * "Pending write-ups" — the header switch that reveals the projects whose files
- * are published ahead of their prose.
+ * "Pending write-ups" — the switch that reveals the projects whose files are
+ * published ahead of their prose.
  *
  * Those pages are real and reachable by URL, by search and from the project
- * list; what this controls is only whether they clutter the sidebar. Fifty-six
- * of sixty-four projects are pending, so showing them by default buries the
- * eight finished guides in a list four times longer than the site people came
- * for. Off by default, remembered once set.
+ * list; what this controls is only whether they clutter the sidebar. Most of
+ * the projects are pending, so showing them by default buries the finished
+ * guides in a list several times longer than the site people came for. Off by
+ * default, remembered once set.
+ *
+ * It renders once, from site/components/Sidebar.astro, immediately above the
+ * list it filters — see the note there for why it is no longer in the header.
+ * Nothing in here uses an element id: this component was duplicated once and
+ * the duplicate ids are what broke it, so it is matched by class and every copy
+ * that ever exists gets wired and kept in step.
  *
  * The confirmation is shown the first time it is switched on and never again —
  * it exists to set the expectation before someone opens a thin page and decides
- * the project is thin, which a checkbox label has no room to do. Turning it back
+ * the project is thin, which a switch label has no room to do. Turning it back
  * off is silent; nobody needs a dialog to hide something.
  *
  * Everything is a class on <html>, so the stylesheet does the showing and there
- * is no per-page state to keep in step. The initial read is inline in
- * `head` (see astro.config.mjs) so a reader who has opted in never watches the
- * rows appear after paint.
+ * is no per-page state to keep in step. The initial read is inline in `head`
+ * (see astro.config.mjs) so a reader who has opted in never watches the rows
+ * appear after paint.
  */
+interface Props {
+	/** How many pending projects there are. The switch is not rendered for none. */
+	count?: number;
+}
+
+const { count = 0 } = Astro.props;
 ---
 
-<div class="pending-toggle">
-	<label class="pending-toggle__label">
-		<input type="checkbox" id="pending-switch" />
-		<span class="pending-toggle__text">Pending write-ups</span>
-	</label>
-</div>
+{
+	count > 0 && (
+		<div class="pending-toggle">
+			<label class="pending-toggle__label">
+				<input type="checkbox" class="pending-toggle__input" />
+				<span class="pending-toggle__text">Pending write-ups</span>
+				<span class="pending-toggle__count">{count}</span>
+			</label>
+		</div>
+	)
+}
 
-<dialog id="pending-dialog" class="pending-dialog" aria-labelledby="pending-dialog-title">
-	<h2 id="pending-dialog-title">Show projects that aren't written up yet?</h2>
+<dialog class="pending-dialog" aria-label="Show projects that aren't written up yet?">
+	<h2>Show projects that aren't written up yet?</h2>
 	<p>
 		These pages are rough. The write-up on each one is a first pass — some of it
 		generated and not checked over yet — so the descriptions may be off. I'm
@@ -39,10 +56,12 @@
 		Most of them do have their files attached, and those are the real thing: print
 		files, CAD sources and configs. A few have nothing up yet.
 	</p>
-	<p>Turning this on adds them to the sidebar, marked with a small dot.</p>
+	<p>Turning this on adds them to the list, marked with a small dot.</p>
 	<form method="dialog" class="pending-dialog__actions">
 		<button value="cancel">Not now</button>
-		<button value="confirm" class="pending-dialog__confirm" autofocus>Show them</button>
+		<button value="confirm" class="pending-dialog__confirm" autofocus>
+			Show them
+		</button>
 	</form>
 </dialog>
 
@@ -51,6 +70,7 @@
 		var KEY = 'bruh:show-pending';
 		var ASKED = 'bruh:show-pending-asked';
 		var root = document.documentElement;
+		var dialog = null;
 
 		function store(key, value) {
 			// An iframe or a locked-down browser can refuse localStorage, and a
@@ -67,99 +87,163 @@
 			}
 		}
 
+		/** Every copy of the switch shows the same state, whatever moved it. */
 		function apply(on) {
 			root.classList.toggle('show-pending', on);
-			var box = document.getElementById('pending-switch');
-			if (box) box.checked = on;
+			var boxes = document.querySelectorAll('.pending-toggle__input');
+			for (var i = 0; i < boxes.length; i++) boxes[i].checked = on;
+		}
+
+		/**
+		 * One dialog, parented to <body>.
+		 *
+		 * A <dialog> only renders if its ancestors do. The sidebar is
+		 * `visibility: hidden` on a phone until the menu is opened, and was
+		 * `display: none` in the header before that — either one hides a modal
+		 * that `showModal()` has already put in the top layer, with no error to
+		 * say so. Owned by no part of the layout, it cannot be hidden by one.
+		 */
+		function claimDialog() {
+			var all = document.querySelectorAll('.pending-dialog');
+			if (!all.length) return dialog;
+			if (!dialog || !dialog.isConnected) {
+				dialog = all[0];
+				document.body.appendChild(dialog);
+			}
+			for (var i = 0; i < all.length; i++) {
+				if (all[i] !== dialog) all[i].remove();
+			}
+			return dialog;
+		}
+
+		function onChange(event) {
+			var box = event.currentTarget;
+
+			if (!box.checked) {
+				store(KEY, 'false');
+				apply(false);
+				return;
+			}
+
+			// Explain once, the first time. After that the switch is just a switch.
+			var d = claimDialog();
+			if (read(ASKED) === 'true' || !d || !d.showModal) {
+				store(KEY, 'true');
+				store(ASKED, 'true');
+				apply(true);
+				return;
+			}
+
+			apply(false);
+			// `returnValue` survives a close, so a dialog dismissed with Escape
+			// would otherwise report whatever was pressed the time before.
+			d.returnValue = '';
+			d.showModal();
+			d.addEventListener(
+				'close',
+				function () {
+					var yes = d.returnValue === 'confirm';
+					store(ASKED, 'true');
+					store(KEY, yes ? 'true' : 'false');
+					apply(yes);
+				},
+				{ once: true }
+			);
 		}
 
 		function wire() {
-			var box = document.getElementById('pending-switch');
-			var dialog = document.getElementById('pending-dialog');
-			if (!box) return;
-
+			claimDialog();
+			var boxes = document.querySelectorAll('.pending-toggle__input');
+			for (var i = 0; i < boxes.length; i++) {
+				// `astro:page-load` fires on the first load too, so without this
+				// every switch would carry two handlers after the very first paint.
+				if (boxes[i].dataset.wired) continue;
+				boxes[i].dataset.wired = 'true';
+				boxes[i].addEventListener('change', onChange);
+			}
 			apply(read(KEY) === 'true');
-
-			box.addEventListener('change', function () {
-				if (!box.checked) {
-					store(KEY, 'false');
-					apply(false);
-					return;
-				}
-
-				// Explain once, the first time. After that the switch is just a switch.
-				if (read(ASKED) === 'true' || !dialog || !dialog.showModal) {
-					store(KEY, 'true');
-					store(ASKED, 'true');
-					apply(true);
-					return;
-				}
-
-				box.checked = false;
-				dialog.showModal();
-				dialog.addEventListener(
-					'close',
-					function () {
-						var yes = dialog.returnValue === 'confirm';
-						store(ASKED, 'true');
-						store(KEY, yes ? 'true' : 'false');
-						apply(yes);
-					},
-					{ once: true }
-				);
-			});
 		}
 
 		wire();
-		// Starlight swaps the document on navigation; the header is re-rendered
-		// with a fresh, unwired checkbox each time.
+		// Starlight swaps the document on navigation; the sidebar is re-rendered
+		// with a fresh, unwired switch each time.
 		document.addEventListener('astro:page-load', wire);
 	})();
 </script>
 
 <style>
+	/* A row, not a chip. It sits at the top of the sidebar column, so it gets
+	   the full width and reads as a control over the list beneath it rather
+	   than another thing in the list. */
 	.pending-toggle {
-		display: inline-flex;
-		align-items: center;
+		margin-block-end: 0.25rem;
 	}
 	.pending-toggle__label {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
-		gap: 0.4rem;
-		padding-inline: 0.5rem;
-		font-size: var(--sl-text-xs);
-		color: var(--sl-color-gray-3);
+		gap: 0.55rem;
+		width: 100%;
+		min-height: 2.5rem;
+		padding: 0.4rem 0.6rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.375rem;
+		background: var(--sl-color-gray-7, transparent);
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-sm);
+		line-height: 1.3;
 		cursor: pointer;
-		white-space: nowrap;
 		user-select: none;
 	}
 	.pending-toggle__label:hover {
 		color: var(--sl-color-white);
+		border-color: var(--sl-color-gray-4);
 	}
-	.pending-toggle input {
+	.pending-toggle__label:focus-within {
+		outline: 2px solid var(--sl-color-accent);
+		outline-offset: 2px;
+	}
+	.pending-toggle__text {
+		flex: 1;
+	}
+	/* What the switch is worth, in one number, so nobody has to flip it to find
+	   out whether it does anything. */
+	.pending-toggle__count {
+		flex: none;
+		padding-inline: 0.4rem;
+		border-radius: 0.75rem;
+		background: var(--sl-color-gray-6);
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-xs);
+		font-variant-numeric: tabular-nums;
+	}
+	.pending-toggle__input {
+		flex: none;
 		accent-color: var(--sl-color-accent);
 		cursor: pointer;
-		/* A checkbox is a small target; the label carries the rest of it. */
 		margin: 0;
+		/* The default 13px box is under every touch-target guideline there is,
+		   and the label carrying the hit area does not make the box itself
+		   easier to aim at. */
+		width: 1.1em;
+		height: 1.1em;
 	}
+
 	@media (pointer: coarse) {
 		.pending-toggle__label {
 			min-height: 44px;
-		}
-	}
-	/* The header is tight on a phone — search, theme and two social icons are
-	   already competing. The words go and the box stays, with the label moved
-	   onto the control itself. */
-	@media (max-width: 72rem) {
-		.pending-toggle__text {
-			display: none;
+			/* iOS zooms a page in on any control under 16px and never zooms back
+			   out, which strands the reader at an arbitrary scale. */
+			font-size: 1rem;
 		}
 	}
 
 	.pending-dialog {
+		width: calc(100vw - 2rem);
 		max-width: 32rem;
+		max-height: calc(100dvh - 4rem);
 		margin: auto;
 		padding: 1.5rem;
+		overflow-y: auto;
 		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 0.5rem;
 		background: var(--sl-color-black);
@@ -198,8 +282,28 @@
 	.pending-dialog__actions button:hover {
 		background: var(--sl-color-gray-6);
 	}
-	.pending-dialog__confirm {
-		border-color: var(--sl-color-accent);
-		background: var(--sl-color-accent);
+	/* Qualified by the container, because `.pending-dialog__actions button` beats
+	   a bare class and the affirmative button spent its life looking like the
+	   other one. */
+	.pending-dialog__actions .pending-dialog__confirm {
+		border-color: var(--sl-color-text-accent);
+		background: var(--sl-color-text-accent);
+		/* The inverted pair: `--sl-color-black` is white in the light theme, so
+		   this stays legible on accent in both. */
+		color: var(--sl-color-black);
+	}
+	.pending-dialog__actions .pending-dialog__confirm:hover {
+		background: var(--sl-color-text-accent);
+		opacity: 0.85;
+	}
+	/* Two buttons side by side in a 320px dialog are two small buttons. Stacked,
+	   with the affirmative on top, they are two thumb-sized ones. */
+	@media (max-width: 26rem) {
+		.pending-dialog__actions {
+			flex-direction: column-reverse;
+		}
+		.pending-dialog__actions button {
+			width: 100%;
+		}
 	}
 </style>

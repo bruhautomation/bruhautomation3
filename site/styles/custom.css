@@ -462,7 +462,7 @@ img[src$="-phone.webp"] {
    are pending, so listing them all in the sidebar by default buries the eight
    finished guides in a list four times longer than the site people came for.
 
-   The rows are hidden until someone asks for them with the header switch
+   The rows are hidden until someone asks for them with the switch above them
    (site/components/PendingToggle.astro), which adds `.show-pending` to <html>.
    The pages themselves are never hidden — they are reachable by URL, by search
    and from the project list, and each one says at the top what it is.
