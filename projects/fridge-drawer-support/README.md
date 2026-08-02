@@ -10,9 +10,10 @@ A printed shim that lifts a dropped refrigerator drawer back onto its rail.
 
 The part is a flat bar **228 mm × 18 mm × 2 mm**. The underside is the full flat
 rectangle and sits on the ledge; the entire top perimeter is rolled over with a
-2 mm bullnose — the same radius as the thickness, so the upper face is all curve
-and has no shoulder for the drawer to catch on. No holes, no fasteners. It is
-held down with a strip of 12.7 mm VHB tape.
+2 mm bullnose — the same radius as the thickness, so the roll runs from the flat
+top all the way down to the plate and leaves no shoulder for the drawer to catch
+on. The flat left in the middle of the top is 224 × 14. No holes, no fasteners.
+It is held down with a strip of 12.7 mm VHB tape.
 
 Print two, one per side. Lifting only one side racks the drawer.
 

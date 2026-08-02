@@ -1,8 +1,9 @@
 ---
 title: Laser Turret
 description: A pan-tilt laser turret for the cat — two servos, a 5 mW red diode and an ESP32 on ESPHome, so Home Assistant runs playtime on a schedule.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+# Concept stage — two renders, no STLs, no CAD, no firmware. The parts are
+# decided, the build isn't. Published, and marked as pending on the page, in
+# the sidebar and on the project list.
 pending: true
 ---
 
@@ -12,12 +13,13 @@ import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 A pan-tilt bracket, two servos and a red laser diode, driven by an ESP32 so
 Home Assistant can run the cat around the living room at 3pm on a Tuesday while
-nobody is home. Everything on the shelf that does this is a battery toy with a
-fixed sweep the cat learns in a week; the point of building it is that the
-pattern comes from an automation, and an automation can be random.
+nobody is home. A shop-bought laser toy runs its own pattern on its own timer;
+the point of building one is that the pattern comes from an automation, so it
+can start because the house is empty, stop because somebody walked in, and never
+repeat itself.
 
 :::note
-**This is at concept stage.** The two images below are renders, not photographs —
+**This is at concept stage.** The two images below are AI renders, not photographs —
 there are no STLs, no CAD and no firmware in the folder yet. What is real is the
 parts list: every part below is a specific thing that exists, and the build
 described is the one those parts make. Treat it as a shopping list and a set of
@@ -34,7 +36,7 @@ dot. That is the entire job.
 
 <AffiliateDisclosure />
 
-- [ESP32 DevKit, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — 2-pack. The ESP32's hardware LEDC timers give clean servo PWM; an ESP8266 bit-bangs it and the jitter shows up as twitch
+- [ESP32 DevKit, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — 2-pack. The ESP32's hardware LEDC timers give clean servo PWM; an ESP8266 generates it in software and the jitter shows up as twitch
 - [650 nm 5 mW red laser diode module](https://www.amazon.com/dp/B07L4225TM?tag=brau01-20) — 2-pack, so you have a spare. The variant here is the cross-line head, which throws an X rather than a dot; the cat does not care, but pick the dot version if you want the classic
 - [Pan/tilt servo bracket](https://www.amazon.com/dp/B07PQ12TXS?tag=brau01-20) — 2 sets. This is the part that decides the whole build: it is cut for standard-size servos, so that is what goes in it
 - [MG996R metal-gear servos](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20) ×2 — 6-pack. Standard size, metal gears, and the exact frame the bracket above is drilled for
@@ -50,9 +52,9 @@ Optional, if you would rather it only ran when the cat is actually in the room
 than on a blind schedule: an [HC-SR501 PIR](https://www.amazon.com/dp/B00FDPO9B8?tag=brau01-20)
 on a spare input, or any presence sensor Home Assistant already has.
 
-A [PCA9685 servo driver](https://www.amazon.com/dp/B082QT9D5F?tag=brau01-20) is
-worth having in the drawer but is not needed here — it earns its place past about
-four servos, and this is two.
+You do not need a [PCA9685 servo driver](https://www.amazon.com/dp/B082QT9D5F?tag=brau01-20)
+for this. Two servos are two GPIOs; that board starts earning its place at four
+or five.
 
 ## Power
 
@@ -74,8 +76,10 @@ wonder why the signal is garbage.
 
 :::caution
 Set both bucks with a multimeter across the output terminals **before** anything is
-connected to them. These modules ship with the trim pot at an arbitrary position,
-and the first thing a 12 V output does to an MG996R is destroy it.
+connected to them. They ship with the pots at an arbitrary position, and the first
+thing a 12 V output does to an MG996R is destroy it. The CC/CV module has two pots,
+not one — wind the current limit up as well, or it drops out of constant voltage
+the moment both servos move at once and the 6 V rail sags with them.
 :::
 
 ## Wiring
@@ -98,9 +102,10 @@ in the config.
 Do not hang the laser straight off a GPIO. It is only tens of milliamps, which is
 close enough to the pin's limit to work on the bench and fail in a box in July.
 
-Some pins to avoid when you pick them: GPIO 0, 2, 12 and 15 are strapping pins and
-a servo held at the wrong level through a reset will stop the board booting, and
-GPIO 34–39 are input-only, so nothing that has to *drive* anything goes there.
+Two rules when you pick the pins. Leave GPIO 0, 2, 12 and 15 alone — the ESP32 reads
+those at reset to decide how to boot, and GPIO 12 held high is the one that stops
+it booting at all. And skip GPIO 34–39, which are input-only and cannot drive
+anything.
 
 ## Design notes
 
@@ -122,8 +127,9 @@ Centre both servos before you fit the horns. Drive each one to its mid position,
 The base is the part that does not exist yet, and it has one real requirement: mass.
 A pan servo snapping 90° will drag a light printed puck across a table. Print it with
 high infill, or make it big enough to sit a weight inside, and put rubber feet under
-it. Keep the pan travel under a full turn so the servo leads can just flex rather
-than needing a slip ring.
+it. The pan axis only ever sweeps 180° — that is an MG996R's limit — so the tilt
+servo's lead and the laser's wires flex rather than wind up, and nothing here needs
+a slip ring.
 
 <ImagePlaceholder alt="The assembled laser turret on a shelf, laser on, dot visible on the floor">
   Hero shot once it is built — the real turret on a low shelf, laser on, the dot
@@ -152,9 +158,8 @@ just switching off leaves an animal wound up with nothing to show for it. Land t
 dot on a real toy or a treat and turn it off there. That is one line at the end of
 the automation and it is the difference between a good toy and an annoying one.
 
-Five minutes is plenty. The novelty is in it being unpredictable, which means the
-automation's random-interval, random-position version beats any fixed sweep — and it
-is also the reason this is worth building instead of buying.
+Five minutes is plenty, and the whole value is in being unpredictable: random
+interval, random position, no sweep the cat can learn.
 
 ## What still has to happen
 

@@ -1,8 +1,9 @@
 ---
 title: COB Panel Mount
 description: A bracket for the cheap 12 V 70 W COB LED panels — plus the heatsinking and the constant-current supply that stop one cooking itself.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+# The write-up is here; the bracket isn't — no STL in the folder, nothing to
+# print. Published, and marked as pending on the page, in the sidebar and on the
+# project list, until one lands.
 pending: true
 ---
 
@@ -41,7 +42,7 @@ The panel and its cooling:
 
 - [12 V 70 W COB panel, 8.6 × 4.4 in, 6500 K](https://www.amazon.com/dp/B08RJWDYJD?tag=brau01-20) — the board everything here is sized around
 - [Aluminium heatsink, 100 × 25 × 10 mm](https://www.amazon.com/dp/B07D9ZTTN2?tag=brau01-20) — sold in fives, and eight of them cover one panel, so buy two packs
-- [Thermal conductive glue](https://www.amazon.com/dp/B072MSXHJD?tag=brau01-20) — silicone, cures hard, permanent. This is the one to use
+- [Thermal conductive glue](https://www.amazon.com/dp/B072MSXHJD?tag=brau01-20) — silicone, cures hard, permanent. This is the one to use. A 10 g tube is about one panel's worth of thin film and not much more
 - [Double-sided thermal tape, 15 mm wide](https://www.amazon.com/dp/B087D48T61?tag=brau01-20) — the removable alternative, and two strips per sink, because the sink base is 25 mm
 - [99% isopropyl alcohol](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — nothing bonds to a board with flux residue still on it
 
@@ -50,7 +51,7 @@ Power:
 - [24 V 5 A power supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20) — 120 W, 5.5 × 2.1 mm barrel
 - [20 A / 300 W CC-CV buck converter](https://www.amazon.com/dp/B07Y7YB14L?tag=brau01-20) — 6–40 V in, 1.2–36 V out, two-pack. The constant-current half is the entire reason it is on this list
 - [5.5 × 2.1 mm barrel jack sockets and pigtails](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20) — 20-pack, panel-mount sockets plus flying leads
-- [18 AWG two-conductor silicone wire](https://www.amazon.com/dp/B07FMRDP87?tag=brau01-20) — several amps at 12 V is real current, and thin hookup wire will warm up before the LEDs do
+- [18 AWG two-conductor silicone wire](https://www.amazon.com/dp/B07FMRDP87?tag=brau01-20) — six amps at 12 V is real current, and thin hookup wire will warm up before the LEDs do
 
 The bracket:
 
@@ -64,7 +65,7 @@ The bracket:
 Worth having:
 
 - [Infrared thermometer](https://www.amazon.com/dp/B07VTPJXH9?tag=brau01-20) — the only honest way to find out whether your heatsinking is enough
-- [40 mm 12 V fan](https://www.amazon.com/dp/B072JK9GX6?tag=brau01-20) — if you insist on running near full output
+- [40 mm 12 V fan](https://www.amazon.com/dp/B072JK9GX6?tag=brau01-20) — if you insist on running near full output. There is no 12 V rail anywhere in this build, so run it off the second module in the converter two-pack, set to plain constant voltage
 - [MOSFET PWM switch module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — 10-pack; dims the panel from a 3.3 V ESP pin
 - [Inline rotary PWM dimmer](https://www.amazon.com/dp/B07MM88SB6?tag=brau01-20) — dims it with a knob and no code
 - [ABS filament](https://www.amazon.com/dp/B00J0H6NNM?tag=brau01-20) — only if the fixture will genuinely live at full power, and only if your printer is enclosed
@@ -82,11 +83,12 @@ is still not enough for 70 W in still air. Passive cooling at the rating is not
 on the table.
 
 So underdrive it. Set the converter's current limit around 2 A and the panel
-draws roughly a quarter of its rating. You lose light more or less in proportion
-to the current — you get a little back, because a cool LED is a more efficient
-one — and what you buy is a fixture that still works next year instead of one
-that dims for a month and then dies. Two amps through this board is already an
-unreasonable amount of light for a garage.
+draws about 24 W — a third of its rating, and inside what that stack can shed.
+You lose light more or less in proportion to the current — you get a little
+back, because a cool LED is a more efficient one — and what you buy is a fixture
+that still works next year instead of one that dims for a month and then dies.
+Twenty-four watts of bare 6500 K emitter is still more light than you want to
+stand in front of.
 
 Two things about how it hangs, both of which cost nothing:
 
@@ -105,6 +107,10 @@ sinks undoes the sinks.
 
 ## Print settings
 
+**There is no STL in this folder yet.** What follows is what the part wants
+whenever one lands, and it holds just as well for a bracket you model yourself
+in the meantime.
+
 | Setting | Value |
 |---|---|
 | Material | PETG |
@@ -120,13 +126,14 @@ that range, and a PLA bracket does not snap — it slowly leans, and you find ou
 when the panel is pointing at the floor. PETG holds to about 80 °C. ABS if you
 are running the panel hard and have an enclosed printer.
 
-Orient the part so the layer lines run across the load rather than along it. The
-screw bosses are where a printed bracket fails, and they fail by splitting
-between layers.
+Orient the part so the load runs along the layers rather than trying to peel
+them apart — a printed part is weakest at the bond between one layer and the
+next. The screw bosses are where a printed bracket fails, and they fail by
+splitting between layers.
 
 ## Wiring
 
-Four wires, and one of them matters more than the rest.
+Four wires, and nothing between the wall and the LEDs except the converter.
 
 | From | To | Notes |
 |---|---|---|
@@ -147,11 +154,13 @@ the current you set it to and takes the voltage wherever it needs to go. The
 converter needs headroom above its output to regulate, which is why the supply is
 24 V and not 12 V.
 
-To dim it, the MOSFET module goes in the 12 V line between the converter and the
-panel, with PWM on its trigger input from an ESP pin. The rotary dimmer does the
-same job inline on the barrel jack with no code at all. Read the silkscreen on
-whichever board you use before wiring it — terminal ordering varies between
-batches of the same module.
+Both dimmers go **after** the converter, between it and the panel. The MOSFET
+module takes PWM on its trigger input from an ESP pin; the rotary one does the
+same job with a knob and no code, and since it is a barrel-jack pass-through you
+put a plug and socket from the 20-pack on the converter's output to take it.
+Neither goes on the converter's input — chopping a buck converter's supply just
+makes it brown out and restart. Read the silkscreen on whichever board you use
+before wiring it: terminal ordering varies between batches of the same module.
 
 ## Assembly
 
@@ -166,16 +175,18 @@ batches of the same module.
    is thermal adhesive that lets go in six months.
 
 3. **Bond the heatsinks.** Lay eight of them across the back, fins running the
-   way the panel will hang. A thin, even film of the silicone glue — squeeze-out
-   is fine, a thick bead is not, because the glue conducts heat worse than the
-   metal on either side of it. Weight the stack flat and leave it to cure.
+   way they will end up vertical on the wall. A thin, even film of the silicone
+   glue — squeeze-out is fine, a thick bead is not, because the glue conducts
+   heat worse than the metal on either side of it. Weight the stack flat and
+   leave it to cure.
 
-4. **Set the current on the bench** before any of this goes near a bracket. See
-   below. It is far easier to get a probe on bare wires now than later.
-
-5. **Solder the leads on** with the 18 AWG wire and strain-relieve them at the
+4. **Solder the leads on** with the 18 AWG wire and strain-relieve them at the
    board. The pads on these panels are the first thing to fail, and they fail by
    being tugged.
+
+5. **Set the current on the bench** before any of this goes near a bracket. See
+   below. It is far easier to get a probe on loose leads now than on a mounted
+   fixture later.
 
 6. **Melt the inserts in**, then fit the bracket to the heatsink stack. Inserts
    go in with the iron at PETG temperature and a slow, straight push — a rushed
@@ -213,9 +224,9 @@ silkscreen says which is which.
 
 :::caution
 Do not look into the emitter while you are doing this, and do not aim it at
-anyone. Seventy watts of 6500 K in a palm-sized area is not a lamp you glance
-at — it leaves an afterimage from across a room, and it has no diffuser of any
-kind.
+anyone. This is a bare 6500 K die with no diffuser of any kind over it, and even
+underdriven it leaves an afterimage from across a room. Point it at a wall while
+you work.
 :::
 
 ## Troubleshooting
@@ -234,10 +245,11 @@ middle is not.
 **The bracket has slowly gone out of square.** PLA. Reprint it in PETG — there is
 no fix for a part that has already crept.
 
-**The supply clicks or shuts down.** Twenty-four volts at 5 A is 120 W, and a
-converter driving this panel at full rating plus its own losses gets close enough
-to that to trip a cheap brick's protection. One more argument for underdriving
-it.
+**The supply clicks or shuts down.** At full rating the converter pulls a bit
+over 3 A from the 24 V side once its own losses are in, and a cheap brick's 5 A
+is a label, not a promise it will hold all evening in a warm garage. Come down
+on the current, or feed the converter from a supply with real headroom. One more
+argument for underdriving it.
 
 ## Files & downloads
 

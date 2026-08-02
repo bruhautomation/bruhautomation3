@@ -14,8 +14,8 @@ import ProjectFiles from '../../site/components/ProjectFiles.astro';
 A bench covered in twelve-place tube racks is a bench where half the racks are
 somewhere else. This is one printed slab with enough positions to hold an entire
 run of 15 mL conicals in order, in one thing you can pick up with one hand. It
-prints in one piece, so there is nothing to assemble, nothing to glue and nothing
-to lose in a drawer.
+prints in one piece, so there is nothing to assemble and nothing to lose in a
+drawer.
 
 <ImagePlaceholder alt="A large 3D-printed 15mL tube megarack filled with conical tubes on a lab bench">
   Hero shot — the printed megarack on the bench, loaded with 15 mL conicals,
@@ -32,22 +32,28 @@ bottom.
 
 <AffiliateDisclosure />
 
-- [15 mL conical centrifuge tubes](https://www.amazon.com/s?k=15mL+conical+centrifuge+tubes+sterile&tag=brau01-20) — the thing the whole rack is dimensioned around
-- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print it in this
-- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the alternative, and the cheaper one if the rack lives on a cool bench (4 × 1 kg, black)
-- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure the tubes you actually stock before you commit a multi-hour print
-- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round the top of each bore; this is the difference between a tube dropping in and a tube being screwed in
-- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — four under the corners so a loaded rack doesn't skate on a wiped-down bench (200 pcs, you need four)
-- [Label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) and [12 mm laminated tape](https://www.amazon.com/dp/B06XCQ79ZM?tag=brau01-20) — for numbering the rows, if you want positions to mean something
-- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — only if the footprint is bigger than your bed and you cut it in the slicer
+- [15 mL conical centrifuge tubes](https://www.amazon.com/s?k=15mL+conical+centrifuge+tubes+sterile&tag=brau01-20) — the part the whole rack is dimensioned around. Measure yours; see below.
+- [eSUN PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print it in this. Why, below.
+- [SUNLU PLA+ 1.75 mm, 4 × 1 kg black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — for the fit-check print. PLA+ holds the model's dimensions more closely than PETG, so it tells you about the bore sooner and for less filament.
+- [Neiko digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure the tubes you actually stock before you commit a multi-hour print.
+- [AFA deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round the top of each bore. This is the difference between a tube dropping in and a tube being screwed in.
+- [Self-adhesive clear rubber bumpers, 200 pcs](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — four under the corners so a loaded rack doesn't skate on a wiped-down bench.
+- [Solimo 99% isopropyl alcohol, 16 oz × 12](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — cut it to 70% before you wipe anything, roughly seven parts alcohol to three parts water. Neat 99% flashes off the plastic before it has done anything.
+- [Brother P-touch Cube label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) and [12 mm laminated TZe tape, 4-pack](https://www.amazon.com/dp/B06XCQ79ZM?tag=brau01-20) — for numbering the rows, if you want positions to mean something.
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — only if the footprint is bigger than your bed and you cut it in the slicer.
 
 ## Before you print
 
-Every 15 mL conical is about 17 mm across the barrel and about 120 mm long, and
-it hangs in a rack by its cap, not by its body — the cap is wider than the
-barrel, and that lip is the whole retention mechanism. Brands vary by a few
-tenths of a millimetre. Put a caliper on the tubes in your own store cupboard
-before you start a print that is going to cut sixty of those holes.
+A 15 mL conical is about 17 mm across the barrel and about 120 mm long, and it
+comes to a point at the bottom. It cannot stand up on its own, which is the
+entire reason the rack exists.
+
+Two numbers come off the tube, not one. The barrel diameter sets the bore. The
+cap is wider — call it 20 mm — and it never goes into the bore at all: it stands
+proud on the deck, so it is the cap, not the barrel, that decides how close two
+bores can be. Brands vary by a few tenths of a millimetre on both. Put a caliper
+on the tubes your own store cupboard stocks first, because every bore in the
+rack is the same bore, and one wrong number is the whole print.
 
 If the bores come out wrong, fix them in the model, not with the slicer's scale
 box. Scaling the part scales the pitch, the wall thickness and the deck
@@ -65,13 +71,13 @@ tubes and no longer fits the bench.
 | Material | PETG |
 | Orientation | Flat on the bed, bores vertical |
 
-Bores vertical is the only sensible orientation — every hole is then a vertical
-tube the printer bridges nothing across, and the part needs no supports at all.
+Bores vertical is the only sensible orientation. Every hole is then a straight
+vertical shaft with nothing to bridge, and the part needs no supports anywhere.
 
-Turn up wall count rather than infill. Fifteen millilitres of water is 15 grams,
-and a megarack holds a lot of tubes, so the load on the deck adds up quickly.
-Perimeters carry that; sparse infill in the middle of a thin deck does very
-little.
+Three perimeters rather than the usual two. A full rack is mostly water — 15 mL
+is 15 grams a tube, and a megarack holds a run of them — and what carries that
+is the wall around each bore. Sparse infill in the middle of a thin deck does
+almost nothing.
 
 ## Material
 
@@ -81,30 +87,32 @@ PLA starts going soft around 60 °C. A rack that sags is a rack whose bores no
 longer line up. PETG holds its shape through all of that and shrugs off being
 dropped, which is the other thing that happens to tube racks.
 
-PLA+ is fine if you know the rack stays cool, and it prints more accurately, so
-the bores come out closer to the number in the model.
+PLA+ is the material for the fit-check, not for the rack. It prints closer to
+the number in the model, so a block of four bores in PLA+ tells you the truth
+about your tubes faster and cheaper than a full rack in PETG will. Don't keep
+the PLA+ one: on top of the sag, PLA crazes under repeated alcohol — fine cracks
+that start at corners and holes, which on this part is everywhere.
 
 :::caution
 Do not autoclave a printed rack. An autoclave cycle runs at 121 °C and both PETG
 and PLA are well past soft by then — you will open the chamber to find a
 puddle. Printed racks are bench organisers, not sterile consumables: the layer
 lines hold liquid that you cannot get back out of them. Wipe it down with 70%
-ethanol and keep it out of the autoclave and the glasswasher.
+alcohol and keep it out of the autoclave and the glasswasher.
 :::
 
 ## Finishing
 
-Run the deburring tool once round the mouth of every bore. Fresh off the bed,
-the first layer of each hole carries a little elephant's foot and the top edge
-carries a burr, and both of them catch on the tube's cap skirt. A quarter turn
-each and a tube drops in under its own weight — which is what you want when you
-are loading a rack one-handed with a pipette in the other.
+Run the deburring tool once round the mouth of every bore. Fresh off the bed the
+top edge of each hole carries a burr, and a burr is what a tube catches on going
+in. A quarter turn each and a tube drops in under its own weight — which is what
+you want when you are loading a rack one-handed with a pipette in the other.
 
 Four rubber bumpers under the corners next. A full rack is heavy and the bench
 is usually damp; without feet it will slide the moment you pull a tube.
 
 Then label it. A rack with numbered rows is a rack you can write positions down
-against, and the laminated tape survives an ethanol wipe where a marker line
+against, and the laminated tape survives an alcohol wipe where a marker line
 does not.
 
 ## Files & downloads

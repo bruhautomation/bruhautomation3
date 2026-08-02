@@ -6,15 +6,15 @@ status: prototype
 
 # Dog Treat Dispenser
 
-Treats stack in a printed column, a servo pulls a slide at the bottom, one
-biscuit falls out. Triggered from Home Assistant.
+Treats stack in a printed column with a closed floor, a servo pushes the bottom
+one out through a gap in the side. Triggered from Home Assistant.
 
 ## What's in this folder
 
 - `models/` — print-ready STL files (these are what the site previews)
   - `dog_treat_dispenser_1.stl` — the magazine column
 
-The gate, the servo mount and the outlet chute are not modelled. They were built
+The pusher, the servo mount and the catch tray are not modelled. They were built
 to suit the wall the dispenser lives on, so the write-up stays flagged as
 unfinished until they are.
 
@@ -22,13 +22,21 @@ unfinished until they are.
 
 - 67 × 34 mm outside, 245 mm long, corners rounded 2 mm
 - 2.0 mm wall throughout, so the bore is 63 × 30 mm
-- Open at both ends
-- A 10 mm slot cut through one 67 mm face, running 228 mm from one end
-- 17 mm of unbroken tube at the other end — that end goes at the bottom, and it
-  is where the gate runs
+- One end is the full 63 × 30 bore, wide open — that is the top, and it is how
+  you load it
+- The other end is a solid 2 mm plate — the floor a biscuit rests on
+- The 15 mm above that floor has no front wall and no side walls, so the bottom
+  treat is open on three sides. That is the outlet, and a pusher shoves one
+  biscuit out through it
+- A 10 mm window down the centre of the front face, starting 17 mm above the
+  base and running 228 mm off the open top
 
-Print it standing on end: no overhangs, no bridge across the bore, and five
-walls at 0.4 mm add up to exactly the 2 mm wall, so it needs no infill.
+Print it lying flat on the back face — the unbroken one, opposite the window.
+It is the only face that runs the full 245 mm, and the window splits the front
+face into two 26.5 mm bridges instead of one 63 mm span. Five 0.4 mm perimeters
+and five 0.2 mm top and bottom layers both add up to the 2 mm wall, so it needs
+no infill. It wants a 245 mm bed; on a 220 mm one, stand it on the closed base
+and support the first 17 mm.
 
 ## Hardware
 

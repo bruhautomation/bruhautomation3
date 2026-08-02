@@ -1,8 +1,9 @@
 ---
 title: Christmas Ornaments
-description: Smart-home themed ornaments printed as hollow shells, lit by a flameless tea light, a single addressable pixel, or their own ESP on the tree's pixel string.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: Smart-home themed ornaments printed as hollow shells, lit three ways — a flameless tea light dropped in, one addressable pixel off the tree's own string, or a ring and an ESP so the ornament is a device in its own right.
+# The write-up is here; the models aren't. Published, and marked as pending on
+# the page, in the sidebar and on the project list, until the STLs land in the
+# folder.
 pending: true
 ---
 
@@ -28,6 +29,12 @@ least visible difference — do that one on the ornament that sits at eye level.
   least one glowing from inside so the shell's diffusion is visible.
 </ImagePlaceholder>
 
+:::note
+The models aren't posted yet. What follows is the filament and lighting choice,
+the print settings a hollow shell wants and the wiring for the ESP version —
+the STLs will land in the download section at the bottom.
+:::
+
 ## Parts
 
 <AffiliateDisclosure />
@@ -35,10 +42,10 @@ least visible difference — do that one on the ornament that sits at eye level.
 Filament first, because on this project the filament *is* the design. Nothing
 here gets painted.
 
-- [Glow-in-the-dark PLA](https://www.amazon.com/dp/B0FB3LV36D?tag=brau01-20) — the one filament that makes an ornament work with no electronics in it at all
+- [Glow-in-the-dark PLA](https://www.amazon.com/dp/B0FB3LV36D?tag=brau01-20) — the one filament that makes an ornament work with no electronics in it at all. This spool glows blue; the colour of the glow is the colour you get, so pick it before you model anything
 - [Matte white PLA](https://www.amazon.com/dp/B089S1HB8K?tag=brau01-20) — the shell material for anything lit from inside
 - [Clear PLA](https://www.amazon.com/dp/B07ZNG4L9P?tag=brau01-20) — icicles, and anything meant to sparkle rather than glow
-- [Silk tri-colour PLA](https://www.amazon.com/dp/B0BN5Z2798?tag=brau01-20) — co-extruded, so the colour shifts up the ornament with no work from you
+- [Silk tri-colour PLA](https://www.amazon.com/dp/B0BN5Z2798?tag=brau01-20) — pink, blue and silver co-extruded on one strand, so the colour shifts up the ornament with no work from you
 - [Colour-changing gradient PLA](https://www.amazon.com/dp/B0BV69PNHY?tag=brau01-20) — black through to green over the spool
 - [PLA+ in black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — 4 kg, for caps, backs and the second colour of a two-tone print
 - [Hardened steel 0.4 mm nozzle](https://www.amazon.com/dp/B08VNNZH37?tag=brau01-20) — a 20-pack, and you want one fitted before the glow filament goes in
@@ -75,8 +82,8 @@ And the bits that hold it together.
 | Orientation | Flat face on the bed, seam to the back |
 
 Two walls, because every wall you add is light you don't get back. A shell meant
-to glow is printed as a bowl — no infill, no top layers until the cap — and it
-prints faster than a solid one as a bonus.
+to glow is a bowl: no infill, no top layers, and the cap is a separate part. It
+prints faster than a solid one too.
 
 **Matte white is the diffuser, not clear.** Clear PLA prints frosty and passes a
 lot of light, but you can still see the LED through it as a hard bright dot.
@@ -85,18 +92,21 @@ you are after. Keep the clear filament for icicles and shapes that catch the
 tree's own lights.
 
 **Glow filament is abrasive.** It is loaded with strontium aluminate, and a brass
-nozzle will be visibly wider after a spool of it. Fit the hardened nozzle before
-you start and leave it in — the same nozzle handles carbon-fibre filament later.
-Glow also needs charging: a few seconds under the 365 nm torch and the ornament
-holds its glow long after the room lights go off, which is a better party trick
-than any of the wired versions.
+nozzle comes out measurably wider after a spool of it. Fit the hardened nozzle
+before you start and leave it in — the same nozzle handles carbon-fibre filament
+later.
+
+Glow also needs charging. A few seconds under the 365 nm torch and the ornament
+holds its glow long after the room lights go off — no supply, no controller, and
+nothing to unplug in January.
 
 For two-tone shapes — a logo or a face in one colour on a body in another —
-either run them on a multi-material printer ([Bambu Lab A1 with the AMS
-lite](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20) is what these were sliced
-for) or put a colour change at the layer where the inlay starts. The colour
-change costs nothing and works on any printer, as long as the second colour only
-appears on the top face and never comes back.
+either run them on a multi-material printer (the [Bambu Lab A1
+Combo](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20) ships with the AMS
+lite, which is four colours in one print) or put a colour change at the layer
+where the inlay starts. The colour change costs nothing and works on any
+printer, as long as the second colour only appears on the top face and never
+comes back.
 
 :::caution
 Do not hang a PLA ornament against an old incandescent light string. PLA softens
@@ -110,7 +120,7 @@ Only the ESP version has any. A ring, a board, three wires.
 
 | Ring pin | D1 mini | Notes |
 |---|---|---|
-| DIN | Any free GPIO | Pick one and name it in the config — keep the lead short |
+| DIN | Any free GPIO | Not D3, D4 or D8 — the ESP8266 samples those at reset, and a ring on one can stop it booting. Name whichever you pick in the config; keep the lead short |
 | 5V | **5V** | Off the board's 5 V pin, which is USB power passed through. Not 3V3 |
 | GND | GND | Common ground, and it has to be common if the ring is powered separately |
 

@@ -10,10 +10,9 @@ import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 One big button on a wall, and what it does depends on how you hit it. An ESP32
 counts the presses — one, two, three, four, five, or a hold — and publishes each
-pattern to Home Assistant as a different string, so a single button drives six
-automations without a single wire changing. Eight pixels next to it show a level
-you set with the same button, which is how one input ends up being a dial as well
-as a trigger.
+pattern to Home Assistant as a different string, so one button drives six
+automations. Eight pixels next to it show a level you set with the same button,
+so the same input is a dial as well as a trigger.
 
 The button is a 22 mm industrial mushroom head in a two-hole control station box.
 That is the whole point: it is the size and the weight of a thing you *hit*, not
@@ -59,15 +58,15 @@ present. The string is only there for a second, and any automation that polls fo
 <AffiliateDisclosure />
 
 - [ESP32 dev board, 38-pin WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the config's `board: esp32dev`. Ships as a 2-pack
-- [22 mm momentary mushroom-head push button](https://www.amazon.com/dp/B0B8R7R9YM?tag=brau01-20) — IP65, screw terminals, one normally-open contact
+- [22 mm momentary mushroom-head push button](https://www.amazon.com/dp/B0B8R7R9YM?tag=brau01-20) — IP65, SPST: two screw terminals and one normally-open contact, so there is no block to wire up wrong
 - [22 mm two-hole control station box](https://www.amazon.com/dp/B07GMZ9DSY?tag=brau01-20) — the button and the box are the same 22 mm standard, so it drops straight in
 - [8-pixel WS2812 board](https://www.amazon.com/dp/B07KD6ZB88?tag=brau01-20) — a rigid PCB, not cut strip. `num_leds: 8`, `type: GRB`. 2-pack
-- [22 mm key switch](https://www.amazon.com/dp/B07L59N466?tag=brau01-20) — optional, and what the box's second hole is for. The config does not read it; you would add a second `binary_sensor`
-- [EC11 rotary encoder with push switch](https://www.amazon.com/dp/B07D3DF8TK?tag=brau01-20) — optional, see below. 10-pack
+- [22 mm key switch, 1NO1NC maintained](https://www.amazon.com/dp/B07L59N466?tag=brau01-20) — optional, and one thing the box's second hole can be. The config does not read it; you would add a second `binary_sensor`
+- [EC11 rotary encoder with push switch](https://www.amazon.com/dp/B07D3DF8TK?tag=brau01-20) — optional, and read the section below first. 10-pack, and a 7 mm threaded bushing rather than a 22 mm one
 - [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — for the run from the button's screw terminals to the board
 - [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — female-to-female for the LED board's header
-- [2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20)
-- [Short right-angle micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — the right-angle plug is what makes an ESP32 fit in a box this shallow
+- [2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — 3-pack, and the 2.4 A is shared across its two ports, so give this one the button to itself
+- [Short right-angle micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — 3-pack of 1 ft cords. The right-angle plug is what makes an ESP32 fit in a box this shallow
 
 :::caution
 **Buy the momentary one.** The 22 mm mushroom head also comes in a latching
@@ -86,8 +85,9 @@ The comment at the top of the config says "rotary encoder with push button", and
 that is what the pin is named after — `encoder_sw`. But there is no
 `rotary_encoder:` component anywhere in the file. **Only the switch is read.**
 Turning a knob does nothing; the level moves by clicking, up on a short press and
-down on a long one. Fit an encoder if you want the option later, or fit the
-mushroom head and ignore the name.
+down on a long one. Fit the mushroom head and ignore the name. If you want the
+knob, you are adding a `rotary_encoder:` component and two more pins yourself,
+and an EC11 needs a 7 mm hole drilled somewhere the box does not have one.
 
 ## Wiring
 
@@ -101,16 +101,17 @@ Three wires to the LED board, two to the button.
 | LED board 5V | **5V / VIN** | Not 3V3 — the pixels are 5 V parts |
 | LED board GND | **GND** | |
 
-Use the button's **normally-open** pair. If Home Assistant shows the button held
-down permanently and it clears when you press it, you are on the normally-closed
-contacts — move one wire.
+The button above has one normally-open contact on two screw terminals, so there
+is no polarity and nothing to choose: either terminal to GPIO22, the other to
+GND. Heads that ship with a screw-on 1NO1NC block give you four terminals
+instead, and only the NO pair works here.
 
 Eight WS2812s at full white pull roughly 60 mA each, so about half an amp with
 everything on. That comes out of the ESP32's 5 V pin, which is the USB rail, which
 is why the parts list says a 2.4 A charger and not the 500 mA one in the drawer.
 
 <ImagePlaceholder alt="Inside the control box — the ESP32 wired to the mushroom button's screw terminals and to the eight-pixel LED board">
-  Wiring shot — the inside of the box with the button's contact block, the two
+  Wiring shot — the inside of the box with the button's screw terminals, the two
   wires to GPIO22 and GND, and the three-wire run to the LED board.
 </ImagePlaceholder>
 
@@ -118,18 +119,21 @@ is why the parts list says a 2.4 A charger and not the 500 mA one in the drawer.
 
 <Steps>
 
-1. **Decide what the pixels are for** before anything else, because it changes the
-   build. Point them out of the box's second 22 mm hole behind a paper or white
-   plastic diffuser and you get a lit ring beside the button — but you give up the
-   key switch. Or run them out of the box on a lead and stick the bar somewhere
-   you can actually see from across the room. Both are fine; pick one now.
+1. **Decide where the pixels go** before anything else, because it decides what
+   the second 22 mm hole is for. The LED board is a straight bar — eight 5050
+   packages in a row, over 40 mm end to end — so it does not sit behind a 22 mm
+   round hole. Either pass a three-wire lead out through that hole and stick the
+   bar where you can see it from across the room, or file the hole into a slot and
+   mount the bar behind a strip of white plastic. Fit the key switch there instead
+   and the bar goes outside.
 
 2. **Fit the button.** It drops into a 22 mm hole from the front and clamps with
    the ring nut from behind. Snug, not gorilla-tight — it is a plastic box.
 
-3. **Wire the button** to GPIO22 and GND with the silicone wire, under the screw
-   terminals of the normally-open block. Feed the USB cable into the box at this
-   point; there is very little room left once the switch body is in.
+3. **Wire the button** to GPIO22 and GND with the silicone wire, under its two
+   screw terminals. Bring the USB cable in at this point too — the switch body
+   fills most of the box once it is in, and threading a plug past it afterwards is
+   miserable.
 
 4. **Wire the LED board** to 5 V, GND and GPIO13. Short leads. A long data run to
    the first pixel is the usual cause of a first pixel that shows the wrong
@@ -137,15 +141,16 @@ is why the parts list says a 2.4 A charger and not the 500 mA one in the drawer.
 
 5. **Flash it over USB and test it with the box open.** Press once, twice, three
    times, and watch the text sensor in Home Assistant change. Closing the box on
-   a miswired contact block is the one mistake that costs you the whole assembly
-   again.
+   a wire that has pulled out of a screw terminal is the one mistake that costs
+   you the whole assembly again.
 
 </Steps>
 
 ## Firmware
 
 The config is `esphome/bruh-switch.yaml` in the download section below. It is
-plain ESPHome — no external components, no custom code.
+plain ESPHome — nothing to install beyond ESPHome itself, and the only C++ in it
+is the lambda that draws the level bar.
 
 <Steps>
 
@@ -207,9 +212,14 @@ number:
     restore_value: true
 ```
 
-The light also carries fifteen effects beyond `Status` — rainbow, scan, colour
-wipe, twinkle, fireworks, a two-colour `Police` wipe and a set of BRUH-tuned
-flicker variants. Those are what you fire from the celebration scene.
+One more quirk you will see before you look for it: the effect lights the pixels
+*below* the value and `max_value` is 7, so the eighth pixel never comes on. A full
+level is seven lit and one dark. Set `max_value: 8` if you want the whole bar.
+
+The light carries fourteen more effects beyond `Status` — flicker, addressable
+flicker, strobe, random, rainbow, scan, colour wipe, twinkle, random twinkle,
+fireworks, a two-colour `Police` wipe and three BRUH-tuned flicker and twinkle
+variants. Those are what you fire from the celebration scene.
 
 ## In Home Assistant
 
@@ -218,6 +228,9 @@ side. With the substitutions above you get:
 
 - **`sensor.hype_button_action`** — the string in the table at the top. This is
   the thing you automate on.
+- **`binary_sensor.hype_button_button`** — the raw contact, on while your hand is
+  down. Check your wiring against this one before anything else; it should be
+  `off` at rest and flick `on` under your palm.
 - **`light.hype_button_led`** — the eight pixels, with the whole effects list.
 - **`number.hype_button_switch_1`** — the 0–7 level.
 - **`switch.hype_button_alert_mode`** — an optimistic template switch. It does
@@ -262,8 +275,9 @@ matches, and a single-click pattern sitting above a double-click pattern will
 match first and the longer one never fires. Put them back in the order the file
 ships in.
 
-**The button reads pressed all the time.** Normally-closed contacts. Move the wire
-to the other pair on the block.
+**The button reads pressed all the time and clears while you hold it.** You are on
+a normally-closed pair. Only a head with a 1NO1NC block can do this — move both
+wires to the NO terminals.
 
 **Nothing on the LEDs.** In order: the light entity is off, or the effect isn't
 `Status`; then 5 V wired to 3V3; then the data lead on the wrong pin. GPIO13.

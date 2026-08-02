@@ -1,6 +1,6 @@
 ---
 title: Desk Controller
-description: An ESP32 that reads a standing desk's real height off the handset's serial line and presses its up/down buttons through relays, so Home Assistant gets the presets.
+description: An ESP32 that reads a standing desk's real height off the handset's serial line and presses its up and down buttons through relays, so Home Assistant gets a height sensor and can drive the desk itself.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -30,11 +30,11 @@ electrically. Unplug it and you have a stock desk again.
 
 The control box streams the current height up to the handset so the handset can
 show a number. That is a plain 9600-baud serial line, and `table_height_sensor.h`
-is a custom ESPHome component that sits on it and does one thing: it discards any
-byte of 5 or below and the value 170 — `0xAA`, the frame marker — and turns
-whatever is left into a height with `(byte + 256) / 10`. One byte per reading,
-offset by 256 tenths. It only publishes when the value changes, so the sensor
-sits quiet while the desk is still.
+is a custom ESPHome component that sits on it and does one thing: it drops any
+byte of 5 or below and the value 170 (`0xAA`), and turns whatever is left into a
+height with `(byte + 256) / 10`. One byte per reading, offset by 256 tenths. It
+polls once a second and publishes only when the value changes, so the sensor sits
+quiet while the desk is still.
 
 Going the other way there is no protocol at all. GPIO18 and GPIO19 each drive a
 relay, and the relay contacts are wired across the handset's own up and down
@@ -53,20 +53,36 @@ it forever. Change `unit_of_measurement` to `in` before you flash.
 
 <AffiliateDisclosure />
 
-- [ESP32 dev board, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack. The config's `board:` key is `nodemcu-32s`, which is what this narrow ESP-WROOM-32 board is
-- [2-channel 5V relay module, **low-level trigger**](https://www.amazon.com/dp/B078478SZ9?tag=brau01-20) — 4 boards, you need one. Low-level trigger is not optional here; see the wiring section
-- [Logic level converter, 3.3V ↔ 5V](https://www.amazon.com/dp/B088LMJR5K?tag=brau01-20) — a 6-pack. Buy it before you find out whether you need it
-- [Silicone hookup wire, 24 AWG](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — flexible enough to run alongside a cable that moves every time the desk does
-- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — for the bench, not for the finished box
-- [Perfboard, headers and screw terminals](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
-- [Project enclosure with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20) — the glands are the point, they take the strain off the tap cable
-- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a straight plug sticks out further than the box is deep
-- [USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — 3-pack, 2.4 A per port
-- [VHB double-sided tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — how the box gets under the desktop
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — a DevKitC-style board rather than a literal NodeMCU-32S, but it is the same
+  ESP-WROOM-32 module on the same pinout and the config's `board: nodemcu-32s`
+  key builds for it unchanged. Ships as a 2-pack.
+- [2-channel 5V relay module, **low-level trigger**](https://www.amazon.com/dp/B078478SZ9?tag=brau01-20)
+  — 4 boards, you need one. The trigger type is not a preference here; see the
+  wiring section.
+- [Logic level converter, 3.3V ↔ 5V](https://www.amazon.com/dp/B088LMJR5K?tag=brau01-20)
+  — a 6-pack of TXS0108E boards, eight channels each, and you need one channel.
+  Only if your desk's handset bus runs above 3.3 V; see the caution in the wiring
+  section.
+- [Silicone hookup wire, 24 AWG](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  — 10 colours × 30 ft, flexible enough to run alongside a cable that moves every
+  time the desk does.
+- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) —
+  for the bench, not for the finished box.
+- [Perfboard, headers and screw terminals](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20).
+- [Project enclosure with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  — the glands are the point, they take the strain off the tap cable.
+- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20)
+  — a 3-pack. The plug turns the cable along the board instead of adding an inch
+  past the end of it, which is what decides where the gland goes.
+- [Dual-port USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20)
+  — 3-pack, 12 W. An ESP32 with the radio up draws well under a quarter of that.
+- [VHB double-sided tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — how
+  the box gets under the desktop.
 
-Not on the list: the desk. Any electric sit-stand frame whose handset talks to
-the control box over serial will do, and the tap point is the thing you work out
-for yourself.
+Not on the list: the desk. Any electric sit-stand frame whose control box sends
+the height to its handset over serial will do, and the tap point is the thing you
+work out for yourself.
 
 The config also carries an unrelated passenger — see [the plant sensor riding
 along](#the-plant-sensor-riding-along) at the bottom.
@@ -82,19 +98,21 @@ Every pin here is the pin the config expects.
 | Relay IN1 — Up | **GPIO18** | Relay contacts across the handset's **up** button |
 | Relay IN2 — Down | **GPIO19** | Relay contacts across the handset's **down** button |
 | Status LED | **GPIO2** | The board's own blue LED, no wiring needed |
-| Relay board power | **5V** and **GND** | The devkit's 5V pin, live whenever USB is plugged in |
+| Relay board power | **5V** and **GND** | The devkit's 5V/VIN pin, live whenever USB is plugged in |
 | Ground | **GND** | Must be common with the desk's ground, or the UART reads noise |
 
 Both relay switches are declared `inverted: true`, which is what a low-level-trigger
-board wants — the relay pulls in when the ESP32 drags the IN pin to ground. Fit a
-high-level-trigger board instead and the polarity flips: `RESTORE_DEFAULT_OFF` will
-drive both pins high at boot, which is both desk buttons held down at once, before
-you have logged in to anything.
+board wants — the relay pulls in when the ESP32 drags the IN pin to ground, and a
+switch reading *off* holds that pin high. That is why the trigger type is not a
+preference. `RESTORE_DEFAULT_OFF` puts both switches off at boot, so both pins go
+high; on a high-level-trigger board high means energised, and the desk comes up
+with both buttons held down. `interlock` will not save you either — as far as
+ESPHome is concerned both switches are off.
 
-The other two lines in each `switch:` block are worth keeping. `interlock` means
-ESPHome will never have up and down energised together. `RESTORE_DEFAULT_OFF`
-means a reboot or a power cut never comes back with a relay latched — the desk
-should be still when nobody asked it to move.
+Both lines do a real job on the right board. `interlock` means ESPHome will never
+have up and down energised together. `RESTORE_DEFAULT_OFF` means a reboot or a
+power cut never comes back with a relay latched — the desk should be still when
+nobody asked it to move.
 
 :::caution
 Measure the height line before you connect it. ESP32 GPIOs are 3.3 V and are not
@@ -112,9 +130,9 @@ higher. If yours does, the level converter goes between that line and GPIO17.
 <Steps>
 
 1. **Find the height line.** Open the handset and look for the wire carrying data
-   from the control box. Put the ESP32 on it at 9600 baud with `logger:` running,
-   watch the ESPHome log, and raise the desk by hand — the right line is the one
-   whose bytes climb as the desk does. Ground first, always.
+   from the control box. Put the ESP32 on it at 9600 baud, add a `debug:` block
+   under `uart:` so the raw bytes go to the log, and raise the desk by hand — the
+   right line is the one whose bytes climb as the desk does. Ground first, always.
 
 2. **Tap the two buttons.** Solder a pair of wires to each of the up and down
    button pads inside the handset and bring them out to the relay's normally-open
@@ -171,13 +189,19 @@ Helpers, and set its min and max to your own desk's travel, in whatever unit the
 sensor is reporting. That helper is the setpoint — the config imports it back as
 an internal sensor and compares it against the measured height.
 
+That entity id is written out in full in the config and does **not** follow the
+substitutions, so renaming the device does not rename the helper. Either name the
+helper `bruh_desk_height` whatever you call the desk, or change the `entity_id:`
+line to match.
+
 The device then exposes:
 
 - **Height** — the live reading off the serial line.
 - **Up** and **Down** — the two relays, as switches you can hold on and off
   yourself.
-- **`esphome.bruh_desk_move_desk`** — a service taking one variable, `delay_time`,
-  in seconds. It looks at the setpoint, decides which way that is, pulses the
+- **`esphome.bruh_desk_move_desk`** — the service name is built from `device_id`,
+  so renaming the device renames this too. It takes one variable, `delay_time`, in
+  seconds: it looks at the setpoint, decides which way that is, pulses the
   matching relay for `delay_time`, and stops.
 - Status, WiFi signal and a restart switch.
 
@@ -205,23 +229,25 @@ these sensors need, and it keeps the radio out of the way of WiFi.
 
 ## Troubleshooting
 
-**The height sensor never publishes.** Wrong wire, or no shared ground. Both look
-identical from Home Assistant and different in the ESPHome log — a wrong wire is
-silence, a missing ground is a stream of garbage bytes that the `> 5` filter
-mostly eats.
+**The height sensor never publishes.** Silence means nothing is arriving — wrong
+wire, or the wrong baud rate. A missing ground looks nothing like this: the filter
+only drops seven values out of 256, so noise reaches Home Assistant as a height
+that jumps around rather than as no height at all.
 
 **The height jumps to a wildly wrong number.** Some other byte on that bus is
 getting through the filter. The decoder trusts every byte above 5 that is not
-`0xAA`, which is a thin protocol; watch the raw stream with the logger at debug
-and see what else the control box sends.
+`0xAA`, which is a thin protocol; put a `debug:` block under `uart:` and read what
+else the control box sends.
 
 **Both relays click at boot.** High-level-trigger relay board. Either swap it for
 a low-level-trigger one or remove `inverted: true` from both switches, and do it
 before the desk is loaded.
 
 **The desk moves the wrong way.** The two relays are on the wrong buttons. Swap
-the pin numbers on `gpio_18` and `gpio_19` rather than resoldering — but swap
-them in the `interlock:` lines too.
+the `pin:` values between the two `switch:` blocks rather than resoldering, and
+leave everything else alone — `interlock:` names ids, not pins, so it is still
+correct. You end up with an id called `gpio_18` sitting on pin 19, which is a
+misleading name and nothing worse.
 
 **It overshoots every preset.** `delay_time` is too long. See the note above:
 short pulses, re-check between each.

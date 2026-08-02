@@ -20,8 +20,8 @@ back the same way it went.
 
 :::note
 The models and the sketch aren't published yet — that is what the banner at the
-top of this page is about. The parts list below is the real one, and the
-mechanical notes are the ones worth reading before you model anything.
+top of this page is about. The parts list below is complete; the mechanical
+notes are what to read before you model anything.
 :::
 
 <ImagePlaceholder alt="A 3D-printed motorised inverter holding a 96-well plate part-way through a flip over a waste tray">
@@ -42,10 +42,14 @@ sits**. Run it through the middle of the plate and the load is balanced either
 side of the axis through the whole sweep, so the servo carries almost nothing
 and the motion is as smooth at 90° as it is at 10°. Put the axis under the
 plate — which is the obvious way to draw it, because that is where there is
-room — and the cradle becomes a pendulum. The servo strains up to top dead
-centre and then the plate falls over the far side faster than it was told to
-move. That fall is exactly what throws liquid between wells, and no amount of
-slowing the command down will fix it.
+room — and the plate's mass now sits above the pivot. Upright stops being a
+balance point and becomes the top of an arc: gravity pulls the cradle over from
+the moment the sweep starts, hardest at 90°, and the servo spends the outbound
+stroke braking a load running ahead of its own gear backlash. The plate arrives
+inverted faster than it was told to, which is exactly what throws liquid between
+wells, and no amount of slowing the command down will fix it. The return stroke
+is the other half of the same mistake — the servo lifts the whole plate back
+over the top, and that is where a marginal one stalls.
 
 Plate footprints are standardised and heights are not. Every SLAS-footprint
 plate is 127.76 × 85.48 mm, so clamp on the skirt and the cradle fits
@@ -59,29 +63,31 @@ bar to adjust, or accept that a deep-well block will not go in.
 - [MG996R metal-gear servo](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20) ×1 — sold in a 6-pack; the flip drive
 - [Arduino Nano](https://www.amazon.com/s?k=Arduino+Nano+ATmega328P&tag=brau01-20) — one servo output and one button input is all it needs
 - [12 V 4 A power brick](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) with the matching [5.5 × 2.1 mm panel jacks and pigtails](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20)
-- [MP1495 adjustable step-down module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — 12 V down to 6 V for the servo, 3 A, sold in fives
+- [MP1495 adjustable step-down modules](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — 3 A each, sold in fives; you need two, one at 6 V for the servo and one at 5 V for the board
 - [Mini momentary push button](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20) — 30-pack, you need one
-- [608-2RS ball bearings](https://www.amazon.com/dp/B07C6FL8TW?tag=brau01-20) — one for the idle trunnion, two if you carry the servo end on a bearing as well
+- [608-2RS ball bearings](https://www.amazon.com/dp/B07C6FL8TW?tag=brau01-20) — a 20-pack; one for the idle trunnion, two if you carry the servo end on a bearing as well
 - [M3 brass heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and an [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
 - [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — for the servo horn screw, which is the one fastener that will back out
 - [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — the servo lead is never long enough
 - [IP65 hinged project box](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20) — a sealed box is the right call for anything that lives beside a waste tray
 - Filament: [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the frame, [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the cradle, a little [TPU](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) for the clamp pads
 
-Two worth adding if you have them. A [Nano screw-terminal
+Two worth adding. A [Nano screw-terminal
 shield](https://www.amazon.com/dp/B07K8KM583?tag=brau01-20) turns the whole
 harness into screw terminals, which matters when the box gets opened wearing
 gloves. And if you want the inverter to show up in Home Assistant rather than
 answer only to its own button, an [ESP32
 DevKit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) drives the same
-servo and the same button off the same 6 V rail.
+servo and reads the same button off the same two rails.
 
 :::note
 The MG996R is roughly 10 kg·cm at 6 V, which is far more than a balanced cradle
 asks for and about right for one that isn't quite. If yours ends up
 nose-heavy, the [DS3218](https://www.amazon.com/dp/B07G34PLXQ?tag=brau01-20) is
-20 kg·cm in the same standard servo case — but fix the balance first, because a
-bigger servo makes an unbalanced flip faster, not gentler.
+20 kg·cm in the same standard servo case — but fix the balance first. More
+torque only means the servo can hold the offset. It still holds it continuously,
+it still gets hot doing it, and the sweep is still quicker going over than
+coming back.
 :::
 
 ## Print settings
@@ -113,12 +119,17 @@ each sweep.
 ## Powering it
 
 The servo does not run off the board's 5 V pin. An MG996R pulls well over an amp
-when it starts a sweep, and a Nano's regulator answers that by browning out
-mid-flip with a plate upside down in the cradle. Set the step-down module to
-6.0 V with a meter **before** you connect the servo, feed the servo from there,
-and tie the grounds together so the board and the servo share a reference. The
-board itself can run from the same 6 V rail into `VIN`, or off USB while you are
-still writing code.
+starting a sweep and around 2.5 A stalled, and a Nano's regulator answers that
+by browning out mid-flip with a plate upside down in the cradle. Set one step-down to 6.0 V with a meter **before** you connect the
+servo, feed the servo from there, and tie the grounds together so the board and
+the servo share a reference.
+
+The board gets the second module out of that 5-pack, set to 5.0 V and wired to
+the Nano's `5V` pin, which goes in past the onboard regulator. Don't feed it the
+6 V servo rail through `VIN` — the Nano's regulator needs 7 V or more to hold
+5 V, and 6 V in is exactly where it drops out. USB is fine while you're still
+writing code, but pull the 5 V feed before you plug it in rather than have two
+supplies arguing across the board.
 
 ## Assembly
 
@@ -131,8 +142,9 @@ still writing code.
 
 2. **Build the cradle and check the balance by hand.** Load a real plate, hold
    the trunnions between two fingers and let go at 45°. It should stay where you
-   put it. If it swings back to upright, the axis is too low and now is the time
-   to move it, not after the servo is mounted.
+   put it. If it keeps falling over, the axis is below the load and has to come
+   up; if it swings back to upright, the axis is above it and has to come down.
+   Move it now, not after the servo is mounted.
 
 3. **Centre the servo before the horn goes on.** Power it, command mid-travel,
    and only then press the horn on so the cradle reads upright. A standard servo
@@ -142,7 +154,9 @@ still writing code.
 4. **Threadlocker on the horn screw.** It is the only fastener taking a reversing
    load every cycle, and it is the one that will be loose in a fortnight.
 
-5. **Wire it, set the buck to 6.0 V, then connect the servo** — in that order.
+5. **Wire it, set both step-downs on a meter, then connect the servo and the
+   board** — in that order. 6.0 V and 5.0 V with nothing loaded, checked again
+   with the servo moving.
 
 6. **Set the two endpoints with the plate empty**, then repeat with the plate
    full of water over the sink before it ever sees a sample.
@@ -168,9 +182,8 @@ Whatever is in the plate ends up in the tray. Run this over a tray of
 disinfectant with an absorbent pad in it, and if the contents need a biosafety
 cabinet then the inverter needs to be in the cabinet too — a motorised flip
 generates the same aerosol as a hand flick and does it at bench height where you
-are not looking. The plate is also mechanically captive: check the clamp is
-tight before every run, because there is no sensor on this that knows the plate
-left.
+are not looking. Nothing holds the plate but the clamp, and nothing on this
+machine knows if it lets go — check it is tight before every run.
 :::
 
 ## Files & downloads

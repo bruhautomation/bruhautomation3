@@ -18,10 +18,11 @@ crosses between columns.
 - MG996R standard-size metal-gear servo driving one trunnion
 - 608-2RS bearing on the idle trunnion
 - Arduino Nano (or an ESP32, if you want it in Home Assistant) and one momentary button
-- 12 V brick into an MP1495 step-down set to 6 V — the servo never runs off the board's regulator
+- 12 V brick into two MP1495 step-downs — 6 V for the servo, 5 V for the board; the servo never runs off the board's regulator
 - 3D-printed cradle in PETG, frame in PLA+, clamp pads in TPU
 - M3 heat-set inserts throughout
 
 The rotation axis runs through the middle of the plate, not under it. Balanced
-that way the servo carries almost nothing; underslung, the cradle is a pendulum
-that falls over top dead centre and splashes.
+that way the servo carries almost nothing; underslung, the plate's mass sits
+above the pivot, gravity drags the sweep over faster than it was commanded, and
+that is what splashes.

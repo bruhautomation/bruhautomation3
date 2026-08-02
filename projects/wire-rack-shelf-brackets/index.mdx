@@ -1,18 +1,218 @@
 ---
 title: Wire Rack Shelf Brackets
-description: Reinforcement brackets for wire shelving.
+description: Printed brackets that stop a chrome wire shelf bowing and tie it back to the post — the material choice, the four measurements that decide the part, and why you should never print the split sleeve.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Reinforcement brackets for wire shelving.
+A chrome wire rack carries a lot of weight and carries it badly. Nothing on it
+is bolted to anything — each shelf just drops over four tapered plastic sleeves
+and wedges there — so a loaded shelf bows in the middle, the unit leans when you
+drag a bin off the end, and the corner that gets grabbed every day is the one
+that works loose. These are printed brackets that clamp the shelf's frame wire
+to the post and brace the mat where it sags.
 
-## Hardware
-- 3D-printed metal-compatible brackets
-- Wire rack shelving
+:::note
+**There are no print files in this folder yet** — no STL, no CAD, no
+photographs. What is real is everything below: how the joint you are reinforcing
+actually works, the four numbers any bracket has to hit, and the material
+decision that determines whether it is still the right shape in a year. Treat it
+as the design brief, not a build guide.
+:::
+
+## How a wire rack holds itself up
+
+Four grooved posts, and a shallow ring cut into each one every inch or so. A
+two-piece tapered plastic sleeve — the split sleeve, or shelf clip — snaps into
+one of those rings, and the welded collar at the corner of the shelf drops over
+the taper. That is the whole mechanism. Weight on the shelf drives the collar
+harder onto the cone and the cone harder onto the post, so the joint gets
+*tighter* the more you load it and there is not a fastener anywhere in it.
+
+It is a good design and it fails in two predictable places. The sleeves are
+injection-moulded plastic under permanent compression, so they split, they go
+brittle with age, and one always disappears during a house move. And the mat
+between the four corners is only as stiff as its own wires: load the middle of a
+36 in shelf with paint tins and it takes a visible set, which no clip anywhere
+can fix because the clips are not where the bending is.
+
+A bracket is worth printing for the second problem — spreading a load across
+more of the mat, or tying the shelf's frame wire back to the post so the corner
+is located by something other than friction. It is not worth printing for the
+first. See the [caution](#load-creep-and-what-plastic-is-for) below.
+
+:::tip
+If your shelving is the white plastic-coated ventilated stuff screwed to a
+closet wall, this is a different animal — no posts, no sleeves, and the sag is a
+span problem. The fix there is a proper diagonal support bracket landed on a
+stud, not a printed part.
+:::
+
+<ImagePlaceholder alt="A loaded chrome wire shelf with a visible bow in the middle of the mat">
+  The problem shot — a wire shelf under real load, photographed along its length
+  so the bow in the mat is obvious against a straight edge.
+</ImagePlaceholder>
+
+## Measure your rack first
+
+Nothing about wire shelving is standardised across brands. A commercial NSF rack,
+a restaurant-supply rack and the flat-pack one from a big-box store use different
+post diameters, different wire gauges and different mat spacings, and a bracket
+drawn for one is scrap on another. Take four numbers off your own rack with a
+caliper before you draw, scale or slice anything.
+
+| Measure | Where | What it sets |
+|---|---|---|
+| Post diameter | On the plain barrel between two grooves, not in a groove | The bore or the jaw of the clamp |
+| Groove pitch | Count the rings over 100 mm and divide | The heights a bracket is allowed to sit at |
+| Frame wire | The thick perimeter wire round the edge of the shelf | The slot the bracket hooks over |
+| Mat wire and pitch | A middle wire, and centre-to-centre across several of them | How many slots, and how far apart |
+
+The two wire diameters are different — the perimeter wire is always the fatter
+one, because it is the shelf's frame — and modelling both slots to the frame
+number is the single most common way to end up with a bracket that rattles on
+the mat. Measure both.
+
+Post diameter is the one to be fussy about. A clamp cut to the groove diameter
+grips nothing but air along most of its length and slides under load; a clamp cut
+to the barrel is the one that stays where you put it.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PETG, 1 kg](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the default,
+  and the reason is in [the caution below](#load-creep-and-what-plastic-is-for).
+  A bracket on a shelf is under load every second of its life, and PETG holds its
+  shape under a constant load far better than PLA does. A set of brackets for a
+  four-shelf rack is well under half a spool.
+- [PLA+, 4 × 1 kg](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — fine if
+  the rack is indoors, in a cool room, and the brackets are locating something
+  rather than holding it up. Not in a garage, and not in an attic.
+- [Carbon-fibre PLA](https://www.amazon.com/dp/B0D86M3RM4?tag=brau01-20) plus a
+  [hardened 0.4 mm nozzle](https://www.amazon.com/dp/B08VNNZH37?tag=brau01-20) —
+  noticeably stiffer, which is tempting for a part whose whole job is stiffness.
+  Read the caution first: carbon fill raises the modulus, it does not stop the
+  creep, because underneath it is still PLA.
+- [M5 button-head bolt and nut kit, 180 pcs](https://www.amazon.com/dp/B07CYHFQ7S?tag=brau01-20)
+  — for a two-piece clamp that closes round a post. M5 is the right size here;
+  M3 through a printed jaw you are deliberately over-tightening is not.
+- [M3 screw, nut and washer kit, 562 pcs](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+  and [M3 heat-set inserts, 100 pcs](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+  — for the smaller brackets, and for anything you expect to take off and put
+  back. A machine screw into bare plastic survives about three cycles.
+- [Heavy-duty zip ties, 12 in](https://www.amazon.com/dp/B0D97ZC72N?tag=brau01-20)
+  — the no-fastener route. A bracket with two slots in it and a zip tie through
+  each one is faster than bolts, costs nothing, and is also the right thing to
+  add afterwards as a backstop so a cracked bracket cannot fall out of the rack.
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — the one
+  tool that matters. Every number in the table above comes off this.
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) and a
+  [needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — wire
+  slots print undersize once elephant's foot has had its say, and a file is
+  quicker than a reprint.
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) —
+  only if you want a split bracket bonded permanently shut round a wire it can
+  no longer be threaded off.
+- [A wire shelving unit](https://www.amazon.com/s?k=chrome+wire+shelving+unit+adjustable&tag=brau01-20)
+  if you are starting from nothing, and
+  [spare split sleeves](https://www.amazon.com/s?k=wire+shelving+split+sleeves+shelf+clips&tag=brau01-20)
+  to match its post diameter. Buy those, don't print them.
+
+## Print settings
+
+There is no model in the folder to give you a specific orientation for, so what
+follows is the general recipe for a printed part that has to hold a shelf up.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 5 or more |
+| Infill | 40%, gyroid |
+| Supports | None, if you have oriented it properly |
+| Material | PETG |
+| Orientation | Load along the extrusions, never across the layers |
+
+The walls are what carries the load and the infill mostly stops them buckling
+inwards, so five walls at 20% infill beats three walls at 60% every time and
+takes less filament doing it.
+
+Orientation is the part people get wrong. A printed bracket does not fail by
+tearing plastic — it fails by unzipping between two layers, because that bond is
+the weakest thing in the part by a wide margin. So work out which way the load
+pulls, and print so it pulls along the extrusions. For a C-clamp that wraps a
+post, that means the bore axis vertical on the plate: every layer is then a
+complete closed C and the hoop load runs the long way round an extrusion. Stand
+the same clamp up so the bore is horizontal and you have built a part that is
+trying to peel itself open along a layer line.
+
+## Fitting
+
+<Steps>
+
+1. **Take the weight off the shelf first.** A loaded collar is wedged onto its
+   cone by the load itself, and it will not move while the tins are still on it.
+
+2. **Tap the collar up off the taper** with a block of wood against the collar
+   itself. Never lever against the mat — that is how a shelf that was sagging
+   becomes a shelf that is bent.
+
+3. **Inspect all four sleeves while they are out.** Any that are cracked, or
+   that no longer snap firmly into the groove, get replaced now. This is the
+   five-minute job that the rest of the project is not a substitute for.
+
+4. **Dry-fit the bracket before you bolt anything.** Check it sits on the post
+   barrel and not in a groove, check both wire slots actually seat, and file
+   them out until they do.
+
+5. **Reload from the bottom shelf upwards**, heaviest at the bottom, and put a
+   zip tie through each bracket as a backstop.
+
+6. **Re-check the bolts after a week.** A bolted joint through printed plastic
+   relaxes as the plastic takes its set under the clamp load. One re-tighten
+   settles it; if it is still going slack a month later, the jaw is too thin.
+
+</Steps>
+
+## Load, creep, and what plastic is for
+
+:::caution
+**Plastic under a constant load behaves nothing like plastic under a brief one.**
+A PLA bracket that shrugs off a hard shove will quietly deform under a shelf's
+worth of dead weight held for months — it is called creep, it happens at room
+temperature with no heat involved at all, and in a garage in August it happens
+several times faster. The part never cracks and never gives you a warning. It
+just is not the shape you printed any more.
+
+PETG creeps too, more slowly, which is why it is the default here and not the
+compromise. Carbon-fibre PLA is stiffer on day one and creeps like PLA on day
+two hundred.
+
+The design conclusion matters more than the filament choice: **nothing printed
+should be the only thing between a loaded shelf and the floor.** A good bracket
+shares the load with the steel and the moulded sleeve that were always meant to
+carry it. A printed split sleeve carries the entire shelf on a plastic wedge,
+alone, forever — which is the one part of a wire rack you should buy rather than
+print.
+:::
+
+## What still has to happen
+
+For this to become a build guide rather than a design brief: a parametric STEP
+with the post bore, groove pitch and both wire slots driven by the four
+measurements above, STLs for the clamp halves and the mid-span brace, and
+photographs of a set fitted to a loaded rack. None of that is in the folder yet.
+
+<ImagePlaceholder alt="A printed bracket clamped to a wire rack post and hooked over the shelf's frame wire">
+  Detail shot once the parts exist — one bracket in place, close enough to see
+  the jaw on the post barrel and the slot seated on the frame wire.
+</ImagePlaceholder>
 
 ## Files & downloads
 

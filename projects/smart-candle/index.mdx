@@ -1,66 +1,375 @@
 ---
 title: Smart Candle
-description: A WiFi-controlled, auto-igniting, auto-extinguishing candle built with ESPHome and an arc lighter.
+description: A real flame you can light and snuff from Home Assistant — an arc lighter, a diaphragm pump and two copper tubes that do both jobs, driven by an ESP32 T-Display running ESPHome.
 banner:
   content: |
     Don't build this. It's a bad idea.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
-import candleIgnition from './images/candle-arc-ignition.gif';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
+import candleIgnition from './images/candle-arc-ignition.gif';
+import candleConcept from './images/smart-candlet-concept.png';
 
-A WiFi-connected candle that ignites and extinguishes itself on command via Home Assistant. Arc lighter for ignition, diaphragm pump for blowout.
+An oil candle that lights itself when Home Assistant says so and blows itself
+out when it says otherwise. Two copper tubes arch over the wick and do both
+jobs: an arc jumps the gap between their tips to light it, and a diaphragm pump
+pushes air up one tube and pulls it down the other to snuff it. An ESP32 with a
+1.14 in screen runs the whole thing off two relays and a pair of buttons.
 
 :::danger
-This involves high voltage and open flame. Proceed at your own risk.
+This is mains-free, but it is not safe. It makes an open flame on a timer, in a
+room, from an API call. Every failure mode ends in fire. Build it on a hard
+surface, keep an extinguisher within reach, and never leave it armed in an
+empty house.
 :::
+
+<img
+  src={candleConcept.src}
+  alt="AI render of a living room on fire, curtains and sideboard alight, one small candle burning on the coffee table"
+  style="max-width: 100%; border-radius: 8px;"
+/>
+
+That is a render, not a photograph, and not anybody's living room. It is on the
+page because it is the honest picture of what this project's failure mode looks
+like.
+
+## Parts
 
 <AffiliateDisclosure />
 
-## Choosing a Candle
+- [ESP32 board with a 1.14 in ST7789 LCD](https://www.amazon.com/dp/B07X1W16QS?tag=brau01-20)
+  — a T-Display-shaped board, USB-C. The config is written to that pinout:
+  display on 19/18/5/16/23, backlight on 4, the two onboard buttons on 0 and
+  35. Any board matching it works; the `board:` key in the YAML is
+  `featheresp32` and can stay that way, because every pin the config uses is
+  written out as an explicit GPIO number.
+- [3.7 V 3000 mAh LiPo with a JST 1.25 plug, 4-pack](https://www.amazon.com/dp/B08T6GT7DV?tag=brau01-20)
+  — plugs straight onto the board's battery header and charges over USB-C. This
+  is what makes the candle a thing you put on a table rather than a thing on the
+  end of a cable.
+- [TP4056 charger + adjustable boost module, 6-pack](https://www.amazon.com/dp/B08GWTBD3T?tag=brau01-20)
+  — the pump wants 5–6 V and a single cell gives you 3.7 V, so something has to
+  step it up. This board charges the cell and boosts it in one part. An
+  [XL6009 boost module](https://www.amazon.com/dp/B06XWSV89D?tag=brau01-20) does
+  the boosting half if you already have charging sorted.
+- [3 V single-channel opto-isolated relay, 6-pack](https://www.amazon.com/dp/B07ZM84BVX?tag=brau01-20)
+  — two of them, one for the lighter and one for the pump. Get the **3 V**,
+  high-level-trigger kind: the ESP32's GPIOs are 3.3 V, and the config turns a
+  relay on by driving its pin high. See the caution under
+  [Wiring](#wiring) before you substitute anything.
+- [USB-rechargeable plasma arc lighter](https://www.amazon.com/dp/B08CF3Q7NC?tag=brau01-20)
+  — the ignition source, and the part that finally worked. It has its own cell
+  and its own charger, so all you take from it is its button and its two
+  electrodes.
+- [5 V miniature diaphragm vacuum pump](https://www.amazon.com/dp/B078H8V563?tag=brau01-20)
+  — 100 kPa, 370-motor. It has a separate inlet and outlet, which is the whole
+  reason it is this pump and not an aquarium bubbler.
+- [3/16 in copper tubing, 25 ft roll](https://www.amazon.com/dp/B000CSZ5GE?tag=brau01-20)
+  — you need about 500 mm of it. It is the arc electrode and the air duct at the
+  same time.
+- [3/16 in aquarium airline tubing, 25 ft](https://www.amazon.com/dp/B01N8SNNOI?tag=brau01-20)
+  — 3/16 in airline is sized on its bore and 3/16 in copper on its outside
+  diameter, so the soft tubing pushes straight onto the copper tails with
+  nothing in between. It is also the insulator that keeps the high voltage from
+  walking back down to the pump.
+- [Tube cutter, 1/8–5/8 in](https://www.amazon.com/dp/B000LDGNCU?tag=brau01-20)
+  and a [tubing bender](https://www.amazon.com/dp/B000F5HV0W?tag=brau01-20) —
+  a hacksawed copper end is a burr that changes where the arc strikes, and a
+  kinked arch is a blocked air duct. Both are cheap and both matter here.
+- [6 in refillable glass pillar candle](https://www.amazon.com/dp/B00PFZ1CB6?tag=brau01-20)
+  and [clean-burning lamp oil, 32 oz](https://www.amazon.com/dp/B00NCAXBSS?tag=brau01-20)
+  — a fixed-wick oil candle, not wax. See [Choosing a candle](#choosing-a-candle);
+  this is the single decision the build stands on.
+- [Mini momentary push buttons, NO, 30-pack](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20)
+  — two of them, for the two 7 mm holes in the printed base. These are the
+  ignite and blow buttons the firmware reads on GPIO22 and GPIO21.
+- [22 mm latching panel button](https://www.amazon.com/dp/B07MJ347XL?tag=brau01-20)
+  for the arming switch, with a
+  [step drill](https://www.amazon.com/dp/B0CP4VSXNZ?tag=brau01-20) to open the
+  base's 16.5 mm centre hole out to 22 mm. A
+  [16 mm metal panel button](https://www.amazon.com/dp/B098FGVVFZ?tag=brau01-20)
+  drops into that hole as printed, but the 16 mm one is momentary, and an arming
+  switch that springs back is not an arming switch.
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the
+  base — see [Printing the base](#printing-the-base) for why it isn't PLA.
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20),
+  [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) and
+  [perfboard, headers and terminal blocks](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20),
+  plus [adhesive-lined heat shrink](https://www.amazon.com/dp/B0CT88MHXQ?tag=brau01-20)
+  for the lighter's leads.
 
-Standard wax candles are a poor fit for automation because the wick position changes as the candle burns down. You can't just aim a lighter at a fixed point and call it done.
+If you would rather run it off an 18650 than a pouch cell, the
+[Samsung INR18650-35E 4-pack](https://www.amazon.com/dp/B0762LDVF8?tag=brau01-20)
+and a [holder with flying leads](https://www.amazon.com/dp/B00LSG5BKO?tag=brau01-20)
+go straight onto the TP4056 board above. That is what the first version of this
+ran on.
 
-For this prototype, I used an oil-filled candle with a fixed wick — the ignition point stays consistent relative to the base, which made everything much simpler.
+## Choosing a candle
+
+A wax candle is the wrong shape for automation and it is not close. The wick
+retreats down the wax as it burns, so the point you have to put an arc at moves
+several centimetres over the life of the candle. You would be automating a
+target that walks away from you.
+
+An oil candle fixes that in one part. The wick is held at the top of a glass
+reservoir and stays exactly where it is until the oil runs out — the ignition
+point sits at a constant height above the base, which is what lets you build a
+rigid arch and forget about it. Refill it and the geometry is unchanged.
+
+Use lamp oil sold as clean-burning and low-odour. This is a thing that lives on
+a table in a room somebody is sitting in.
 
 ## Ignition
 
-I tested three different methods before finding one that worked reliably:
+Three attempts, in order, and only the third one is a build.
 
-- **Resistance wire** — [32AWG Kanthal A1](https://amzn.to/3LvWkn8) heated up but was inconsistent and burned out quickly.
-- **High voltage generator** — A [5V buck boost](https://amzn.to/3sZZnh4) was extremely loud and immediately destroyed the wick. Turns out stun guns and arc lighters work very differently — arc lighters use higher frequency, lower power pulses that transfer heat more efficiently.
-- **Arc lighter** — A USB rechargeable [arc lighter](https://www.amazon.com/dp/B09YPZK854?tag=brau01-20) with opto-isolated relay control. This is what worked.
+**Resistance wire.** [32 AWG Kanthal A1](https://www.amazon.com/dp/B077S2ND4Q?tag=brau01-20)
+laid against the wick. It heats, and sometimes it lights, and then it oxidises
+and breaks. Inconsistent from cold, and it burns itself out fast enough that you
+would be rebuilding the igniter more often than you refill the oil.
+
+**A high-voltage generator module.** The
+[400 kV](https://www.amazon.com/dp/B01C2IVE6Q?tag=brau01-20) and
+[700 kV](https://www.amazon.com/dp/B01GM9B4R0?tag=brau01-20) step-up boards, and
+the [15 kV arc igniter coil](https://www.amazon.com/dp/B07DMWN7B3?tag=brau01-20).
+All three are loud, and all three destroy the wick on contact rather than
+lighting it. A stun-gun module and an arc lighter are not the same device wearing
+different cases: the lighter runs a much higher frequency at much lower power,
+which puts heat into the wick instead of blowing it apart.
+
+**An arc lighter.** This is the one. It fires a stable, quiet arc, it strikes
+across a few millimetres of air, and it has an internal cell and a USB charger,
+so it needs nothing from the ESP32 except a relay across its own button.
+
+<img
+  src={candleIgnition.src}
+  alt="Arc jumping between two copper tube tips above the wick of a glass oil candle, lighting it"
+  style="max-width: 400px; border-radius: 8px;"
+/>
 
 :::note
-High-voltage modules need to be electrically isolated from your control circuitry. Otherwise you'll get random resets on the microcontroller.
+Keep the high-voltage side electrically isolated from the control side. Opto-
+isolated relays are not optional here — with a direct connection, every arc
+strike resets the ESP32, and you get a board that reboots every single time it
+does its job.
 :::
-
-<img src={candleIgnition.src} alt="Candle ignition test with arc lighter" style="max-width: 400px; border-radius: 8px;" />
 
 ## Extinguishing
 
-I went with a [5V diaphragm pump](https://www.amazon.com/NW-5V-6VDC-Miniature-Vacuum-100KPa/dp/B078H8V563?tag=brau01-20) — it has both an inlet and an outlet, so I positioned copper tubes on either side of the flame to simultaneously blow and suck the fire out.
+The pump has an inlet and an outlet, and the build uses both. One copper tube
+blows across the flame, the other one draws at it from the opposite side. Doing
+both at once puts a real crosswind through a very small volume, which is what
+gets a wick out in under a second rather than making it flare.
 
-The copper tubes double as the arc lighter conductors, so there's no additional hardware needed for ignition.
+Those are the same two tubes the arc jumps between. That is the whole trick of
+this build, and it is why there is no separate igniter hardware anywhere on the
+base: the two copper arches are electrodes to the lighter and ducts to the pump,
+and each job is fine with the other being there.
 
-## Build
+The soft airline tubing does a second job as well. It is the only thing between
+the copper and the pump's motor, so it is the insulation that keeps the arc from
+tracking down into the pump. Give it a decent length — 150 mm or so per side —
+rather than trimming it neat.
 
-The controller is an ESP32 running ESPHome. Here's the parts list:
+## Printing the base
 
-### Parts
+`candle_legs_v2.stl` is one part, 150 × 90 × 25 mm. It is a U — 5 mm-thick arms
+down each long side, joined by a 4 mm rail at the front with a generous sweep
+into each corner, open at the back so the candle goes in from behind and the
+wiring comes out the same way. The candle stands inside it on the table; the
+frame does not carry it.
 
-- ESP32 ([one I used](https://amzn.to/3t2FTZm)) — these days I'd use a [screw-terminal breakout](https://amzn.to/45UUzIv)
-- [Battery module](https://www.amazon.com/gp/product/B06XCXPY86?tag=brau01-20) + [18650 battery](https://amzn.to/3LvB2Gt) with [clip](https://www.amazon.com/gp/product/B00LSG5BKO?tag=brau01-20)
-- NO [16mm toggle button](https://www.amazon.com/ARTGEAR/dp/B07KX144DT?tag=brau01-20) (power) + [momentary buttons](https://www.amazon.com/gp/product/B07KX144DT?tag=brau01-20) (ignite/extinguish)
-- [Relay board](https://amzn.to/48nCtR6) or [single relays](https://amzn.to/3PwALnY)
-- [Arc lighter](https://amzn.to/3sY6EOD)
-- [Diaphragm pump](https://amzn.to/3PIcYTg)
-- [Copper tube](https://amzn.to/3RsNtXs) + [silicone tubing](https://amzn.to/44YBIeb) + 3D-printed base
+The front 25 mm of the U is floored with a 2 mm panel, and that panel is the
+control surface. Three holes sit on one centreline, 12.5 mm back from the front
+edge: **16.5 mm in the middle, and 7 mm 30 mm either side of it**. The 7 mm pair
+takes the mini momentary buttons the firmware reads; the middle hole is the
+arming switch.
 
-### Safety
+There are no holes anywhere for the copper tubes, and that is deliberate — where
+the arch has to sit depends on the diameter of your candle glass, which is not a
+number that can be modelled once for everybody. Bend the tubes first, hold them
+where the arc gap wants to be, then drill the arms to match.
 
-I added a physical power switch between the battery and ESP32. The candle has to be manually armed before it can be remotely ignited — it can't accidentally turn on from a stray automation or API call.
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 4 |
+| Infill | 25% |
+| Supports | None |
+| Material | PETG |
+| Orientation | Flat, as exported |
+
+Printed as exported the 2 mm floor is on the plate and nothing overhangs, so it
+needs no supports. **Print it in PETG.** PLA goes soft around 60 °C and this
+part exists to sit under an open flame for an hour at a time; a base that creeps
+is a base that moves the arc gap off the wick.
+
+Ream the three holes after printing. Vertical holes in FDM always come out
+undersize, and a panel switch that needs persuading into a 2 mm shelf is a panel
+switch that cracks it.
+
+<ImagePlaceholder alt="The printed U-shaped base with the two copper arches fitted and the three panel switches in the front shelf">
+  Hero shot — the finished candle on a table, arches over the wick, flame lit,
+  the three buttons visible on the front shelf of the printed base.
+</ImagePlaceholder>
+
+## Wiring
+
+Every pin below comes out of `bruh-candle.yaml`, which is the authority.
+
+| Function | GPIO | Notes |
+|---|---|---|
+| Relay 1 — pump | **15** | `relay_1`. "Blow Out" pulses it for 800 ms |
+| Relay 2 — arc lighter | **12** | `relay_2`. "Make Fire" pulses it for 1666 ms |
+| Blow button | **21** | `switch_1`, inverted. Runs the pump while held |
+| Ignite button | **22** | `switch_2`, inverted. Fires the lighter while held |
+| Display MOSI | **19** | SPI, shared bus |
+| Display SCLK | **18** | SPI |
+| Display CS | **5** | |
+| Display DC | **16** | |
+| Display RST | **23** | |
+| Display backlight | **4** | Also exposed as a `switch` — see below |
+| Onboard button 0 | **0** | Next display page |
+| Onboard button 1 | **35** | Previous display page |
+| Status LED | **2** | `status_led`; there is no LED there on every board |
+
+The two manual buttons are interlocked against the Home Assistant switches, not
+against each other. Pressing blow does nothing while a "Make Fire" pulse is
+running, and pressing ignite does nothing while a "Blow Out" pulse is running.
+Holding both buttons at once is not caught by anything, so don't.
+
+`pin_adc_power` (GPIO14) and `pin_adc_in` (GPIO34) are declared in the
+substitutions block and then never referenced. There is no battery sensor in
+this config — those two lines are a hook somebody left for one.
+
+:::caution
+**GPIO12 is a strapping pin.** The ESP32 samples it at reset to choose the flash
+voltage, and if something holds it high at boot the chip comes up expecting 1.8 V
+flash and does not come up at all. That is the pin the arc lighter's relay is on.
+Relay modules vary in what they do to their input pin when unpowered — if the
+board goes into a boot loop the moment you plug the relay in, that is what
+happened. Move the lighter to a free pin (GPIO13, GPIO26 and GPIO27 are all
+clear in this config) and change `relay_2` in the substitutions to match.
+:::
+
+:::caution
+**The relay's trigger polarity has to match the config.** Both relays are plain
+`switch: platform: gpio` entries with no `inverted:`, so ESPHome turns a relay on
+by driving its pin **high**. That is a high-level-trigger board. A low-level
+board — like the common
+[2-channel 5 V opto module](https://www.amazon.com/dp/B078478SZ9?tag=brau01-20)
+— is on when the pin is low, so with one of those the candle lights itself the
+instant the ESP32 boots and stops when you tell it to fire. If you use one,
+add `inverted: true` to both GPIO switch pins before you put any oil in the
+glass.
+:::
+
+<ImagePlaceholder alt="Wiring diagram showing the ESP32 T-Display, two opto-isolated relays, the arc lighter and the diaphragm pump">
+  Wiring diagram or a labelled photo of the underside — the two relays, the
+  boost module, and where the lighter's button leads are tapped in.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Print the base and ream the three holes.** Fit the two momentary buttons
+   and the arming switch dry, before anything is soldered.
+
+2. **Cut and bend the copper.** Two mirrored arches that rise from the base,
+   come over the top of the glass and end with their tips facing each other a
+   few millimetres apart, directly above the wick. Cut with the tube cutter, bend
+   with the bender — kink the arch and you have blocked the air path you need
+   later.
+
+3. **Tap the lighter's button.** Open it, find the two contacts its own button
+   bridges, and solder a pair of leads across them to the relay's normally-open
+   terminals. Sleeve them in adhesive-lined heat shrink. Bring the lighter's two
+   electrodes out to the bottom ends of the two copper arches.
+
+4. **Set the gap over the wick.** This is the only adjustment that matters. Too
+   wide and the arc will not strike; too tight and it strikes but misses the
+   wick. Get it lighting reliably by hand before you drill the base for the
+   tubes.
+
+5. **Push the airline tubing onto the copper tails**, one side to the pump's
+   inlet and the other to its outlet, and leave the runs long.
+
+6. **Wire the relays, the boost module and the buttons**, flash the board, and
+   confirm the entities appear in Home Assistant.
+
+7. **Bench-test dry.** Candle empty, no oil, nothing to light. Press each button
+   and each Home Assistant switch and listen for the relay click and the pump. A
+   wrong-polarity relay shows itself here and nowhere else.
+
+8. **Fill it, arm it, and only then test ignition** — hard surface, extinguisher
+   at hand, nothing flammable within a metre.
+
+</Steps>
+
+## Firmware
+
+`bruh-candle.yaml` is in the download section below. It is one ESPHome file and
+it needs three things from you.
+
+<Steps>
+
+1. **`secrets.yaml`** with `wifi_ssid`, `wifi_password` and `ota_password`.
+
+2. **`Roboto-Medium.ttf` sitting next to the YAML.** The `font:` block loads it
+   by filename from the config directory at three sizes. Without that file
+   ESPHome fails at the compile step, not at the flash step, which is a
+   confusing place to find out.
+
+3. **The substitutions block at the top**, which is where every pin in the
+   wiring table lives. Change a pin there and the whole config follows.
+
+</Steps>
+
+Flash it over USB the first time; every flash after that is over WiFi. Holding
+the board's GPIO0 button while you reset it is the way into download mode if the
+USB port comes up mute.
+
+:::caution
+**GPIO4 is claimed twice.** It appears as the `backlight` GPIO switch and again
+as the display's `backlight_pin`. Current ESPHome refuses to validate a pin used
+by two components unless both carry `allow_other_uses: true`. Add that to both,
+or delete the switch and let the display own the pin — you lose a
+backlight entity and nothing else.
+:::
+
+## What you get in Home Assistant
+
+Two template switches, **Make Fire** and **Blow Out**, that pulse their relay and
+then turn themselves off, so they behave like buttons even though they show up
+as switches. The two raw relays are exposed too, which is useful for testing and
+is also a way to leave an arc lighter running indefinitely, so treat them as
+diagnostics. Beyond that: the two physical buttons as binary sensors, a backlight
+switch, a restart switch, WiFi signal every 5 minutes and a connection status
+sensor.
+
+**The display never changes itself.** There are three pages in the config —
+"Ready" on black, "FIRE!" on red, "WOOSH!" on blue — and the only thing that moves
+between them is the two onboard buttons. Nothing in the ignite or blow actions
+touches the display. If you want the screen to actually report what the candle is
+doing, add a `display.page.show:` line to each template switch's `turn_on_action`
+and another back to `page1` after the delay. It is four lines and it is the first
+edit worth making.
+
+## Safety
+
+There is a physical switch between the battery and the ESP32, and it is the most
+important part on the page. The candle has to be armed by hand before Home
+Assistant can do anything to it, which means a mistyped automation, a stray
+service call or a compromised API cannot light a flame in an empty room. The
+firmware cannot enforce that, and no amount of YAML replaces a broken circuit.
+
+Do not put this on a schedule. Do not wire it to presence detection. Do not give
+it a voice assistant. Light it when you are in the room and snuff it when you
+leave, and the whole thing is a party trick rather than a hazard.
 
 <iframe width="315" height="560" src="https://www.youtube.com/embed/AcJ1OWoMghA" title="Smart Candle Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 

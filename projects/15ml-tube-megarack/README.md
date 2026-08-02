@@ -14,10 +14,10 @@ small racks.
 
 ## Hardware
 - One printed rack body — no fasteners, no assembly
-- PETG recommended; PLA+ if the rack never sits anywhere warm
+- PETG for the rack; PLA+ for a fit-check block of a few bores first
 - Four self-adhesive rubber bumpers as feet
-- Fits standard 15 mL conicals (about 17 mm barrel, about 120 mm long), which
-  hang by the cap
+- Fits standard 15 mL conicals — about 17 mm barrel, about 120 mm long, and a
+  cap about 20 mm across that sits proud of the deck and sets the bore spacing
 
 Not autoclavable — 121 °C is well past soft for both PETG and PLA. Wipe down
-with 70% ethanol instead.
+with 70% alcohol instead.

@@ -1,6 +1,6 @@
 ---
 title: Sonoff RF Bridge
-description: Bring cheap 433 MHz remotes, PIRs and door sensors into Home Assistant with an ESPHome-flashed RF bridge.
+description: Flash a Sonoff RF Bridge with ESPHome so every 433 MHz remote, contact and PIR in the house fires a Home Assistant event — and Home Assistant can transmit back out the same antenna.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -10,102 +10,295 @@ import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 There is a whole world of $3 sensors on 433 MHz — door contacts, PIRs, water
 leak pucks, four-button keyfobs — that predate WiFi and will outlast it on a
-coin cell. The RF Bridge is the translator: it listens on 433 MHz, and ESPHome
-turns what it hears into Home Assistant events.
+coin cell. The RF Bridge is the translator: an ESP8266 and a dedicated RF chip
+in one small box, talking to each other over a serial link. Flashed with
+ESPHome, everything it hears becomes a Home Assistant event, and anything Home
+Assistant wants to say goes back out the same antenna.
 
-This is the cheapest way to add a dozen door sensors to a house, and the battery
-life is measured in years rather than months.
+It is also the gentlest Sonoff to flash. The bridge runs on 5 V over micro-USB
+and there is no mains anywhere near the board, so unlike the
+[S20](/projects/sonoff-s20/) and [S31](/projects/sonoff-s31/) there is no step
+where you have to think about what is live.
 
-<ImagePlaceholder alt="A Sonoff RF Bridge opened on a bench with a serial adapter connected to its header">
-  The bridge opened up, with the serial header visible and an adapter connected.
+<ImagePlaceholder alt="A Sonoff RF Bridge opened on a bench with a serial adapter connected to its programming header">
+  Hero shot — the bridge open on the bench, the four programming holes visible
+  with a header soldered in and the serial adapter wired to it, the case halves
+  beside it.
 </ImagePlaceholder>
 
-## What you need
+## Parts
 
 <AffiliateDisclosure />
 
 - [Sonoff RF Bridge 433](https://www.amazon.com/s?k=Sonoff+RF+Bridge+433MHz&tag=brau01-20)
-- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
-- [433 MHz sensors and remotes](https://www.amazon.com/s?k=433MHz+door+sensor+PIR+remote+kit&tag=brau01-20) — whatever you want it to hear
-- A small Phillips screwdriver
+  — buy the **433 MHz** version. There is a 315 MHz variant sold alongside it and
+  the two cannot hear each other. Check what your sensors transmit on before you
+  order anything.
+- [FT232RL USB-to-TTL serial adapter](https://www.amazon.com/dp/B00IJXZQ7C?tag=brau01-20)
+  — it has a voltage jumper. **Move it to 3.3 V before you plug anything in.**
+- [2.54 mm header pins](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20) —
+  the programming connection is a row of bare holes, so snap a four-pin strip off
+  and solder it in. This kit is sold for its perfboard; the header strips are what
+  you want here.
+- [Female-to-female Dupont jumpers](https://www.amazon.com/dp/B07GCZBH51?tag=brau01-20)
+  — four, from the adapter to the header you just soldered.
+- [Spring-loaded test probes](https://www.amazon.com/dp/B07WT77D4K?tag=brau01-20)
+  — the no-solder route, if you would rather not touch the board. These are bare
+  pogo pins; you press four into a drilled scrap and hold the jig on the holes.
+- [Precision screwdriver set](https://www.amazon.com/dp/B0747HLF1P?tag=brau01-20)
+  and [plastic pry tools](https://www.amazon.com/dp/B07R44VJHN?tag=brau01-20) —
+  the pry set is sold as a car trim kit, but the nylon wedges split a plastic
+  shell without scarring it.
+- [Soldering station](https://www.amazon.com/dp/B0DMFBGPWB?tag=brau01-20),
+  [lead-free solder](https://www.amazon.com/dp/B07QZX9LG2?tag=brau01-20) and
+  [liquid flux](https://www.amazon.com/dp/B0FR3SKG1W?tag=brau01-20) — four
+  through-holes, once per bridge.
+- [5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20),
+  or a USB block you already own plus a
+  [right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20).
+  The bridge wants to live high up and central, which usually means a shelf and a
+  cable that doesn't stick out.
+
+And then something for it to talk to. Hearing and transmitting are two different
+jobs, and they want different hardware:
+
+- [433 MHz EV1527 wall button](https://www.amazon.com/dp/B07C5N94LR?tag=brau01-20)
+  — a single button on an adhesive pad, running on a coin cell. EV1527 is a fixed
+  code, which is the kind the bridge can both hear and replay. It is the cheapest
+  way to put a scene button on a wall with no wire behind it.
+- [Mini 433 MHz transmitter PCB, 3–12 V](https://www.amazon.com/dp/B08F7FFQ14?tag=brau01-20)
+  — a bare sender. Wire a contact across it and you have built a sensor for
+  whatever the shop-bought ones don't cover.
+- [433 MHz relay receiver with a momentary remote](https://www.amazon.com/dp/B07F9QN2QQ?tag=brau01-20)
+  or [the latching version](https://www.amazon.com/dp/B07H7CF8HL?tag=brau01-20)
+  — this is the transmit half of the job. Learn the remote's code once, and Home
+  Assistant can drive the relay from an automation without any of the receiver's
+  firmware knowing it happened.
+- [433 MHz door contacts, PIRs and leak sensors](https://www.amazon.com/s?k=433MHz+door+sensor+PIR+water+leak+alarm+kit&tag=brau01-20)
+  — the multipacks sold for cheap alarm panels. Buy one pack of one brand rather
+  than three brands, and see the last item in Troubleshooting before you order a
+  dozen.
 
 :::note
-Buy the **433 MHz** version. There is a 315 MHz variant sold alongside it, and
-the two cannot hear each other. Check what your sensors use before ordering.
+If all you want is one remote switching one load, you don't need a bridge at all.
+The [Sonoff RF switch](https://www.amazon.com/dp/B07QX3SK2M?tag=brau01-20) is an
+inline WiFi relay with a 433 receiver built into it, so it does that one job on
+its own. The bridge earns its place when you want the codes *in Home Assistant*,
+where they can trigger anything.
 :::
+
+## Wiring
+
+Four connections to flash it, and the data pair crosses.
+
+| Serial adapter | Bridge header | Note |
+|---|---|---|
+| 3V3 | **3V3** | Jumper the adapter to 3.3 V first |
+| TX | **RX** | Crossed |
+| RX | **TX** | Crossed |
+| GND | **GND** | |
+
+The adapter transmits into the board's receiver. Getting that backwards is the
+single most common reason a flash never starts.
 
 ## Flashing
 
 <Steps>
 
-1. **Open the case** — four screws in the base.
+1. **Open the case.** Screws first, then work the seam apart with a nylon wedge —
+   the rest of it is clips.
 
-2. **Find the four-pin header** near the ESP8266: `3V3`, `RX`, `TX`, `GND`. On
-   most units it is unpopulated, so solder in a header or hold pogo pins.
+2. **Solder a four-pin header** into the programming holes marked `3V3`, `RX`,
+   `TX`, `GND`, or press a pogo-pin jig against them. Holding loose jumper wires
+   in the holes works right up until one twitches mid-flash.
 
-3. **Wire the adapter with the data lines crossed** — adapter TX to board RX,
-   adapter RX to board TX, plus 3V3 and GND.
+3. **Wire the adapter** to the table above, with the USB end still unplugged.
 
-4. **Bridge the `GPIO0` pad to ground** as you apply power, to select flash mode.
-   Some revisions expose a button for this instead.
+4. **Pull `GPIO0` low as power arrives.** That is what selects flash mode. Which
+   physical thing does it depends on the revision in front of you — some expose a
+   button, others a pad you bridge to ground. Whichever yours has, hold it as you
+   plug the adapter into USB and for a second or two after.
 
-5. **Flash the config below.** Everything after this is over WiFi.
+5. **Flash `sonoff-rf-bridge.yaml`** over the serial port. Read the configuration
+   section below first. Everything after this first flash is over WiFi.
 
 </Steps>
 
-## How it works
+## How the two halves talk
 
-Unlike the S20 and S31, the interesting pins here are **not** GPIO. The bridge
-carries a separate RF chip that does the demodulating, and it talks to the
-ESP8266 over a serial link:
+Unlike the S20 and S31, the interesting pins here are not GPIO you wire anything
+to. The bridge carries its own RF chip that does the demodulating, and it reports
+to the ESP8266 over a serial link that is already routed on the PCB. All the
+config does is name it:
 
-| Function | Pin | Notes |
+| Function | ESP pin | In the config |
 |---|---|---|
-| RF module TX | **GPIO1** | ESP transmits codes to the RF chip |
-| RF module RX | **GPIO3** | ESP receives decoded codes |
+| RF module → ESP | **GPIO3** | `uart: rx_pin: 3` — decoded codes arrive here |
+| ESP → RF module | **GPIO1** | `uart: tx_pin: 1` — codes to transmit go out here |
+| Link speed | — | `baud_rate: 19200` |
 
-Because GPIO1 and GPIO3 *are* the hardware UART, the config runs the ESPHome
-logger with its own UART disabled. If you turn serial logging back on, the
-bridge stops hearing anything — the log and the RF chip are fighting over the
-same two pins.
+GPIO1 and GPIO3 *are* the ESP8266's hardware UART, which is also where the logger
+writes by default. That is why the config carries this:
 
-## Pairing a sensor
+```yaml
+logger:
+  baud_rate: 0
+```
+
+It only switches off logging over the serial pins. ESPHome's log stream over
+WiFi, which is the one you actually read, is untouched. Turn serial logging back
+on and the bridge stops hearing anything — the log and the RF chip end up
+shouting over each other on the same two wires.
+
+## Configuration
+
+Two substitutions at the top name the device. The file ships with these, and they
+work as they are:
+
+```yaml
+substitutions:
+  device_name: "Sonoff RF Bridge"
+  device_id: "sonoff-rf-bridge"
+```
+
+Change both if you will ever run a second bridge. Everything downstream is built
+from `device_id`, including the service names below, so pick it once and leave it
+alone.
+
+The rest comes from `secrets.yaml` — `wifi_ssid`, `wifi_password` and
+`ota_password`. There is a `secrets.yaml.example` in the repo with every key
+these configs use.
+
+There is no `ap:` block and no encryption on the API. Both are worth adding: the
+fallback access point is what catches a mistyped WiFi password without the case
+coming off again, and `secrets.yaml.example` already carries an `api_key` for the
+`encryption:` block. Keep the additions small either way — `esp01_1m` means 1 MB
+of flash, and an over-the-air update needs room for the new image beside the
+running one.
+
+### What you actually get
+
+Nothing in the entity list. The config declares no sensors, no switches and no
+binary sensors, and a lot of people flash it and then go looking for the device
+in Home Assistant wondering what went wrong. What it gives you is two services
+and one event:
+
+| Thing | What it does |
+|---|---|
+| `esphome.rf_code_received` | An event, fired every time the bridge decodes a code. Carries `sync`, `low`, `high` and `code` |
+| `esphome.sonoff_rf_bridge_send_rf_code` | A service. Transmits a code — takes the same four values as integers |
+| `esphome.sonoff_rf_bridge_learn` | A service. Runs the RF module's own learn cycle |
+
+The two service names are the node name with its dashes turned into underscores,
+so they change with `device_id` if you rename the device.
+
+## Learning a code
+
+The bridge reports every code it decodes on its own — you do not have to call
+anything to make that happen. `rf_bridge.learn` is there for the module's
+explicit learn cycle, and is the fallback rather than the first move.
 
 <Steps>
 
-1. Open the ESPHome log for the bridge.
+1. **Open Developer Tools → Events in Home Assistant** and listen to
+   `esphome.rf_code_received`. This is the authoritative view, because it is
+   exactly what the config emits.
 
-2. Trigger the sensor — open the door, wave at the PIR, press the fob.
+2. **Trigger the sensor** — open the door, wave at the PIR, press the fob.
 
-3. A received code appears in the log. **Write it down**; that number is the
-   sensor's identity.
+3. **An event appears with four hex values.** `code` is the sensor's identity;
+   write it down. `sync`, `low` and `high` are the protocol's timings and matter
+   only when you want to transmit the same thing later.
 
-4. Add a `binary_sensor` to the config matching that code, give it a name and a
-   `device_class`, and reflash.
+4. **Press it twice more.** If `code` comes back identical every time, it is a
+   fixed-code device and you can both automate on it and replay it. If it changes
+   each press, it is rolling-code and there is nothing to match — that is the
+   remote working as designed, not a fault.
+
+5. **Write the automation against the event.** Copy the hex string out of
+   Developer Tools rather than retyping it; the event data are strings, and a
+   string only matches if it matches exactly.
 
 </Steps>
 
-Repeat per sensor. The codes are fixed per device, so a sensor keeps its identity
-across battery changes.
+```yaml
+automation:
+  - alias: "Laundry door opened"
+    triggers:
+      - trigger: event
+        event_type: esphome.rf_code_received
+        event_data:
+          code: "5a3c81"
+    actions:
+      - action: notify.mobile_app_phone
+        data:
+          message: "The laundry door opened"
+```
+
+One automation per sensor. The codes are burned in at the factory, so a sensor
+keeps its identity across battery changes and you only ever do this once.
+
+## Sending a code
+
+The transmit side is where the one real trap in this config lives. The event
+publishes its four values as **hex strings**, because the config runs them
+through `format_hex` on the way out. The `send_rf_code` service declares all four
+as **integers**. They are the same numbers written two ways, and nothing in
+between converts for you.
+
+Do it in the call:
+
+```yaml
+actions:
+  - action: esphome.sonoff_rf_bridge_send_rf_code
+    data:
+      sync: "{{ '2a6c' | int(base=16) }}"
+      low: "{{ '015e' | int(base=16) }}"
+      high: "{{ '0424' | int(base=16) }}"
+      code: "{{ '5a3c81' | int(base=16) }}"
+```
+
+The four strings there are placeholders — use the ones your own event handed you.
+That is the whole recipe for driving a 433 relay receiver from Home Assistant:
+press its remote once with Developer Tools listening, then have an automation
+replay those four numbers.
 
 :::caution
-433 MHz sensors of this type are not encrypted or authenticated — anything in
-range can transmit the same code. They are fine for "the laundry door opened" and
-a bad idea as the only thing standing between someone and your alarm being armed.
+433 MHz sensors of this type are not encrypted or authenticated, and anything in
+range can transmit the same code — including you, now that you own a bridge that
+does exactly that. They are fine for "the laundry door opened" and a bad idea as
+the only thing standing between someone and your alarm being disarmed.
 :::
 
 ## Troubleshooting
 
 **No codes ever appear.** Usually the wrong band — a 315 MHz sensor against a
-433 MHz bridge. Otherwise check the logger's UART is disabled in the config.
+433 MHz bridge. After that, check `logger:` still has `baud_rate: 0`; if serial
+logging came back, the RF module cannot get a word in.
 
-**Codes appear but the sensor is unreliable at range.** The onboard antenna is a
-PCB trace. Moving the bridge more central in the house beats anything else you
-can do.
+**Codes appear in the log but the automation never fires.** The event data are
+strings and the comparison is exact. Copy the value out of Developer Tools
+instead of retyping it, and don't add an `0x` prefix that was never there.
 
-**One sensor triggers another's automation.** Two devices sharing a code — common
-with cheap multipacks programmed at the factory. Re-pair one, or use a different
-brand for that spot.
+**Sending does nothing at all.** Hex where the service wants an integer. Convert
+it in the call — see [Sending a code](#sending-a-code).
+
+**The sensor works next to the bridge and not from the far end of the house.**
+The onboard antenna is a trace on the PCB, so the cheapest fix by a wide margin
+is moving the bridge somewhere central rather than somewhere convenient. If you
+go looking for the wire-antenna mod afterwards, a quarter wave at 433.92 MHz is
+17.3 cm.
+
+**Two bridges, and every code looks like it came from both.** The event name in
+the config is a fixed string, so a second bridge fires the same
+`esphome.rf_code_received` at the same Home Assistant. Add a line naming the
+device to the event's `data:` block and match on it in the automation.
+
+**One sensor triggers another's automation.** Two devices shipped with the same
+code — common in cheap multipacks programmed in one batch at the factory. Check
+for it the moment a pack arrives, before anything is mounted: listen to the event
+and trigger each sensor in turn. Anything duplicated has to go back or go
+somewhere it cannot matter.
 
 ## Files & downloads
 

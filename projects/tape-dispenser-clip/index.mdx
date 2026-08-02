@@ -1,15 +1,291 @@
 ---
 title: Lab Tape Dispenser Clip
-description: A magnetic or adhesive bench-mounted clip for lab tape dispensers.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed bracket that puts a lab tape dispenser on the edge of the bench, the shelf or the cabinet frame — magnets, VHB or a clip over a lip — and holds when you tear a strip one-handed.
+# The write-up is here; the model isn't. Published, and marked as pending on the
+# page, in the sidebar and on the project list, until the STLs land in the folder.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A clip to keep your lab tape dispenser within reach on the bench — mounts with a magnet or adhesive.
+A roll of lab tape is only useful if you can get a strip off it with one hand,
+because the other hand is holding the thing you are about to label. A dispenser
+loose on the bench fails that test — it slides, it ends up behind the pipette
+box, and it goes in the sink at the end of the week. This is the printed bracket
+that fixes it somewhere: the front lip of the bench, the upright of a shelf, the
+frame beside a cabinet, wherever your hand already goes.
+
+:::note
+The printable parts aren't in this folder yet, so the download section at the
+bottom is thin and the page is still flagged as unfinished. What's written up
+here is the mount — which surface, which fixing, and the load it has to take —
+and that is the part that decides whether the bracket stays up.
+:::
+
+<ImagePlaceholder alt="A 3D printed clip holding a lab tape dispenser on the front edge of a laboratory bench, a strip of tape being torn one-handed">
+  Hero shot — the bracket in place on a bench edge or shelf upright with the
+  dispenser loaded, shot mid-tear so the one-handed pull is what reads. Get the
+  mounting face in frame; that is the part of this project people will ask about.
+</ImagePlaceholder>
+
+## The load is the tear, not the weight
+
+A tape dispenser weighs almost nothing, and mounting it as though weight were
+the problem is how you end up picking it off the floor. The load case is the
+tear: a fast pull, downward and outward, that arrives all at once and stops
+dead. Everything about the mount follows from that.
+
+An adhesive pad is strong in shear — pulled along the surface it's stuck to —
+and weak in peel, where the force gets under one edge and walks it off. Magnets
+are the same story in different words: a disc magnet on a steel panel takes a
+sideways drag far better than it takes being levered off at a corner. So the
+bracket wants to sit so the tear pulls **down the face of whatever it's mounted
+to**, not away from it. Mount it on a vertical surface — a bench fascia, a shelf
+upright, a cabinet side — rather than under a horizontal one, and the pull is
+shear instead of peel without you doing anything clever.
+
+The second half is where the tape stops. If the dispenser's own serrated blade
+is doing the cutting, the bracket only has to hold it still. Print a cutting
+edge yourself and it will crush tape rather than sever it — plastic teeth off an
+FDM printer are the wrong hardness and the wrong sharpness, and there is no
+slicer setting that fixes it. Keep the dispenser's blade.
+
+## Parts
+
+<AffiliateDisclosure />
+
+Print it in PETG if it lives in a lab. It gets wiped with alcohol along with
+everything else on the bench, and PLA crazes with repeated alcohol contact and
+goes chalky under a germicidal lamp. On a workshop bench or a desk, PLA+ is
+fine and easier to print.
+
+- [eSUN PETG, 1.75 mm, solid white](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20)
+  — one spool does this and a dozen other bench parts. White shows a spill; that
+  is the point of white in a lab.
+- [SUNLU PLA+, 1.75 mm, black, 4 × 1 kg](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20)
+  — for the fit print, and for the version that lives on a desk rather than a
+  bench. Print one in PLA+ first to check the dispenser actually drops in.
+- [A lab tape dispenser](https://www.amazon.com/s?k=lab+tape+dispenser+bench+top&tag=brau01-20)
+  and [coloured write-on lab tape](https://www.amazon.com/s?k=laboratory+labeling+tape+colored+write+on&tag=brau01-20)
+  — measure the dispenser you own before you print anything. See
+  [Sizing it](#sizing-it).
+- [AFA deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — the
+  first-layer lip on the mounting face is what stops a magnet sitting flat and
+  an adhesive pad from bonding across its whole area. Ten seconds with this.
+- [Neiko digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20)
+  — for the dispenser, and for the thickness of the lip you're clipping over.
+
+Then pick **one** of the three mounts below. Don't buy all three.
+
+### If it's going on steel
+
+- [6 × 3 mm neodymium discs, 100 pcs](https://www.amazon.com/dp/B07873ZCY4?tag=brau01-20)
+  — the standard press-fit size for printed pockets, and the one to buy if
+  you're only buying one bag of magnets. You'll use a handful here and the rest
+  on everything else you print.
+- [6 × 2 mm neodymium discs, 120 pcs](https://www.amazon.com/dp/B075RZ82HP?tag=brau01-20)
+  — the thin version, for a shallow pocket in a thin backplate.
+- [LOVIMAG countersunk cup magnets, 10 pcs with screws](https://www.amazon.com/dp/B0B1M7FVSF?tag=brau01-20)
+  — the heavy answer. These are rated in tens of pounds each and screw through
+  the back of the bracket, so the magnet is doing the holding and the plastic is
+  only carrying it. Overkill for tape, and exactly right if the same bracket is
+  going to end up holding something heavier.
+- [Volport steel plates with 3M adhesive, 10 pcs](https://www.amazon.com/dp/B01DKEXMVG?tag=brau01-20)
+  — these are what let the magnetic version work on a surface that isn't steel.
+  Stick a plate where you want the bracket, and the bracket becomes movable
+  anywhere you have stuck another one. Read the caution below first.
+
+### If it's going on a flat, smooth surface
+
+- [3M VHB 5952, 1/2 in × 15 ft](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20)
+  — the permanent one. Correctly applied to clean, smooth plastic or painted
+  metal, this outlives the part it's holding. It does not come off again without
+  fishing line and a lot of patience.
+- [Scotch Outdoor Mounting Tape, 1 in × 60 in](https://www.amazon.com/dp/B0083K36KA?tag=brau01-20)
+  — thicker foam, so it bridges a textured or slightly curved surface that VHB
+  can't wet out on. Weaker, and the right call on powder coat and orange peel.
+- [VELCRO Industrial Strength, 2 in × 15 ft](https://www.amazon.com/dp/B00006RSP1?tag=brau01-20)
+  — the removable one. The bracket comes off for a proper clean and goes back in
+  the same place, which on a bench that gets decontaminated is worth more than
+  the strength you give up.
+- [Solimo 99% isopropyl alcohol, 16 oz × 12](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20)
+  or [individually wrapped alcohol prep pads, 400](https://www.amazon.com/dp/B00KOSP454?tag=brau01-20)
+  — not optional. Every adhesive above bonds to whatever film is on the surface,
+  and a bench has silicone, hand cream and cleaning-product residue on it. One
+  prep pad per mount is the tidiest way to do this.
+
+### If it's clipping over a lip or a rail
+
+- [Overture TPU, 1.75 mm, white](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20)
+  — print a thin pad for the inside of each jaw. TPU is what turns a clip that
+  slides along a shelf lip into one that stays put, and it stops a hard PETG jaw
+  scoring a painted edge.
+- [Self-adhesive clear rubber bumpers, 200 pcs](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20)
+  — the same fix without a second filament. Two inside the jaw.
+- [ruthex M3 heat-set inserts, 100 pcs](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+  and [VIGRUE M2/M3/M4 stainless screws and nuts, 1080 pcs](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20)
+  — for a jaw that tightens with a screw rather than relying on the plastic to
+  spring. **Stainless, not the black alloy kits**, on anything that gets wiped
+  with alcohol daily; black zinc blooms rust in a few months.
+  A [black M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+  is the cheaper box if the bracket is going in a workshop.
+- [MITREAPEL CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20)
+  — for locking magnets into their pockets, and for the TPU pads if you'd rather
+  not print them.
+
+:::caution
+**Test the surface with a magnet before you print the magnetic version.** Lab
+benches, biosafety cabinet decks and most good casework are 304 or 316 stainless
+— austenitic, and effectively non-magnetic. A neodymium disc that grips a fridge
+door hard enough to hurt will slide straight off a stainless bench with almost no
+force at all. Fridge and freezer doors, painted mild-steel casework, filing
+cabinets and most shelf uprights are magnetic; the stainless work surface next to
+them usually isn't. Thirty seconds with a magnet from the bag answers it.
+:::
+
+## Sizing it
+
+Bench-top tape dispensers are not a standard, and neither is lab tape. Rolls
+come on 1 in and 3 in cores in widths from about 1/2 in to 1 in, and two
+dispensers that take the same roll can have completely different bases. Measure
+what you own — the footprint of the dispenser's base, its height, and the
+thickness of the lip or rail you intend to clip over — before you slice.
+
+Then add clearance, roughly half a millimetre on each face. A pocket cut to the
+measured size accepts the dispenser on the bench in front of you and refuses it
+at arm's length, gloved, at the back of a cabinet. This is the same lesson as
+every other printed holder: the fit that feels precise on a caliper is the one
+that's annoying to use.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 4 |
+| Infill | 25% |
+| Supports | None |
+| Material | PETG for a lab, PLA+ for a desk |
+| Orientation | Mounting face flat on the bed, clip arms lying in the print plane |
+
+Four walls rather than two. This is a part that fails at a wall, not in the
+infill — the jaw of a clip and the neck between the mounting plate and the
+cradle are both thin sections carrying a snatch load, and perimeters are what
+carries it.
+
+**Orientation is the thing that will bite you.** A clip arm printed standing up
+splits along a layer line the first or second time it's flexed, because the
+bending stress is pulling the layers apart. Lay the part down so the arms run
+across the bed and the layers run along their length, and the same load is being
+taken along the extrusions instead of between them. If the geometry forces a
+choice, orient for the clip and let the mounting plate take the compromise —
+the plate is in compression against a wall and doesn't care.
+
+Print the mounting face down on a smooth plate if you have one. Adhesive wants
+a flat, non-textured face, and a textured PEI sheet leaves a surface VHB only
+touches on the high spots.
+
+## Fitting the magnets
+
+<Steps>
+
+1. **Check polarity before anything is permanent.** Stack the magnets you're
+   about to fit and mark the exposed face of each with a marker while they're
+   still stuck together, so every one goes into the bracket the same way round.
+   A magnet glued in backwards is a magnet you destroy the pocket getting out.
+
+2. **Fit them proud of nothing.** Flush with the mounting face or a hair below
+   it. A magnet standing above the surface rocks the whole bracket on one point,
+   and a rocking bracket is one that walks its way off over a week of tears.
+
+3. **Press-fit if the pocket is right, glue if it isn't.** A 6 mm disc in a
+   pocket printed at nominal usually needs a squeeze from a clamp and stays
+   there. If yours drops in, a spot of CA and the activator is instant.
+
+4. **Keep your fingers out from between two of them.** Neodymium discs this size
+   snap together hard enough to blood-blister a fingertip, and they chip and
+   shatter when they do it. Slide them together rather than letting them jump.
+
+</Steps>
+
+## Mounting it
+
+<Steps>
+
+1. **Decide where your hand already goes.** Stand at the bench and do the job
+   you'd be labelling for. The bracket goes where your hand ended up, not where
+   there happens to be a clear patch of wall.
+
+2. **Clean the surface properly** — an alcohol pad or a cloth with 99%
+   isopropyl, and let it flash off completely. This is the step people skip and
+   it is the reason most adhesive mounts fail.
+
+3. **Press the adhesive hard for thirty seconds.** VHB works by wetting out into
+   the surface under pressure; it is not a contact adhesive that grabs when it
+   touches. Lean on it.
+
+4. **Then leave it alone for 24 hours before you load it.** VHB reaches a
+   fraction of its final strength on contact and the rest over the next day or
+   two. Hanging a dispenser on it immediately, and tearing tape off that, is how
+   a bond that would have been permanent gets peeled apart in its first hour.
+
+5. **Tear-test it empty-handed** before you trust it. One hard pull downward. If
+   it moves at all, it is on the wrong surface or in the wrong orientation —
+   deal with it now rather than after it has dropped a dispenser into an open
+   plate.
+
+</Steps>
+
+## Keeping it clean
+
+An FDM print is porous by construction: the layer lines are a surface no wipe
+gets into. Treat this the way you'd treat the rest of the bench furniture — it
+lives outside the sterile field, it never goes in a cabinet during work, and it
+gets wiped down on the same schedule as everything else it's sitting on.
+
+Don't autoclave it. PETG softens around 80 °C and an autoclave runs at 121 °C,
+so the cycle returns a puddle with a dispenser-shaped dent in it.
+
+If your bench gets a UV decontamination cycle overnight, PETG is the material
+that survives it and PLA is the one that goes chalky and brittle at the thin
+sections — which on this part are exactly the sections doing the work.
+
+## Troubleshooting
+
+**It lets go when you tear a strip, but holds fine otherwise.** The pull is
+peeling the mount instead of shearing it. Move the bracket to a vertical face so
+the tear runs down the surface, or turn it so the roll pays out downward.
+
+**The magnets barely hold on the bench.** The bench is austenitic stainless and
+is not magnetic. Stick one of the adhesive steel plates to it and mount to that,
+or use the adhesive version instead.
+
+**The adhesive pad came away with the surface's finish attached.** That was a
+painted or laminated surface that wasn't going to give VHB back. Foam mounting
+tape or the hook-and-loop are the reversible options; on anything you don't own,
+use those from the start.
+
+**The clip slides along the shelf lip.** Nothing in the jaw has any grip. TPU
+pads or two rubber bumpers inside the jaw fix it; tightening the jaw further
+usually just splits it.
+
+**A jaw cracked along a layer line.** Printed in the wrong orientation. Reprint
+with the arms lying in the print plane, and take the walls up to four while
+you're in the slicer.
+
+**The dispenser rocks in the cradle.** Either a magnet is standing proud of the
+mounting face or there's an elephant's foot on the first layer of the cradle.
+Both are a deburring-tool problem, not a reprint.
 
 ## Files & downloads
+
+:::note
+The model isn't posted yet — that's the missing piece here, and it's why this
+page is still flagged as unfinished. Everything above holds for any printed
+bracket you hang off a bench in the meantime.
+:::
 
 <ProjectFiles slug="tape-dispenser-clip" />

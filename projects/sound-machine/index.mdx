@@ -1,19 +1,311 @@
 ---
 title: Sound Machine
-description: DFPlayer-based white noise and ambient sound machine.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: An ESP32 and a DFPlayer Mini that loop white noise, rain or a fan off an SD card, with volume, track and EQ exposed to Home Assistant as services.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-DFPlayer-based white noise and ambient sound machine.
+A shop-bought sound machine plays a good loop and answers to nobody. This one is
+an ESP32 talking to a DFPlayer Mini over four wires, so the loop starts when the
+bedroom light goes off, the volume follows the time of day, and the whole thing
+is a service call rather than a knob somebody has to reach.
 
-## Hardware
-- Audio amplifier
-- Speaker
-- Control circuitry
+Two chips and a speaker. There is no display, no button and no app — every
+control lives in Home Assistant, because that is the only reason to build one of
+these instead of buying one.
+
+<ImagePlaceholder alt="The finished sound machine — an ESP32 and DFPlayer Mini wired to a small speaker in a box on a bedside table">
+  Hero shot — the assembled unit on a nightstand, speaker facing out, ideally
+  with the Home Assistant volume slider visible on a phone beside it.
+</ImagePlaceholder>
+
+## How it works
+
+The DFPlayer Mini is a complete MP3 player on a 20 mm square: an SD slot, a
+decoder, and a small class-D amplifier that will drive a speaker on its own. It
+takes commands over a 9600-baud serial link and does everything else itself, so
+the ESP32 never touches audio data. That is the whole appeal — an ESP32 doing
+real audio needs I²S, a DAC and a lot more config than this.
+
+`bruh-sound-machine.yaml` wires that up as one `uart:` bus, one `dfplayer:`
+component, and seventeen user-defined API services. Nothing plays on boot and
+nothing is scheduled in the config; Home Assistant decides when a sound starts
+and what it is.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — a DevKitC-style board rather than a literal NodeMCU-32S, but it is the same
+  ESP-WROOM-32 module on the same pinout and the config's `board: nodemcu-32s`
+  key builds for it unchanged. Ships as a 2-pack. Read the caution below before
+  you substitute a different ESP32.
+- [DFPlayer Mini (YX5200), 4-pack](https://www.amazon.com/dp/B0BVH1KLSP?tag=brau01-20)
+  — the module the config is written around. These are cheap enough that a
+  4-pack costs less than one branded DFRobot board, and the YX5200 is the chip
+  ESPHome's `dfplayer:` component talks to.
+- [DFPlayer + 2 W 8 Ω speaker bundle](https://www.amazon.com/dp/B08FFLH5XL?tag=brau01-20)
+  — three modules and five metal-shell speakers in one order, if you would
+  rather not buy the two separately. The speakers are small and sealed, which is
+  exactly right for a box on a nightstand.
+- [2 in 4 Ω 3 W full-range speaker, 2-pack](https://www.amazon.com/dp/B01CHYIU26?tag=brau01-20)
+  — the better-sounding option, and the one to use if you want any low end at
+  all in a rain loop. It needs a baffle: screwed to a flat panel it sounds like
+  a speaker, dangling on its leads it sounds like a phone.
+- [32 GB microSD card](https://www.amazon.com/dp/B06XWN9Q99?tag=brau01-20) —
+  **32 GB is the module's ceiling, not a suggestion.** The DFPlayer reads FAT32
+  and tops out at 32 GB; a 128 or 256 GB card either fails to mount or mounts
+  and then loses tracks. This is one part where the biggest one you own is the
+  wrong one.
+- [5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20)
+  — the board's own USB socket powers everything, module and speaker included. A
+  [right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20)
+  is what lets the box sit flat against a wall or a nightstand back.
+- [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — four
+  wires between the two boards, female-to-female, no iron. If you would rather
+  solder it once, the [perfboard, headers and terminal blocks kit](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
+  covers it.
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  for the speaker leads. The DFPlayer's speaker pads are on 2.54 mm pitch and
+  silicone wire is the stuff that stays put while you solder next to it.
+- [1 kΩ resistor](https://www.amazon.com/s?k=1k+ohm+1%2F4w+resistor+assortment&tag=brau01-20)
+  — one, in series with the module's RX pin. See
+  [Troubleshooting](#troubleshooting); you may not need it, and you will know
+  within ten seconds of the first track.
+- [IP65 project box with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  — **there is no printed case in this folder**, so this is a box, not the box.
+  150 × 100 × 70 mm swallows both boards and the speaker with room left. Drill
+  the speaker hole in the lid; do not leave the driver sealed behind solid
+  plastic and expect to hear it.
+
+:::caution
+**Do not build this on a WROVER board.** GPIO16 and GPIO17 are the two pins the
+config uses for the serial link, and on any ESP32 module carrying PSRAM —
+WROVER, and most boards sold as "ESP32-CAM compatible" — those exact two pins
+are wired to the PSRAM die and are not yours to use. The WROOM-32 has no PSRAM
+and both pins are free, which is why `board: nodemcu-32s` is the right key here.
+If you must use a WROVER, change `uart_b_rx` and `uart_b_tx` in the
+substitutions to a free pair and rewire to match.
+:::
+
+### If you want it louder
+
+The DFPlayer's built-in amplifier is a couple of watts into one speaker, which
+is plenty for a bedside box and not enough for a nursery across a hallway. For
+more, ignore the speaker pins and take the line-level `DAC_L` / `DAC_R` outputs
+into a real amplifier — a [TDA2050 mono amplifier module](https://www.amazon.com/dp/B0CDWTL57H?tag=brau01-20)
+is the one in the parts drawer here. It is mono, so pick one DAC output and
+leave the other open, and it wants more than 5 V on its supply before it does
+anything the DFPlayer couldn't.
+
+:::danger
+**Never wire an external amplifier to `SPK_1` and `SPK_2`.** That output is
+bridged — neither side is ground, both swing — so tying one of them to an
+amplifier's input ground shorts half the DFPlayer's output stage. Line-level out
+means `DAC_L` or `DAC_R` and the module's `GND`, and nothing else.
+:::
+
+:::note
+If what you actually want is a good non-looping white noise generator and not a
+Home Assistant entity, buy a [LectroFan EVO](https://www.amazon.com/dp/B074FFW5W4?tag=brau01-20)
+and stop reading. It sounds better than this does, because it synthesises noise
+instead of looping a file. This project wins on one thing: it is in your
+automations.
+:::
+
+## Wiring
+
+Four wires, and the two signal pins come straight out of the substitutions block
+at the top of `bruh-sound-machine.yaml`. Everything on the DFPlayer side is
+named on its silkscreen, so there are no pin numbers to miscount.
+
+| Function | ESP32 | DFPlayer Mini |
+|---|---|---|
+| ESP32 transmit → module receive | **GPIO17** (`uart_b_tx`) | **RX** |
+| Module transmit → ESP32 receive | **GPIO16** (`uart_b_rx`) | **TX** |
+| Power | **5V** / **VIN** | **VCC** |
+| Ground | **GND** | **GND** |
+| Speaker | — | **SPK_1** and **SPK_2** |
+
+TX goes to RX and RX goes to TX. If the board boots, connects to WiFi and then
+answers every service call with silence and no error, that crossover is the
+first thing to check — the module never hears the command and has no way to say
+so.
+
+Power the module from **5 V**, not 3V3. Its logic is 3.3 V regardless, so the
+ESP32 connects directly with no level shifter, but the amplifier's output is
+proportional to the supply and a DFPlayer on 3.3 V is audibly quieter.
+
+GPIO16 and GPIO17 are the ESP32's UART2 pins, which is why the logger stays out
+of the way. There is no `baud_rate: 0` in this config and none is needed —
+`logger:` keeps UART0 and the USB console works while the module is playing.
+
+<ImagePlaceholder alt="Wiring diagram showing an ESP32 connected to a DFPlayer Mini over four wires with a speaker on SPK_1 and SPK_2">
+  Wiring diagram or a labelled photo of the two boards side by side, with the
+  four jumpers and the speaker leads visible.
+</ImagePlaceholder>
+
+## The SD card
+
+This is where the build actually goes wrong, and it has nothing to do with the
+electronics. The DFPlayer indexes files by the order they were written to the
+card, not by their names, and it counts every file it finds — including the
+invisible ones your computer leaves behind.
+
+<Steps>
+
+1. **Format the card FAT32.** Not exFAT, which is what a 64 GB card ships as and
+   what a Mac will happily give you again if you don't look.
+
+2. **Make a folder called `01`** at the root of the card. Numbered folders `01`
+   through `99` hold files named `001.mp3` through `255.mp3`, and that pair of
+   numbers is exactly what the `dfplayer_play_folder` service takes.
+
+3. **Copy the files in one at a time, in order.** `001.mp3` first, then
+   `002.mp3`. Dragging a selection across copies them in whatever order the
+   filesystem feels like, and the track you get is not the track you asked for.
+
+4. **Delete the hidden files.** macOS writes `.DS_Store`, `._001.mp3` and a
+   `.Trashes` folder onto any card it touches, and the DFPlayer counts them as
+   tracks. On a Mac, `dot_clean` the card and empty the trash before ejecting.
+   This is the single most common reason a DFPlayer plays the wrong thing.
+
+5. **Eject it properly** and put it in the module with the contacts facing the
+   PCB.
+
+</Steps>
+
+Make the loops long. A three-minute rain file seams twenty times an hour and
+your ear finds the seam; a fifteen-minute file seams four times and it doesn't.
+Trim both ends at a zero crossing and export constant-bitrate MP3 — the DFPlayer
+handles VBR unevenly and the symptom is a click at the loop point that isn't in
+your file.
+
+## Assembly
+
+<Steps>
+
+1. **Load the card first** and leave it in the module. Debugging a silent build
+   is much easier when you already know the card is right.
+
+2. **Solder the speaker leads** to `SPK_1` and `SPK_2`. Polarity does not matter
+   on a single driver.
+
+3. **Run the four jumpers** between the boards. Female-to-female Dupont onto both
+   headers works and takes a minute.
+
+4. **Flash before you box it**, and **set the volume before you play anything.**
+   Nothing in the config sets a volume at boot, so the module comes up at its own
+   power-on default — which is loud, into a speaker six inches from your face.
+   Call `dfplayer_set_volume` with something around 10 first.
+
+5. **Cut the speaker opening** in the lid and mount the driver against it. A
+   speaker screwed to a flat panel with a hole in it is the difference between
+   this sounding like a sound machine and sounding like a phone in a drawer.
+
+</Steps>
+
+## Flashing
+
+<Steps>
+
+1. Copy `bruh-sound-machine.yaml` from the download section below into your
+   ESPHome folder.
+
+2. Fill in `secrets.yaml` — `wifi_ssid`, `wifi_password` and `ota_password`.
+   There is a `secrets.yaml.example` in the repo with every key these configs
+   use.
+
+3. Change the two name substitutions so the node is yours:
+
+   ```yaml
+   substitutions:
+     device_name: "Bedroom Sound Machine"
+     device_id: "bedroom-sound-machine"
+   ```
+
+4. Flash over USB the first time. Every flash after that is over WiFi.
+
+</Steps>
+
+The device is discovered by Home Assistant on its own — there is no YAML to
+write on the Home Assistant side. You get a status `binary_sensor` and the
+services below.
+
+## Using it from Home Assistant
+
+Every service is exposed as `esphome.<device_id>_<service>`, with the hyphens in
+`device_id` turned into underscores. With the default `bruh-sound-machine` that
+makes `esphome.bruh_sound_machine_dfplayer_set_volume`, and so on.
+
+**The one you actually want is `dfplayer_play_loop_folder`.** It takes a folder
+number and loops that folder forever, which is the entire behaviour of a sound
+machine. `dfplayer_stop` ends it. Everything else in the list is there for the
+cases where you want something more specific.
+
+| Service | Arguments | What it does |
+|---|---|---|
+| `dfplayer_play_loop_folder` | `folder` | Loops a whole folder — the sound-machine call |
+| `dfplayer_play_folder` | `folder`, `file` | One specific track, once |
+| `dfplayer_play` | `file` | Track by global index, once |
+| `dfplayer_play_loop` | `file`, `loop_` | Track by index, looping if `loop_` is true |
+| `dfplayer_play_1` | — | Plays track 1 |
+| `dfplayer_random` | — | Random track |
+| `dfplayer_next` / `dfplayer_previous` | — | Step through the index |
+| `dfplayer_start` / `dfplayer_pause` / `dfplayer_stop` | — | Transport |
+| `dfplayer_set_volume` | `volume` | 0–30 |
+| `dfplayer_volume_up` / `dfplayer_volume_down` | — | One step either way |
+| `dfplayer_set_eq` | `preset` | 0–5 |
+| `dfplayer_sleep` | — | Low-power state; needs `dfplayer_reset` to wake |
+| `dfplayer_reset` | — | Restarts the module and re-reads the card |
+
+Two arguments need their ranges spelled out, because the config passes them
+through as raw integers and the module does nothing useful with a bad one.
+**Volume is 0 to 30**, and the top third is where a small driver starts to
+distort. **`preset` is 0 to 5**, mapping to ESPHome's EQ enum in order: normal,
+pop, rock, jazz, classic, bass. For white noise leave it on 0 — the others are
+shaped for music and a fan loop through the "rock" curve is a strange thing to
+fall asleep to.
+
+Note the trailing underscore on `loop_` in `dfplayer_play_loop`. That is what the
+config declares, `loop` being reserved, and a service call using `loop` silently
+fails validation.
+
+The `on_finished_playback` trigger in the config only writes a log line. If you
+want a track to hand off to another one, that is where the automation goes — but
+for a loop, `dfplayer_play_loop_folder` already does it in the module and never
+involves WiFi.
+
+## Troubleshooting
+
+**Silence, and the logs look fine.** TX and RX are the wrong way round. It is
+this nine times out of ten, because the config's `tx_pin` is the ESP32's
+transmit pin and it goes to the pin marked RX on the module.
+
+**It plays, but it's the wrong track.** Hidden files on the card, or files
+copied in a batch instead of one at a time. Reformat, `dot_clean`, copy in
+order. Nothing in the firmware can fix an index built at copy time.
+
+**Hiss, pops or a click on every command.** Put a 1 kΩ resistor in series with
+the module's RX line — between GPIO17 and the module's RX pin. It is the
+manufacturer's own recommendation for exactly this, and it costs nothing to try.
+
+**It boots at full volume every time.** There is no `on_boot` in the shipped
+config. Add one, or make the first thing your Home Assistant automation does a
+`dfplayer_set_volume` call before it plays anything.
+
+**The card won't mount.** It is over 32 GB, or it is exFAT. Both look identical
+from the outside: the module powers up, the ESP32 talks to it, and no service
+call produces a sound.
+
+**It works on the bench and drops out in the bedroom.** The ESP32's onboard
+antenna is behind whatever you boxed it in. Metal-shelled speakers and a foil
+sticker on a lid both do more damage than you'd expect — try rotating the box
+90° before you blame the WiFi.
 
 ## Files & downloads
 

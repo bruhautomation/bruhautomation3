@@ -54,12 +54,12 @@ this is a page you build the hardware from and write the middle of yourself.
   rather than in wall-clock time.
 
 The `nextion_10inch_dev_2` project is a second, larger interface for the same
-rig: a schematic of the fluid path that redraws itself as valves change, two
-pumps with independent speed, and named operations — fill and drain the
-reservoir, fill, drain and transfer the cube, recirculate, harvest, stop. Its
-buttons emit Nextion touch events by hand (`printh 65 00 …`) under comments like
-*trigger ESP btn event*, so that generation is driven by an ESP32 rather than by
-the display alone.
+rig, drawn for an 800×480 panel rather than the 480×320 one: a schematic of the
+fluid path, a media pump and a circulation pump with independent speed, and
+named operations — fill and drain the carboy, fill, drain and transfer the cube,
+recirculate, harvest, stop. Its buttons emit Nextion touch events by hand
+(`printh 65 00 …`) under comments like *trigger ESP btn event*, so that
+generation is driven by an ESP32 rather than by the display alone.
 
 ## Parts
 
@@ -74,7 +74,7 @@ the display alone.
 - [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — on the gearbox and shaft-collar grub screws. A worm drive vibrates
 - [Nextion Enhanced 3.5 in NX4832K035 with the IO expansion board](https://www.amazon.com/dp/B087RMD9ZD?tag=brau01-20) — **Enhanced, not Basic.** The HMI files are 480×320 and the footswitches hang off the GPIO header, which only the Enhanced has
 - [Momentary foot switches](https://www.amazon.com/s?k=momentary+foot+switch+pedal&tag=brau01-20) ×2 — one per direction
-- [ESP32 development board](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the host that reads the display's UART and drives the motors
+- [ESP32 development board](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the host that reads the display's UART and drives the motors. The second-generation HMI names an ESP in its own comments; this is the board to use
 - [24 V 5 A supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20) — the motor rail
 - [Isolated 24 V to 5 V buck converter](https://www.amazon.com/dp/B08H7XRCVQ?tag=brau01-20) — the display and the logic. Do not hang them off the stepper rail directly
 - [2020 aluminium extrusion, 2 m](https://www.amazon.com/dp/B081B8Q5LL?tag=brau01-20) — the frame
@@ -82,29 +82,29 @@ the display alone.
 - [2020 corner brackets, 10-pack](https://www.amazon.com/dp/B07VW9H99P?tag=brau01-20) and [L joint plates](https://www.amazon.com/dp/B0899S8BBD?tag=brau01-20)
 - [2020 drop-in M5 T-nuts](https://www.amazon.com/dp/B07PR31317?tag=brau01-20) — the roll-in kind, so you can add a bracket without pulling the frame apart
 - [M5 button-head bolt and nut kit](https://www.amazon.com/dp/B07CYHFQ7S?tag=brau01-20)
-- [1/4 in opaque white acrylic, 12 × 36 in](https://www.amazon.com/dp/B01DYSVUZI?tag=brau01-20) — the panels. Buy two; some of the cut files are wider than a single sheet
-- [Peristaltic pump head with a serial stepper drive](https://www.amazon.com/s?k=peristaltic+pump+head+stepper&tag=brau01-20) — read the protocol section below before you buy one
-- [Platinum-cured silicone tubing](https://www.amazon.com/s?k=platinum+cured+silicone+peristaltic+pump+tubing&tag=brau01-20) — for the pump head and the pinch valves
+- [1/4 in opaque white acrylic, 12 × 36 in](https://www.amazon.com/dp/B01DYSVUZI?tag=brau01-20) — one sheet cuts the narrow side panel, the fan side, the end cap and the pump profile. The 419 mm main face and the 407 mm wide side do not fit across 12 in, so those two want stock at least 18 in wide
+- [Masterflex L/S pump head](https://www.amazon.com/s?k=masterflex+L%2FS+peristaltic+pump+head&tag=brau01-20) — the HMI is written against one, on a stepper drive that speaks the `/1` protocol. Read that section below before you buy
+- [Masterflex L/S tubing](https://www.amazon.com/s?k=masterflex+L%2FS+16+platinum+cured+silicone+tubing&tag=brau01-20) — the calibration page has L/S 14, 16, 17 and 18 as presets, so buy one of those and it is already in there
 - [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — the pinch valve lids are M3 throughout
 - [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — for anything you will open more than twice
-- [92 mm quiet fan](https://www.amazon.com/dp/B009NQM7V2?tag=brau01-20) and [40 mm quiet fan](https://www.amazon.com/dp/B072JK9GX6?tag=brau01-20) — `fludics_panel_cut_sides_with_fans.dxf` is the side panel with the cutouts already in it
+- [120 mm case fans, 4-pack](https://www.amazon.com/dp/B000O8I474?tag=brau01-20) — every fan opening in the DXFs is a 120 mm spiral grille, six of them across the three side panels. Read the note under [Cutting the panels](#cutting-the-panels) about the bolt spacing before you cut
 - [20 AWG silicone hookup wire](https://www.amazon.com/dp/B071DX3X6M?tag=brau01-20) and [female-to-female jumper leads](https://www.amazon.com/dp/B07GCZBH51?tag=brau01-20)
 - [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the pinch valves and anything else on the fluid path
 - [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — everything else
 
 ## The printed parts
 
-Sixty-odd STLs, most of them revisions of six things. What goes on the machine
-is the highest-numbered version of each.
+Sixty-four STLs, most of them revisions of the eight things below. What goes on
+the machine is the highest-numbered version of each.
 
 | Group | Files | What it is |
 |---|---|---|
-| Tilt drive | `nema_23_bracket_v2`, `servo_nema_adapter_v3`, `gear_mount_plate`, `gear_mount_box` | Plates drilled to the NEMA 23 four-bolt pattern with a 25.4 mm centre bore for the shaft |
+| Tilt drive | `nema_23_bracket_v2`, `servo_nema_adapter_v3`, `gear_mount_plate`, `gear_mount_box` | Plates drilled to the NEMA 23 four-bolt pattern — 47.1 mm square — with a 25.4 mm centre bore for the shaft |
 | Shaft | `6.35_to_11mm_bore_adapter`, `shaft_adapter_v2`, `1in_shaft_adapter`, `1in_cap`, `0.5in_dowel_mount` | Motor to gearbox, gearbox to the 1 in tilt shaft, and end caps |
 | End stops | `limit_mount`, `limit_mount_mirror`, `limit_mount_dual`, `limit_presser_final`, `end_stop_mirror` | Switch plates in both hands, plus the cams that trip them |
-| Readout | `tilt_indicator_4`, `cc_stand_gear_face`, `dots`, `handle` | A 50.8 mm angle dial, the gear face, and a 172 mm knurled handle for turning it by hand |
+| Readout | `tilt_indicator_4`, `cc_stand_gear_face`, `dots`, `handle` | A 50.8 mm angle dial, a 96 mm gear face, and a 172 mm handle for turning it by hand |
 | Pinch valves | `cc_pinch_valve_v5`, `cc_pinch_lid_v5`, `double_pinch_top_final_2`, `double_pinch_bottom_final_2`, `press_pull_final`, `valve_push` | Single and twin clamps on the media lines. M3 throughout |
-| Line management | `retainer_clip_v1` / `_v2` / `_v3` | 25.4 mm strips with 1/4 in holes at 2.5 in pitch, in 5, 6 and 8 in lengths |
+| Line management | `retainer_clip_v1` / `_v2` / `_v3` | 25.4 × 6.35 mm strips, three 1/4 in holes each: `_v2` is 5 in at 2 in pitch, `_v3` is 6 in at 2.5 in, `_v1` is 8 in at 3.5 in |
 | Enclosures | `electronics_box_3`, `electronics_plate`, `component_shelf`, `face_plate`, `face_plate_bottom`, `o2_box`, `o2_box_bottom` | The controller box, its backplate, a shelf and a small sensor box |
 | Extras | `microscope_mount-2`, `cc_stand_triple_cap`, `anyconv.com__ut_logo` | A 1/4 in-bore mount with two M3 holes at 12 mm centres, caps, and a badge |
 
@@ -118,7 +118,7 @@ Scale it in the slicer or you will print a speck.
 | Layer height | 0.2 mm |
 | Walls | 3, and 4 on the drive parts |
 | Infill | 25% general, 50% on the brackets, gear mounts and shaft adapters |
-| Supports | None, once each part is laid on a flat face |
+| Supports | None on the plates and clips; the tall pinch-valve bodies want them |
 | Material | PETG on the fluid path, PLA+ everywhere else |
 
 **Print the pinch valves in PETG.** A pinch valve is a part that lives under
@@ -129,21 +129,31 @@ frame plates and the boxes have no such problem, and PLA+ is fine there.
 **Reorient before you slice.** These came out of Fusion with the thin dimension
 on Y rather than Z — `gear_mount_box` exports 159 × 5.5 × 159, `electronics_plate`
 107 × 1 × 150, `nema_23_bracket_v2` 56 × 10 × 56. Dropped straight onto the bed
-they stand on edge. Lay each one flat on its largest face first; every part here
-prints supportless in that orientation.
+they stand on edge. Lay each one flat on its largest face first, which is what
+gets the drive plates and the clips through without supports.
 
 ## Cutting the panels
 
-Six DXF files, all sized for 1/4 in (6 mm) acrylic.
+Six DXF files, all in millimetres and all sized for 1/4 in (6 mm) acrylic. The
+sizes below are the pieces, not the file extents — three of these files carry
+construction lines that run off the part, so a naive import looks bigger than
+what you cut.
 
-| File | Size | Notes |
+| File | Piece | What's in it |
 |---|---|---|
-| `fludics_panel_cut_1` | ~457 × 438 mm | The main fluidics face |
-| `fludics_panel_cut_sides` | ~604 × 400 mm | Sides, no ventilation |
-| `fludics_panel_cut_sides_with_fans` | — | The same sides with the fan cutouts in them |
-| `cell_cube_end_cap` | ~280 mm across | Spline-cut, one closed profile |
-| `pump_profile_dxf` | 101.6 × 120.3 mm | Twelve 4.9 mm holes, two 14.8 mm, two 3.9 mm |
-| `fix_2` | ~444 × 439 mm | A revised panel |
+| `fludics_panel_cut_1` | 419.1 mm square | The main fluidics face: a 166 × 101 mm cutout, an 84 mm square, six 30 mm holes, twelve 7 × 4 mm slots |
+| `fludics_panel_cut_sides` | 203 × 443 mm and 407 × 443 mm | Two side panels nested on one layout, two 120 mm fan grilles on each |
+| `fludics_panel_cut_sides_with_fans` | 185.9 × 457.2 mm | A third side, two more grilles, and an 83 × 80 mm notch out of the bottom edge |
+| `cell_cube_end_cap` | 250 × 250 mm | One spline profile with radiused corner cut-ins, plus a 7.6 mm and a 5.1 mm hole |
+| `pump_profile_dxf` | 101.6 × 120.3 mm | The pump's mounting footprint — twelve 4.9 mm holes, two 14.8 mm, two 3.9 mm |
+| `fix_2` | four 10 mm squares on a 194 × 406 mm grid, plus a 20 × 100 mm slot | Not a panel. A second pass of extra cuts for the 407 mm side |
+
+:::caution
+**The fan holes are drawn wrong.** Each grille is a 120 mm circle with four
+5.6 mm bolt holes on a 109.8 mm square. A 120 mm fan's holes are 105 mm apart.
+Move them or cut them as slots — it is a two-minute edit in the DXF and an
+unrecoverable one in acrylic.
+:::
 
 :::tip
 The filenames say *fludics*, not *fluidics*. It is a typo that shipped, and it
@@ -156,29 +166,44 @@ varies by machine and these panels have press-fit cutouts in them.
 
 ## The display
 
-Seven HMI projects, all for the same 480×320 Enhanced panel. The six
-`cc_stand_nextion_display_footswitch*` files are one design iterating: `_2` and
-`_2_5_inch` are layout revisions, and the `_float` pair swaps the integer volume
-variable (`va_vol_int`) for a scaled one (`va_vol_float`) so you can dose 2.5 mL
-instead of rounding to 2 or 3. Open the `float_2` project unless you have a
-reason not to.
+Six of the seven HMI projects are for the 480×320 Enhanced panel; the seventh,
+`nextion_10inch_dev_2`, is the 800×480 one described above.
+
+**Open `cc_stand_nextion_display_footswitch` — the unsuffixed original. It is
+the only one that tilts anything.** The five later revisions dropped the
+position page entirely and kept the pump: no `Left`, no `Level`, no purge, no
+GPIO outputs, no boot init. What they add is a finer calibration factor —
+`_float` replaces the integer `cal_fac_int`, in hundredths of a millilitre per
+revolution, with `cal_fac_f` in thousandths. That is a third decimal place on
+your tubing constant, not a decimal place on the dose; the volume is still
+`va_vol_int` and still steps in whole millilitres. If you want both, the tilt
+page merges into a `_float` project in an afternoon.
 
 ### GPIO
 
-The panel drives its own IO rather than asking the host to do it. Taken from the
-HMI's own `cfgpio` lines:
+The panel drives its own IO rather than asking the host to do it. Straight out
+of the original project:
 
 | Line | What it does |
 |---|---|
-| `cfgpio 3,1,b2` | IO3 becomes an input bound to button `b2` — the **right** footswitch |
-| `cfgpio 4,1,b1` | IO4 becomes an input bound to button `b1` — the **left** footswitch |
-| `cfgpio 3,2,0` … `cfgpio 7,2,0` | At boot, IO3 to IO7 are push-pull outputs |
-| `n0.val=pio0` | Page 0 reads IO0 as an input |
+| `cfgpio 3,2,0` … `cfgpio 7,2,0` | At boot, IO3 to IO7 become push-pull outputs |
+| `cfgpio 3,1,b2` | The pump page rebinds IO3 as an input on button `b2` — the **right** footswitch |
+| `cfgpio 4,1,b1` | And IO4 on `b1` — the **left** footswitch |
+| `pio6` | Media pump run / stop |
+| `pio7` | Media pump direction, cw / ccw |
+| `pio2`, `pio3` | Loop or bypass — `pio3` is held high for 3.5 s to throw the valve, `pio2` holds the state |
+| `pio0`, `pio1` | The right-purge button pulses `pio0` high after 100 ms with `pio1` low |
+| `n0.val=pio0` | Reads IO0 back, so the start button shows what the pump is actually doing after a page change |
 
-IO3 and IO4 are therefore an output at power-on and a bound input once the
-footswitch page loads. That is deliberate, and it is also the first thing to
-check when a pedal stops working: a `cfgpio` on the wrong page quietly turns
-your input back into an output.
+So IO3 and IO4 are an output at power-on and a bound input once the pump page
+loads, which is the first thing to check when a pedal stops working: a `cfgpio`
+on the wrong page quietly turns your input back into an output.
+
+**IO0, IO1 and IO2 are written but never configured.** The `cfgpio` run only
+covers 3 to 7, and a Nextion pin powers up as a pull-up input, so `pio0=1` and
+`pio2=0` land on pins that are still inputs. If the valve and pump lines do
+nothing on your build, add `cfgpio 0,2,0` through `cfgpio 2,2,0` to the boot
+code.
 
 ### What it sends
 
@@ -192,12 +217,15 @@ AllMotion's EZ drivers and Lin Engineering's SilverPak motors speak:
 /1V150000R              set velocity, run
 /1P<steps>D<back>R      dispense <steps>, retract <back>, run
 /1gP51200G10R           loop: 51,200 steps (one revolution), ten times
+/1P0R                   run forward until told to stop — the Prime button
+/1TR                    terminate — what releasing Prime sends
 ```
 
-Positions go out as bare words — `Left`, `Level`, `Right`, `leftpurge`,
-`rightpurge` — for the host to act on. The page that handles them writes all
-twenty-five from/to pairs out longhand, because how far the stand has to travel
-depends entirely on where it already was.
+Positions go out as one string naming both ends of the move: `oldset` + `" to "`
++ `set`, so the host reads `Level to rightpurge` and knows the travel without
+tracking state itself. The page writes all twenty-five from/to pairs out
+longhand and prints `ELSE` if a combination falls through — which, since all
+twenty-five are covered, means something has corrupted `set.txt`.
 
 :::caution
 If your pump does not speak the `/1` protocol, the HMI still works — the strings
@@ -214,18 +242,23 @@ routine built in, and it is worth knowing what it actually does.
 
 <Steps>
 
-1. **Run the calibration cycle** into a tared vessel. It sends
+1. **Prime the line.** Load the tubing, put about 100 mL of test fluid on the
+   inlet, and hold the Prime button until the line is full.
+
+2. **Run the calibration cycle** into a tared vessel. It sends
    `/1gP1280000G2R` — 25 revolutions, looped twice, so fifty revolutions in
    total.
 
-2. **Enter what came out**, in millilitres, on the calibration page.
+3. **Enter what came out**, in millilitres, and press Finish.
 
-3. **The panel stores `pumped_vol × 2`** as the calibration factor. That number
+4. **The panel stores `pumped_vol × 2`** as the calibration factor. That number
    is hundredths of a millilitre per revolution: 80 is 0.8 mL/rev, 380 is
-   3.8 mL/rev. The four presets in the project — 22, 80, 280 and 380 — are four
-   tubing bores.
+   3.8 mL/rev. The four preset buttons are the standard Masterflex L/S sizes —
+   L/S 14 at 0.22, L/S 16 at 0.80, L/S 17 at 2.8 and L/S 18 at 3.8 mL/rev — so
+   if you are running one of those, the calibration is a check rather than a
+   measurement.
 
-4. **Set the anti-drip steps** on the same page. They are added to the forward
+5. **Set the anti-drip steps** on the same page. They are added to the forward
    move and then reversed back out, so the net volume is exactly what you asked
    for and the last thing the pump does is run backwards — which pulls the drop
    hanging off the line back up it. If it still drips, raise the number.

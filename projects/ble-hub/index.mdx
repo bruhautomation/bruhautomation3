@@ -35,17 +35,17 @@ range it didn't have.
 **Beacon tracker.** `esp32_ble_tracker` plus the `binary_sensor` and `sensor`
 blocks watch for specific iBeacon UUIDs and report present/away and signal
 strength as entities on this node. That part *is* configured per beacon, and the
-config ships with three set up.
+config ships with three UUIDs already in it.
 
 ## Parts
 
 <AffiliateDisclosure />
 
-- [ESP32 dev board, 38-pin DevKit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack. This is the plain ESP-WROOM-32 the config's `board: esp32dev` means. Any ESP32 with a WROOM module works; **it must be an ESP32, not an ESP8266**, because the ESP8266 has no Bluetooth radio at all
-- [ESP32 dev board, 6-pack](https://www.amazon.com/dp/B08MFBQ8LV?tag=brau01-20) — the honest way to buy these, because one is never enough. Same board, cheaper each
+- [ESP32 dev board, 38-pin DevKit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack. This is the plain ESP-WROOM-32 the config's `board: esp32dev` means. **It has to be an original ESP32.** The ESP8266 has no Bluetooth radio, and neither does the ESP32-S2, which sells under the same name and the same photo. Anything carrying a WROOM-32 module is right
+- [ESP32 dev board, 6-pack](https://www.amazon.com/dp/B08MFBQ8LV?tag=brau01-20) — the honest way to buy these, because one is never enough. Same 38-pin DevKit, WROOM-32D instead of WROOM-32, cheaper each
 - [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a 3-pack. The right-angle head is what lets the board sit flat behind a bookcase instead of standing off the wall
 - [Dual-port 2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — a 3-pack of cubes, two nodes per cube
-- [16 ft flat micro-USB extension](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20) — for the node that needs to be on a garage ceiling or above a doorway, where the socket isn't
+- [16 ft flat micro-USB cable](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20) — a 2-pack, sold for security cameras. This is the whole run, socket to board, not an extension on the end of the short lead — it is what gets a node onto a garage ceiling or above a doorway where the outlet isn't
 - [BlueCharm iBeacon](https://www.amazon.com/s?k=BlueCharm+BC021+iBeacon+bluetooth+beacon&tag=brau01-20) — the beacons the shipped config is written around. These come from BlueCharm rather than a generic seller, and the search is the honest link
 
 Worth having if a node is going somewhere unfriendly:
@@ -59,13 +59,13 @@ You do not have to own beacons for this to earn its socket. These are ordinary
 BLE devices that Home Assistant supports natively and that a proxy brings into
 range:
 
-- [Inkbird IBS-TH2 Bluetooth thermometer/hygrometer](https://www.amazon.com/dp/B08S34C5X9?tag=brau01-20) — broadcasts openly, no pairing, no app. Passive scanning is enough
+- [Inkbird IBS-TH2 Bluetooth thermometer/hygrometer](https://www.amazon.com/dp/B08S34C5X9?tag=brau01-20) — puts temperature and humidity straight into its advertisement. No pairing, no app, no cloud; Home Assistant's Inkbird integration reads it through the proxy
 - [SwitchBot Bot](https://www.amazon.com/dp/B07B7NXV4R?tag=brau01-20) and [SwitchBot Curtain](https://www.amazon.com/dp/B09Y5ZF81H?tag=brau01-20) — these need an outbound *connection*, which is exactly what `active: true` on the proxy is for. With a proxy in the room you can drop the SwitchBot hub
 
 ## Configuration
 
-The config is `bruh-ble-hub.yaml` in the download section. Two things to change
-before you flash.
+The config is `bruh-ble-hub.yaml` in the download section. Two things to make
+yours before you flash.
 
 **The node's name.** There is no `substitutions:` block in this one — edit
 `esphome: name:` directly. It ships as `bruh-ble-hub-1`, and the `-1` is a hint:
@@ -78,8 +78,8 @@ them as ASCII and the joke gives itself away — `426C7565-4368-6172-6D42-656163
 is `BlueCharmBeacons`. The three UUIDs are byte-for-byte identical except the
 last one, which the beacon changes to say *why* it is transmitting: `73` is
 sitting still, `74` is the accelerometer moving, `79` is the button. That is why
-one physical beacon produces three entities in the config — presence, motion and
-button — and why they are named after one object.
+one physical beacon produces three binary sensors in the config — presence,
+motion and button — and why all four entities are named after one object.
 
 Swap in your own UUID if you use a different beacon, and delete the sensors you
 don't have. A `ble_presence` block with a UUID nothing is transmitting is an
@@ -98,12 +98,12 @@ Passive scanning is the right default here, and it is why the beacons still work
 — an iBeacon puts everything it has to say in the advertisement, so there is
 nothing to ask it for. Some sensors do hold data back in the scan response, and
 those go quiet under passive scanning. If a device that should appear never
-does, set `scan_parameters: active: true` and see if it turns up.
+does, set `active: true` under `scan_parameters:` and see if it turns up.
 
 :::note
-The `ota:` block in this config has no `platform:` key. Current ESPHome wants
-`platform: esphome` nested under `ota:` — add that line if the compile complains
-about it.
+The `ota:` block in this config has no `platform:` key, and current ESPHome
+requires one. Add `platform: esphome` under `ota:` alongside the password before
+you compile.
 :::
 
 ## Flashing
@@ -141,13 +141,20 @@ Don't add sensors to this board. WiFi and BLE share one radio on an ESP32, and
 this config already has both busy full time with `continuous: true`. Give the
 temperature reading its own node.
 
+A bare board on a shelf still looks like a bare board on a shelf. The
+[Happy Bubbles enclosure](/projects/happy-bubbles-enclosure/) is a printed puck
+drawn for the presence detector this project replaced, and a DevKit uses about
+half its floor — check the port notch height on that page before you print one.
+
 ## What you get in Home Assistant
 
-Per beacon, on each node that is configured for it:
+Four entities per node, from the beacon blocks as shipped:
 
-- **A presence `binary_sensor`** — on while the beacon's advertisement is being
-  heard, off after it stops.
-- **An RSSI `sensor`** — signal strength in dBm.
+- **`Trash Can`, `Trash Can Motion`, `Trash Can Button`** — a `ble_presence`
+  binary sensor each, on while that UUID is being heard and off after it stops.
+- **`Trash Can RSSI`** — signal strength in dBm, on the idle UUID only. The
+  motion and button UUIDs get no `ble_rssi` block, and shouldn't: they transmit
+  in bursts, so a signal reading taken from them is stale most of the day.
 
 RSSI reads like a distance and is not one. A wall, a body or a closed cupboard
 moves it as much as several metres do. Use it to answer *which of my nodes hears
@@ -165,8 +172,10 @@ which is what you actually wanted.
 
 ## Troubleshooting
 
-**Nothing Bluetooth appears at all.** Check the board is really an ESP32. An
-ESP8266 will happily compile most of a config and has no Bluetooth hardware.
+**The config won't compile.** Two likely causes. `ota:` needs its
+`platform: esphome` line, as above. And `esp32_ble_tracker` is rejected outright
+on a chip with no BLE radio, so an ESP8266 or an ESP32-S2 stops the build here
+rather than flashing and going quiet.
 
 **The beacon shows up as away when it is sitting right there.** Coin-cell
 beacons broadcast on an interval measured in seconds and get slower as the cell
@@ -175,9 +184,10 @@ presence timeout is the thing to look at. If it is not updating, change the
 battery before you change the config.
 
 **A SwitchBot or another connect-type device fails to control.** That is the
-proxy's `active: true` and connection capacity, not the scanner. An ESP32 holds
-only a handful of simultaneous BLE connections; spread connect-type devices
-across nodes instead of asking one to hold them all.
+proxy's `active: true` and its connection slots, not the scanner. ESPHome gives
+`bluetooth_proxy` three of them by default, so a fourth connect-type device in
+the same room waits for one to free up. Spread them across nodes instead of
+asking one board to hold them all.
 
 **It works, then drops off WiFi for minutes at a time.** BLE scanning runs
 continuously in this config and shares the antenna. If the node is at the edge

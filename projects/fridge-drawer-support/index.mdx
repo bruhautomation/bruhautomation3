@@ -24,11 +24,12 @@ Worth being precise, because "bracket" undersells how simple it is. The model is
 a bar **228 mm long, 18 mm wide and 2 mm thick**. The bottom is flat — the full
 228 × 18 rectangle, sitting on the ledge. The whole top perimeter is rolled over
 with a 2 mm radius, which because the bar is only 2 mm thick means the roll runs
-all the way from the flat top down to the plate. There is no sharp shoulder
-anywhere on the upper face, so the drawer slides on and off it without catching
-on an edge. There are no holes and no fasteners.
+all the way from the flat top down to the plate, leaving a 224 × 14 flat in the
+middle. There is no sharp shoulder anywhere on the upper face, so the drawer
+slides on and off it without catching on an edge. There are no holes and no
+fasteners.
 
-The 2 mm thickness is the specification here. That is how much lift you get.
+The 2 mm thickness is the specification: that is how much lift you get.
 
 ## Parts
 
@@ -36,23 +37,24 @@ The 2 mm thickness is the specification here. That is how much lift you get.
 
 - [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — about 10 g per bar, so a 1 kg spool covers every fridge you will ever own
 - [3M VHB double-sided tape, 1/2 in](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — 12.7 mm wide, which lands neatly down the middle of an 18 mm bar
-- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — the one tool this project genuinely needs, because 228 mm is one particular fridge and not yours
+- [Digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the ledge width and the drop, which are the two numbers that have to be right. It stops at 203 mm, so the run length is a tape-measure job
 - [Wet/dry sandpaper, assorted grit](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — for the bottom edge and for taking the bar down to length
 - [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — optional, but it kills an elephant's foot in one pass where sandpaper takes five minutes
 
 :::note
-Print it in PETG. A fridge is cold and wet, and this is a 2 mm strip you have to
-flex slightly to get past the drawer stops. Cold PLA snaps doing that. PETG bends
-and comes back, and it does not care about condensation. If all you have is
+Print it in PETG. A fridge is cold and wet, and this is a 2 mm bar that gets
+pulled out, washed and put back every time you clean the drawer. PLA is brittle
+at 4 °C and snaps where PETG flexes and comes back, and PETG does not care about
+condensation. If all you have is
 [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) it will work — just
-fit it gently, and expect to reprint it the first time you are rough with the
-drawer.
+handle it gently coming out of a cold fridge, and expect to reprint it
+eventually.
 :::
 
 ## Measure before you print
 
 The bar is drawn for one drawer. Pull yours all the way out and take three
-numbers with the caliper:
+numbers — a tape measure for the first, the caliper for the other two:
 
 - **How long the ledge run is.** That sets the 228 mm.
 - **How wide the ledge is.** That sets the 18 mm. Narrower is fine; wider than
@@ -84,22 +86,23 @@ Flat face down, rolled face up, exactly as exported. Nothing overhangs.
 | Material | PETG |
 | Orientation | Flat, as exported |
 
-0.15 mm rather than 0.2 mm because at 2 mm total height the bullnose is only ten
-or thirteen layers of curve, and the difference between those two numbers is
-visible as stepping on the roll. Run it at 0.2 mm if you would rather have the
-time back; it fits the same.
+0.15 mm rather than 0.2 mm because the bullnose is the whole 2 mm of height —
+thirteen layers of curve at 0.15 mm, ten at 0.2 — and the difference between
+those two is visible as stepping on the roll. Run it at 0.2 mm if you would
+rather have the time back; it fits the same.
 
 Solid infill is not optional. At 2 mm thick the top and bottom shells almost meet
 anyway, and a hollow bar with a 15% gyroid inside crushes under the drawer and
 stops lifting it. The perimeters are the part that matters — they run the full
-228 mm, which is the direction the load pulls, so more walls is strictly better
-until the cross-section is solid.
+228 mm, which is the direction the bar wants to bend, so more walls is strictly
+better until the cross-section is solid.
 
 :::caution
-**228 mm does not fit an Ender 3's 220 × 220 bed along an axis.** Rotate the bar
-45° on the plate and the diagonal swallows it easily. On a 235 mm plate it fits
-straight with about 3 mm at each end — turn the skirt off, or it prints into the
-bed clips.
+**228 mm does not fit a 220 × 220 print area along an axis** — an Ender 3's, for
+one. Rotate the bar 45° and it does: a 228 × 18 rectangle turned diagonally needs
+174 mm square. If your printer will use the full 235 mm plate it fits straight
+with about 3 mm at each end, but turn the skirt off or it prints into the bed
+clips.
 :::
 
 Two other things about a long thin part. It will curl at the ends if you let it,
@@ -114,9 +117,10 @@ the sheet with it — print this on the textured side.
    only racks it — it will bind worse than the sag did. The part is symmetric,
    so there is no left and right; print the same file twice.
 
-2. **Take the drawer and the shelf out and let them warm up.** VHB will not bond
-   to a cold, damp surface, and the inside of a fridge is exactly that. Give the
-   ledge twenty minutes at room temperature and wipe it down with alcohol.
+2. **Warm the ledge up first.** VHB wants a dry surface above about 10 °C, and
+   the inside of a fridge is neither. The ledge is part of the cabinet and does
+   not come out, so take the drawer out and leave the door open — or the fridge
+   off — for twenty minutes, then wipe the ledge with alcohol and let it dry.
 
 3. **Dry-fit first, with no tape.** Sit both bars on their ledges, slide the
    drawer in and out a few times, and check two things: that it no longer scrapes,
@@ -125,8 +129,8 @@ the sheet with it — print this on the textured side.
    the sandpaper fixes it.
 
 4. **Tape them down.** One strip of VHB down the centre of the flat bottom of each
-   bar, press hard for thirty seconds. It holds immediately and reaches full
-   strength over about a day.
+   bar, press hard for thirty seconds. It grabs immediately, gets to most of its
+   strength in a day and all of it in three.
 
 5. **Put the drawer back and leave it alone overnight** before you load it with
    anything heavy.

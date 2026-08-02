@@ -15,9 +15,8 @@ the room at 3 a.m. without waking up. The **RGB** one is the kid's-room version:
 a warm bulb on its own dimmer plus 54 addressable RGBW pixels around the roof,
 for colour wipes, twinkles and a police-car mode nobody asked for.
 
-Both are ESPHome, so both appear in Home Assistant on their own with no YAML to
-write on the Home Assistant side, and both update over WiFi after the first
-flash.
+Both are ESPHome: they are discovered by Home Assistant with no YAML to write on
+its side, and both update over WiFi after the first flash.
 
 <ImagePlaceholder alt="The two BRUH nightlights — a white strip under a kitchen counter and an RGBW nightlight in a child's bedroom">
   Hero shot — ideally both builds in one frame, or two shots: the mono strip
@@ -31,7 +30,7 @@ flash.
 
 **The mono build — "BRUH Countertop"**
 
-- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the config's `board: nodemcu-32s` is this pinout. A 2-pack, so the spare covers a second light
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a DevKitC-style board rather than a literal NodeMCU-32S, but the same ESP-WROOM-32 module on the same 38-pin pinout, and the config's `board: nodemcu-32s` key builds for it unchanged. A 2-pack, so the spare covers a second light
 - [Dual MOSFET PWM driver module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — 5–36 V, 15 A. A 10-pack; you need one per PWM channel
 - [24 V natural-white high-density strip](https://www.amazon.com/dp/B07FCSHKLV?tag=brau01-20) — 16.4 ft, cut to the counter at the marked lines
 - [24 V 5 A power supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20)
