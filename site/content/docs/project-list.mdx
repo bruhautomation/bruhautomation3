@@ -18,13 +18,14 @@ export const written = projects.filter((p) => p.guide && !p.pending).length;
 
 All {projects.length} of them. Every project lives in its own folder in the
 <a href={`${REPO_URL}/tree/main/projects`}>GitHub repo</a> — the write-up, the photos, the print
-files, the CAD source and the firmware, all in one place — and every one has a page here with
-its parts in a 3D viewer and its files ready to download.
+files, the CAD source and the firmware, all in one place — and every one has a page here, with
+whatever files it has in a 3D viewer and ready to download.
 
-{written} have their build guide written. The rest are marked **write-up pending**: the files
-are there and ready to use, and the words are what I'm catching up on. If you want a particular
-one written up sooner, <a href={`${REPO_URL}/discussions`}>say so in Discussions</a> and I'll
-bump it up the list.
+{written} have their build guide written. The rest are marked **write-up pending** — rough
+pages whose description is a first pass I haven't checked over, and most, though not all, have
+their files attached. The files are the real thing; the words are what I'm catching up on. If
+you want a particular one done sooner, <a href={`${REPO_URL}/discussions`}>say so in
+Discussions</a> and I'll bump it up the list.
 
 {groups.map((group) => (
 	<section>

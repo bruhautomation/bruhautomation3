@@ -224,6 +224,9 @@ export default defineConfig({
 				// The sidebar group icons, generated above from the sidebar's own
 				// running order so the two can never drift apart again.
 				{ tag: 'style', content: sidebarIconCss },
+				// iOS composites a home-screen icon onto an opaque tile of its
+				// own choosing; this is a deliberate one instead of a guess.
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
 				// Set the pending-rows class before first paint. Read in `head`
 				// rather than by the toggle's own script, which runs after the
 				// sidebar has already been laid out without them.

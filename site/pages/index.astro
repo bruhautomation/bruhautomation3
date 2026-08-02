@@ -68,6 +68,9 @@ const cards = [...groups, APPS].map((group) => ({
 		<meta name="twitter:image" content="https://bruhautomation.com/og-image.png" />
 		<meta name="theme-color" content="#1e90ff" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		{/* iOS composites a home-screen icon onto an opaque tile of its own
+		    choosing, so it gets a deliberate one rather than a guess. */}
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 		{/* Block render until theme is set — prevents flash */}
 		<script is:inline>
