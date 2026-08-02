@@ -1,6 +1,6 @@
 ---
 title: Peristaltic Dosing Pump Controller
-description: A laser-cut controller that drives a lab peristaltic pump over its DB25 remote port — encoder, footswitches, and repeatable dose volumes.
+description: An Arduino and a laser-cut panel that drive a lab peristaltic pump through its DB25 remote port — dial a volume on the encoder, tap a footswitch, get the same dose every time.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -9,129 +9,310 @@ import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
 Lab peristaltic pumps have a DB25 remote-control port on the back that almost
-nobody uses, because the vendor's foot pedal and dosing controller cost more than
-the pump did. This is that controller, built out of an Arduino and a laser-cut
-box: dial in a volume, hit a footswitch, get the same dose every time — and keep
-both hands on what you are actually doing.
+nobody uses, because the vendor's foot pedal and dosing controller cost more
+than the pump did. This is that controller: an Arduino, a rotary encoder sitting
+in the middle of a 24-pixel ring, an eight-digit display and two footswitches,
+behind a laser-cut acrylic panel. Dial a volume, tap a pedal, and keep both
+hands on what you are actually doing.
 
 :::note
 This drives an **existing** pump through its remote port. It is not a pump — the
-peristaltic head, the motor and the tubing are the pump you already own. Check
-your pump has a DB25 remote connector before building this.
+head, the motor and the tubing are the pump you already own. Check yours has a
+DB25 remote connector, and get its manual out, because you will need to know
+what it expects on pins 1, 15 and 16.
 :::
 
-<ImagePlaceholder alt="A custom-built laser-cut peristaltic dosing pump controller with encoder, seven-segment display and footswitches">
-  Hero shot — the finished controller on the bench, wired to a pump, with the
-  seven-segment display lit and the NeoPixel ring visible.
+<ImagePlaceholder alt="A laser-cut peristaltic dosing pump controller with encoder, LED ring and eight-digit display, wired to a lab pump">
+  Hero shot — the finished controller on the bench beside the pump it drives,
+  display lit, the LED ring around the knob visible, DB25 cable running to the
+  back of the pump.
 </ImagePlaceholder>
 
 ## What it does
 
-- **Set a dose** on the rotary encoder, read it off the seven-segment display.
-- **Trigger it** from either of two footswitches — one per hand's worth of work,
-  or one for dose and one for continuous.
-- **Run the pump forward or in reverse** through the relay pair, for priming and
-  clearing lines.
-- **A 24-LED NeoPixel ring** shows progress through a dose as it runs, so you can
-  see where you are without looking at the display.
-- **Reads the pump's own feedback line** through a voltage sensor, rather than
-  assuming the pump did what it was told.
+The encoder sets a target volume between 100 and 4000 mL in 50 mL steps, and
+comes up at 2000. The display carries both numbers at once: dose-so-far on the
+right four digits, target on the left four. Tap the left footswitch and D4 pulls
+DB25 pin 15 to start the pump; tap it again and the pump stops. The right
+footswitch flips direction on DB25 pin 16, and only while the pump is stopped,
+which is the right way round. Speed is a separate number, 150 to 2900, that
+leaves D6 as PWM and reaches the pump's speed input on DB25 pin 1 through a
+boost module.
+
+The unit on all of that is mL and mL/min — the sketch's own debug line says so —
+so a target of 2000 is two litres and the 2900 ceiling is a fast pump.
+
+**The volume counter is fed by the pump, not by a clock.** A3 reads the pump's
+speed feedback through a divider, the sketch maps 0–405 ADC counts onto
+0–2900 mL/min, and integrates that ten times a second. That is the whole reason
+this thing doses accurately instead of guessing, and it is also the first thing
+that bites you: with A3 unwired the measured speed is zero, the volume never
+climbs, and the pump runs until you tap the pedal again.
 
 ## Parts
 
 <AffiliateDisclosure />
 
-- [Arduino Nano or Uno](https://www.amazon.com/s?k=Arduino+Nano+ATmega328P&tag=brau01-20) — the firmware uses A0–A5 and D2–D13
-- [Rotary encoder with push switch](https://www.amazon.com/s?k=KY-040+rotary+encoder+module&tag=brau01-20)
-- [MAX7219 8-digit seven-segment display](https://www.amazon.com/s?k=MAX7219+8+digit+7+segment+display+module&tag=brau01-20)
-- [24-LED NeoPixel / WS2812 ring](https://www.amazon.com/s?k=WS2812B+24+LED+ring&tag=brau01-20)
-- [2-channel relay module](https://www.amazon.com/s?k=2+channel+5V+relay+module+arduino&tag=brau01-20)
-- [Momentary footswitches](https://www.amazon.com/s?k=momentary+foot+switch+pedal&tag=brau01-20) ×2
-- [DB25 male connector and hood](https://www.amazon.com/s?k=DB25+male+solder+cup+connector+hood&tag=brau01-20)
-- [DC-DC step-up / voltage booster module](https://www.amazon.com/s?k=DC+DC+boost+converter+adjustable+module&tag=brau01-20) — sets the pump's speed line
-- [Voltage sensor module](https://www.amazon.com/s?k=arduino+voltage+sensor+module+25V&tag=brau01-20)
-- Acrylic for the case — the cut files are below
+- [Arduino Nano (ATmega328P)](https://www.amazon.com/s?k=Arduino+Nano+V3+ATmega328P&tag=brau01-20)
+  — the sketch uses A0, A1, A3, A4, A5 and most of D4 through D13, which leaves
+  a Nano with exactly one digital pin spare. A Uno works and is bigger than it
+  needs to be.
+- [Nano screw-terminal adapter, 3-pack](https://www.amazon.com/dp/B07K8KM583?tag=brau01-20)
+  — fifteen wires land on this board. Dropping the Nano into a terminal shield
+  turns every one of them into a screwdriver job you can redo inside the box.
+- [KY-040 rotary encoder module, 5-pack](https://www.amazon.com/dp/B06XQTHDRR?tag=brau01-20)
+  — buy the module, not a bare encoder. The sketch sets the two encoder channels
+  to plain `INPUT` with no pull-up, so it needs a board that brings its own. The
+  knob caps come in the bag.
+- [MAX7219 8-digit seven-segment display, 2-pack](https://www.amazon.com/dp/B01D0WSCJA?tag=brau01-20)
+  — this exact module. The panel's display window is 60.8 × 14.3 mm, which is
+  the two four-digit blocks on this board and nothing else.
+- [24-pixel RGBW LED ring](https://www.amazon.com/s?k=SK6812+RGBW+24+LED+ring+66mm&tag=brau01-20)
+  — the panel aperture is 66 mm outside and 51 mm inside, so it wants a
+  24-pixel ring and no other size. A 12-pixel ring is 37 mm across and rattles
+  around in the hole.
+- [2-channel relay module, 4-pack](https://www.amazon.com/dp/B078478SZ9?tag=brau01-20)
+  — low-level trigger, which is what the sketch assumes: it writes HIGH to leave
+  a valve shut. These drive pinch valves on the lines, not the pump.
+- [Momentary foot pedals](https://www.amazon.com/s?k=momentary+foot+switch+pedal+SPST&tag=brau01-20)
+  ×2 — any normally-open pedal. Both inputs are `INPUT_PULLUP` and read a press
+  as a short to ground, so there is nothing to get wrong but the polarity of a
+  changeover switch.
+- [DB25 male solder-cup connector and hood](https://www.amazon.com/s?k=DB25+male+solder+cup+connector+backshell&tag=brau01-20)
+  — only three pins and a ground actually go anywhere.
+- [XL6009 boost module, 5-pack](https://www.amazon.com/dp/B06XWSV89D?tag=brau01-20)
+  — this is what gets the speed signal above the Arduino's 5 V ceiling. Skip it
+  if your pump's speed input tops out at 5 V.
+- [Voltage sensor / divider module](https://www.amazon.com/s?k=voltage+sensor+module+arduino+0-25V&tag=brau01-20)
+  — for the feedback line into A3. See [Calibration](#calibration) for the ratio
+  the sketch expects.
+- [12 V 4 A supply](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20),
+  [MP1495 buck module, 5-pack](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+  and [5.5 × 2.5 mm panel jacks](https://www.amazon.com/dp/B078YNW3JZ?tag=brau01-20)
+  — nothing in the box actually wants 12 V. The buck is there because a
+  barrel-jack brick is the easy thing to buy and the ring needs a stiffer 5 V
+  than a Nano's regulator will give it. Match the jack to the brick's 2.5 mm
+  plug; a 2.1 mm jack will not take it.
+- [White opaque acrylic, 12 × 36 in, 1/4 in](https://www.amazon.com/dp/B01DYSVUZI?tag=brau01-20)
+  — one sheet holds the 470 mm panel with room left over.
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  and [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20), or
+  [perfboard, headers and terminal blocks](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
+  if you would rather solder it once.
+- [M3 screw and nut kit](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) and
+  [nylon standoffs](https://www.amazon.com/dp/B00MMWDYI4?tag=brau01-20) — the
+  boards all mount on M3, and the nylon ones keep the relay board's underside
+  off an acrylic panel you have just wired.
 
 ## Wiring
 
-Taken from the firmware's pin definitions, which are the authority here.
+Every pin here is read out of `BRUHpumpcontrollerV6.ino`, which is the authority.
 
 | Function | Arduino pin | Goes to |
 |---|---|---|
-| Encoder DT | **D2** | Rotary encoder |
-| Encoder CLK | **D3** | Rotary encoder |
-| Encoder switch | **D10** | Rotary encoder SW |
-| Pump start | **D4** | DB25 **pin 15** |
-| NeoPixel data | **D5** | 24-LED ring |
-| Pump speed set | **D6** | Voltage booster → DB25 **pin 1** |
+| Pump start / stop | **D4** | DB25 **pin 15** |
+| NeoPixel data | **D5** | 24-pixel ring |
+| Pump speed set | **D6** | Boost module → DB25 **pin 1** |
 | Display CLK | **D7** | MAX7219 |
 | Display CS | **D8** | MAX7219 |
 | Display DIN | **D9** | MAX7219 |
+| Encoder channel A | **D10** | KY-040 DT |
+| Encoder switch | **D10** | KY-040 SW — see below |
+| Encoder channel B | **D12** | KY-040 CLK |
 | Pump direction | **D13** | DB25 **pin 16** |
+| Left footswitch | **A0** | Pedal to ground |
+| Right footswitch | **A1** | Pedal to ground |
+| Pump feedback | **A3** | Voltage divider from the pump |
 | Relay IN1 | **A4** | 2-channel relay |
 | Relay IN2 | **A5** | 2-channel relay |
-| Left footswitch | **A0** | Footswitch |
-| Right footswitch | **A1** | Footswitch |
-| Pump feedback | **A3** | Voltage sensor |
+
+D11 and A2 are the only pins left. D2 and D3 are declared at the top of the
+sketch as the encoder pins and then never read — `outputA` is sampled once in
+`setup()` into a variable nothing looks at again, and `outputB` is not used at
+all. Leave them empty.
 
 :::caution
-The display pins are the one place the source will mislead you. The comment above
-the constructor in the sketch reads *"7 to DIN, 4 to CS, 5 to CLK"*, but the
-constructor itself is `DigitLedDisplay(9, 8, 7)` — DIN 9, CS 8, CLK 7. **The
-constructor is what runs.** The comment is left over from an earlier revision.
+**The encoder switch and encoder channel A are both on D10.** `EncoderSwitch` is
+10 and `encoder0PinA` is 10, and `setup()` sets pin 10 to `INPUT_PULLUP` and then
+immediately to plain `INPUT`, so the pull-up loses. In practice the sketch reads
+the same pin as "is the button held" and "did channel A just go high", the
+button always looks released, and the encoder only ever adjusts volume — speed
+mode is unreachable.
+
+The fix is one character: change `int EncoderSwitch = 10;` to `11` and wire the
+encoder's SW to D11, which is the free pin. Do it before you cut wire to length.
 :::
 
-<ImagePlaceholder alt="Wiring diagram for the peristaltic pump controller showing the Arduino, relay pair, display and DB25 connector">
-  Wiring diagram or a labelled photo of the inside of the case, showing how the
-  DB25 breaks out to the relay pair and the booster.
+:::caution
+**The display comment lies.** Above the constructor the sketch says *"7 to DIN,
+4 to CS, 5 to CLK"*, but the constructor is `DigitLedDisplay(9, 8, 7)` — DIN on
+9, CS on 8, CLK on 7. The constructor is what runs; the comment is left over
+from an earlier revision. Wire the table.
+:::
+
+D13 also drives the Nano's onboard LED, so the board tells you which way the
+pump is set to turn without you opening the box. That is worth keeping rather
+than moving.
+
+<ImagePlaceholder alt="Wiring diagram for the pump controller showing the Arduino, relay pair, display, LED ring and DB25 connector">
+  Wiring diagram, or a labelled photo of the inside of the panel showing how the
+  DB25 breaks out to the boost module and the feedback divider.
 </ImagePlaceholder>
 
-## Building the case
+## The ring and the relays are switched off
 
-The case is laser-cut acrylic, not printed — five files in the download section.
-`pump_controller_housing_v4` is the current housing; `front_final`, `swirl_final`
-and `Sides` are the panels that go with it.
+`loop()` calls `ReadFootswitch()`, `ReadEncoder()`, `ControlPump()` and
+`UpdateLCD()`. The fifth line is `//UpdateLEDS();` — commented out. Build the
+sketch as shipped and the pump doses correctly, the display counts, and the ring
+stays dark forever.
+
+That matters more than it sounds, because the relay logic lives inside
+`UpdateLEDS()` too, under a heading that has nothing to do with LEDs. With that
+call commented out the valves sit in whatever state `setup()` left them —
+both closed — and never flop with direction. Uncomment the line to get either
+one, and expect to get both.
+
+While you are in there, `UpdateLEDS()` writes `setPixelColor(NUM_LEDS, ...)` in
+its stopped-and-blinking branch. On a 24-pixel ring the valid indices are 0 to
+23, so that branch lights nothing. Change it to `i` if you want the red blink.
+
+## The panel
+
+The case is laser-cut acrylic, not printed. `pump_controller_housing_v4` is the
+current file — a 470 × 165 mm panel with 5 mm squares out of each corner.
+`pump_controller_front` carries the same set of openings in a different sheet
+layout, so cut one or the other, not both.
+
+Measured off the DXF, the openings on the main panel are:
+
+| Opening | Size | What it is |
+|---|---|---|
+| Ring aperture | 66 mm outside, 51 mm inside | The 24-pixel ring shines through this |
+| Encoder shaft | 7.2 mm round | Dead centre of the ring aperture |
+| Display window | 60.8 × 14.3 mm | The MAX7219's two four-digit blocks |
+| Two rounded openings | 30 × 31 mm, 62.5 mm apart | Right-hand end of the panel |
+| Rectangular cutout | 50 × 27 mm | Left-hand end |
+| Round holes | 9.5 mm and 12 mm | Along the bottom edge |
+| Corner squares | 5 × 5 mm, ×4 | Joinery |
+
+The encoder sits in the middle of the ring, which is the whole idea of the
+layout: the knob you are turning is surrounded by the bar graph of the dose it
+is running. A 7.2 mm hole is the threaded bushing of an EC11-bodied encoder,
+which is what a KY-040 module has on it.
+
+There are no finger joints anywhere in these files — the panels are rectangles
+with corner squares removed, and they bolt together. That means **material
+thickness is yours to choose**: nothing in the cut geometry is sized to a
+particular sheet. 1/4 in is stiff enough that a footswitch cable tugging on the
+panel does not flex the display out of its window.
+
+Two further rectangles, roughly 99 × 114 mm and 100 × 100 mm, sit over the
+bottom edge of `pump_controller_housing_v4` and overhang the panel outline.
+Separate them in your laser software before you send the job.
+
+The rest of the folder is a second, larger panel set: `front_final` is four
+140 × 253 mm panels nested on one sheet with only the fourth one drilled,
+`front_only_final` is that drilled panel on its own (two 100 × 109 mm windows,
+a 16.6 mm hole and a 7.7 mm hole), `Sides` is a plain 132 × 245 mm panel, and
+`swirl_final` is a 371 × 260 mm engraving — artwork, not a cut path. Send that
+one to the engrave layer or you will spend an hour cutting a spiral out of a
+sheet you needed.
+
+:::tip
+Check the scale on import. Every file here is in millimetres, and some laser
+software silently rescales an imported DXF to whatever it feels like. Measure
+the 60.8 mm display window on screen before you fire anything.
+:::
+
+## Assembly
 
 <Steps>
 
-1. **Cut the panels.** Both DXF and SVG are provided — use whichever your cutter
-   is happier with. **Check the scale on import**, because some laser software
-   silently re-scales an imported DXF.
+1. **Cut the panel** and dry-fit the display, the encoder and the ring into
+   their openings while everything is still flat and reachable. Acrylic kerf
+   varies by machine; a 7.2 mm shaft hole is the one that most often needs a
+   pass with a round file.
 
-2. **Test-fit before you glue.** Acrylic kerf varies by machine and thickness; the
-   finger joints are cut for a particular kerf and may need a pass with a file.
+2. **Wire the panel hardware first** — display, encoder, ring — with the panel
+   on the bench in front of you, and leave enough tail to lift it away from the
+   box later.
 
-3. **Mount the panel hardware** — encoder, display, LED ring, footswitch jacks —
-   into the front panel while it is still flat and reachable.
+3. **Set the buck module to 5 V before you connect it to anything.** Put a meter
+   on its output, turn the trimmer, then wire it in. These ship at whatever the
+   last person on the production line left them at.
 
-4. **Wire it up** to the table above, then solder the DB25 last: it is the
-   connector you least want to redo inside a closed box.
+4. **Solder the DB25 last.** It is the connector you least want to redo inside a
+   closed box, and only pins 1, 15, 16 and a ground go anywhere.
+
+5. **Bring it up on the bench with `DEBUG` on and the pump disconnected.** The
+   serial log prints every volume and speed change, so you can confirm the
+   encoder counts in the right direction before anything moves liquid.
 
 </Steps>
 
 ## Firmware
 
 The sketch is `BRUHpumpcontrollerV6.ino`, in the download section below. It needs
-two Arduino libraries:
+two libraries, both from the Arduino IDE's Library Manager:
 
-- **Adafruit NeoPixel** — for the ring
-- **DigitLedDisplay** — for the MAX7219
+- **Adafruit NeoPixel** for the ring
+- **DigitLedDisplay** for the MAX7219
 
-Both install from the Arduino IDE's Library Manager. Keep the `.ino` inside a
-folder of the same name, which is how the IDE expects to find a sketch.
+Keep the `.ino` inside a folder of the same name, which is how the IDE expects
+to find a sketch.
 
-There is a `#define DEBUG` at the top — leave it in while you are bringing the
-board up and it will report over serial what it thinks each input is doing.
-Comment it out when the box is closed.
+The ring is declared `NEO_GRBW` — RGBW, with a real white LED in each pixel. If
+you buy a plain RGB WS2812B ring instead, change that to `NEO_GRB` or every
+colour comes out shifted. `BRIGHTNESS` is 50 of 255, which is what keeps 24 RGBW
+pixels under half an amp; turn it up and size your 5 V rail accordingly.
+
+There is a `#define DEBUG` at the top. Leave it while you are bringing the board
+up and comment it out when the box is closed.
 
 ## Calibration
 
-Volume per revolution depends on your tubing bore and your pump head, so the dose
-numbers mean nothing until you calibrate. Pump into a tared vessel on a balance,
-weigh what came out, and adjust until the display agrees with the scale. Re-do it
-whenever the tubing changes — peristaltic tubing takes a set as it ages, and an
-old line delivers less per turn than a new one.
+Two separate things need calibrating, and they are not related.
 
-## Files & downloads
+**The feedback divider.** `currentPumpSpeed = map(voltage, 0, 405, 0, 2900)` — so
+the sketch expects the pump's full-scale speed feedback to arrive at A3 as 405
+ADC counts, which on a 5 V reference is about 1.98 V. Set your divider so that
+your pump running flat out puts roughly 2 V on A3. Get this wrong and every dose
+is wrong by the same ratio, silently, because nothing else in the sketch
+measures anything.
+
+**Volume per revolution.** That depends on your tubing bore and your pump head,
+so the numbers on the display mean nothing until you check them. Pump into a
+tared vessel on a balance, weigh what came out, and trim the divider until the
+display agrees with the scale. Redo it whenever the tubing changes — peristaltic
+tubing takes a set as it ages, and an old line delivers less per turn than a new
+one.
+
+**The speed line.** D6 is PWM, not a voltage. Whatever you put between D6 and
+DB25 pin 1 has to smooth it to DC first, and the boost module is only in the
+chain because some pumps want 0–10 V there and an Arduino cannot reach it. Check
+your pump's manual for what pin 1 expects, then set the module so full-scale PWM
+lands at full-scale speed and not above it.
+
+## Troubleshooting
+
+**The pump starts and never stops.** A3 is not seeing the feedback line, so
+measured speed is zero and the accumulated volume never reaches the target.
+Check the divider before you check anything else.
+
+**The ring is dark and the valves never move.** `UpdateLEDS()` is commented out
+in `loop()`. See [above](#the-ring-and-the-relays-are-switched-off).
+
+**Turning the knob only ever changes volume, never speed.** The D10 collision.
+Move the encoder switch to D11.
+
+**The right pedal stops responding when you are holding the left one.**
+`ReadFootswitch()` gates the right switch on `Left_Footswitch_Status_Previous`
+instead of the right one's. It is a copy-paste slip in the condition; change it
+to `Right_Footswitch_Status_Previous` and both pedals become independent.
+
+**The display shows garbage or nothing.** DIN, CS and CLK are 9, 8 and 7 — not
+what the comment above the constructor says.
+
+## Files and downloads
 
 <ProjectFiles slug="peristaltic-dosing-pump" />

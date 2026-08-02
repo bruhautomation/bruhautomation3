@@ -1,18 +1,325 @@
 ---
 title: Nextion Touch Panel
-description: Wall-mounted Home Assistant touch display, 3.5' and 5'.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A wall-mounted Home Assistant control panel — a 5-inch Nextion touchscreen and an ESP32 in a 13 mm printed shell, with printed Decora plates to trim it into the wall.
+# The shells, the plates, the CAD and the Nextion HMI project are all here. The
+# ESPHome config that sits between the display's UART and Home Assistant is not,
+# so nobody can build this end to end from the page yet. Published, and marked
+# as pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Wall-mounted Home Assistant touch display, 3.5" and 5".
+Every room already has a control surface on the wall at the right height. This
+replaces one with a screen: a 5-inch Nextion touchscreen and an ESP32 in a shell
+13 mm deep, showing eight room buttons, eight scenes and a brightness slider.
+The Nextion draws its own pages and handles its own touches on its own
+processor, so the ESP32 never renders anything — it translates between a serial
+port and Home Assistant, which is why a panel this cheap still feels instant.
 
-## Hardware
-- Nextion 5-inch or 3-inch touchscreen display
-- Decora switch plate mounting
+<ImagePlaceholder alt="The finished Nextion touch panel mounted flat on a wall, screen lit, showing the room buttons page">
+  Hero shot — the panel on the wall beside a light switch, screen lit on the
+  home page, ideally at an angle that shows how little it stands proud.
+</ImagePlaceholder>
+
+:::note
+**The ESPHome config isn't in the folder.** What is here is everything either
+side of it: the printed shells and wall plates, the Fusion sources, the Nextion
+HMI project and the 48 px icon set that goes on it. The display's whole
+interface is a handful of named components and text variables, and the sections
+below set every one of them out — so this is a page you build and print from,
+and write the middle of yourself.
+:::
+
+## What's on the screen
+
+Three pages, one navigation strip across all of them.
+
+- **Home** (`page0`) — eight buttons, `home_button1` through `home_button8`.
+- **Scenes** (`page1`) — eight more, `scene_button1` through `scene_button8`.
+- **Settings** (`page2`) — a single slider labelled *Screen Brightness*.
+- **The nav strip** — `tab1`, `tab2` and `tab3` jump to Home, Scenes and
+  Settings, and `panic_button` sits between them with no local behaviour at all.
+  It does whatever the host decides a panic button does.
+
+None of the sixteen room and scene buttons carries a line of its own event code.
+Nothing happens on the display when you press one; the press leaves as a Nextion
+touch event and the host acts on it, which in ESPHome arrives as the `nextion`
+component's touch trigger carrying a page id and a component id.
+
+Every label is remote too. Each page keeps a set of invisible text variables —
+`id_h_b1` to `id_h_b8` for Home, `id_s_b1` to `id_s_b8` for Scenes, `id_nav_l1`
+to `id_nav_l4` for the strip — and the page's load event plus a repeating timer
+copy them onto the visible buttons. Write a label once into the variable and it
+survives a page change, a redraw and a walk back into the room. Until something
+does, the panel shows what is baked in: `STAIRS`, `PLAYROOM`, `BASEMENT`,
+`Outside Off`, and four tabs that say `Label 1` through `Label 4`.
+
+Brightness works the same way. The slider on Settings writes both the display's
+own `dim` and a variable called `page0.remote_dim.val`, and every page's timer
+re-applies `dim` from that variable. So the host sets brightness by writing
+`remote_dim`, not `dim` — see [Troubleshooting](#troubleshooting) for what
+happens if you get that backwards.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [5-inch Nextion HMI touchscreen, 800×480](https://www.amazon.com/s?k=Nextion+5+inch+800x480+HMI+touch+display&tag=brau01-20)
+  — the panel everything here is cut for. `nextion_display_5_cover_v7.stl` has a
+  111.3 × 67.9 mm window over a 125.3 × 83.0 mm pocket, and
+  `nextion_5_inch_esp32_top_v1.stl` a 119.5 × 71.9 mm one. Those are 5-inch
+  numbers and nothing else's.
+- [Nextion Enhanced 3.5 in NX4832K035 with the IO expansion board](https://www.amazon.com/dp/B087RMD9ZD?tag=brau01-20)
+  — **the smaller panel, and a substitute rather than an alternative.** It is
+  480×320 where `bruh_nextion_5_inch_scene_ui_v3_oct.hmi` is drawn for 800×480,
+  so every page has to be laid out again, and none of the printed parts in this
+  folder fit it. Buy this one if you want to redraw the UI small; buy the 5-inch
+  if you want to load the HMI that's already here and be done.
+- [ESP32 development board, 38-pin narrow, 2-pack](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — the host. The shell is named for it and keeps about 41 mm of solid width
+  beside the display window for it to sit in.
+- [32 GB microSD card](https://www.amazon.com/dp/B06XWN9Q99?tag=brau01-20) —
+  how the HMI gets onto the display. Nextion's card loader wants FAT32 and
+  small; 32 GB is the safe ceiling, which is why this and not the 256 GB card
+  already in the drawer.
+- [5 V 2.5 A supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20) and a
+  [right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20)
+  — the simple way to power it, and the right-angle plug is what lets the shell
+  sit flat.
+- [Isolated 12–72 V to 5 V converter with a USB socket](https://www.amazon.com/dp/B08H7XRCVQ?tag=brau01-20)
+  — if there is already a low-voltage rail behind the wall, tap that instead of
+  running another cable.
+- [HLK-PM01 mains-to-5 V modules, 10-pack](https://www.amazon.com/dp/B082CS92KV?tag=brau01-20)
+  — the in-wall option, small enough to live in a switch box. Read the caution
+  under [Power](#power) before you order these.
+- [Female-to-female jumper leads](https://www.amazon.com/dp/B07GCZBH51?tag=brau01-20)
+  — four of them is the entire harness between the two boards. The Nextion ships
+  with its own 4-pin pigtail; these go on the other end of it.
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  — if you would rather solder than jumper.
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and
+  [an M3 countersunk screw kit](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+  — for anything you expect to open twice.
+- [#6-32 wall-plate screws, 100-pack](https://www.amazon.com/dp/B09BMRZNPJ?tag=brau01-20)
+  — the printed plates take the same screws a bought one does, and the ones that
+  came with your switch are always 3 mm too short for a printed plate.
+- [Matte PLA](https://www.amazon.com/dp/B0DR7XN26N?tag=brau01-20) for the plates
+  and the bezel, [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for
+  the shells. Matte on the visible parts, and it is not a preference — a glossy
+  wall plate at eye level shows every layer line under a ceiling light.
+- [XTC-3D print coating](https://www.amazon.com/dp/B00PFXK4JY?tag=brau01-20) —
+  optional, and the difference between a printed plate that looks printed and
+  one that looks moulded. Brush it on the face, sand it back, paint it.
+- [VHB tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) or a
+  [drywall and hollow-wall anchor kit](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20)
+  — how the shell gets onto the wall, depending on whether you ever plan to take
+  it down.
+
+If you would rather buy the trim than print it, the printed plates are copies of
+[Leviton's oversized 1-gang](https://www.amazon.com/dp/B001DZNJW2?tag=brau01-20)
+and [oversized 2-gang](https://www.amazon.com/dp/B000U3HZJ6?tag=brau01-20)
+Decora plates — same footprint, same opening, and they cost less than the
+filament.
+
+## The printed parts
+
+Eight STLs covering two separate jobs: the panel enclosure, and the wall trim
+that surrounds it.
+
+| File | Size | What it is |
+|---|---|---|
+| `nextion_5_inch_esp32_bottom_v1` | 169.6 × 88.5 × 12.4 mm | Back shell. Closed floor, 2 mm walls, the ESP32's bay to one side |
+| `nextion_5_inch_esp32_top_v1` | 169.6 × 88.5 × 4.4 mm | Front shell, with a 119.5 × 71.9 mm window. A 3.4 mm lip drops into the back shell — assembled, the panel is 13.4 mm deep |
+| `nextion_display_5_cover_v7` | 149.4 × 106.0 × 15.5 mm | A separate front bezel: 111.3 × 67.9 mm window, 125.3 × 83.0 mm pocket, 10 mm skirt. Use this **or** the two-part shell, not both |
+| `decora_1-gang_v4` | 79.2 × 123.8 × 6.4 mm | Oversized 1-gang Decora plate, 33.2 × 66.8 mm opening |
+| `decora_2-gang_v1` | 125.0 × 123.4 × 6.4 mm | Oversized 2-gang, two of the same openings on 46 mm centres |
+| `bruh_decora_1_v1` | 125.0 × 123.4 × 6.4 mm | Byte-for-byte the same mesh as `decora_2-gang_v1`. Print one of them |
+| `light_switch_plate_v1` | 70.0 × 114.0 × 5.5 mm | Standard-size 1-gang plate with a toggle opening, for the old switch beside the panel |
+| `bruh_light_switch_buttons_v1` | 42.5 × 103.0 × 34.1 mm | A Decora-format keypad — see below |
+
+`bruh_light_switch_buttons_v1.stl` is an **assembly export, not a print-ready
+part**. It carries 43 separate bodies, and among them are a 42 × 78 mm PCB
+1.6 mm thick, twelve 6.8 mm tactile switches and two rows of 2.54 mm header pin.
+Slice it as it stands and your printer will faithfully reproduce the circuit
+board. Open `cad/bruh_light_switch_buttons_v1.f3d`, hide the electronics, and
+export the bodies you actually want.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm, or 0.16 mm on the visible faces |
+| Walls | 3 |
+| Infill | 20% |
+| Supports | None, once everything is the right way up |
+| Material | Matte PLA for the plates and bezel, PLA+ for the shells |
+
+**Orientation is the whole job here, and three of these files export the wrong
+way up.**
+
+- The two shells are exported lying on their sides — their depth runs along Y,
+  not Z. Rotate each 90° so the flat back face is on the bed, then print.
+- `decora_1-gang_v4`, `decora_2-gang_v1` and `nextion_display_5_cover_v7` all
+  export face-up, with the visible face at the top of the model and the hollow
+  recess underneath. Flip them. Face-down on the bed the visible surface is the
+  first layer, which is the flattest thing an FDM printer makes, and every wall
+  above it is vertical, so there is nothing to support.
+- `light_switch_plate_v1` is already the right way up. Print it as it comes.
+
+## Wiring
+
+Four wires between two boards, and that is the whole electrical build.
+
+| Signal | Nextion | ESP32 |
+|---|---|---|
+| +5 V | +5V (red) | — power both from the supply, not one through the other |
+| Ground | GND (black) | GND |
+| Display → host | TX (yellow) | any UART-capable GPIO, used as RX |
+| Host → display | RX (blue) | the matching UART TX pin |
+
+The Nextion's serial pins are 3.3 V logic and so are the ESP32's, so the two
+talk directly. No level shifter, and no reason to fit one.
+
+Pick the two GPIOs yourself and name them in your ESPHome `uart:` block —
+there is no config in this folder pinning them down, and inventing a pair here
+would only give you a number to un-learn.
+
+:::caution
+**Don't feed the display through the ESP32's 5 V pin.** A 5-inch Nextion's
+backlight pulls around half an amp on its own. That current has no business
+crossing a dev board's micro-USB socket and its 5 V trace on the way to
+somewhere else. Run one pair from the supply and split it at a terminal, so the
+board and the display each get their own leg.
+:::
+
+<ImagePlaceholder alt="Wiring between the ESP32 and the Nextion display, four wires, laid out inside the printed back shell">
+  Wiring photo — the ESP32 in its bay in the back shell with the four-wire
+  pigtail running to the display, taken before the top goes on.
+</ImagePlaceholder>
+
+### Power
+
+Three ways in, in the order you should want them.
+
+A **5 V brick with a right-angle micro-USB lead** is the one to build first. It
+works, it takes ten seconds to unplug, and nothing about it can hurt you.
+
+An **isolated buck converter** off an existing 12 V or 24 V rail is the tidy
+answer if the wall already has one — a doorbell transformer, a landscape-light
+run, an alarm panel.
+
+:::danger
+The **HLK-PM01** puts line voltage on a bare module inside a printed box, and it
+is the only option here where a mistake matters. If you fit one: it goes in a
+proper electrical box, not in the printed shell; the mains side gets covered so
+nothing is exposed when the plate is off; and you kill the breaker before the
+plate comes off, every time, including the time you are only having a quick look.
+If any part of that sentence is new to you, use the 5 V brick.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Print the shells and dry-fit the display** before anything is wired.
+   The Nextion's LCD drops through the window in the top shell and its PCB sits
+   behind the lip. If it does not go, open the window with a file rather than
+   forcing it — the glass is the expensive part.
+
+2. **Melt the heat-set inserts in.** Do this before the electronics are in the
+   shell, and do it with the iron at around 200 °C going in slowly and straight.
+   A crooked insert is a crooked screw for the life of the part.
+
+3. **Wire the four leads** to the table above and leave them long enough that
+   the two halves can lie open beside each other on the bench. You will be
+   opening this again while you write the ESPHome side.
+
+4. **Load the HMI** and confirm the display comes up on its own, before the top
+   goes on. The display works with no host attached — it draws its pages, the
+   tabs navigate, the brightness slider moves. If that is not happening, the
+   problem is the `.tft` file and not your wiring.
+
+5. **Close the shell**, then mount it. VHB on the back if the wall is smooth and
+   painted; anchors if it is not, or if you would like to get it off again
+   without repainting.
+
+6. **Fit the wall plates last.** The printed Decora plates take #6-32 screws
+   through the same holes a bought plate uses. If the print came in tight, open
+   the holes with a drill by hand rather than driving the screw in hard — a
+   printed plate splits along a layer line, and it splits where you can see it.
+
+</Steps>
+
+## Loading the HMI
+
+Nextion displays take their firmware over the microSD slot, not over serial.
+There is no programmer to buy and nothing to plug into a computer.
+
+<Steps>
+
+1. Open `nextion-hmi/bruh_nextion_5_inch_scene_ui_v3_oct.hmi` in the free
+   Nextion Editor and set the device to the panel you actually bought.
+
+2. Compile, and take the `.tft` file it produces.
+
+3. Format the microSD as **FAT32** and put that one `.tft` in the root of it.
+   Nothing else — the loader reads the first one it finds and gets confused by
+   company.
+
+4. Power the display **off**, insert the card, power it **on**. It flashes
+   itself, tells you it is done, and then waits. Power off, remove the card,
+   power back on.
+
+</Steps>
+
+The icons in `nextion-assets/` are the source artwork for the buttons — 21 icons
+at 48 × 48 px (rooms, lights, fan, blinds, media, scene moods) plus a 454 × 454
+background. They are already inside the compiled HMI; they are in the folder so
+you can swap one out for a room the original never had.
+
+## What the display expects from the host
+
+Everything below is read out of the HMI project, so it is what the panel will
+actually do rather than what a config file claims.
+
+| The host has to | Which means |
+|---|---|
+| Talk at **921600 baud** | `page0`'s pre-initialise event runs `bauds=921600`, so the display changes speed a few milliseconds after power-on, on every power-on |
+| Write button labels into variables | `id_h_b1`…`id_h_b8` (Home), `id_s_b1`…`id_s_b8` (Scenes), `id_nav_l1`…`id_nav_l4` (the three tabs and the panic button). The pages copy them onto the buttons themselves |
+| Read touch events | The sixteen buttons and the panic button run no local code; a press is a touch event with a page id and a component id, and nothing more |
+| Set brightness via `page0.remote_dim.val` | The Settings slider writes it, and every page's timer re-applies `dim` from it |
+
+Handle the tabs and you are done — `tab1`, `tab2` and `tab3` navigate on their
+own, and each page's load event marks the current one, so the host never has to
+know which page is showing.
+
+## Troubleshooting
+
+**The screen comes up and then goes silent, or the host reads garbage.** The
+baud rate. The display starts at whatever speed it was saved with and jumps to
+921600 the instant page 0 loads, and a host sitting at 9600 sees a page of
+nonsense and then nothing. `bauds` is the volatile form of the command, so this
+happens again at every power cycle — it is not something you set once.
+
+**The buttons say `STAIRS`, `PLAYROOM` and `Label 1`.** Nothing has written the
+text variables yet. That is the shipped placeholder set, and seeing it means the
+display is healthy and the host is not talking.
+
+**Brightness snaps back a second after you set it.** You wrote `dim`. Every page
+runs a timer that re-applies `dim` from `page0.remote_dim.val`, so a direct write
+survives until the next tick and no longer. Write `remote_dim` instead.
+
+**The card does nothing when the display powers up.** FAT32, 32 GB or under, one
+`.tft` in the root, and the card goes in with the power off. Three of those four
+are the usual culprit.
+
+**The bezel sits proud of the display, or rocks.** The cover's pocket is
+125.3 × 83.0 mm and 5-inch Nextion modules vary at the corners by a fraction of a
+millimetre. Take the corners back with a needle file, not the whole pocket.
 
 ## Files & downloads
 
