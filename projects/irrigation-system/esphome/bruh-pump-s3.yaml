@@ -57,7 +57,7 @@ wifi:
   password: !secret wifi_password
   ap:
     ssid: "Bruh-Pump-S3 Fallback Hotspot"
-    password: "Uk3a7WP1Skr6"
+    password: !secret ap_password
 
 captive_portal:
 

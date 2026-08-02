@@ -1,16 +1,95 @@
 ---
 title: Sonoff S31
-description: Smart plug with power monitoring.
+description: Flash a Sonoff S31 with ESPHome and get local, real-time power monitoring with no cloud account.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Smart plug with power monitoring.
+The S31 is the smart plug worth buying, because it has a **CSE7766** metering
+chip inside — real voltage, current, wattage and energy totals, not an estimate.
+Flashed with ESPHome it reports all of that to Home Assistant locally, keeps
+working when the internet is down, and never talks to a vendor server again.
 
-## Hardware
-- Sonoff S31 smart plug
-- Power monitoring circuit
-- Relay control
+It is also the easiest Sonoff to flash. The board slides out of the case and the
+programming pads are a labelled, properly spaced header — no scraping at test
+points with a probe.
+
+<ImagePlaceholder alt="A Sonoff S31 opened with the board slid out, showing the four programming pads">
+  The S31 opened up — end cap off, board partly slid out, with the four
+  programming pads visible and ideally a USB-to-serial adapter clipped on.
+</ImagePlaceholder>
+
+## What you need
+
+<AffiliateDisclosure />
+
+- [Sonoff S31 smart plug](https://www.amazon.com/s?k=Sonoff+S31+smart+plug&tag=brau01-20) — make sure it is the **S31**, not the S31 Lite, which has no metering chip
+- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
+- [Pogo pins or jumper wires](https://www.amazon.com/s?k=pogo+pin+programming+jig+header&tag=brau01-20)
+- A small Phillips screwdriver and a plastic prying tool
+
+:::danger
+The board is mains-powered in normal use. **Unplug it from the wall before you
+open it, and never plug it into mains while the serial adapter is attached.**
+Flash it on the bench, close it up, then plug it in.
+:::
+
+## Flashing
+
+<Steps>
+
+1. **Open it.** Remove the two screws under the label on the end, then slide the
+   board out of the plastic shell.
+
+2. **Find the four pads** — `3V3`, `RX`, `TX`, `GND` — in a row near the edge of
+   the board.
+
+3. **Wire the adapter**, crossing the data lines: adapter TX to board **RX**,
+   adapter RX to board **TX**, then 3V3 to 3V3 and GND to GND.
+
+4. **Hold the button down while connecting the adapter to USB.** That is what
+   puts the ESP8266 into flash mode. Keep holding for a second or two after.
+
+5. **Flash the config** below from ESPHome. After this first wired flash,
+   everything is over WiFi.
+
+6. **Close it up before it goes anywhere near a socket.**
+
+</Steps>
+
+## What the config gives you
+
+The board is an `esp01_1m` — 1 MB of flash, which is why the config keeps the
+logger quiet and the feature list tight.
+
+| Function | GPIO | Notes |
+|---|---|---|
+| Relay | **GPIO12** | The switch entity in Home Assistant |
+| Status LED | **GPIO13** | Inverted, driven as a PWM light |
+| Button | **GPIO0** | Inverted; also the flash-mode button |
+| CSE7766 metering | **UART RX** | Serial, not GPIO — the chip streams readings |
+
+In Home Assistant you get a switch, the LED as a dimmable light, and sensors for
+voltage, current, power and cumulative energy. The energy sensor is a
+`total_daily_energy`, so it plugs straight into the Energy dashboard.
+
+## Troubleshooting
+
+**The flash never starts.** The button has to be held *as* USB power arrives,
+not after. Try again holding it from before you plug in until a second after.
+
+**It flashes but the power readings are zero.** That is the S31 Lite — no
+CSE7766. The relay and button will work; the metering never will.
+
+**It flashes, then won't connect to WiFi.** The S31's antenna is inside a plastic
+brick behind a mains transformer. Check signal strength before blaming the flash.
+
+**Readings are slightly off.** The CSE7766 can be calibrated in the config —
+worth doing if you're billing anything off it, unnecessary if you just want to
+know the dryer finished.
 
 ## Files & downloads
 

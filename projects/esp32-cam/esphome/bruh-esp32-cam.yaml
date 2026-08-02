@@ -32,7 +32,7 @@ wifi:
   password: !secret wifi_password
   ap:
     ssid: "Esp32-Cam-1 Fallback Hotspot"
-    password: "qBmvElSjwwOz"
+    password: !secret ap_password
 
 captive_portal:
 

@@ -79,7 +79,7 @@ wifi:
   password: !secret wifi_password
   ap:
     ssid: "Smart-Jar-2 Fallback Hotspot"
-    password: "QZMRwrW2FYJB"
+    password: !secret ap_password
 
 captive_portal:
 

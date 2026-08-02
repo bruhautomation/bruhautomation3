@@ -74,6 +74,33 @@ function countFiles(sub: string, extensions: string[]): number {
 	return count;
 }
 
+/**
+ * Like `filesIn`, but walks nested folders and keeps the path relative to
+ * `sub` — an Arduino sketch lives in a directory named after itself, so a flat
+ * read of `firmware/` finds nothing to link.
+ */
+function filesInDeep(sub: string, extensions: string[]): Entry[] {
+	const dir = join(projectDir, sub);
+	if (!existsSync(dir)) return [];
+	const found: Entry[] = [];
+	const walk = (current: string, prefix: string) => {
+		for (const entry of readdirSync(current, { withFileTypes: true }).sort((a, b) =>
+			a.name.localeCompare(b.name, undefined, { numeric: true })
+		)) {
+			const path = prefix ? `${prefix}/${entry.name}` : entry.name;
+			if (entry.isDirectory()) walk(join(current, entry.name), path);
+			else if (extensions.some((ext) => entry.name.toLowerCase().endsWith(ext)))
+				found.push({
+					name: path,
+					path: `${sub}/${path}`,
+					size: statSync(join(current, entry.name)).size,
+				});
+		}
+	};
+	walk(dir, '');
+	return found;
+}
+
 function formatSize(bytes: number) {
 	return bytes >= 1024 * 1024
 		? `${(bytes / 1024 / 1024).toFixed(1)} MB`
@@ -107,13 +134,23 @@ const cad = filesIn('cad', Object.keys(CAD_KINDS)).map((entry) => ({
 	kind: CAD_KINDS[entry.name.slice(entry.name.lastIndexOf('.')).toLowerCase()] ?? 'CAD file',
 }));
 
+// Custom components a config `#include`s. They sit in `esphome/` beside the
+// YAML that needs them, and a config quoted in full while the header it depends
+// on goes unmentioned is a config nobody can actually compile.
+const headers = filesIn('esphome', ['.h', '.cpp']);
+
+// Cut files and firmware get named, downloadable rows rather than a count. For
+// a project whose whole output is a stack of DXFs, a line reading "laser-cut/ —
+// 11 files" is the page failing to deliver the project.
+const laserCut = filesInDeep('laser-cut', ['.dxf', '.svg']);
+const firmware = filesInDeep('firmware', ['.ino', '.h', '.cpp']);
+
 // The rest of the folder, counted rather than listed.
 const otherFolders = [
-	{ dir: 'laser-cut', label: 'laser-cut vectors', exts: ['.dxf', '.svg'] },
-	{ dir: 'firmware', label: 'firmware', exts: ['.ino', '.h', '.cpp'] },
 	{ dir: 'arduino-legacy', label: 'legacy Arduino sketches', exts: ['.ino', '.h'] },
 	{ dir: 'fritzing', label: 'wiring diagrams', exts: ['.fzz'] },
 	{ dir: 'nextion-hmi', label: 'Nextion display projects', exts: ['.hmi'] },
+	{ dir: 'nextion-assets', label: 'Nextion UI artwork', exts: ['.png', '.jpg'] },
 ]
 	.map((group) => ({ ...group, count: countFiles(group.dir, group.exts) }))
 	.filter((group) => group.count > 0);
@@ -128,10 +165,12 @@ const viewable = [
 	})),
 ];
 
-// Long lists get truncated to the folder link; short ones are all shown.
-const MODEL_ROWS = 12;
+// Long lists fold rather than truncate. Sending someone to GitHub for the other
+// 50 parts is sending them away from the download links: the bioreactor ships 62
+// STLs and only 12 of them were reachable from the page that documents it.
+const MODEL_ROWS = 24;
 const shownModels = models.slice(0, MODEL_ROWS);
-const hiddenModels = models.length - shownModels.length;
+const restModels = models.slice(MODEL_ROWS);
 
 // A config short enough to take in at a glance is open; anything longer starts
 // folded, because a 400-line YAML between two paragraphs is a page break.
@@ -157,13 +196,22 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 						))}
 					</ul>
 				)}
-				{hiddenModels > 0 && (
-					<p class="file-more">
-						<a href={folderUrl}>
-							{hiddenModels} more {hiddenModels === 1 ? 'part' : 'parts'} in the project folder
-							on GitHub
-						</a>
-					</p>
+				{restModels.length > 0 && (
+					<details class="more-parts">
+						<summary>
+							{restModels.length} more {restModels.length === 1 ? 'part' : 'parts'}
+						</summary>
+						<ul class="file-list">
+							{restModels.map((model) => (
+								<li>
+									<a href={`/models/${slug}/${model.name}`} download>
+										{model.name}
+									</a>
+									<span class="file-meta">{formatSize(model.size)}</span>
+								</li>
+							))}
+						</ul>
+					</details>
 				)}
 				{previews.length > 0 && (
 					<p class="file-meta">
@@ -210,6 +258,64 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 						</p>
 					</details>
 				))}
+				{headers.length > 0 && (
+					<>
+						<p>
+							{headers.length === 1 ? 'This config ' : 'These configs '}
+							<code>includes</code> a custom component. Save it in the same folder as the
+							YAML above, or the compile fails on a missing header.
+						</p>
+						<ul class="file-list">
+							{headers.map((file) => (
+								<li>
+									<a href={rawUrl(file.path)}>{file.name}</a>
+									<span class="file-meta">{formatSize(file.size)}</span>
+								</li>
+							))}
+						</ul>
+					</>
+				)}
+			</>
+		)
+	}
+
+	{
+		laserCut.length > 0 && (
+			<>
+				<h3 id="laser-cut-files">Laser-cut files</h3>
+				<p>
+					Vector cut paths. Check the scale against the drawing before you cut — some
+					laser software re-scales an imported DXF on open.
+				</p>
+				<ul class="file-list">
+					{laserCut.map((file) => (
+						<li>
+							<a href={rawUrl(file.path)}>{file.name}</a>
+							<span class="file-meta">{formatSize(file.size)}</span>
+						</li>
+					))}
+				</ul>
+			</>
+		)
+	}
+
+	{
+		firmware.length > 0 && (
+			<>
+				<h3 id="firmware">Firmware</h3>
+				<p>
+					The sketch that runs on the microcontroller. Open the <code>.ino</code> in the
+					Arduino IDE — keep it in a folder of the same name, which is how the IDE expects
+					to find a sketch.
+				</p>
+				<ul class="file-list">
+					{firmware.map((file) => (
+						<li>
+							<a href={rawUrl(file.path)}>{file.name}</a>
+							<span class="file-meta">{formatSize(file.size)}</span>
+						</li>
+					))}
+				</ul>
 			</>
 		)
 	}
@@ -237,7 +343,7 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 	}
 
 	{
-		models.length === 0 && previews.length === 0 && configs.length === 0 && cad.length === 0 && otherFolders.length === 0 && (
+		models.length === 0 && previews.length === 0 && configs.length === 0 && cad.length === 0 && laserCut.length === 0 && firmware.length === 0 && otherFolders.length === 0 && (
 			<p class="file-empty">
 				The source files for this project aren't in the repo yet — there's nothing to download
 				beyond the notes. They land in <code>projects/{slug}/</code> when they do, and this
@@ -326,6 +432,15 @@ const configsToRender = configs.map((config) => ({ ...config, open: config.lines
 		color: var(--sl-color-gray-3);
 		font-size: var(--sl-text-xs);
 	}
+	.more-parts {
+		margin-top: 0.6rem;
+	}
+	.more-parts summary {
+		cursor: pointer;
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-sm);
+	}
+
 	.file-empty {
 		margin-top: 0.75rem;
 		color: var(--sl-color-gray-2);

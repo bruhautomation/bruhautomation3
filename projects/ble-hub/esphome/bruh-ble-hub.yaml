@@ -30,7 +30,7 @@ wifi:
   password: !secret wifi_password
   ap:
     ssid: "Bruh-Ble-Hub-1 Fallback Hotspot"
-    password: "7nfBmRCOJVRZ"
+    password: !secret ap_password
 
 captive_portal:
 

@@ -1,15 +1,111 @@
 ---
 title: Sonoff RF Bridge
-description: 433MHz RF bridge — reference ESPHome configuration.
+description: Bring cheap 433 MHz remotes, PIRs and door sensors into Home Assistant with an ESPHome-flashed RF bridge.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-433MHz RF bridge — reference ESPHome configuration.
+There is a whole world of $3 sensors on 433 MHz — door contacts, PIRs, water
+leak pucks, four-button keyfobs — that predate WiFi and will outlast it on a
+coin cell. The RF Bridge is the translator: it listens on 433 MHz, and ESPHome
+turns what it hears into Home Assistant events.
 
-## Hardware
-- Sonoff RF Bridge device
-- 433MHz wireless receiver/transmitter
+This is the cheapest way to add a dozen door sensors to a house, and the battery
+life is measured in years rather than months.
+
+<ImagePlaceholder alt="A Sonoff RF Bridge opened on a bench with a serial adapter connected to its header">
+  The bridge opened up, with the serial header visible and an adapter connected.
+</ImagePlaceholder>
+
+## What you need
+
+<AffiliateDisclosure />
+
+- [Sonoff RF Bridge 433](https://www.amazon.com/s?k=Sonoff+RF+Bridge+433MHz&tag=brau01-20)
+- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
+- [433 MHz sensors and remotes](https://www.amazon.com/s?k=433MHz+door+sensor+PIR+remote+kit&tag=brau01-20) — whatever you want it to hear
+- A small Phillips screwdriver
+
+:::note
+Buy the **433 MHz** version. There is a 315 MHz variant sold alongside it, and
+the two cannot hear each other. Check what your sensors use before ordering.
+:::
+
+## Flashing
+
+<Steps>
+
+1. **Open the case** — four screws in the base.
+
+2. **Find the four-pin header** near the ESP8266: `3V3`, `RX`, `TX`, `GND`. On
+   most units it is unpopulated, so solder in a header or hold pogo pins.
+
+3. **Wire the adapter with the data lines crossed** — adapter TX to board RX,
+   adapter RX to board TX, plus 3V3 and GND.
+
+4. **Bridge the `GPIO0` pad to ground** as you apply power, to select flash mode.
+   Some revisions expose a button for this instead.
+
+5. **Flash the config below.** Everything after this is over WiFi.
+
+</Steps>
+
+## How it works
+
+Unlike the S20 and S31, the interesting pins here are **not** GPIO. The bridge
+carries a separate RF chip that does the demodulating, and it talks to the
+ESP8266 over a serial link:
+
+| Function | Pin | Notes |
+|---|---|---|
+| RF module TX | **GPIO1** | ESP transmits codes to the RF chip |
+| RF module RX | **GPIO3** | ESP receives decoded codes |
+
+Because GPIO1 and GPIO3 *are* the hardware UART, the config runs the ESPHome
+logger with its own UART disabled. If you turn serial logging back on, the
+bridge stops hearing anything — the log and the RF chip are fighting over the
+same two pins.
+
+## Pairing a sensor
+
+<Steps>
+
+1. Open the ESPHome log for the bridge.
+
+2. Trigger the sensor — open the door, wave at the PIR, press the fob.
+
+3. A received code appears in the log. **Write it down**; that number is the
+   sensor's identity.
+
+4. Add a `binary_sensor` to the config matching that code, give it a name and a
+   `device_class`, and reflash.
+
+</Steps>
+
+Repeat per sensor. The codes are fixed per device, so a sensor keeps its identity
+across battery changes.
+
+:::caution
+433 MHz sensors of this type are not encrypted or authenticated — anything in
+range can transmit the same code. They are fine for "the laundry door opened" and
+a bad idea as the only thing standing between someone and your alarm being armed.
+:::
+
+## Troubleshooting
+
+**No codes ever appear.** Usually the wrong band — a 315 MHz sensor against a
+433 MHz bridge. Otherwise check the logger's UART is disabled in the config.
+
+**Codes appear but the sensor is unreliable at range.** The onboard antenna is a
+PCB trace. Moving the bridge more central in the house beats anything else you
+can do.
+
+**One sensor triggers another's automation.** Two devices sharing a code — common
+with cheap multipacks programmed at the factory. Re-pair one, or use a different
+brand for that spot.
 
 ## Files & downloads
 

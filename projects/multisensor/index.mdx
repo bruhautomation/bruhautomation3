@@ -1,18 +1,181 @@
 ---
 title: Multisensor
-description: Room sensor — temperature, humidity, motion and light.
+description: The original BRUH room sensor — temperature, humidity, motion, light level and an RGB status LED on a $5 board.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Room sensor — temperature, humidity, motion and light.
+This is the project the channel is known for. One NodeMCU in a small printed
+case, sitting in a room, reporting four things Home Assistant can automate on:
+temperature, humidity, motion, and how bright the room is. The RGB LED on the
+front is a status light you can drive from an automation — a doorbell flash, a
+laundry-is-done colour, a red glow when the garage is still open.
 
-## Hardware
-- ESP8266/ESP32 microcontroller
-- DHT temperature/humidity sensor
-- Motion sensor (PIR)
-- Light sensor
-- WiFi/MQTT connectivity
+It has been rebuilt several times since the original Arduino sketch. **What's
+documented here is the ESPHome version, which is the one to build today** — it
+is a config file rather than a sketch, it updates over WiFi, and it needs no
+MQTT broker. The old sketches are still in the folder at the bottom for anyone
+maintaining a node they flashed years ago.
+
+<ImagePlaceholder alt="The BRUH multisensor assembled in its printed case, LED lit, sitting on a shelf">
+  Hero shot — the finished sensor in its case on a shelf or wall, RGB LED lit,
+  ideally with the PIR dome and DHT22 visible through the front.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [NodeMCU v2 (ESP8266)](https://www.amazon.com/s?k=NodeMCU+v2+ESP8266+development+board&tag=brau01-20) — the board the case is designed around
+- [DHT22 / AM2302 temperature and humidity sensor](https://www.amazon.com/s?k=DHT22+AM2302+temperature+humidity+sensor&tag=brau01-20)
+- [HC-SR501 PIR motion sensor](https://www.amazon.com/s?k=HC-SR501+PIR+motion+sensor&tag=brau01-20)
+- [Photoresistor / LDR assortment](https://www.amazon.com/s?k=photoresistor+LDR+5528+assortment&tag=brau01-20) plus a 10 kΩ resistor
+- [Common-cathode RGB LED](https://www.amazon.com/s?k=common+cathode+RGB+LED+5mm&tag=brau01-20) and three 220 Ω resistors
+- [Micro-USB power supply](https://www.amazon.com/s?k=5V+2A+micro+USB+power+supply&tag=brau01-20)
+
+Plus the printed case — `nodemcu_top.stl` and `nodemcu_bottom.stl`, both in the
+download section below.
+
+:::note
+The DHT22 is the accurate one. A DHT11 will fit the same three pins and is a few
+dollars cheaper, but it reads to a whole degree and drifts. If you plan to
+automate a thermostat off this, buy the DHT22.
+:::
+
+## Print settings
+
+Both halves print flat on the bed with no supports.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Infill | 20% |
+| Supports | None |
+| Material | PLA or PETG |
+| Orientation | Flat, as exported |
+
+PETG is the better pick if the sensor is going anywhere warm — a car, a garage,
+a south-facing window. PLA will sag over a summer in a hot room.
+
+## Wiring
+
+Every pin below is the pin the config expects. If you wire it differently you'll
+need to change the config to match, which is a one-line edit per sensor.
+
+| Part | NodeMCU pin | Notes |
+|---|---|---|
+| DHT22 data | **D7** | 10 kΩ pull-up between data and 3V3 if your module has no breakout resistor |
+| PIR motion out | **D5** | The HC-SR501's OUT pin. It is 3.3 V logic — safe direct |
+| Photoresistor | **A0** | In a divider with 10 kΩ to ground |
+| RGB LED red | **D1** | 220 Ω in series |
+| RGB LED green | **D2** | 220 Ω in series |
+| RGB LED blue | **D3** | 220 Ω in series |
+| Everything's power | 3V3 and GND | The PIR will also run from VIN/5 V |
+
+The RGB LED in the config is **common cathode** — the long leg goes to GND. If
+yours is common anode the colours will come out inverted, and the fix is
+`inverted: true` on each of the three `output:` entries.
+
+<ImagePlaceholder alt="Wiring diagram for the BRUH multisensor showing DHT22, PIR, photoresistor and RGB LED connected to a NodeMCU">
+  Wiring diagram — either a photo of the assembled perfboard with pins labelled,
+  or an export of the Fritzing file already in the project folder.
+</ImagePlaceholder>
+
+There are Fritzing diagrams in the project folder if you'd rather work from a
+breadboard layout than a table.
+
+## Assembly
+
+<Steps>
+
+1. **Print both halves** and dry-fit the NodeMCU into the bottom. It should drop
+   in with the USB port lined up to the cutout.
+
+2. **Wire the sensors** on a small piece of perfboard, or straight to the board's
+   header pins if you're comfortable soldering to those. Keep the DHT22 leads
+   short — it is the one part where long unshielded leads cause bad readings.
+
+3. **Mount the DHT22 and PIR** so they poke through the front of the top half.
+   The PIR's white dome wants to sit proud of the case; the DHT22 needs airflow,
+   so don't seal it behind a wall of plastic.
+
+4. **Set the PIR's two trimmers** before you close the case. The one nearest the
+   dome is sensitivity, the other is how long OUT stays high after a trigger —
+   turn it most of the way down, because ESPHome and Home Assistant handle the
+   "how long until we call it clear" part better than the sensor does.
+
+5. **Flash it** (below), confirm the entities appear in Home Assistant, and only
+   then close the case.
+
+</Steps>
+
+## Flashing
+
+<Steps>
+
+1. Copy the config from the download section below into your ESPHome folder.
+
+2. Fill in `secrets.yaml` — `wifi_ssid`, `wifi_password`, `ota_password`,
+   `ap_password`. There is a `secrets.yaml.example` in the repo with every key
+   these configs use.
+
+3. Change the two substitutions at the top so each node gets its own name:
+
+   ```yaml
+   substitutions:
+     device_name: "Living Room Sensor"
+     device_id: "living-room-sensor"
+   ```
+
+4. Flash over USB the first time. Every flash after that is over WiFi.
+
+</Steps>
+
+It appears in Home Assistant on its own — ESPHome devices are discovered, so
+there is no YAML to write on the Home Assistant side.
+
+## What you get in Home Assistant
+
+- **Temperature** and **Humidity** from the DHT22, updating every 5 seconds.
+  Temperature is converted to °F by a filter in the config; delete that filter
+  block to get °C.
+- **Motion** as a `binary_sensor` with `device_class: motion`, so it drives
+  presence automations directly.
+- **Luminance** as a percentage, calibrated with a two-point `calibrate_linear`
+  and a 3% delta filter so it isn't reporting noise every two seconds.
+- **A light entity** for the RGB LED, with flicker, strobe and random effects.
+- WiFi signal, uptime status, and a restart button.
+
+## The ESP32 variant
+
+There is a second config in the folder for an ESP32 build. It is a different
+sensor stack, not just a different board — **BME280** at `0x76` for temperature,
+pressure and humidity, and a **TSL2561** at `0x39` for a real lux reading rather
+than a photoresistor's rough percentage. It also computes altitude, absolute
+humidity and dew point from those readings.
+
+Build that one if you want accuracy. Build the ESP8266 one if you want to make
+six of them for the cost of two.
+
+## Troubleshooting
+
+**The temperature reads `nan`.** Almost always the DHT22 pull-up. Add a 10 kΩ
+resistor between data and 3V3.
+
+**Motion triggers constantly.** The PIR's retrigger timer is turned up too far,
+or it is looking at a heat source — a vent, a radiator, direct sun on a wall.
+Turn sensitivity down and move it off the heat.
+
+**Luminance sits at 0 or 100.** The `calibrate_linear` block is tuned for a
+particular divider resistor. Watch the raw value in the ESPHome log and change
+the two calibration points to the range you actually see.
+
+**It drops off WiFi in a far room.** The ESP8266's antenna is not strong. Before
+adding a repeater, try rotating the node 90° — orientation is worth a surprising
+amount.
 
 ## Files & downloads
 
