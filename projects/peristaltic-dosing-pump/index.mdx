@@ -1,18 +1,136 @@
 ---
-title: Peristaltic Dosing Pump
-description: A custom peristaltic pump for precise, automated reagent dosing.
+title: Peristaltic Dosing Pump Controller
+description: A laser-cut controller that drives a lab peristaltic pump over its DB25 remote port — encoder, footswitches, and repeatable dose volumes.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A custom-built peristaltic pump for precise reagent dosing — significantly cheaper than commercial alternatives.
-
-{/* Photo needed — A hero photo of the finished peristaltic dosing pump — show the assembled pump with tubing threaded through the rotor.
-    alt text when it lands: A custom-built 3D-printed peristaltic dosing pump with tubing routed through the rotor head */}
+Lab peristaltic pumps have a DB25 remote-control port on the back that almost
+nobody uses, because the vendor's foot pedal and dosing controller cost more than
+the pump did. This is that controller, built out of an Arduino and a laser-cut
+box: dial in a volume, hit a footswitch, get the same dose every time — and keep
+both hands on what you are actually doing.
 
 :::note
-Component list and assembly guide coming soon.
+This drives an **existing** pump through its remote port. It is not a pump — the
+peristaltic head, the motor and the tubing are the pump you already own. Check
+your pump has a DB25 remote connector before building this.
 :::
+
+<ImagePlaceholder alt="A custom-built laser-cut peristaltic dosing pump controller with encoder, seven-segment display and footswitches">
+  Hero shot — the finished controller on the bench, wired to a pump, with the
+  seven-segment display lit and the NeoPixel ring visible.
+</ImagePlaceholder>
+
+## What it does
+
+- **Set a dose** on the rotary encoder, read it off the seven-segment display.
+- **Trigger it** from either of two footswitches — one per hand's worth of work,
+  or one for dose and one for continuous.
+- **Run the pump forward or in reverse** through the relay pair, for priming and
+  clearing lines.
+- **A 24-LED NeoPixel ring** shows progress through a dose as it runs, so you can
+  see where you are without looking at the display.
+- **Reads the pump's own feedback line** through a voltage sensor, rather than
+  assuming the pump did what it was told.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Arduino Nano or Uno](https://www.amazon.com/s?k=Arduino+Nano+ATmega328P&tag=brau01-20) — the firmware uses A0–A5 and D2–D13
+- [Rotary encoder with push switch](https://www.amazon.com/s?k=KY-040+rotary+encoder+module&tag=brau01-20)
+- [MAX7219 8-digit seven-segment display](https://www.amazon.com/s?k=MAX7219+8+digit+7+segment+display+module&tag=brau01-20)
+- [24-LED NeoPixel / WS2812 ring](https://www.amazon.com/s?k=WS2812B+24+LED+ring&tag=brau01-20)
+- [2-channel relay module](https://www.amazon.com/s?k=2+channel+5V+relay+module+arduino&tag=brau01-20)
+- [Momentary footswitches](https://www.amazon.com/s?k=momentary+foot+switch+pedal&tag=brau01-20) ×2
+- [DB25 male connector and hood](https://www.amazon.com/s?k=DB25+male+solder+cup+connector+hood&tag=brau01-20)
+- [DC-DC step-up / voltage booster module](https://www.amazon.com/s?k=DC+DC+boost+converter+adjustable+module&tag=brau01-20) — sets the pump's speed line
+- [Voltage sensor module](https://www.amazon.com/s?k=arduino+voltage+sensor+module+25V&tag=brau01-20)
+- Acrylic for the case — the cut files are below
+
+## Wiring
+
+Taken from the firmware's pin definitions, which are the authority here.
+
+| Function | Arduino pin | Goes to |
+|---|---|---|
+| Encoder DT | **D2** | Rotary encoder |
+| Encoder CLK | **D3** | Rotary encoder |
+| Encoder switch | **D10** | Rotary encoder SW |
+| Pump start | **D4** | DB25 **pin 15** |
+| NeoPixel data | **D5** | 24-LED ring |
+| Pump speed set | **D6** | Voltage booster → DB25 **pin 1** |
+| Display CLK | **D7** | MAX7219 |
+| Display CS | **D8** | MAX7219 |
+| Display DIN | **D9** | MAX7219 |
+| Pump direction | **D13** | DB25 **pin 16** |
+| Relay IN1 | **A4** | 2-channel relay |
+| Relay IN2 | **A5** | 2-channel relay |
+| Left footswitch | **A0** | Footswitch |
+| Right footswitch | **A1** | Footswitch |
+| Pump feedback | **A3** | Voltage sensor |
+
+:::caution
+The display pins are the one place the source will mislead you. The comment above
+the constructor in the sketch reads *"7 to DIN, 4 to CS, 5 to CLK"*, but the
+constructor itself is `DigitLedDisplay(9, 8, 7)` — DIN 9, CS 8, CLK 7. **The
+constructor is what runs.** The comment is left over from an earlier revision.
+:::
+
+<ImagePlaceholder alt="Wiring diagram for the peristaltic pump controller showing the Arduino, relay pair, display and DB25 connector">
+  Wiring diagram or a labelled photo of the inside of the case, showing how the
+  DB25 breaks out to the relay pair and the booster.
+</ImagePlaceholder>
+
+## Building the case
+
+The case is laser-cut acrylic, not printed — five files in the download section.
+`pump_controller_housing_v4` is the current housing; `front_final`, `swirl_final`
+and `Sides` are the panels that go with it.
+
+<Steps>
+
+1. **Cut the panels.** Both DXF and SVG are provided — use whichever your cutter
+   is happier with. **Check the scale on import**, because some laser software
+   silently re-scales an imported DXF.
+
+2. **Test-fit before you glue.** Acrylic kerf varies by machine and thickness; the
+   finger joints are cut for a particular kerf and may need a pass with a file.
+
+3. **Mount the panel hardware** — encoder, display, LED ring, footswitch jacks —
+   into the front panel while it is still flat and reachable.
+
+4. **Wire it up** to the table above, then solder the DB25 last: it is the
+   connector you least want to redo inside a closed box.
+
+</Steps>
+
+## Firmware
+
+The sketch is `BRUHpumpcontrollerV6.ino`, in the download section below. It needs
+two Arduino libraries:
+
+- **Adafruit NeoPixel** — for the ring
+- **DigitLedDisplay** — for the MAX7219
+
+Both install from the Arduino IDE's Library Manager. Keep the `.ino` inside a
+folder of the same name, which is how the IDE expects to find a sketch.
+
+There is a `#define DEBUG` at the top — leave it in while you are bringing the
+board up and it will report over serial what it thinks each input is doing.
+Comment it out when the box is closed.
+
+## Calibration
+
+Volume per revolution depends on your tubing bore and your pump head, so the dose
+numbers mean nothing until you calibrate. Pump into a tared vessel on a balance,
+weigh what came out, and adjust until the display agrees with the scale. Re-do it
+whenever the tubing changes — peristaltic tubing takes a set as it ages, and an
+old line delivers less per turn than a new one.
 
 ## Files & downloads
 

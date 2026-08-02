@@ -4,8 +4,12 @@
  * dashed box describing what to capture and the exact alt text the real image
  * should use — so dropping in the final asset is a copy-paste.
  *
- * Usage (in an .mdx page):
- *   import ImagePlaceholder from '../../../components/ImagePlaceholder.astro';
+ * Usage (from a project page, `projects/<slug>/index.mdx`):
+ *   import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
+ *
+ * From `apps/<app>/` it is the same path; from `apps/<app>/<section>/` add one
+ * more `../`. The path this docstring carried before resolved from nowhere in
+ * the repo, which is a good way to make a component look broken.
  *
  *   <ImagePlaceholder alt="The BRUH Minecraft panel dashboard showing live TPS and players">
  *     Screenshot of the **Dashboard** tab — status, uptime, memory, TPS, online players.

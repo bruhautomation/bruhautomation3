@@ -1,15 +1,83 @@
 ---
 title: Sonoff S20
-description: Basic smart plug — reference ESPHome configuration.
+description: The simplest ESPHome flash there is — a Sonoff S20 turned into a local smart plug with no cloud account.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Basic smart plug — reference ESPHome configuration.
+The S20 is a plug and a relay and nothing else — no power monitoring, no
+metering chip. That makes it the right first ESPHome flash: four pads, a short
+config, and a device that stops phoning home the moment it reboots.
 
-## Hardware
-- Sonoff S20 smart plug
-- Relay control
+If you want to know how much the thing plugged into it is drawing, build the
+[Sonoff S31](/projects/sonoff-s31/) instead — same flashing procedure, real
+metering inside.
+
+<ImagePlaceholder alt="A Sonoff S20 opened on a bench with a serial adapter connected to its programming header">
+  The S20 opened up, board visible, serial adapter connected to the four
+  programming pads.
+</ImagePlaceholder>
+
+## What you need
+
+<AffiliateDisclosure />
+
+- [Sonoff S20 smart plug](https://www.amazon.com/s?k=Sonoff+S20+smart+plug&tag=brau01-20) — check the socket type matches your country
+- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
+- [Jumper wires or a pogo-pin jig](https://www.amazon.com/s?k=dupont+jumper+wires+female&tag=brau01-20)
+- A small Phillips screwdriver
+
+:::danger
+Unplug it from the wall before opening it, and never connect the serial adapter
+while it is in a socket. Flash on the bench, reassemble, then plug it in.
+:::
+
+## Flashing
+
+<Steps>
+
+1. **Open the case** — one screw under the label, then release the clips.
+
+2. **Find the four-pad header** on the board: `3V3`, `RX`, `TX`, `GND`. On some
+   revisions it is unpopulated and you will need to solder in a header or hold
+   pogo pins against it.
+
+3. **Wire the adapter with the data lines crossed** — adapter TX to board RX,
+   adapter RX to board TX, plus 3V3 and GND.
+
+4. **Hold the button down as you connect USB.** That is what selects flash mode.
+
+5. **Flash the config below**, then reassemble. Everything after this is over WiFi.
+
+</Steps>
+
+## What the config gives you
+
+An `esp01_1m` board — 1 MB flash, which is why the config stays small.
+
+| Function | GPIO | Notes |
+|---|---|---|
+| Relay | **GPIO12** | The switch entity in Home Assistant |
+| Status LED | **GPIO13** | Inverted, driven as a PWM light |
+| Button | **GPIO0** | Inverted; also the flash-mode button |
+
+In Home Assistant you get a switch, the LED as a dimmable light, WiFi signal and
+uptime. The physical button toggles the relay locally, so the plug still works
+if Home Assistant is down — which is most of the reason to run it locally.
+
+## Troubleshooting
+
+**Nothing happens on flash.** The button must be held *as* power arrives. Also
+check TX/RX aren't straight-through — crossed is correct.
+
+**It flashes but never joins WiFi.** 2.4 GHz only; the ESP8266 cannot see a 5 GHz
+network. If your router publishes both under one name, that is usually the cause.
+
+**The relay clicks but the socket is dead.** That is a mains-side fault, not a
+firmware one. Stop and check your work before plugging anything else in.
 
 ## Files & downloads
 

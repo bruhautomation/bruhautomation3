@@ -1,18 +1,78 @@
 ---
 title: UV Flashlight
-description: A portable, 3D printed UV light source for lab use.
+description: A portable, 3D printed UV light source for gel visualisation and contamination checks.
 ---
 
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A portable UV light source for gel visualization, contamination checks, and general lab use.
+A handheld UV source for the bench — checking gels, spotting contamination, and
+finding what a spray bottle missed. A printed body around a UV LED array and a
+battery, with no microcontroller in it at all.
 
-{/* Photo needed — A hero photo of the finished UV flashlight — show the assembled 3D-printed light powered on and emitting UV.
-    alt text when it lands: A 3D-printed UV flashlight assembled and switched on, held in hand */}
+:::note[This one is still a write-up, not a build]
+The print files for this haven't been published yet, and there is no firmware —
+it is a light and a switch. What's below is the parts list and the reasoning, so
+you can build the electrical side today; the printed body follows when the CAD
+is cleaned up.
 
-:::note
-BOM and assembly details coming soon.
+If you're looking for the **UV sensor** — an LTR390 that reports UV index to
+Home Assistant — that is a [separate project](/projects/uv-sensor/) with a
+complete ESPHome config.
 :::
+
+<ImagePlaceholder alt="A 3D-printed UV flashlight assembled and switched on, held in hand">
+  Hero photo — the assembled flashlight switched on, ideally lighting something
+  fluorescent so the output is visible rather than just a purple glow.
+</ImagePlaceholder>
+
+## Wavelength matters more than anything else
+
+This is the part worth getting right, because most "UV" torches sold online are
+the wrong one for lab work.
+
+| Band | Wavelength | What it's for |
+|---|---|---|
+| UV-A "blacklight" | 395–405 nm | Pet stains, counterfeit notes. **Sold as UV, barely is** |
+| **UV-A** | **365 nm** | Fluorescent dyes, gel work, contamination checks |
+| UV-B / UV-C | < 320 nm | Sterilisation. **Not this project** |
+
+395 nm emitters are cheaper and look brighter to the eye — which is exactly the
+problem, because that visible purple swamps the fluorescence you are trying to
+see. **Buy 365 nm** and accept that it looks dimmer.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [365 nm UV LED array or emitter](https://www.amazon.com/s?k=365nm+UV+LED+emitter+high+power&tag=brau01-20) — not 395 nm
+- [Constant-current LED driver](https://www.amazon.com/s?k=constant+current+LED+driver+module+1A&tag=brau01-20) matched to the emitter
+- [18650 cell and holder](https://www.amazon.com/s?k=18650+battery+holder+with+leads&tag=brau01-20), or a USB power bank
+- [Momentary or latching push switch](https://www.amazon.com/s?k=16mm+latching+push+button+switch&tag=brau01-20)
+- [ZWB2 / UG-1 filter glass](https://www.amazon.com/s?k=ZWB2+UV+pass+filter+glass&tag=brau01-20) — optional, and the single biggest improvement
+- A small heatsink for anything above about 3 W
+
+:::danger
+365 nm UV damages eyes and skin, and it does it without hurting at the time.
+Wear [UV-blocking safety glasses](https://www.amazon.com/s?k=UV+protection+safety+glasses+400nm&tag=brau01-20) — not sunglasses — and never point it at anyone.
+Cheap emitters also leak shorter wavelengths, which is another reason for the
+filter.
+:::
+
+## Why the filter glass is worth it
+
+A ZWB2 filter passes UV and blocks the visible violet that comes with it. Without
+one you get a bright purple flood and washed-out fluorescence; with one the beam
+looks almost dark and whatever is fluorescing lights up clearly. On a cheap build
+it is the part that makes the difference between a novelty and a tool.
+
+## Heat
+
+UV LEDs are less efficient than white ones — most of what you put in comes out as
+heat, and they dim permanently if you cook them. Bond the emitter to aluminium,
+not directly to the printed body, and if you are running more than a couple of
+watts print the body in **PETG** rather than PLA.
 
 ## Files & downloads
 
