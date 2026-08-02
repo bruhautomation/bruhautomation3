@@ -30,7 +30,7 @@ const result = spawnSync(`npx astro build --mode ${mode}`, {
 	stdio: 'inherit',
 	shell: true,
 	// Export the resolved decision so astro.config.mjs renders the matching
-	// "In Development" sidebar group (it reads SHOW_DRAFTS / VERCEL_ENV).
+	// "Write Up Pending" sidebar group (it reads SHOW_DRAFTS / VERCEL_ENV).
 	env: { ...process.env, SHOW_DRAFTS: String(showDrafts) },
 });
 

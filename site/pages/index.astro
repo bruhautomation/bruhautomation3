@@ -372,11 +372,37 @@ const cards = [...groups, APPS].map((group) => ({
 			}
 
 			/* ── Categories ── */
-			.categories {
+			.catchup {
 				max-width: 1000px;
 				width: 100%;
 				margin: 0 auto;
 				padding: 0 1.5rem 5rem;
+			}
+			.catchup p {
+				background: var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.1rem 1.35rem;
+				color: var(--text-muted);
+				font-size: 0.95rem;
+				line-height: 1.65;
+				text-align: center;
+			}
+			.catchup a {
+				color: var(--accent);
+				font-weight: 600;
+			}
+			.catchup a:hover {
+				text-decoration: underline;
+			}
+
+			.categories {
+				max-width: 1000px;
+				width: 100%;
+				margin: 0 auto;
+				/* The catch-up note carries the bottom padding now, so the cards
+				   stop short of it rather than leaving a gap twice over. */
+				padding: 0 1.5rem 2rem;
 				display: grid;
 				/* Six cards — five categories and the apps — so three across
 				   fills two even rows rather than leaving a short one. */
@@ -494,7 +520,7 @@ const cards = [...groups, APPS].map((group) => ({
 			<div class="nav-right">
 				<a href="/project-list/" class="nav-link">Docs</a>
 				<a
-					href="https://www.youtube.com/@BRUHAutomation"
+					href="https://www.youtube.com/@BRUHAutomation1"
 					class="nav-link"
 					target="_blank"
 					rel="noopener">YouTube</a
@@ -597,7 +623,7 @@ const cards = [...groups, APPS].map((group) => ({
 						</svg>
 					</a>
 					<a
-						href="https://www.youtube.com/@BRUHAutomation"
+						href="https://www.youtube.com/@BRUHAutomation1"
 						class="btn btn-outline"
 						target="_blank"
 						rel="noopener"
@@ -645,6 +671,20 @@ const cards = [...groups, APPS].map((group) => ({
 						</a>
 					))
 				}
+			</section>
+
+			{/* Most projects have their files up and their write-up still to come.
+			    Saying so on the front page is better than letting someone find it
+			    one project at a time. */}
+			<section class="catchup">
+				<p>
+					I'm catching up on the documentation for all of these, so expect a lot
+					more soon. If there's one you want sooner, head over to
+					<a
+						href="https://github.com/bruhautomation/bruhautomation3/discussions"
+						>GitHub Discussions</a
+					> and let me know — I'll bump it up the list.
+				</p>
 			</section>
 		</main>
 

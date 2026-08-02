@@ -9,7 +9,7 @@ import { APPS, OTHER_PROJECTS, groupByCategory, iconMaskUrl, readProjects } from
 // live site) and VISIBLE on every Vercel Preview deployment and in local dev.
 // Page visibility is enforced by Starlight via the Astro build mode
 // (site/scripts/build.mjs maps the deploy env to `--mode`); this flag only
-// mirrors that decision for the dev-only "In Development" sidebar group below,
+// mirrors that decision for the dev-only "Write Up Pending" sidebar group below,
 // so the nav matches the pages that were actually built. The build wrapper
 // exports SHOW_DRAFTS during builds; force it manually with
 // SHOW_DRAFTS=true|false. To take a draft live, set `draft: false` — it moves
@@ -172,6 +172,9 @@ export default defineConfig({
 	// pictures and files; `site/` holds the machinery that renders them.
 	srcDir: './site',
 	publicDir: './site/public',
+	// On the `apps` stage the project URLs have nothing to land on, so they are
+	// dropped rather than pointed at a missing page, and the root goes to the
+	// add-on docs — the reason the site is up at that stage.
 	redirects: { ...retiredAppUrls, ...liveProjectUrls },
 	integrations: [
 		starlight({
@@ -194,7 +197,7 @@ export default defineConfig({
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bruhautomation' },
-				{ icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@BRUHAutomation' },
+				{ icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@BRUHAutomation1' },
 			],
 			customCss: [
 				'./site/styles/custom.css',
@@ -400,7 +403,7 @@ export default defineConfig({
 				...(showDrafts && draftProjects.length > 0
 					? [
 							{
-								label: '🚧 In Development',
+								label: '🚧 Write Up Pending',
 								badge: { text: 'Dev only', variant: 'caution' },
 								items: draftProjects,
 							},

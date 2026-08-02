@@ -27,7 +27,17 @@ interface Props {
 
 const { alt, label = 'Image needed' } = Astro.props;
 const hasNote = Astro.slots.has('default');
+
+// A dashed "Image needed" box is a note to whoever is writing the page, not
+// something a reader came for — on the live site it just says the guide isn't
+// finished. It renders on dev and Vercel Preview, where the author sees it, and
+// on production the page simply reads without the picture. The shot list in
+// docs/IMAGES-NEEDED.md is the record either way, so nothing gets lost by the
+// box being invisible where it would only be noise.
+const showPlaceholders = import.meta.env.MODE !== 'production';
 ---
+
+{showPlaceholders && (
 
 <figure class="img-placeholder" role="img" aria-label={`Placeholder — image needed: ${alt}`}>
 	<div class="img-placeholder__inner">
@@ -50,3 +60,4 @@ const hasNote = Astro.slots.has('default');
 		<p class="img-placeholder__alt"><span>alt text</span> <code>{alt}</code></p>
 	</div>
 </figure>
+)}
