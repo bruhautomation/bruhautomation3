@@ -3,6 +3,7 @@
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
 import { APPS, groupByCategory, readProjects } from '../catalog.mjs';
+import { inject } from '@vercel/analytics';
 
 // Counts come from the project folders, so the numbers on the front page are
 // the repo — not a figure anyone has to remember to bump. A project counts as
@@ -31,6 +32,9 @@ const cards = [...groups, APPS].map((group) => ({
 	blurb: group.blurb,
 	icon: group.icon,
 }));
+
+// Inject Vercel Web Analytics
+inject();
 ---
 
 <!doctype html>

@@ -189,6 +189,8 @@ export default defineConfig({
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
 				SocialIcons: './site/components/SocialIcons.astro',
+				// Vercel Web Analytics integration.
+				Head: './site/components/Head.astro',
 			},
 			logo: {
 				dark: './site/assets/bruh-logo-light.svg',
