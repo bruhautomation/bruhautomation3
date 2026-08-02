@@ -1,31 +1,327 @@
 ---
 title: Irrigation System
-description: Large-scale automated irrigation system with flow monitoring and zone control.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A seven-zone ESP32 irrigation controller with a flow meter on every zone, manifold pressure, water temperature and TDS, and metered fertiliser injection.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Large-scale automated irrigation system covering 1500ft with 7 independent zones, real-time flow monitoring, manifold pressure/temperature/TDS sensors, and fertilizer dosing control. Perfect for garden beds, raised planters, orchards, and complete landscape automation.
+A hose timer tells you a valve opened. This tells you what came out of it. Seven
+zones, a hall-effect flow meter on every one of them, plus pressure, water
+temperature and TDS at the manifold and a second pair of meters straddling the
+fertiliser injector so you know how much concentrate actually went into the
+line. It runs about 1500 ft of drip tubing across a garden, blueberries, trees,
+blackberries, a mister run, a hose drop and the front beds.
 
-## How It Works
+Flow per zone is the part that earns its keep. A zone that suddenly reads double
+has a blown fitting; a zone that reads zero has a clogged filter or a valve that
+didn't open. Both of those are invisible on a timer, and both of them are a dead
+bed by the time you notice.
 
-An ESP32 controls multiple irrigation zones via I2C relay expander (PCF8574) while monitoring flow rates through each zone with pulse counters. The ADS1115 ADC measures manifold pressure, temperature (via NTC thermistor), and TDS (total dissolved solids) for nutrient tracking. Separate flow meters on the fertilizer inflow and outflow allow precise nutrient metering.
+<ImagePlaceholder alt="The irrigation pump box open, showing the ESP32, relay board and the manifold with flow meters plumbed inline">
+  Hero shot — the pump box with the door open, ESP32 and relay board visible,
+  ideally with the manifold and its row of inline flow meters in the same frame.
+</ImagePlaceholder>
 
-## Hardware
+## Parts
 
-- **Board:** ESP32
-- **Flow Sensors:** Pulse counters (10 total: 7 zones + 1 manifold + 2 fertilizer)
-- **ADC:** ADS1115 for analog sensors (pressure, temperature, TDS)
-- **Relay Expander:** PCF8574 I2C I/O expander (7 zones + 2 valves)
-- **Sensors:** Pressure transducer, NTC thermistor, TDS electrode
-- **Control:** 7 zone solenoid valves + pump valve + fertilizer valve
+<AffiliateDisclosure />
 
-## Firmware
+This is a big build and the list is long. Nothing here is optional if you want
+every entity in the config; take the electronics and the zone valves and skip
+the fertiliser half if you only want watering.
 
-This project runs [ESPHome](https://esphome.io/). The full configuration is below — copy it into your ESPHome directory and adjust the substitutions at the top.
+### The pump box
+
+- [ESP32 38-pin DevKit (2-pack)](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the config's `board: esp32dev`
+- [ADS1115 16-bit I2C ADC (3-pack)](https://www.amazon.com/dp/B07VPFLSMX?tag=brau01-20) — pressure, thermistor and TDS all land here
+- [PCF8575 16-bit I2C I/O expander (4-pack)](https://www.amazon.com/dp/B0B6BSJPS8?tag=brau01-20) — nine relay outputs off two wires
+- [16-channel relay module](https://www.amazon.com/dp/B07P95V4Y2?tag=brau01-20) — sold in 5 V, 12 V and 24 V coil versions; buy the one that matches your rail
+- [TXS0108E 8-channel level shifters (6-pack)](https://www.amazon.com/dp/B088LMJR5K?tag=brau01-20) — ten 5 V pulse lines into a 3.3 V board
+- [24 V 5 A supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20) — one rail for the valves
+- [Isolated 12–72 V to 5 V buck converter](https://www.amazon.com/dp/B08H7XRCVQ?tag=brau01-20) — makes the 5 V for the ESP32 and the flow meters off that rail
+- [Large ABS NEMA enclosure](https://www.amazon.com/dp/B005UPANU2?tag=brau01-20) — the 16-channel relay board on its own is bigger than a typical project box
+- [IP65 hinged junction box with glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20) ×2–3 — for the flow-meter junctions out at the manifold
+- [12 V 70 W COB panel](https://www.amazon.com/dp/B08RJWDYJD?tag=brau01-20) — the box light, dimmable from Home Assistant
+- [Dual MOSFET PWM driver module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — a 3.3 V pin cannot drive that panel directly
+- [5.5×2.1 mm barrel jacks and pigtails](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20)
+- [24 AWG silicone hookup wire, 10 colours](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+
+### The manifold
+
+- [WAYNE PLS100 1 HP stainless sprinkling pump](https://www.amazon.com/dp/B0002YVPSK?tag=brau01-20)
+- [1 inch motorised brass ball valve, 9–24 V AC/DC, 2-wire auto-return](https://www.amazon.com/dp/B06XXGMDZK?tag=brau01-20) ×7 for the zones, plus one for the pump valve — this is the expensive part of the build
+- [1/2 inch normally-closed 12 V solenoid valve](https://www.amazon.com/dp/B018WRJYUE?tag=brau01-20) — the fertiliser output valve, on a smaller line
+- [G3/4 hall-effect flow meter, 2–45 L/min](https://www.amazon.com/dp/B07DLZH8P2?tag=brau01-20) ×10 — seven zones, the manifold, and one either side of the injector
+- [G1/4 pressure transducer, 0–80 psi, 0.5–4.5 V out](https://www.amazon.com/dp/B0B1VYV2C8?tag=brau01-20)
+- [0–200 psi test gauge, 3/4 inch hose thread](https://www.amazon.com/dp/B07PGXSWF5?tag=brau01-20) — you need this to calibrate the transducer
+- [50–55 psi brass pressure regulator](https://www.amazon.com/dp/B094HTRZ4Z?tag=brau01-20) — drip tubing does not want mains pressure
+- [Hose-bib backflow preventer](https://www.amazon.com/dp/B09JNGKDQJ?tag=brau01-20) — fertiliser goes in downstream of this, and it stays that way
+- [Analog TDS probe](https://www.amazon.com/s?k=analog+TDS+sensor+probe+arduino&tag=brau01-20) — nothing in the parts bin matches, so this is a search
+- [10 kΩ NTC thermistor probe, B3950](https://www.amazon.com/s?k=10K+NTC+thermistor+probe+B3950+waterproof&tag=brau01-20) plus a [10 kΩ resistor](https://www.amazon.com/s?k=1%2F4W+metal+film+resistor+assortment+kit&tag=brau01-20) for its divider
+
+Plus brass to join it all: [G1/2 tees](https://www.amazon.com/dp/B0B8GZMYHB?tag=brau01-20),
+[G1/2 hex nipples](https://www.amazon.com/dp/B07KS438MV?tag=brau01-20),
+[NPT-to-G adapters](https://www.amazon.com/dp/B09FS8PLR1?tag=brau01-20) for the
+transducer port, [1/4 NPT to 3/4 GHT adapters](https://www.amazon.com/dp/B013XV6AEW?tag=brau01-20),
+and a short [3/4 inch rubber hose](https://www.amazon.com/dp/B077T6LNHT?tag=brau01-20) for jumpers.
+
+### Fertiliser
+
+- [EZ-FLO 2005-HB 3/4 gallon low-pressure injector](https://www.amazon.com/dp/B07CSC11Z6?tag=brau01-20) — the "EZ-Flo" sensors in the config are named after this
+- [G1/2 venturi injector](https://www.amazon.com/dp/B0BHNVHPRH?tag=brau01-20) — the cheap alternative if you'd rather mix from a bucket
+
+### Out in the yard
+
+- [1/2 inch poly supply tubing, 500 ft](https://www.amazon.com/dp/B000A24JX2?tag=brau01-20) — you will want three rolls
+- [Rain Bird 1/4 inch blank distribution tubing, 250 ft](https://www.amazon.com/dp/B0049PJMYC?tag=brau01-20)
+- [Rain Bird pressure-compensating emitter tubing, 50 ft rolls](https://www.amazon.com/dp/B000FK00Z0?tag=brau01-20) — buy more of these than you think
+- [1/2 inch barbed fittings kit](https://www.amazon.com/dp/B09V2H2R68?tag=brau01-20), [1/2 to 1/4 inch barbed tees](https://www.amazon.com/dp/B0CXSCC2D2?tag=brau01-20), [reducing tees](https://www.amazon.com/dp/B096DML597?tag=brau01-20) and [end plugs](https://www.amazon.com/dp/B096DHVCCF?tag=brau01-20)
+- [Adjustable 360° emitters on 6.5 inch stakes](https://www.amazon.com/dp/B0CRKXPHJY?tag=brau01-20)
+- [Rain Bird 10-32 micro-spray nozzles](https://www.amazon.com/dp/B0019THT0K?tag=brau01-20)
+- [49 ft misting line with 15 brass nozzles](https://www.amazon.com/dp/B08611N214?tag=brau01-20) — the "Misters" zone
+- [3/4 GHT to 1/2 inch drip adapters](https://www.amazon.com/dp/B0B6CSFNJY?tag=brau01-20)
+- [6 inch galvanised landscape staples, 120-pack](https://www.amazon.com/dp/B0834WKKH3?tag=brau01-20)
+
+### Getting signal and power out there
+
+- [16/2 low-voltage landscape cable, 500 ft](https://www.amazon.com/dp/B07WZF8H75?tag=brau01-20) — one pair per valve
+- [1/2 inch liquid-tight conduit and fittings kit](https://www.amazon.com/dp/B0C9PDSF3L?tag=brau01-20)
+- [Solder-seal heat-shrink butt connectors](https://www.amazon.com/dp/B0BZ88G8JJ?tag=brau01-20) — every splice that lives outside
+- [IP68 3-pin inline junction connectors](https://www.amazon.com/dp/B0BBZ985QM?tag=brau01-20)
+- [Lever-nut wire connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) — for inside the box only
+
+### Filament
+
+- [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for anything that lives outdoors, or [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the drill guide if it stays in the shop.
+
+## Wiring
+
+Every pin below comes out of `bruh-pump.yaml`. Change one and you change the
+matching line in `substitutions:` — that is the whole point of them being there.
+
+| Function | ESP32 pin |
+|---|---|
+| I2C SDA | **GPIO21** |
+| I2C SCL | **GPIO22** |
+| Manifold flow pulse | **GPIO32** |
+| EZ-Flo inflow pulse | **GPIO33** |
+| EZ-Flo outflow pulse | **GPIO25** |
+| Zone 1 flow pulse | **GPIO16** |
+| Zone 2 flow pulse | **GPIO17** |
+| Zone 3 flow pulse | **GPIO27** |
+| Zone 4 flow pulse | **GPIO23** |
+| Zone 5 flow pulse (`zone_5_pulse`) | **GPIO14** |
+| Zone 6 flow pulse (`zone_6_pulse`) | **GPIO13** |
+| Zone 7 flow pulse | **GPIO26** |
+| Box light PWM | **GPIO18** |
+
+Every pulse input is configured `input: true, pullup: true`. That is the right
+setup for a hall meter with an open-drain output — the pin idles at 3.3 V and the
+meter pulls it down. If yours drives its output *high* to its own 5 V supply
+instead, it needs the level shifter or it will sit 1.7 V above what the ESP32's
+pins are rated for. Power and ground for the meters come off the buck converter.
+
+On the I2C bus, the ADS1115 sits at **0x48** and the expander at **0x27**. The
+expander's outputs are all `inverted: true`, which is what a low-level-trigger
+relay board wants:
+
+| Output | PCF8575 pin |
+|---|---|
+| Zone 1–7 | **0, 1, 2, 3, 4, 5, 6** |
+| Pump water valve | **14** |
+| Fertiliser output valve | **15** |
+
+And on the ADC:
+
+| ADS1115 channel | Reads |
+|---|---|
+| **A0** | Manifold pressure transducer |
+| **A1** | TDS probe |
+| **A2** | Thermistor divider |
+
+:::caution
+**Two flow inputs are crossed in the file.** The sensor named `Z5 Flow` reads
+`${zone_6_pulse}` (GPIO13) and the one named `Z6 Flow` reads `${zone_5_pulse}`
+(GPIO14). Either swap the two wires at the terminal strip or swap the two
+substitution references — but do it deliberately, because the zone *switches*
+are not crossed, so as shipped, opening Zone 5 makes Zone 6's meter spin.
+:::
+
+:::caution
+**The ADS1115 has to run at 5 V here.** The transducer swings to 4.5 V, which is
+why the config asks for `gain: 6.144` — a 3.3 V reference simply cannot see the
+top of that range. If your breakout's I2C pull-ups go to VDD, the bus will then
+idle at 5 V and the ESP32's pins are in it. Pull SDA and SCL up to 3.3 V instead,
+or put the level shifter on the bus as well as on the pulse lines.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Plumb the manifold dry first**, on the bench, with the gauge fitted. Every
+   flow meter has an arrow on it and it is not a suggestion. The pressure
+   transducer taps a G1/4 port; the thermistor and TDS probe want to sit in
+   flowing water, not in a dead leg where they read yesterday's number.
+
+2. **Fit the regulator and the backflow preventer upstream of everything**, and
+   the fertiliser injection point downstream of the backflow preventer. That
+   order is not negotiable — this is the one part of this build that can put
+   fertiliser into drinking water.
+
+3. **Pressure-test the manifold** before a single wire goes in. Ten meters and
+   nine valves is a lot of threaded joints, and finding the weeping one with the
+   box wired is miserable.
+
+4. **Mount the relay board and the ESP32** in the big box, and land every valve
+   pair on the terminal strip before you connect the relay commons. Label the
+   pairs as you land them. Seven identical brown wires is how a zone ends up
+   watering the wrong bed for a season.
+
+5. **Run the flow-meter signal wires back through the shifter.** Ten pulse lines
+   at 5 V is the thing most likely to kill the ESP32 in this build.
+
+6. **Power the box in stages** — 24 V rail first with the valve outputs
+   disconnected, confirm the buck is putting out 5 V, then plug in the ESP32.
+
+7. **Flash and check the I2C scan** in the ESPHome log before you close the
+   door. `scan: true` is already set; you are looking for 0x27 and 0x48.
+
+</Steps>
+
+## Configuration
+
+The config is `bruh-pump.yaml`, in the download section below. Copy it into your
+ESPHome directory and fill in `secrets.yaml` — `wifi_ssid`, `wifi_password`,
+`ota_password`, `api_key`, `ap_password`. There is a `secrets.yaml.example` in
+the repo with every key these configs use.
+
+Everything you'd normally change lives in `substitutions:` at the top — the
+device name, both I2C pins, the light pin, and all ten pulse pins.
+
+:::note
+The seven `zone_N_name` substitutions (Garden, Blueberries, Trees, Blackberries,
+Misters, Wood Hose, Front) are defined but nothing references them — the
+switches and sensors are named `Zone 1` and `Z1 Flow` literally. Rename the
+entities in Home Assistant, or point the `name:` fields at the substitutions.
+Also defined and unused: `manifold_sensor_power` on GPIO4, left over from
+switching the analog sensors' supply.
+:::
+
+There is a second config, `bruh-pump-s3.yaml`, for an
+[ESP32-S3-DevKitC-1](https://www.amazon.com/s?k=ESP32-S3-DevKitC-1&tag=brau01-20).
+It is the same I2C addresses and the same nine relay outputs on different pins,
+but it carries only the manifold and the two EZ-Flo meters — no per-zone flow,
+no pressure, no temperature, no TDS. Build the ESP32 one unless you have a
+specific reason not to.
+
+## Calibration
+
+Nothing on this device reads correctly out of the box, and all three
+calibrations are two-point.
+
+**Flow.** Each pulse counter divides by a constant to get L/min: 483 for the
+manifold, 660 for the zones, 898 for the EZ-Flo pair. Those are pulses per litre
+for three different meters — if all yours are the same model, they should all be
+the same number. Find yours by running a zone into a bucket of known volume and
+dividing the counted pulses by the litres that came out. Do it at a realistic
+flow rate; these meters are not linear near the bottom of their range.
+
+**Pressure.** The config maps 0 V to 0.5 psi and 5 V to 80 psi:
+
+```yaml
+filters:
+  - calibrate_linear:
+      - 0.0 -> 0.5
+      - 5 -> 80.0
+```
+
+That is a rough fit, not the transducer's transfer function. Put the test gauge
+on the manifold, run the pump, and take two real readings — one at rest and one
+at working pressure — then replace both points. This is what the gauge is in the
+parts list for.
+
+**TDS.** The chain is: raw voltage → temperature compensation at 2% per °C off
+25 °C → a conversion lambda → a two-point `calibrate_linear` (22 → 22 and
+1040 → 700) → a 5-sample moving average. Calibrate it with a bottled solution of
+known ppm and plain RO water, and replace both points.
+
+:::caution
+The TDS conversion lambda looks like the standard cubic curve but isn't. It reads
+`133.42 * V * 3 - 255.86 * V * 2 + 857.39 * V` — multiplied by 3 and 2, not cubed
+and squared. It collapses to a straight line, about 373 × V after the 0.5 factor.
+In practice the two-point calibration downstream absorbs it and the number is
+usable near where you calibrated, but it will drift at the ends of the range. If
+you want the real curve, rewrite those terms with `pow()`.
+:::
+
+## Printed parts
+
+Two, and they do unrelated jobs.
+
+`air_injector_drill_guide_v3` is a drill guide: a 130 mm flange, 5 mm thick, with
+a 70 mm tower over a 21.5 mm bore (opening to 22 mm for the lowest 20 mm). The
+tower is that tall for one reason — a long bore is what stops a big bit walking
+when it bites. Clamp the flange flat, go slow, and back the bit out to clear
+chips rather than leaning on it. Check the bore against your actual bit before
+you commit to a print; a guide that is 0.3 mm loose is not a guide.
+
+`timer_indicator_disk_v2` is a 130 mm face, 0.4 mm thick, with a 6.2 mm D-profile
+centre hole (4.7 mm across the flat) and two 2.25 mm holes on a 14.5 mm bolt
+circle, plus an index tab that runs out to 140 mm overall. It presses onto a
+flatted shaft and pins to the two holes behind it.
+
+### Print settings
+
+| Setting | Drill guide | Indicator disk |
+|---|---|---|
+| Layer height | 0.2 mm | 0.2 mm |
+| Walls | 4+ | n/a — it is two layers of solid |
+| Infill | 40% | 100% |
+| Supports | None | None |
+| Material | PETG, or PLA+ if it lives indoors | PETG |
+| Orientation | Flange on the bed, as exported | Flat, as exported |
+
+The guide wants walls, not infill — everything that matters is the bore surface,
+and a 20% part will flex around a bit under load. The disk is 0.4 mm total, so at
+0.2 mm layers it is the first layer plus one; get your first layer right or it
+will curl off the plate before it finishes.
+
+The other two CAD files, `backyard_v2` and `garden_sketch_v6`, are layout
+sketches rather than parts — the plan of the beds and the runs. There is nothing
+to print in them.
+
+## Troubleshooting
+
+**A zone's flow reads zero but water is coming out.** Check the meter's arrow
+first, then the signal wire. A hall meter wired backwards passes water happily
+and never pulses.
+
+**Every flow sensor reads a small non-zero number with the pump off.** Electrical
+noise picked up on long pulse runs. Use one twisted pair per meter — signal and
+its own ground — and keep those runs out of the same conduit as the 24 V valve
+wiring. Switching nine inductive loads next to ten open-drain signal lines is
+asking for phantom pulses.
+
+**The device boots but no sensors appear.** Read the I2C scan in the log. No
+0x48 and no 0x27 means the bus isn't running — usually SDA and SCL swapped, or
+no pull-ups on the bus at all. One address missing and the other present is a
+wiring fault on that one board, not a bus problem.
+
+**Manifold temperature reads a wild number or `nan`.** The thermistor chain has
+three stages, and each one publishes its own entity for exactly this reason.
+Look at "Raw Manifold Temperature Voltage" first; if that is sensible, look at
+"Manifold Raw Resistance". The `resistance` platform is configured `DOWNSTREAM`
+with a 10 kΩ resistor, so the thermistor goes to the supply and the fixed
+resistor to ground. Wire the divider the other way round and the curve inverts.
+
+**A valve buzzes and gets hot.** The 2-wire auto-return valves draw their full
+current the whole time they are open. That is normal for the type, but it means
+seven zones open at once is not something the 5 A supply will do. Stagger them
+in Home Assistant.
 
 ## Files & downloads
 

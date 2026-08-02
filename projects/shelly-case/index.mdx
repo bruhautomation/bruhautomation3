@@ -37,13 +37,19 @@ the terminals is what this part is for.
   frame with the case closed and mounted to a joist.
 </ImagePlaceholder>
 
-## Measure your module first
+## Measure the module first
 
 Shelly has changed the outline more than once across Gen1, Plus and Gen3, and a
 shell that swallows one of them will not necessarily close over another. The
 metering modules also carry a lead out to a CT clamp, which needs its own way
 out of the case. Put calipers on the module you actually own before you commit
 a spool to it.
+
+Check for a neutral while you are in there. These modules take their own power
+from the circuit and want a neutral at the module, and plenty of older US switch
+boxes have none — which is a large part of why so many Shellys end up out at the
+fixture, at the appliance, or in a printed box near the load rather than behind
+the switch.
 
 Work from the terminal legend printed on the module itself and the wiring
 diagram in the box. Not from a diagram you found for a different generation.
@@ -61,11 +67,14 @@ diagram in the box. Not from a diagram you found for a different generation.
 - [ABS, 1.75 mm](https://www.amazon.com/dp/B00J0H6NNM?tag=brau01-20) — better again if you have an enclosed printer. An attic in July plus a metering shunt is the case ABS is for
 - [PLA+, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 kg pack of black. Fine for a low-current switching-only module somewhere cool and indoors, and wrong everywhere else
 - [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — 100 of them, M3 × 5.7 mm. You will open this case again; tapped plastic gives up after three or four cycles and an insert does not
+- [Soldering station](https://www.amazon.com/dp/B0DMFBGPWB?tag=brau01-20) — how the inserts go in. Any temperature-controlled iron works; what matters is that you can set it low and hold it there, because a hot iron shoved in fast bulges the boss
 - [M3 countersunk screws, nuts and washers](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — a 562-piece box, 5 to 20 mm. Two or four screws close the lid
 - [Lever-nut connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) — SPL-2 mini, 2-in/4-out. For joining tails to house wiring without a wire nut fighting you in a tight box
 - [Adhesive-lined heat shrink, assorted](https://www.amazon.com/dp/B0CT88MHXQ?tag=brau01-20) — 446 pieces, 4:1. Sleeve the conductors where they cross the printed edge
+- [Heat gun](https://www.amazon.com/dp/B0C9Q557HV?tag=brau01-20) — for the above. A lighter shrinks glue-lined tubing unevenly and sooner or later scorches the printed part behind it
 - [Zip ties with a screw-mount head](https://www.amazon.com/dp/B0G5N67YKF?tag=brau01-20) — 200 of them, 6 in. This is the strain relief: one tie on the cable inside the case so the screw terminals never take a pull
 - [Non-contact voltage tester](https://www.amazon.com/dp/B01N99D3MS?tag=brau01-20) — the cheapest part on this page and the one you should not skip
+- [Ratcheting multi-bit screwdriver](https://www.amazon.com/dp/B0DG6SS4VJ?tag=brau01-20) — 15-in-1. The terminal screws are small slotted-or-Phillips and want a driver that actually fills them, not the nearest bit in the drill case
 - [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the measuring above
 - [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — knocks the elephant's foot off the first layer, which is exactly the edge the lid has to sit flat on
 - [#8 × 1/2 in self-tapping screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20) — a 200-pack, short on purpose. Mounts the case to a joist, a stud or the back of a cabinet
@@ -74,6 +83,14 @@ diagram in the box. Not from a diagram you found for a different generation.
 - [Brother P-touch Cube label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) — write on the case what it switches and which breaker feeds it. In three years that label is the difference between a five-minute job and an afternoon
 
 Printed on a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20).
+
+:::tip
+If the thing you want to control has a plug on the end of it, do not do any of
+this. A [Sonoff S31 with energy monitoring](https://www.amazon.com/dp/B07BTLHWFM?tag=brau01-20)
+is a 2-pack, it goes in the socket, and it gets you the same switch and the same
+power reading with no breaker off and no printed part. Save the Shelly for the
+loads that are hard-wired.
+:::
 
 :::caution
 If the install is outdoors, damp, or anywhere a printed shell is the wrong
@@ -127,27 +144,53 @@ against if you model your own around the module you own.
    can get the iron square to it. Low temperature, slow, straight down —
    pressing an insert in crooked is how a boss splits.
 
-3. **Land the conductors with the module out of the case.** All the terminals
+3. **Set the module up on the bench first.** Join it to WiFi, take the firmware
+   update it will offer, add it to Home Assistant and set the power-on default
+   state. All of that is far easier next to a laptop than it is at the top of a
+   ladder with the lid in your teeth.
+
+4. **Land the conductors with the module out of the case.** All the terminals
    are reachable and visible on the bench and about half of them are not once
    the board is seated. Torque the terminal screws properly; a loose mains
    terminal is a heater.
 
-4. **Strain-relieve the cable before you close anything.** One zip tie around
+5. **Strain-relieve the cable before you close anything.** One zip tie around
    the cable, anchored inside the shell, so any pull on the cable lands on the
    case and not on the terminals. This is the step people skip and it is the
    failure that shows up two years later.
 
-5. **Seat the module and close the lid.** Snug, not tight. A heat-set insert
+6. **Seat the module and close the lid.** Snug, not tight. A heat-set insert
    strips at surprisingly little torque, and a cracked lid on a mains part is
    not a lid.
 
-6. **Power up before you mount it.** Join it to WiFi, add it in Home Assistant,
-   switch the load twice and check the power reading moves. Finding out that the
-   antenna does not reach is much cheaper before the case is screwed to a joist.
+7. **Switch the load twice** and check the power reading moves before the case
+   goes anywhere. Finding out that the antenna does not reach is much cheaper
+   before it is screwed to a joist.
 
-7. **Label it** with the load and the breaker, then mount it.
+8. **Label it** with the load and the breaker, then mount it.
 
 </Steps>
+
+## In Home Assistant
+
+The Shelly integration is local. The module is discovered on the network, it
+needs no account, and once Home Assistant has it you can turn the device's own
+cloud connection off in its web UI — a relay screwed to a joist behind a wall is
+not something that needs to be reachable from the internet. The metering models
+bring power and energy sensors with them, which drop straight into the Energy
+dashboard.
+
+Two settings to get right before the lid goes on, both in the module's own web
+UI rather than in Home Assistant:
+
+**Power-on default.** What the relay does when the circuit comes back after an
+outage. For a light, "restore last" is usually what you want. For a pump, a
+heater or anything with a motor, think about whether you want it deciding for
+itself at 3 a.m. and set it to off if you don't.
+
+**Auto-off timer**, if the load is a momentary one. A garage door opener wants a
+pulse across the button contacts, not a latched relay — a short auto-off turns
+the Shelly into the button rather than a switch that stays pressed.
 
 ## Mounting
 
@@ -186,6 +229,10 @@ is PLA reprint it in PETG rather than tightening it again.
 **The case is warm to the touch.** That is the load telling you the box is too
 closed for what is going through it. More venting, less current, or a real
 enclosure with room around the module.
+
+**The power reading is there but the number looks wrong.** On the EM, that is
+the clamp — it is directional and it has to go around one conductor, not the
+whole cable. Turn it round, or check you haven't caught the neutral in it too.
 
 ## Files & downloads
 

@@ -1,21 +1,173 @@
 ---
 title: LED Light for Lawnmower
-description: An aftermarket LED lighting upgrade for mowing after sunset.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: Two 7-inch LED pods, a fused relay and a waterproof dash switch — aux lighting wired onto a riding mower so you can finish the yard after sunset.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-An LED lighting upgrade for mowing after dark — mounted to the front of the mower deck.
+Riding mowers either ship with two dismal sealed-beam bulbs or with nothing at
+all, which means the last hour of daylight is the last hour of mowing. A pair of
+off-road LED pods, a relay and a switch fixes that for about the price of a tank
+of fuel, and the whole job is an afternoon with a crimper.
 
-{/* Photo needed — A hero photo of the finished LED lawnmower light — show the mower with the LED upgrade switched on in low light.
-    alt text when it lands: A lawnmower with an aftermarket LED light bar mounted to the front deck, lit up at dusk */}
+There is no microcontroller here and nothing to flash. It is 12 V DC wiring done
+properly: fused at the battery, switched through a relay, sealed at every joint,
+and routed so nothing ends up in a pulley.
 
-:::note
-Build details and design files coming soon.
+<ImagePlaceholder alt="A riding lawnmower with two LED pods mounted to the front of the hood, lit up at dusk">
+  Hero shot — the mower at dusk with both pods on, shot from in front and
+  slightly to one side so the beam pattern on the grass is visible.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [7-inch LED pods, spot/flood combo beam](https://www.amazon.com/dp/B079L1GSRK?tag=brau01-20) — a 2-pack, which is exactly what you need. Combo beam is the right call; see below
+- [30 A fused relay kit](https://www.amazon.com/dp/B07PK7F1MC?tag=brau01-20) — relay, pigtail socket and fuse in one. Sold in fives, you need one
+- [Waterproof 12 V rocker switch](https://www.amazon.com/dp/B00RYGY5FY?tag=brau01-20) — panel-mount on/off, rated 20 A so it will never be the weak point
+- [Illuminated toggle with a flip guard](https://www.amazon.com/dp/B07SZJLNZY?tag=brau01-20) — the alternative if your dash has no flat panel to punch a rocker into. Three pins, because the lamp needs its own ground
+- [16/2 low-voltage landscape cable](https://www.amazon.com/dp/B07Y422GDB?tag=brau01-20) — stranded, jacketed and UV-rated; the jacket is what survives being zip-tied along a frame rail for ten years
+- [Solder-seal butt connectors](https://www.amazon.com/dp/B0BZ88G8JJ?tag=brau01-20) — one pass with a heat gun gives you a soldered joint and a sealed one
+- [Adhesive-lined heat shrink](https://www.amazon.com/dp/B0CT88MHXQ?tag=brau01-20) — for the switch tails and anywhere the pod pigtails need dressing
+- [Heavy-duty UV-rated zip ties](https://www.amazon.com/dp/B0D97ZC72N?tag=brau01-20) and [screw-mount zip ties](https://www.amazon.com/dp/B0G5N67YKF?tag=brau01-20) — the screw-mount ones anchor the run where there is nothing to loop around
+- [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — not optional. A mower deck vibrates like nothing else you own
+- [Ratcheting crimp tool](https://www.amazon.com/dp/B0978S514B?tag=brau01-20) — if you don't already own one
+- [12 V battery maintainer](https://www.amazon.com/dp/B094VQ88X2?tag=brau01-20) — read the caution below before you decide you don't need this
+
+You will also want a handful of [ring terminals](https://www.amazon.com/s?k=assorted+heat+shrink+ring+terminals+automotive&tag=brau01-20) for the battery posts, and a [split-loom sleeve](https://www.amazon.com/s?k=split+wire+loom+tubing+1%2F4+inch&tag=brau01-20) if the cable run passes anywhere near the engine.
+
+## What the box says versus what it draws
+
+The pods are sold as 240 W. At 12 V that is 20 A each — 40 A for the pair, more
+than the relay in the kit is rated to pass. They do not draw anything like that.
+The number on the listing is the sum of the LED dies' theoretical maximums, not
+what the driver actually pulls.
+
+So measure it. Put a meter in series with one pod, run it on a bench supply or
+the mower's battery, and write the number down. Then size the fuse just above
+twice that, because you are running two. A fuse chosen from the box's wattage
+claim is a fuse that will never blow, which is the same as no fuse at all.
+
+## Wiring
+
+Four wires, one relay. The relay's terminals are numbered on its body — **go by
+the numbers stamped on the relay, not by the colours in the pigtail**, because
+harness colours change between production batches and the numbers never do.
+
+| Relay terminal | Connects to | Notes |
+|---|---|---|
+| **30** | Battery positive, through the fuse holder | Fuse as close to the battery post as the wire will reach |
+| **87** | Both pods' positive leads | This is the normally-open contact — dead until the coil pulls in |
+| **86** | Switch output | The switch's other side goes to a keyed 12 V feed |
+| **85** | Chassis ground | Coil ground; a clean bolt on the frame is fine |
+
+Both pods' negative leads go to ground as well. Run them back to the battery
+negative or to a bolt you have taken back to bare metal — **paint is not a
+ground**, and a pod that flickers when you hit a bump is nine times out of ten a
+ground that is only touching primer.
+
+The reason for the relay is that the switch never carries the light current. All
+the switch does is energise a coil, so a 20 A rocker lasts forever and the long
+run of cable up to the dash can be thin. It also means you can feed terminal 86
+from a circuit that is only live with the key on, and then it is physically
+impossible to walk away and leave the lights burning. Find one with a test light
+before you commit to it. If your mower has nothing switched, take the feed
+straight off the battery and accept that the rocker is the only thing standing
+between you and a flat battery on Saturday morning.
+
+:::caution
+A riding mower's charging system is small — it exists to top the battery back up
+after cranking, not to run accessories. Two LED pods plus the ignition can
+out-draw it at mowing rpm, and the battery quietly makes up the difference. You
+find out the following weekend when it won't turn over. This is why the
+maintainer is on the parts list: hang it on the battery between mows and the
+question never comes up.
 :::
+
+<ImagePlaceholder alt="Wiring diagram for the mower LED light showing battery, fuse, relay, switch and two LED pods">
+  Wiring diagram — battery through the fuse to relay terminal 30, terminal 87
+  out to both pods, the switch on terminal 86 fed from a keyed circuit, and 85
+  to ground.
+</ImagePlaceholder>
+
+## Mounting
+
+Mount the pods to the hood or the front frame. **Not to the deck.** The deck
+moves relative to the frame every time you change cutting height, so anything
+bolted to it has to flex its wiring through that travel a few thousand times a
+season, and the deck is also where the thrown rocks, the packed grass and the
+impacts with tree roots all happen. The hood is the boring answer and the boring
+answer is right.
+
+<Steps>
+
+1. **Dry-fit both pods** before you drill anything. Sit on the mower with the
+   deck at your usual cutting height and hold each pod where you think it goes —
+   the useful position is lower and closer than instinct says.
+
+2. **Bolt them on** with the bracket and hardware they ship with, and put blue
+   threadlocker on the threads. A pod bracket that works loose rotates slowly
+   downward over an afternoon until you are lighting your own front tyres.
+
+3. **Run the cable** from the battery forward, following an existing loom or a
+   frame rail wherever there is one. Zip-tie it every foot or so and use the
+   screw-mount ties where there is nothing to loop around. Keep it away from the
+   muffler, the belts and anything that pivots when the deck moves.
+
+4. **Fit the fuse holder** at the battery end, as close to the positive post as
+   the wire allows. Everything downstream of it is protected; the few inches
+   upstream of it are not, which is why they should be few.
+
+5. **Punch the switch** into the dash panel, wire it to terminal 86 and to the
+   keyed feed, and seal the tails with adhesive-lined heat shrink.
+
+6. **Splice the pods in** with solder-seal connectors last. Slide, heat until the
+   solder ring flows and the ends shrink down, done — that is a soldered joint
+   with a sealed jacket in one operation, and it is the only splice worth making
+   on a machine that lives outdoors.
+
+7. **Test everything with the fuse in but the pods still loose**, so that if
+   something is wrong you are not fishing a bolt out from behind the grille.
+
+</Steps>
+
+## Aiming
+
+Do this at night, on the grass, with the mower where you actually use it.
+
+Aim the beams to land just past the leading edge of the deck and out to maybe two
+mower-lengths. The mistake is aiming high: a beam thrown to the far fence lights
+the far fence beautifully and leaves a dark band right in front of you, which is
+where the sprinkler heads and the dog toys are. Set the near edge first and let
+the far end fall where it falls.
+
+The combo beam in these pods is what makes that possible. A pure spot puts a hot
+circle out at the tree line and nothing useful under the deck; a pure flood dies
+off before it gets there. Combo does both badly enough to be right.
+
+Aim, then tighten, then threadlock. In that order.
+
+## Troubleshooting
+
+**Nothing happens and the relay doesn't click.** The coil isn't getting power.
+Check 86 and 85 first — a coil circuit is two wires and one of them is wrong.
+
+**The relay clicks but the pods stay dark.** Power is reaching the coil but not
+the contacts. That is terminal 30, the fuse, or the run out to 87.
+
+**One pod is dimmer than the other.** Almost always its ground. Undo it, take the
+contact patch back to bare metal with a wire brush, remake it.
+
+**They flicker over rough ground.** A ground, or a splice you crimped without a
+proper crimper. Redo it with the solder-seal connectors.
+
+**They work fine, then the mower won't crank next weekend.** The charging system
+isn't keeping up. Put the maintainer on it, and if that becomes a habit, wire
+the coil feed to a keyed circuit so the lights can't run without the engine.
 
 ## Files & downloads
 
