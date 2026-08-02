@@ -1,18 +1,204 @@
 ---
 title: Dog Treat Dispenser
-description: Automated treat dispenser you can trigger from Home Assistant.
+description: A 245 mm printed treat column and a servo gate you fire from Home Assistant — press a button anywhere in the house, a biscuit drops.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Automated treat dispenser you can trigger from Home Assistant.
+Treats stack in a printed column, a servo pulls a slide at the bottom, one
+biscuit falls out, the slide shuts. That is the whole machine. It is worth
+building because it is the rare automation with an audience — the dog learns
+within a week that the thing on the wall is worth watching, and a button in
+Home Assistant becomes a way to say hello to him from work.
 
-## Hardware
-- Stepper motor or servo
-- Hopper and dispenser mechanism
+:::note
+**One part is in this folder, and it is the column.** `dog_treat_dispenser_1.stl`
+is the magazine tube. The gate, the servo mount and the chute underneath it were
+built around the spot the dispenser lives in and never made it into a model file.
+So this page documents the column properly — every dimension below is measured
+off the STL — lists the parts that drive it, and says what the column's numbers
+tell you about the gate you have to design. That is why it still carries the
+unfinished flag.
+:::
+
+<ImagePlaceholder alt="The dog treat dispenser mounted on a wall with the printed column full of biscuits">
+  Hero shot — the column mounted vertically with biscuits visible through the
+  slot, the servo and gate at the bottom, and the dog waiting underneath.
+</ImagePlaceholder>
+
+## What the printed part is
+
+| Measurement | Value |
+|---|---|
+| Outside | 67 × 34 mm, corners rounded 2 mm |
+| Length | 245 mm, open at both ends |
+| Wall | 2.0 mm, uniform |
+| Bore | 63 × 30 mm, sharp internal corners |
+| Slot | 10 mm wide, cut clean through one 67 mm face |
+| Slot length | 228 mm from one end, leaving 17 mm of unbroken tube at the other |
+
+Those last two rows are the ones that tell you how it was meant to work. The
+17 mm of unbroken tube goes at the **bottom**: it is the only stretch with four
+complete walls, which is what a sliding gate needs to run against. Everything
+above it is a loading window — you can see the stack, you can drop treats in
+without lining anything up, and you can reach a finger in when one jams.
+
+Measure your treats before you print 245 mm of tube. The bore is 63 × 30 mm and
+nothing about it adapts. Hard, flat, uniform biscuits stack and slide; soft
+training treats bridge across the bore and stay there.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack; any ESP32 or ESP8266 with a spare GPIO does this job
+- [MG90S metal-gear micro servo, 180°](https://www.amazon.com/dp/B0925V3X2S?tag=brau01-20) — a 12-pack, you need one
+- [5V 2.4A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — a 3-pack; the servo and the board share it
+- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a straight plug sticks out further than the box is deep
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the column is 90 cm³ of solid plastic, about 110 g
+- [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — for the servo horn and the mounting bracket
+- [Silicone hookup wire, 24 AWG](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) and [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20)
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure the treats, then the bore, before the print starts
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — the bore is what treats slide down, and an elephant's foot at the bottom end will catch every one
+
+Buy the **metal-gear MG90S, not the plastic SG90**. A treat wedges against the
+gate sooner or later and the servo stalls trying to close; a plastic output gear
+strips the first time that happens, and it always happens when nobody is home.
+
+Optional, and each one earns its place:
+
+- [VL53L0X time-of-flight sensor](https://www.amazon.com/dp/B0D7LWDBVX?tag=brau01-20) — a 3-pack; point one down the tube from the top and it reads the top of the stack in millimetres, which is a "treats remaining" number in Home Assistant
+- [IR obstacle-avoidance modules](https://www.amazon.com/dp/B01I57HIJ0?tag=brau01-20) — a 10-pack; one aimed across the outlet confirms a treat actually left, rather than assuming the servo moving meant something happened
+- [Momentary push buttons](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20) — a 30-pack; somebody standing in front of the dispenser should not have to find their phone
+- [Wyze Cam](https://www.amazon.com/dp/B076H3SRXG?tag=brau01-20) — the point of dispensing a treat remotely is watching it land
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — instead of PLA+ if you want to wash the column in hot water
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — for the bracket and servo mount you design, **not** for the column: these are 5.7 mm long and the column's wall is 2.0 mm
+
+If you would rather turn a drum or an auger than slide a gate, the same servo
+comes as a [continuous-rotation MG90S](https://www.amazon.com/dp/B0925TDT2D?tag=brau01-20).
+It gives you speed and direction instead of an angle, which means the firmware
+has to time the dose rather than command a position — harder to get repeatable,
+and nothing in this folder is built for it.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm, or 0.28 mm — there is no detail to lose |
+| Walls | 5 |
+| Infill | 0% |
+| Supports | None |
+| Brim | Yes |
+| Material | PLA+, or PETG if it will be washed hot |
+| Orientation | Standing on end |
+
+The wall is exactly 2.0 mm, which is five 0.4 mm extrusions. Set five walls and
+zero infill and the whole part comes out as solid perimeters with no infill seam
+anywhere in the bore — that is almost certainly why it was drawn at 2 mm.
+
+**Stand it on end.** Lying flat, the inside of the upper wall becomes a 63 mm
+bridge, and a rough bridge is exactly where a biscuit stops sliding. Standing up
+there are no overhangs at all, and the layer lines run around the tube rather
+than along it. It is 245 mm tall that way, which clears a 250 mm Z axis by five
+millimetres and nothing more, so skip the raft.
+
+The bed contact standing up is only the 2 mm ring — about 365 mm² holding up a
+245 mm tower. Use a brim, and don't put it on the corner of the bed where a
+draught can get at it.
+
+If you want a shorter or longer magazine, scale **only the long axis**. It is a
+straight prism, so stretching it lengthways changes nothing else. Scaling the
+other two axes changes the wall thickness and the slot width at the same time,
+and then five walls no longer add up to the wall.
+
+## Wiring
+
+There is no firmware in this folder, so there are no pin numbers to quote — you
+pick the GPIO. What is worth writing down is the servo's lead colours, because
+they are the thing people get backwards:
+
+| Servo lead | Goes to |
+|---|---|
+| Brown | GND |
+| Red | 5V |
+| Orange | The GPIO you chose |
+
+Run the red lead to the 5V rail feeding the board, not to the board's 3.3V pin.
+An MG90S pulls close to an amp when it stalls, and a 3.3V regulator asked for
+that is a board that reboots every time it hands out a treat.
+
+## Assembly
+
+<Steps>
+
+1. **Deburr the bore**, both ends, before anything else. The bottom opening is
+   the one that matters — treats leave through it.
+
+2. **Dry-stack the treats.** Load the column by hand, tip it, and watch where
+   they hang up. Fix that with sandpaper now, not after the gate is glued on.
+
+3. **Build the gate into the bottom 17 mm.** That stretch has four unbroken
+   walls and the slot starts immediately above it. The gate wants to open far
+   enough to release one treat and close before the next has fallen far enough to
+   follow — how far that is depends entirely on your treats, which is what step 2
+   was for.
+
+4. **Bolt the servo through, M3 and a nut.** The wall is 2 mm: it will not hold a
+   heat-set insert, and it will not hold a self-tapper for long.
+
+5. **Mount the column vertically**, unbroken end down, slot facing where you can
+   see it. It is a 245 mm lever with treats in it, so bracket it near the top as
+   well as the bottom.
+
+6. **Test with the column empty**, then with three treats, then full. A gate that
+   works empty can jam under the weight of a full column.
+
+</Steps>
+
+<ImagePlaceholder alt="The bottom of the treat dispenser column showing the servo, the gate and the outlet chute">
+  Detail shot of the bottom 17 mm — the servo, the gate it drives, and the
+  outlet. This is the part of the build the STL doesn't cover.
+</ImagePlaceholder>
+
+## Firmware
+
+Write this one yourself; there is no config in the folder to copy. In ESPHome it
+is three pieces: a `servo` component on a `ledc` output for the gate, a `script`
+that moves it to the open angle, waits, and moves it back, and a `button` that
+runs the script. The button is what appears in Home Assistant, and `button.press`
+in an automation is then the whole integration — a schedule, a voice command or a
+card on the dashboard all do the same thing.
+
+Two things to get right. Detach the servo between presses, or it will hum against
+the gate all day and cook itself. And put the open and closed angles in
+`substitutions` at the top of the file, because those are the two numbers you
+will change ten times while tuning step 3.
+
+If you added the VL53L0X, it is the `vl53l0x` platform on I²C and it reports a
+distance; a `calibrate_linear` block turns that into a treat count, and a
+template binary sensor turns the count into "the dispenser is empty" — which is
+the automation actually worth having, because a dispenser everyone believes is
+loaded and isn't teaches the dog to stop checking.
+
+## Keeping it clean
+
+:::caution
+A 3D-printed part is not food-safe in the strict sense. Layer lines hold crumbs,
+crumbs hold everything else, and no filament sold as food-safe stays that way
+once a 0.4 mm nozzle has drawn grooves down the inside of it. Dry biscuits only —
+no wet food, nothing greasy. Empty the column and wipe the bore out monthly.
+:::
+
+That is also the argument for printing it in PETG rather than PLA+. PETG takes
+hot soapy water without going soft; PLA+ starts to sag around 60 °C, which is
+well inside what a tap can do. Neither belongs in a dishwasher, but only one of
+them survives a rinse you weren't paying attention to.
 
 ## Files & downloads
 

@@ -6,10 +6,22 @@ status: complete
 
 # 96-Well Plate Inverter
 
-Motorised inverter for assay plates.
+Motorised inverter for assay plates. Clamp a plate in the printed cradle, press
+the button, and a servo sweeps it through 180° over a waste tray, holds while it
+drains, and brings it back — the same flick every time, slow enough that nothing
+crosses between columns.
 
 **Build guide:** [bruhautomation.com/projects/96-well-plate-inverter](https://bruhautomation.com/projects/96-well-plate-inverter/)
 
 ## Hardware
-- Motorized inversion mechanism
-- 3D-printed plate holder
+
+- MG996R standard-size metal-gear servo driving one trunnion
+- 608-2RS bearing on the idle trunnion
+- Arduino Nano (or an ESP32, if you want it in Home Assistant) and one momentary button
+- 12 V brick into an MP1495 step-down set to 6 V — the servo never runs off the board's regulator
+- 3D-printed cradle in PETG, frame in PLA+, clamp pads in TPU
+- M3 heat-set inserts throughout
+
+The rotation axis runs through the middle of the plate, not under it. Balanced
+that way the servo carries almost nothing; underslung, the cradle is a pendulum
+that falls over top dead centre and splashes.

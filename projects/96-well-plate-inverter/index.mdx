@@ -1,20 +1,176 @@
 ---
 title: 96-Well Plate Inverter
-description: A mechanical device for inverting 96-well plates without spilling.
-# The files are here; the write-up isn't finished. Published, and marked as
+description: A motorised cradle that clamps a 96-well plate, sweeps it through 180° over a waste tray and brings it back — the same flick, every plate, every time.
+# The models and the sketch aren't in the folder yet. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A simple mechanical device for inverting 96-well plates without spilling contents.
-
-{/* Photo needed — A hero photo of the finished 96-well plate inverter — show the device gripping a 96-well plate mid-flip.
-    alt text when it lands: A 3D-printed 96-well plate inverter holding a microplate, ready to flip it upside down */}
+Decanting a 96-well plate by hand is the least repeatable step in a wash. You
+tip it, you flick it, and how hard you flicked is now a variable in your data —
+worse, a fast tip walks liquid up the well walls and drops it into the next
+column. This is a printed cradle on a servo: clamp the plate, press the button,
+and it sweeps through 180° over a waste tray, dwells while it drains, and comes
+back the same way it went.
 
 :::note
-Design files and usage guide coming soon.
+The models and the sketch aren't published yet — that is what the banner at the
+top of this page is about. The parts list below is the real one, and the
+mechanical notes are the ones worth reading before you model anything.
+:::
+
+<ImagePlaceholder alt="A 3D-printed motorised inverter holding a 96-well plate part-way through a flip over a waste tray">
+  Hero shot — the inverter on the bench with a plate clamped in the cradle,
+  caught mid-sweep over the waste tray.
+</ImagePlaceholder>
+
+## How it works
+
+The cradle grips the plate by its skirt. It turns on a horizontal axis: a
+standard-size servo drives one trunnion, a 608 bearing carries the other, and a
+single momentary button starts a sweep. There is nothing to home and nothing to
+count — a standard servo is a position, so "upright" and "inverted" are two
+numbers and the dwell between them is a third.
+
+Whether it works well comes down to one decision: **where the rotation axis
+sits**. Run it through the middle of the plate and the load is balanced either
+side of the axis through the whole sweep, so the servo carries almost nothing
+and the motion is as smooth at 90° as it is at 10°. Put the axis under the
+plate — which is the obvious way to draw it, because that is where there is
+room — and the cradle becomes a pendulum. The servo strains up to top dead
+centre and then the plate falls over the far side faster than it was told to
+move. That fall is exactly what throws liquid between wells, and no amount of
+slowing the command down will fix it.
+
+Plate footprints are standardised and heights are not. Every SLAS-footprint
+plate is 127.76 × 85.48 mm, so clamp on the skirt and the cradle fits
+everything; clamp on the top edge and it fits one plate type. Design the top
+bar to adjust, or accept that a deep-well block will not go in.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [MG996R metal-gear servo](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20) ×1 — sold in a 6-pack; the flip drive
+- [Arduino Nano](https://www.amazon.com/s?k=Arduino+Nano+ATmega328P&tag=brau01-20) — one servo output and one button input is all it needs
+- [12 V 4 A power brick](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) with the matching [5.5 × 2.1 mm panel jacks and pigtails](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20)
+- [MP1495 adjustable step-down module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — 12 V down to 6 V for the servo, 3 A, sold in fives
+- [Mini momentary push button](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20) — 30-pack, you need one
+- [608-2RS ball bearings](https://www.amazon.com/dp/B07C6FL8TW?tag=brau01-20) — one for the idle trunnion, two if you carry the servo end on a bearing as well
+- [M3 brass heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and an [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+- [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — for the servo horn screw, which is the one fastener that will back out
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — the servo lead is never long enough
+- [IP65 hinged project box](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20) — a sealed box is the right call for anything that lives beside a waste tray
+- Filament: [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the frame, [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the cradle, a little [TPU](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) for the clamp pads
+
+Two worth adding if you have them. A [Nano screw-terminal
+shield](https://www.amazon.com/dp/B07K8KM583?tag=brau01-20) turns the whole
+harness into screw terminals, which matters when the box gets opened wearing
+gloves. And if you want the inverter to show up in Home Assistant rather than
+answer only to its own button, an [ESP32
+DevKit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) drives the same
+servo and the same button off the same 6 V rail.
+
+:::note
+The MG996R is roughly 10 kg·cm at 6 V, which is far more than a balanced cradle
+asks for and about right for one that isn't quite. If yours ends up
+nose-heavy, the [DS3218](https://www.amazon.com/dp/B07G34PLXQ?tag=brau01-20) is
+20 kg·cm in the same standard servo case — but fix the balance first, because a
+bigger servo makes an unbalanced flip faster, not gentler.
+:::
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 4 perimeters on the cradle and the trunnions |
+| Infill | 25% frame, 40% cradle |
+| Supports | None, if the trunnion bores print vertically |
+| Material | PETG for the cradle, PLA+ for the frame, TPU for the pads |
+
+Print the cradle in PETG. It is the part that gets wiped with 70% ethanol
+several times a day and the part that sits over the waste tray, and PLA is the
+worse choice for both. Nothing here is autoclavable — PETG gives up around
+80 °C and an autoclave runs at 121 °C — so design the cradle to be wiped and
+replaced, not sterilised. It costs an hour of print time to make a spare.
+
+The clamp pads are the only reason to load TPU. Two thin pads under the top bar
+spread the load across the plate skirt so you can clamp hard enough to hold it
+inverted without cracking a polystyrene plate. Print them at 0.2 mm and 100%
+infill; at anything less they compress unevenly and the plate rocks.
+
+Orient the trunnions so the bore axis is vertical on the bed. Printed
+horizontally the bore comes out oval, and an oval bore in a 608 bearing seat is
+a cradle with slop in it — which you will see as the plate nodding at the end of
+each sweep.
+
+## Powering it
+
+The servo does not run off the board's 5 V pin. An MG996R pulls well over an amp
+when it starts a sweep, and a Nano's regulator answers that by browning out
+mid-flip with a plate upside down in the cradle. Set the step-down module to
+6.0 V with a meter **before** you connect the servo, feed the servo from there,
+and tie the grounds together so the board and the servo share a reference. The
+board itself can run from the same 6 V rail into `VIN`, or off USB while you are
+still writing code.
+
+## Assembly
+
+<Steps>
+
+1. **Melt the heat-set inserts in** while the printed parts are still loose and
+   you can get an iron square to each hole. Every screw in this thing gets
+   undone again — the clamp bar every time the plate size changes — and a
+   tapped-plastic thread will not survive that.
+
+2. **Build the cradle and check the balance by hand.** Load a real plate, hold
+   the trunnions between two fingers and let go at 45°. It should stay where you
+   put it. If it swings back to upright, the axis is too low and now is the time
+   to move it, not after the servo is mounted.
+
+3. **Centre the servo before the horn goes on.** Power it, command mid-travel,
+   and only then press the horn on so the cradle reads upright. A standard servo
+   gives you about 180° of travel and nothing more, so a horn fitted a few
+   splines out costs you the end of the sweep you most need.
+
+4. **Threadlocker on the horn screw.** It is the only fastener taking a reversing
+   load every cycle, and it is the one that will be loose in a fortnight.
+
+5. **Wire it, set the buck to 6.0 V, then connect the servo** — in that order.
+
+6. **Set the two endpoints with the plate empty**, then repeat with the plate
+   full of water over the sink before it ever sees a sample.
+
+</Steps>
+
+## Setting the sweep
+
+Three numbers: upright, inverted, and the dwell in between. Upright and inverted
+are whatever your horn indexing gave you — read them off, don't assume 0 and
+180. The dwell is the one you tune, and the honest way to tune it is with water
+and a balance: invert, hold, come back, and weigh what is left in the plate.
+Somewhere around a couple of seconds the residual stops dropping and holding
+longer buys you nothing.
+
+Sweep speed matters more than dwell. Take four or five seconds to go over rather
+than one — if the plate arrives inverted faster than the liquid does, the liquid
+arrives as a splash and lands wherever it likes. Slow is not a compromise here;
+slow is the entire point of building the thing instead of flicking it.
+
+:::caution
+Whatever is in the plate ends up in the tray. Run this over a tray of
+disinfectant with an absorbent pad in it, and if the contents need a biosafety
+cabinet then the inverter needs to be in the cabinet too — a motorised flip
+generates the same aerosol as a hand flick and does it at bench height where you
+are not looking. The plate is also mechanically captive: check the clamp is
+tight before every run, because there is no sensor on this that knows the plate
+left.
 :::
 
 ## Files & downloads

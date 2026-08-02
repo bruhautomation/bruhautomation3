@@ -1,18 +1,155 @@
 ---
 title: DeWalt Screwdriver Holder
-description: Holder for the DeWalt GYRO screwdriver and its bits.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A printed wall mount for the DeWalt GYRO screwdriver — a 1.5 inch plate, a 20 mm sleeve, two screws and about ten grams of filament.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Holder for the DeWalt GYRO screwdriver and its bits.
+The GYRO screwdriver is the tool you reach for twenty times a day and then can
+never find, because it is round, it rolls, and it does not stand up. This gives
+it somewhere to live: a small square plate that screws to a wall, a cabinet door
+or the back of a bench, with a sleeve on it that the driver drops straight into.
+Two screws, ten grams of filament, and it stops migrating.
 
-## Hardware
-- 3D-printed mounting bracket
-- DeWalt GYRO screwdriver
+<ImagePlaceholder alt="The printed DeWalt GYRO screwdriver holder mounted on a workshop wall with the driver sitting in it">
+  Hero shot — the holder screwed to a wall or cabinet door with the GYRO
+  screwdriver dropped into the sleeve, ideally at a slight angle so both the
+  plate and the sleeve read.
+</ImagePlaceholder>
+
+## The part
+
+One printed piece, exported from Fusion 360. Every number below is measured off
+the STEP file in this folder, so you can check the fit before you spend an hour
+of print time on it.
+
+| Feature | Dimension |
+|---|---|
+| Base plate | 38.1 × 38.1 mm (1.5 in square), 6 mm corner radii |
+| Plate thickness | 1.0 mm |
+| Sleeve outside diameter | 24 mm |
+| Sleeve bore | 20 mm, through, with a 1 mm rounded lead-in at both ends |
+| Sleeve length | 20 mm, centred on the plate |
+| Wall thickness | 2 mm |
+| Overall height | 25 mm |
+| Mounting holes | 2 × Ø3 mm on the centreline, 5 mm in from each end (28.1 mm apart) |
+| Head relief | Ø8 mm × 0.75 mm deep around each hole |
+
+The sleeve is a plain through-tube, not a cup. Mount the plate on a vertical
+surface with the bore running up and down and the driver goes in nose-first and
+hangs on whatever part of it is wider than 20 mm; mount it flat and the sleeve
+becomes a scabbard you slide the tool into sideways. Either works — the two
+screws sit directly in line with the bore, which is the arrangement you want
+when a tool is hanging off it.
+
+:::note
+This is the driver mount. There is no bit rack in the model — the bore is one
+open sleeve and nothing else. If you want bits on the same plate, that is a
+change to the `.f3d`, not a second file in this folder.
+:::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the whole part is about 10 g, so one spool is a lifetime supply of these
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print it in this instead if the holder is going in a garage or a shed
+- [#4 × 3/8 in stainless wood screws](https://www.amazon.com/dp/B081V428SD?tag=brau01-20) ×2 — a 2.9 mm shank through a 3 mm hole, which is exactly what the plate was drawn for
+- [M3 screw, nut and washer kit](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — if you are bolting through a thin panel rather than screwing into wood. Take the washers whichever way you mount it
+- [Drywall and hollow-wall anchors](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20) — if it is going on plasterboard and you cannot find a stud
+- [3M VHB 5952 tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — the no-drill option; two strips of the 1/2 in roll cover the back of the plate
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure your driver's barrel before you print, not after
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — for dressing the bore if it comes out tight
+
+And the tool it is built around, which is not part of the build:
+the [DEWALT GYRO 8V MAX screwdriver](https://www.amazon.com/s?k=DEWALT+GYRO+8V+MAX+screwdriver+DCF680&tag=brau01-20)
+and a [71-piece DEWALT bit set](https://www.amazon.com/dp/B00TI7HZY0?tag=brau01-20) to feed it.
+
+## Print settings
+
+Print it exactly as exported — plate flat on the bed, sleeve arching over it.
+Nothing else is worth trying: stood on end the plate has no support under it and
+the whole thing is a 25 mm tower on a 1 mm base.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm — the 1 mm plate comes out as five whole layers |
+| Walls / perimeters | 4 |
+| Infill | 25% |
+| Supports | None |
+| Material | PLA+, or PETG for a hot space |
+| Orientation | Plate on the bed, as exported |
+
+The wall count is what carries the load here, not the infill — a 2 mm sleeve
+wall is five extrusion widths on a 0.4 mm nozzle, so four perimeters makes it
+very nearly solid and the infill percentage barely matters.
+
+**PETG if it lives anywhere warm.** The plate is 1 mm thick and it is holding a
+weight that never comes off. PLA creeps under a constant load once a garage gets
+into the thirties, and the failure is slow enough that you will not notice until
+the sleeve is drooping.
+
+The top of the bore is a 20 mm unsupported arch and will sag a little as it
+closes over. That is fine — it is a clearance sleeve, not a bearing, and the
+sag is at the top where nothing bears. If you want it clean, turn supports on
+for the bore only and pull them out afterwards; the 1 mm lead-in radius at each
+end makes them easy to get a fingernail behind.
+
+## Mounting
+
+<Steps>
+
+1. **Measure the driver first.** Callipers on the part of the barrel you want
+   sitting in the sleeve. Under 20 mm and you are done; over it and you want to
+   open the bore in the `.f3d` before printing rather than after.
+
+2. **Print it**, then test-fit dry. If the bore is tight, a couple of passes
+   with a round needle file or a rolled strip of sandpaper takes the sag off the
+   top of the arch. Do this before it is on a wall.
+
+3. **Mark the holes.** Two, on the centreline, 28.1 mm apart. Hold the plate
+   where you want it and mark straight through it — that is faster and more
+   accurate than measuring, and the plate is thin enough to see through.
+
+4. **Fix it down** with the bore vertical if the tool is going to hang in it, or
+   horizontal if you are laying the tool in sideways. Snug the screws, then
+   stop.
+
+5. **Drop the driver in** and check it clears the wall. Twenty-five millimetres
+   of standoff is not much, so if your driver has a fat grip section, mount the
+   plate somewhere with nothing above or below it.
+
+</Steps>
+
+:::caution
+The shoulder the screw head lands on is only 0.25 mm thick — the Ø8 mm relief
+takes the plate down to almost nothing around each hole. It is there so the head
+sits flush, not so you can crank on it. Tighten these by hand until they stop
+turning easily and no further, and put a washer under each head if you have
+one. Overtighten and the head pulls straight through the plate.
+:::
+
+<ImagePlaceholder alt="Close-up of the holder's base plate showing the two countersunk mounting holes and the sleeve's rounded lead-in">
+  Detail shot of the plate — the two screw holes with their relief, and the
+  rounded lip at the end of the bore. Useful for anyone checking their print
+  came out right.
+</ImagePlaceholder>
+
+## Changing the bore
+
+The Fusion source is in the folder, not just the mesh, so this is a
+five-minute edit rather than a remodel. The bore is a single 20 mm circle and
+the sleeve's outside is a 24 mm one concentric with it — change the bore and
+push the outside out by the same amount to keep the 2 mm wall, or leave the
+outside alone and accept a thinner one down to about 1.6 mm before it stops
+being worth printing.
+
+The same file is the right starting point for anything else round and
+homeless — a glue gun, a soldering iron, a torch. The plate and the screw
+spacing do not care what is in the sleeve.
 
 ## Files & downloads
 

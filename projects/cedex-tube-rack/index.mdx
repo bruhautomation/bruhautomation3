@@ -1,20 +1,155 @@
 ---
-title: Tube Rack for CEDEX BioHT
-description: A custom 3D printed tube rack designed for the CEDEX BioHT analyzer.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+title: Tube Rack for the Cedex Bio HT
+description: A printed bench rack that stages Cedex Bio HT sample tubes upright and in run order, sized around the tubes your own lab uses.
+# The model files aren't in the folder yet, so nobody can print this from the
+# page. Parts, material, print settings and finishing are all here.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A custom tube rack designed for the CEDEX BioHT to keep sample tubes organized during analysis.
+The Cedex Bio HT has a carrier for the samples it is running. It has nothing for
+the twenty tubes waiting their turn. Thaw a week of timecourse supernatant and
+they end up in a foam block, a beaker, or lying on the bench in whatever order
+you pulled them out of the box — and one tube loaded out of order turns a whole
+timecourse into a puzzle. This is a printed rack that sits beside the analyser
+and holds those tubes upright, in the order you sampled them, until they go on.
 
-{/* Photo needed — A hero photo of the finished CEDEX BioHT tube rack — show the printed rack holding sample tubes next to the analyzer.
-    alt text when it lands: A custom 3D-printed tube rack sized for the CEDEX BioHT analyzer, loaded with sample tubes */}
+<ImagePlaceholder alt="A custom 3D-printed tube rack sized for the Cedex Bio HT analyser, loaded with sample tubes">
+  Hero shot — the finished rack on the bench next to the Cedex Bio HT, loaded
+  with labelled sample tubes, position numbers visible along the front edge.
+</ImagePlaceholder>
 
 :::note
-3D files coming soon.
+A rack is drawn around one tube. Cedex sample tubes and cups are not all one
+size and no two labs use quite the same consumables, so **measure yours before
+you print**. The section below is the difference between a rack you use every
+day and a bin full of plastic.
+:::
+
+## Before you print
+
+Put a caliper across the widest part of a **capped, labelled** tube — on most
+tubes that is the cap flange, not the barrel — and write the number down. Then
+measure the tube's height, because how deep the well sits is the other half of
+the design: deep enough that a full tube can't tip, shallow enough that you can
+still pinch a cap out with gloves on.
+
+Two things catch people here.
+
+**Labels are thicker than they look.** A wrapped thermal label adds a few tenths
+of a millimetre to a tube's diameter, and one that overlaps itself adds twice
+that. Size the wells for a labelled tube. A rack that only takes bare tubes is a
+rack you stop using on the first day of a real run.
+
+**FDM holes print undersize.** Almost every printer lays a vertical hole a
+little tight, by an amount that belongs to your machine and your filament rather
+than to the model. Print a two-well test coupon, push a real tube into it, and
+scale from what the coupon tells you — not from what the caliper told you.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print the rack in this. The material section below is why
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 × 1 kg pack, and fine if the rack never leaves a climate-controlled bench
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — this build is a printer and a caliper, and the caliper is the important one
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass takes the burr off a well mouth
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — the round one opens the wells that still come out tight
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — a 200-pack; you need four, under the base
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — only if the rack is longer than your build plate and you split it
+- [Brother P-touch label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) and [laminated TZe tape](https://www.amazon.com/dp/B06XCQ79ZM?tag=brau01-20) — for the position numbers. Laminated tape survives a solvent wipe; paper tape lifts on the second one
+- [99% isopropyl alcohol](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — for the compatibility test below, and the wipe-down after
+
+## Material
+
+Print it in PETG.
+
+PLA is easier, and it is what most bench racks get printed in, and it is the
+wrong answer here for three reasons. It softens around 60 °C, which is close
+enough to the top of a warm instrument or a sunlit bench to matter. It turns
+brittle in the cold, so a rack that comes out of a 4 °C fridge carrying frozen
+aliquots cracks at a well wall instead of flexing. And it is the least happy of
+the common filaments about sitting in spilled media.
+
+PETG holds its shape to about 80 °C, stays tough cold, and takes an ethanol or
+IPA wipe without crazing. It costs you a slower first layer and a brim. Print
+the PLA+ instead only if the rack lives on one bench at one temperature and you
+are making a lot of them.
+
+:::caution
+**Nothing you print on an FDM machine is autoclavable.** PETG is soft well below
+121 °C and PLA is a puddle. This rack gets wiped down, not sterilised. Keep it
+on the bench side of the workflow and keep it out of anything that has to come
+back sterile.
+:::
+
+If your lab wipes with something more aggressive than ethanol, test it before
+you commit a spool. Print a coupon, leave it under a soaked wipe for an hour,
+and check whether it has gone cloudy, tacky or soft.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 3 |
+| Infill | 20%, gyroid |
+| Supports | None |
+| Material | PETG |
+| Orientation | Base flat on the plate, wells opening upward |
+| Brim | Yes in PETG, optional in PLA |
+
+Wells opening upward is the whole orientation argument. Printed that way every
+well is a plain vertical hole — nothing to bridge, nothing to support — and the
+layer lines run around each well rather than across it, which is also the
+direction that resists a tube being shoved in.
+
+Three perimeters rather than more infill. What wears on a rack is the wall
+between two wells, and that wall is perimeters. Pushing infill past 25% buys
+print time and nothing else.
+
+A rack is a wide flat footprint and PETG lifts at the corners. Brim it. If it
+still lifts, the fix is a hotter plate, not more brim.
+
+## Finishing
+
+<Steps>
+
+1. **Deburr every well mouth.** A tube that catches on a stray strand on the way
+   in is a tube you drop on the way out. One pass with the deburring tool per
+   well, and do the underside too if the wells go all the way through.
+
+2. **Test-fit a real tube in every well.** Not one well — every well. A printer
+   that under-extrudes on a single wall gives you exactly one tight position,
+   and that is the one you will find at eight in the morning holding a rack of
+   thawed samples.
+
+3. **Open the tight ones with the round needle file.** A few strokes, test,
+   repeat. Do not reach for a drill: it grabs the plastic and takes the whole
+   well wall with it.
+
+4. **Stick a rubber bumper under each corner of the base.** A freshly wiped
+   bench is wet, and a loaded rack that slides is a loaded rack on the floor.
+
+5. **Number the positions.** Run a strip of laminated tape along the front edge
+   with the numbers on it, printed rather than written — a Sharpie number comes
+   off with the first ethanol wipe.
+
+</Steps>
+
+:::tip
+Number the rack, not the tubes, and load it in sample order. The rack then *is*
+the run list: a tube in the wrong position is visible from across the bench,
+which is not true of twenty tubes in a foam block.
+:::
+
+:::note
+The model files aren't published yet. Everything above is what you'll want ready
+when they land.
 :::
 
 ## Files & downloads

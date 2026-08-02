@@ -1,18 +1,171 @@
 ---
 title: ESP32-CAM
-description: Camera node with an OLED status display.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A $20 all-in-one ESP32 camera board — OV2640, a 0.96in OLED, a PIR and a button on one PCB — running ESPHome and reporting into Home Assistant.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Camera node with an OLED status display.
+A camera node that is one board and a USB cable. The ESPHome config in this
+folder brings up an OV2640 camera, a 0.96in OLED that shows whatever you want it
+to show, a PIR and a button — and every one of those parts is on the same PCB,
+so there is nothing to solder, nothing to wire and nothing to print. Twenty
+dollars gets you a `camera` entity and a motion `binary_sensor` in Home
+Assistant from the same device.
 
-## Hardware
-- ESP32 with integrated camera
-- WiFi connectivity
+:::caution
+**This config is for a TTGO T-Camera, not a bare ESP32-CAM.** The folder is
+called `esp32-cam` and the two names get used interchangeably, but the boards are
+not interchangeable. The camera pins in `bruh-esp32-cam.yaml` — external clock on
+GPIO32, SCCB on 13/12, pixel clock on 19 — are the T-Camera's, and the AI-Thinker
+ESP32-CAM that everyone means by "ESP32-CAM" uses a different set entirely. It
+also has no OLED, no PIR and no button, so the `display:` block and both
+`binary_sensor:` blocks would have nothing to talk to. Buy the T-Camera and this
+config flashes and runs. Buy the other one and you are writing a new config.
+:::
+
+<ImagePlaceholder alt="A TTGO T-Camera board running ESPHome, OLED lit, next to a phone showing the camera feed in Home Assistant">
+  Hero shot — the T-Camera in hand or stuck to a wall, OLED lit, with the Home
+  Assistant camera card visible on a phone or tablet beside it.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [TTGO T-Camera ESP32-WROVER-B, OV2640 + 0.96in OLED](https://www.amazon.com/dp/B07PRZTF1N?tag=brau01-20) — the whole project. Camera, display, PIR and button on one board
+- [5V USB charger, 2.4A](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — a 3-pack, and you want the amps (see Troubleshooting)
+- [Short right-angle micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — the 90° head keeps the cable flat against a wall
+- [16.4 ft flat micro-USB extension](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20) — a 2-pack, for the far more likely case that the camera goes where the outlet isn't. It ships with the little wire clips
+- [3M VHB tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — a 1/2in strip on the back of the PCB is a perfectly good mount for a board this light
+
+The T-Camera sells in a few lens and sensor variants. If yours arrived without
+the PIR populated, an external one on GPIO33 does exactly the same job:
+
+- [Mini pyroelectric PIR module](https://www.amazon.com/dp/B016Y10B3O?tag=brau01-20) — the small AM312-class module, not the big HC-SR501 with the trimmers on the back. It runs on 3.3V and its output is already 3.3V logic
+- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — three female-to-female wires is the entire wiring job
+
+And if you specifically want the AI-Thinker board instead, it is
+[a different part](https://www.amazon.com/s?k=ESP32-CAM+AI-Thinker+OV2640+module&tag=brau01-20)
+and needs a different config — read the caution above first.
+
+## Pins
+
+Every pin here is read straight out of `esphome/bruh-esp32-cam.yaml`. You don't
+wire any of them. They are here so you can recognise the board, and so you know
+what is already taken if you add something.
+
+| Function | GPIO |
+|---|---|
+| Camera external clock (XCLK) | **32**, at 20 MHz |
+| Camera SCCB — SDA / SCL | **13 / 12** |
+| Camera data D0–D7 | **5, 14, 4, 15, 18, 23, 36, 39** |
+| VSYNC | **27** |
+| HREF | **25** |
+| Pixel clock | **19** |
+| OLED I2C — SDA / SCL | **21 / 22** |
+| PIR | **33** |
+| Button | **34** |
+
+**The camera and the display sit on two separate I2C buses, and that is
+deliberate.** The `i2c:` block at the top of the config (21/22) is the OLED's;
+the `i2c_pins:` inside `esp32_camera:` (13/12) is the camera's SCCB bus, which
+the camera driver owns. Collapsing them into one bus is the first tidy-up people
+try and it stops the camera initialising.
+
+## Flashing
+
+<Steps>
+
+1. **Create `secrets.yaml`** in your ESPHome directory with the five keys this
+   config uses: `wifi_ssid`, `wifi_password`, `api_key`, `ota_password` and
+   `ap_password`. `api_key` is the API encryption key — ESPHome generates one for
+   you when you create a device in the dashboard.
+
+2. **Drop `Roboto-Medium.ttf` next to the YAML.** The `font:` block references it
+   by bare filename, so ESPHome looks for it in the same directory as the config.
+   Miss this and the compile fails before it ever reaches the camera code, with
+   an error about a font and nothing about anything else. Any TTF works — change
+   the filename in the config to match whatever you drop in.
+
+3. **Rename the node.** There are no substitutions in this config, so `name:` and
+   `friendly_name:` under `esphome:` are edited directly, along with the fallback
+   hotspot SSID under `wifi.ap`. Do this before you flash a second one, or you
+   end up with two devices called `esp32-cam-1`.
+
+4. **Flash over USB the first time.** Every flash after that goes over WiFi —
+   `ota:` is already in the config.
+
+5. **Watch the log on first boot.** The camera either initialises or it doesn't,
+   and the log tells you which within the first couple of seconds.
+
+</Steps>
+
+It appears in Home Assistant on its own. ESPHome devices are discovered, so there
+is no YAML to write on the Home Assistant side.
+
+## What you get
+
+A **camera** entity, a **PIR Sensor** binary sensor with `device_class: motion`,
+and a **Button** binary sensor. The motion sensor is the useful half — it is a
+real PIR on the same board as the lens, so "notify me with a picture when
+something moves" is one automation, with no cloud, no subscription, and no
+coordination between two separate devices.
+
+Set your expectations on the video. ESPHome's camera is not an RTSP source; Home
+Assistant pulls frames over the native API, and at the 640×480 this config asks
+for that is fine for *what tripped that automation* and poor for *watching the
+driveway*. If you want smooth live video, buy a real camera. This is a sensor
+that takes pictures.
+
+The OLED is the part people underuse. Out of the box the lambda prints
+`"Hello World!"` and that is all it does — a placeholder, not a feature. The
+display is driven entirely on-device, so to put Home Assistant data on it you
+import the values you want as `homeassistant` sensors in ESPHome and print those
+in the lambda instead: room temperature, the state of the alarm, who is home.
+The `rotation: 180` line is there so the text reads the right way up in one
+particular orientation; if yours comes out upside down, that is the line to
+delete.
+
+<ImagePlaceholder alt="Close-up of the T-Camera's 0.96in OLED showing live Home Assistant values instead of Hello World">
+  Close-up of the OLED with a real layout on it — a temperature, a status line —
+  to show what replacing the placeholder lambda buys you.
+</ImagePlaceholder>
+
+## Troubleshooting
+
+**It boots, connects, then resets. Repeatedly.** Power. An ESP32 with the camera
+and the radio both awake pulls hard in short bursts, and a phone charger that
+claims 1A sags on those bursts until the brownout detector fires. Use a 2A-plus
+supply and a short, thick cable. If the 16 ft extension is in the loop, take it
+out first while you are diagnosing.
+
+**The camera never initialises.** Check the module actually says WROVER. The
+framebuffer for a 640×480 frame lives in PSRAM, and PSRAM is the difference
+between a WROVER module and a plain WROOM one — a WROOM ESP32 with an OV2640
+bolted to it cannot hold the frame however the config is written. That is the
+second reason a bare AI-Thinker swap is not a swap.
+
+**The compile fails with an error about a font.** See step 2. The TTF has to be
+sitting beside the YAML.
+
+**The button reads stuck, or backwards.** GPIO34 is one of the ESP32's input-only
+pins and it has **no internal pull-up at all** — the chip does not have one to
+offer on that pin. The config declares it bare, which leans on the board's own
+external pull-up, and that means the pin reads low when the button is pressed. If
+it reports inverted, add `inverted: true` to that `binary_sensor`.
+
+**Motion triggers constantly.** A PIR pointed at a heat source — a vent, a
+radiator, sun tracking across a wall — fires all day. Move it before you change
+any settings. The camera wants to be looking at the room rather than at the
+ceiling anyway, which usually fixes both at once.
+
+**It drops off WiFi.** The WROVER-B's PCB antenna is not strong, and a camera
+node tends to end up stuck to a wall in the exact corner of the house with the
+worst coverage. Rotating the board 90° is worth more than you would expect; try
+that before you buy a repeater.
 
 ## Files & downloads
 

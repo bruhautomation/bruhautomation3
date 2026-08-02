@@ -1,22 +1,182 @@
 ---
 title: Couch Cupholder
-description: A 3D printed cupholder that slips over the arm of a couch, with swappable inserts for different cup sizes.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A printed saddle that straddles a couch arm and holds a drink — one big pocket, plus a drop-in insert that narrows it to a 78 mm cup well.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-## Design
+Two printed parts and no fasteners. A saddle drops over the arm of the couch and
+grips it, a pocket in the top takes a drink, and a separate insert drops into
+that pocket to narrow it down to a cup. Nothing is glued and nothing is screwed
+— you lift it off when you want the arm back.
 
-A cupholder that slips over the arm of the couch. It includes swappable inserts for different cup sizes. Printed in carbon fiber PLA for a clean surface finish and solid feel.
+The catch is that a saddle is sized to one arm, and that arm is mine. **Measure
+yours before you commit a quarter of a spool to it**, because there is no strap
+and no adjustment: it either sits on your couch or it doesn't.
 
-## Make Your Own
+<ImagePlaceholder alt="The printed couch cupholder sitting on the arm of a sofa with a drink in it">
+  Hero shot — the holder on the couch arm with a glass in the insert, shot low
+  and from the side so the skirts hugging the arm are visible.
+</ImagePlaceholder>
+
+## Will it fit your couch?
+
+The arch on the underside is 85 mm deep and it pinches: 193 mm across at its
+widest, closing to about 187 mm at the mouth. That pinch is what stops the
+holder lifting off a padded arm.
+
+| Your arm | What happens |
+|---|---|
+| Under ~180 mm (7 in) | Slips on, but rocks. Rubber bumpers inside the skirts take up the slack |
+| 180–190 mm (7–7½ in) | What it is drawn for |
+| Over ~190 mm (7½ in) | Won't go on. Upholstery compresses a few mm, a hardwood arm doesn't |
+
+It also needs 85 mm of clear side on the arm below the top surface, and it takes
+up 93 mm of the arm's length. Measure the arm at its widest point, which on most
+sofas is a little below the top, not at the top.
+
+<ImagePlaceholder alt="A digital caliper measuring the width of a couch arm">
+  The measurement shot — calipers or a tape across the widest part of the couch
+  arm, so the number in the table above is obvious.
+</ImagePlaceholder>
+
+## Parts
 
 <AffiliateDisclosure />
 
-Printed on an [Ender 3 V2](https://amzn.to/3ZfeX4p) using [carbon fiber PLA](https://amzn.to/48qm3aL) — remix to fit your couch arm and cup sizes. The insert is a separate part; pick it in the viewer below.
+Everything here is filament and tooling. There is no hardware in this build.
+
+- [Carbon-fibre PLA, 1.75 mm](https://www.amazon.com/dp/B0D86M3RM4?tag=brau01-20) — the black matte finish is the whole point; it reads as furniture rather than as a 3D print, and it hides layer lines on a part that lives at eye level in the living room
+- [0.4 mm hardened steel nozzle](https://www.amazon.com/dp/B08VNNZH37?tag=brau01-20) — **not optional with CF filament.** Chopped carbon fibre eats a brass nozzle in a couple of spools. This is a 20-pack, so it's cheaper than one branded nozzle
+- [PLA+, black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the alternative if you don't want to change nozzles, and honestly the tougher plastic of the two. See the caution below
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the arm measurement above, and for checking the insert against the pocket
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — a few dots inside the skirts stop a narrow arm rattling and keep the plastic off the fabric. A 200-pack; you need four
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — the pocket is printed against supports and the insert is a 1 mm fit. One pass round the pocket lip is usually the difference
+- [Assorted wet/dry sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — 240 and up, for the insert if it binds
+
+The body's footprint on the plate is 206 × 141 mm, so it wants a 220 mm bed or
+bigger — a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20)
+swallows it, an Ender-class 220 × 220 bed takes it with 13 mm to spare on the
+long axis. Square the part up on the plate; don't eyeball it.
+
+:::caution
+Carbon-fibre PLA is stiff and it is brittle. The skirts have to spread to go
+over the arm, and CF-PLA would rather crack than flex. If your arm measures at
+the top of the range, print it in PLA+ instead — you give up some of the matte
+look and you get a part that survives being forced on. Either way, both are PLA:
+it lives permanently sprung open around the arm, and PLA creeps under a sustained
+load. Expect the grip to soften over a year or two.
+:::
+
+## Print settings
+
+The body is 276 cm³ of model and the insert 119 cm³. At 20% infill with four
+walls that comes out around 250 g and 90 g — your slicer will give you the real
+number. A 1 kg spool prints the holder and three inserts with room for supports.
+
+| Setting | Body | Insert |
+|---|---|---|
+| Layer height | 0.2 mm | 0.2 mm |
+| Walls | 4 | 4 |
+| Infill | 20% | 20% |
+| Supports | Yes | None |
+| Material | CF-PLA or PLA+ | Same |
+| Orientation | Standing on one of the two flat faces | Flat on its closed end |
+
+**The body prints standing on one flat face, not the way it lands when you open
+the STL.** In that orientation the whole arch profile becomes a straight
+extrusion — every layer is a copy of the one below, the bed contact is a broad
+flat face instead of two skinny skirt edges, and the layer lines run along the
+arch rather than across it. That last part is the one that matters. The load on
+this thing is the arm pushing the skirts apart, which is bending at the corner
+where each skirt meets the deck. Printed the other way up, that corner is a glue
+joint between two layers and it will split.
+
+Supports are only needed around the cup ring — under its lower half, and inside
+the pocket where the wall arcs over. Everything below the deck needs none.
+
+<ImagePlaceholder alt="The cupholder body on a print bed standing on its flat side face with supports under the cup ring">
+  Slicer screenshot of the body in the correct orientation — flat face down,
+  supports visible under and inside the cup ring only.
+</ImagePlaceholder>
+
+The insert prints closed-end-down with its whole 101 × 91 mm base on the plate.
+No supports, no brim, nothing to clean up except the first layer.
+
+## Assembly
+
+<Steps>
+
+1. **Break the supports out of the pocket.** They come out in one or two pieces.
+   Get everything out — the pocket wall is what the insert registers against.
+
+2. **Dress the pocket lip** with the deburring tool, one pass. Elephant's foot on
+   the first layer of the pocket floor is the other place to check.
+
+3. **Drop the insert in.** It should slide down under its own weight and stop
+   2 mm below the rim. If it binds, the fit is 1 mm per side — take material off
+   the *insert* with 240 grit, not off the pocket, because the pocket is the
+   part you can't replace in an hour.
+
+4. **Stick four rubber bumpers inside the skirts**, two per side, roughly a third
+   and two thirds of the way down. They add grip and they keep bare plastic off
+   the upholstery.
+
+5. **Fit it to the arm.** Start it square, push it straight down, and let the
+   skirts spread evenly. Rocking it on corner-first is how you crack a skirt.
+
+</Steps>
+
+## The pocket and the insert
+
+The pocket in the top is an obround — a 93 mm circle pulled 10 mm apart along
+the arm — so 103 × 93 mm and 50 mm deep, with a 4 mm wall and a 6 mm floor. On
+its own it is a bowl: big mugs, a phone and a remote, a handful of popcorn.
+
+The insert makes it a cupholder. It is the same obround 1 mm smaller all round,
+48 mm tall, with a 78 mm round bore and a 3 mm floor — a **78 mm well, 45 mm
+deep**. That is a mug-and-tumbler size, not a can size. A drinks can is around
+66 mm and will rattle in it.
+
+Changing the size is one dimension. The insert's outer profile has to stay as it
+is or it stops fitting the pocket, so the only thing you touch is the bore: it is
+a single cylindrical face in `bruh_couch_arm_cupholder_insert.step`, and you can
+push-pull it in Fusion without unpicking anything else. Keep 4 mm of wall — that
+puts the practical ceiling around 83 mm — and raise the floor if you want a
+shallower well for a short glass. Print one per drink you actually own; they are
+90 g each.
+
+:::note
+There is a strip in the middle of each flat face where the pocket wall tapers
+away to nothing. That is not a slicing fault. The pocket is 93 mm across and the
+body is 93 mm deep, so the wall runs out exactly at the centre of both faces. It
+prints as a ragged 10 mm edge and it lets a spill drain instead of pooling in the
+pocket.
+:::
+
+## Troubleshooting
+
+**The insert won't go in.** Support debris in the pocket first, elephant's foot
+second. Check the insert's first layer with the calipers against the layer above
+it — a squashed first layer is a fat first layer, and 1 mm of clearance doesn't
+leave much.
+
+**The insert rattles.** It is a slip fit on purpose; you have to be able to lift
+it out with a wet hand. Two rubber bumper dots on the insert's outside wall take
+the play out without gluing anything.
+
+**It rocks on the arm.** The arm is under the range. Bumpers inside the skirts
+are the fix, and more of them than you think — build up the thin side until it
+sits flat.
+
+**A skirt cracked going on.** Your arm is over the range and the plastic told
+you so. Measure again at the widest point. If it really is 190 mm or more, this
+model isn't the one — the arch is not a parameter you can nudge without redrawing
+the profile.
+
+## Files & downloads
 
 <ProjectFiles slug="couch-cupholder" />

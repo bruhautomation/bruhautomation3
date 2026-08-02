@@ -1,17 +1,157 @@
 ---
 title: Christmas Ornaments
-description: Smart-home themed ornaments with electronics inside.
+description: Smart-home themed ornaments printed as hollow shells, lit by a flameless tea light, a single addressable pixel, or their own ESP on the tree's pixel string.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Smart-home themed ornaments with electronics inside.
+An ornament is the smallest project a 3D printer is good for: an hour on the
+bed, a few grams of filament, and no reason to stop at one. These are the house's
+own hardware hung on the tree — the shapes that live on the shelves and behind
+the wall plates the rest of the year — printed as hollow shells with somewhere
+inside for a light to go.
 
-## Hardware
-- Optional LEDs or wireless modules
+The only decision that changes the build is what that light is. A flameless tea
+light drops in, costs nothing and needs no wiring. A single addressable pixel
+pressed into the shell puts the ornament on the same string as the tree. An ESP
+inside makes it its own device in Home Assistant, which is the most work for the
+least visible difference — do that one on the ornament that sits at eye level.
+
+<ImagePlaceholder alt="Printed smart-home ornaments hanging on a Christmas tree, lit from inside">
+  Hero shot — three or four of the ornaments hanging on a lit tree at night, at
+  least one glowing from inside so the shell's diffusion is visible.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+Filament first, because on this project the filament *is* the design. Nothing
+here gets painted.
+
+- [Glow-in-the-dark PLA](https://www.amazon.com/dp/B0FB3LV36D?tag=brau01-20) — the one filament that makes an ornament work with no electronics in it at all
+- [Matte white PLA](https://www.amazon.com/dp/B089S1HB8K?tag=brau01-20) — the shell material for anything lit from inside
+- [Clear PLA](https://www.amazon.com/dp/B07ZNG4L9P?tag=brau01-20) — icicles, and anything meant to sparkle rather than glow
+- [Silk tri-colour PLA](https://www.amazon.com/dp/B0BN5Z2798?tag=brau01-20) — co-extruded, so the colour shifts up the ornament with no work from you
+- [Colour-changing gradient PLA](https://www.amazon.com/dp/B0BV69PNHY?tag=brau01-20) — black through to green over the spool
+- [PLA+ in black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — 4 kg, for caps, backs and the second colour of a two-tone print
+- [Hardened steel 0.4 mm nozzle](https://www.amazon.com/dp/B08VNNZH37?tag=brau01-20) — a 20-pack, and you want one fitted before the glow filament goes in
+
+Then pick one of the three ways to light it.
+
+- [Flameless LED tea lights](https://www.amazon.com/dp/B0BQJ5QZ8J?tag=brau01-20) — 24 in a pack, warm white, flickering. The whole lighting system for a dozen ornaments, for the price of one pixel ring
+- [CR2032 cells](https://www.amazon.com/dp/B0DKXJCMSZ?tag=brau01-20) — 50-pack; most flameless tea lights take one, and a fresh cell is cheaper than a new tea light
+- [12 V WS2811 12 mm bullet pixels](https://www.amazon.com/dp/B0922DZ4CC?tag=brau01-20) — 100 diffused nodes on a 10 m string. One node per ornament, the string does the rest
+- [12 V 10 A supply with an 8-way splitter](https://www.amazon.com/dp/B018G3ABWY?tag=brau01-20) — what feeds a full bullet-pixel string. A wall wart will brown out halfway down the tree
+- [WS2812 12-pixel ring](https://www.amazon.com/dp/B0C7CFQXY3?tag=brau01-20) — 2-pack, for an ornament with its own controller
+- [WS2812B strip, 5 V, 30 LEDs/m](https://www.amazon.com/dp/B019HAAVLQ?tag=brau01-20) — cut single pixels off this when a ring is more light than the shape needs
+- [WS2812 8-LED board](https://www.amazon.com/dp/B07KD6ZB88?tag=brau01-20) — a rigid bar rather than a strip, easier to solder to
+- [Wemos D1 mini](https://www.amazon.com/dp/B01N3P763C?tag=brau01-20) — the ESP that actually fits inside an ornament
+- [JST-SM 3-pin pigtails](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20) — so an ornament unplugs from the string instead of being cut off it
+- [24 AWG silicone wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — 10 colours; stays flexible, which matters on a lead that gets bent every December
+
+And the bits that hold it together.
+
+- [6 × 2 mm neodymium magnets](https://www.amazon.com/dp/B075RZ82HP?tag=brau01-20) — 120-pack, so the shell opens to change a cell instead of being glued shut
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — for the ornaments that *are* glued shut
+- [365 nm UV torch](https://www.amazon.com/dp/B0CNSLGFWG?tag=brau01-20) — charges a glow-filament ornament in seconds instead of leaving it under a lamp
+- [Ornament hooks](https://www.amazon.com/s?k=christmas+ornament+hooks&tag=brau01-20) — the one thing here worth buying blind
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 2 |
+| Infill | 0–10% |
+| Supports | None |
+| Material | PLA |
+| Orientation | Flat face on the bed, seam to the back |
+
+Two walls, because every wall you add is light you don't get back. A shell meant
+to glow is printed as a bowl — no infill, no top layers until the cap — and it
+prints faster than a solid one as a bonus.
+
+**Matte white is the diffuser, not clear.** Clear PLA prints frosty and passes a
+lot of light, but you can still see the LED through it as a hard bright dot.
+Matte white turns a point source into an even glow, which is the whole effect
+you are after. Keep the clear filament for icicles and shapes that catch the
+tree's own lights.
+
+**Glow filament is abrasive.** It is loaded with strontium aluminate, and a brass
+nozzle will be visibly wider after a spool of it. Fit the hardened nozzle before
+you start and leave it in — the same nozzle handles carbon-fibre filament later.
+Glow also needs charging: a few seconds under the 365 nm torch and the ornament
+holds its glow long after the room lights go off, which is a better party trick
+than any of the wired versions.
+
+For two-tone shapes — a logo or a face in one colour on a body in another —
+either run them on a multi-material printer ([Bambu Lab A1 with the AMS
+lite](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20) is what these were sliced
+for) or put a colour change at the layer where the inlay starts. The colour
+change costs nothing and works on any printer, as long as the second colour only
+appears on the top face and never comes back.
+
+:::caution
+Do not hang a PLA ornament against an old incandescent light string. PLA softens
+around 60 °C, and a C7 or C9 bulb resting on a shell will leave a dent in it by
+New Year. Modern LED strings run cool enough that it stops being a problem.
+:::
+
+## Wiring
+
+Only the ESP version has any. A ring, a board, three wires.
+
+| Ring pin | D1 mini | Notes |
+|---|---|---|
+| DIN | Any free GPIO | Pick one and name it in the config — keep the lead short |
+| 5V | **5V** | Off the board's 5 V pin, which is USB power passed through. Not 3V3 |
+| GND | GND | Common ground, and it has to be common if the ring is powered separately |
+
+Twelve WS2812s at full white pull the better part of an amp, which is more than a
+thin micro-USB cable and a D1 mini's traces want to carry. Cap the brightness in
+the config at something like a third — you are lighting an ornament the size of a
+fist, not a room, and it will still be the brightest thing on the tree.
+
+The bullet-pixel route has no wiring at all beyond the string's own connectors:
+each 12 mm node presses into a 12 mm hole in the shell, and the ornaments become
+pixels on whatever controller already drives the tree.
+
+## Assembly
+
+<Steps>
+
+1. **Print one before you print twelve.** The fit of the light in the shell is
+   the only thing that can be wrong, and it is much cheaper to find out on the
+   first one.
+
+2. **Dry-fit the light.** A tea light should drop in and sit flat; a bullet pixel
+   should push into its hole and stay there without glue. If either is tight,
+   open the hole with a needle file rather than reprinting — printed holes come
+   out slightly undersized on almost every machine.
+
+3. **Set the magnets, if the shell opens.** Two in the cap, two in the body,
+   glued in with CA. **Check the polarity of all four before the glue goes off** —
+   one magnet in backwards and the cap pushes itself off the ornament every time
+   you close it.
+
+4. **Wire it, if there is anything to wire.** Solder to the ring before it goes in
+   the shell, not after, and put a JST pigtail on the lead so the ornament can
+   come off the string in January without cutting anything.
+
+5. **Close it up.** CA with activator on the seam for the sealed ones — it grabs
+   instantly, so line the halves up first and only then hit it with the spray.
+
+6. **Thread the hanger** and hang it high enough that the dog's tail doesn't
+   reach it.
+
+</Steps>
 
 ## Files & downloads
 

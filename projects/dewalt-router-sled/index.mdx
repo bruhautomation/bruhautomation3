@@ -1,18 +1,244 @@
 ---
 title: DeWalt Router Sled
-description: Router sled and cookie-sheet divider for flattening slabs.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A router sled for flattening slabs no planer will take — a DeWalt DWP611 on rails, hanging from a printed sub-base that copies the stock plate at half again the thickness.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Router sled and cookie-sheet divider for flattening slabs.
+A slab wider than your planer has two routes to flat: a wide-belt sander you do
+not own, or a router on rails. This is the router on rails — two straight rails
+either side of the slab, a bridge that runs across them, and a DeWalt DWP611
+taking the high spots off a couple of millimetres at a time until the whole face
+sits in one plane.
 
-## Hardware
-- DeWalt router
-- Linear motion system
+The part in this folder is the router's half of it: a sub-base that copies the
+DWP611's stock plate — same outline, same holes — and comes out at 6.35 mm
+instead of the 4.35 mm plate it replaces. That is the entire point of it. A
+router hanging off a bridge with a wide cutter loaded up spends the whole pass
+trying to flex its own base, and every bit of that flex ends up in the slab.
+
+<ImagePlaceholder alt="A router sled mid-pass over a walnut slab, the DeWalt DWP611 hanging under its printed base plate">
+  Hero shot — the sled part way across a slab, one flattened band and one rough
+  band visible, with the printed plate and the rails clearly in frame.
+</ImagePlaceholder>
+
+## The plate
+
+Everything on it is traced off the stock DWP611 sub-base, so the screws that come
+out of the stock plate go straight into the print.
+
+| Feature | Size |
+|---|---|
+| Outline | 103.0 mm circle squared off at one end, 123.2 mm overall, 6.35 mm corner radii |
+| Thickness | 6.35 mm (1/4 in) |
+| Bit opening | 37.9 mm |
+| Arc slots | 4 × 6.86 mm wide, on a 63.0 mm bolt circle, 30 degrees of arc each, one on each axis |
+| Mounting holes | 4 × 6.35 mm on a 60.96 mm (2.4 in) square, counterbored 10.2 mm × 2 mm deep |
+| Pockets | 4 × 9.45 mm dia, 2 mm deep |
+| Rib | 66 × 4.5 mm, standing 1 mm proud |
+
+The arc slots are the router's sub-base screws — those hold the plate on the
+router, and the arc is what lets you rotate the plate before you tighten them.
+The four counterbored holes on the 2.4 in square are what you bolt the bridge
+through; the counterbores are there so the heads do not sit proud.
+
+One face of the plate is dead flat with nothing on it but through-holes. Every
+other feature — counterbores, pockets, rib — is on the opposite side. The flat
+face is the one that faces the work.
+
+:::caution
+**Check the cutter diameter before you buy a bit.** The opening in the plate is
+37.9 mm. A cutter wider than that cannot pass through it in either direction, so
+you can never get the bit into the collet with the plate bolted on. A 1-1/4 in
+(31.75 mm) surfacing bit fits with room to spare. A 1-1/2 in (38.1 mm) one does
+not fit at all.
+:::
+
+The DWP611 takes 1/4 in shank bits only, and most slab-flattening cutters are
+sold with a 1/2 in shank because most people run them in a big router. Buy the
+1/4 in shank version. It is a smaller cutter and the passes take longer, which is
+the trade you make for a router light enough to hang off a bridge all afternoon.
+
+## Parts
+
+<AffiliateDisclosure />
+
+The router and the cutter:
+
+- [DeWalt DWP611 compact router](https://www.amazon.com/s?k=DEWALT+DWP611+compact+router+fixed+base&tag=brau01-20) — the router the plate is drawn around
+- [Slab-flattening / surfacing bit, 1/4 in shank](https://www.amazon.com/s?k=slab+flattening+surfacing+router+bit+1%2F4+inch+shank&tag=brau01-20) — 1-1/4 in cutting diameter or less, see the caution above
+- [DeWalt DNP618 edge guide](https://www.amazon.com/dp/B004AJB2UO?tag=brau01-20) — optional, and it fits the same fixed base
+
+The rails and the bridge:
+
+- [2020 aluminium extrusion, 2 m](https://www.amazon.com/dp/B081B8Q5LL?tag=brau01-20) — ×2 for the rails, plus a length for the bridge
+- [2020 corner brackets](https://www.amazon.com/dp/B07VW9H99P?tag=brau01-20) — a 10-pack
+- [2020 drop-in M5 T-nuts](https://www.amazon.com/dp/B07PR31317?tag=brau01-20) — the roll-in kind, so you can add one without dismantling the frame
+- [M5 button-head bolt and nut kit](https://www.amazon.com/dp/B07CYHFQ7S?tag=brau01-20)
+- [1/4-20 bolts and washers](https://www.amazon.com/s?k=1%2F4-20+socket+head+cap+screw+assortment&tag=brau01-20) — ×4, through the plate's counterbored holes
+- [#8 × 1-5/8 in deck screws](https://www.amazon.com/dp/B0CRJY3BDD?tag=brau01-20) — for the timber base frame the rails sit on
+
+Printing it:
+
+- [Carbon-fibre PLA filament](https://www.amazon.com/dp/B0D86M3RM4?tag=brau01-20) or [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — not plain PLA, see below
+- [Hardened 0.4 mm nozzle](https://www.amazon.com/dp/B08VNNZH37?tag=brau01-20) — only if you go carbon fibre; CF eats a brass nozzle
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for checking the holes after printing
+
+Dust, ears and lungs, because a surfacing bit throws an extraordinary amount of chip:
+
+- [Wet/dry vacuum](https://www.amazon.com/dp/B07CB9F446?tag=brau01-20)
+- [Dust collection hose with reducers](https://www.amazon.com/dp/B01JROABYY?tag=brau01-20) and the [DeWalt DWV9000 universal connector](https://www.amazon.com/dp/B00B6K4VKS?tag=brau01-20)
+- [3M reusable respirator, OV/AG/P100](https://www.amazon.com/dp/B01H0S90QE?tag=brau01-20)
+- [Electronic earmuffs](https://www.amazon.com/dp/B001T7QJ9O?tag=brau01-20) — a compact router at full speed for an hour is the loudest thing in the shop
+- [Safety glasses](https://www.amazon.com/dp/B00166OALC?tag=brau01-20)
+
+Afterwards:
+
+- [Hot glue sticks](https://www.amazon.com/dp/B071HH42WW?tag=brau01-20) — for locking the shims under the slab, and the best thing there is for it
+- [5 in 8-hole sanding discs, 60–600 grit](https://www.amazon.com/dp/B07HHY6MKY?tag=brau01-20) — the sled leaves ridges and sanding is how they go
+- [Rubio Monocoat Oil Plus 2C](https://www.amazon.com/dp/B00OA5V19K?tag=brau01-20) — one coat, no topcoat, and it does not sit on the surface like a film finish
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 5 |
+| Infill | 100% |
+| Supports | None |
+| Orientation | Flat face on the bed, features up |
+| Material | PETG or carbon-fibre PLA |
+| Footprint | 123 × 103 mm |
+
+Every hole and slot runs straight through the Z axis, so there is nothing to
+support and nothing to bridge. Print it flat and it comes off the bed finished.
+
+**Do not print this in plain PLA.** It is a structural plate under a motor that
+gets warm, holding a spinning carbide cutter, under sustained load for the whole
+length of a pass — and sustained load at slightly-warm is exactly where PLA
+creeps. PETG is the safe answer. Carbon-fibre PLA is stiffer and the better
+answer if you have a hardened nozzle in the drawer, and stiffness is what this
+part is for.
+
+Solid infill is not optional either. A 20% part feels fine in your hand and still
+bows under the cutter.
+
+:::tip
+There is a STEP file in the folder next to the STL. If you would rather have the
+real thing, that file goes straight to a waterjet or a CNC — 1/4 in polycarbonate
+is what a bought sub-base is made of, and it will outlast any print.
+:::
+
+Printed holes come out undersize. Check the four mounting holes with a caliper
+before you go looking for a bolt, and ream them rather than forcing anything: a
+1/4 in bolt driven into a 6.1 mm hole splits a printed plate along its layer
+lines.
+
+:::note
+The file is named `dewalt_router_sled_cookie_sheet_divider_v2` — an old Fusion
+design name that came along for the ride. There is one part in it and it is the
+base plate.
+:::
+
+## Fitting the plate
+
+<Steps>
+
+1. **Take the stock sub-base off** the router and keep the screws. Lay it on the
+   print and look through every hole. They should line up; if one does not, you
+   have a different base, and that is much better to find out now.
+
+2. **Ream the mounting holes** to whatever bolt you are using, and take the flash
+   off the flat face. The flat face has to stay flat — it is the reference surface
+   for the whole operation.
+
+3. **Bolt the plate to the router** through the arc slots, finger tight.
+
+4. **Centre it on the collet.** Drop a straight bit in, sight the shank against
+   the edge of the bit opening, nudge the plate along its slots until the gap is
+   even the whole way round, then tighten. The arc slots exist for this and it
+   takes two minutes.
+
+</Steps>
+
+## Building the sled
+
+The rails are the whole job. Everything else is carpentry.
+
+<Steps>
+
+1. **Build a base frame** for the slab to sit in — a rectangle of timber, screwed
+   together, longer and wider than the slab and stiff enough not to twist when you
+   lean on it.
+
+2. **Run the two rails along the long sides.** Two lengths of 2020 extrusion,
+   parallel, and — the part that matters — **coplanar**. Any twist between the two
+   rails is copied straight into the slab, and you will not see it until you put a
+   straightedge across the finished face.
+
+3. **Check them against each other, not against the floor.** Bridge the rails with
+   a straight offcut, slide it end to end, and shim until it sits flat everywhere
+   along the run. A bench that is out of level is fine. Rails out of plane are not.
+
+4. **Make the bridge.** Another length of extrusion, or a stiff piece of timber,
+   spanning the rails and free to slide along them. Cut a clearance hole in the
+   middle big enough for the cutter and for the sub-base screw heads, and bolt the
+   plate to it through the four counterbored holes.
+
+5. **Bed the slab.** It must not rock, at all. Shim under the corners until it
+   sits dead still, then run a bead of hot glue down each shim to lock it. A slab
+   that rocks under the cutter comes out with a rocker in it.
+
+6. **Set the first cut.** Slide the bridge over the highest point of the slab and
+   drop the router until the cutter just kisses it. That is your zero. Every pass
+   after that goes deeper.
+
+</Steps>
+
+## Flattening
+
+Take 2 mm a pass, no more, and let the router do it in its own time. A compact
+router driving a 1-1/4 in cutter through hardwood is working near the top of what
+it has; if the motor note drops you are pushing too fast or cutting too deep, and
+you will hear that long before you see it.
+
+Move the bridge along the rails in steps of roughly half the cutter width so each
+pass overlaps the last. Full-width steps leave a ridge on every boundary, and
+those ridges are what you will be sanding out afterwards. Keep the router moving
+whenever the cutter is down — dwelling in one spot burns a dish into the face
+that later passes cannot remove, because later passes take the whole face down
+with it.
+
+When the last high spot disappears, flip the slab, re-bed it, and do the second
+face. The first face is now your flat reference, so the second one only needs
+enough passes to clean up.
+
+Then sand. The sled leaves a corduroy of shallow scallops across the grain; 80
+grit on a random-orbit sander takes them out and everything after that is
+ordinary finishing.
+
+## Troubleshooting
+
+**The finished face has a twist in it.** The rails were not coplanar. Nothing at
+the router end fixes this — go back and shim the rails with a straightedge
+bridged across them.
+
+**A shallow dish down the middle of the slab.** The bridge is flexing. It is
+spanning too far for its section, or the plate is bolted to a thin spot in it.
+Stiffen the bridge or shorten the span.
+
+**Regular ridges you cannot sand out.** The step between passes is too big, or the
+plate is not sitting square to the rails, so the cutter is tilted and cutting on
+one edge. Loosen the arc slots and reseat it.
+
+**Burn marks and a hot cutter.** Feeding too slowly with too small a bite. Take a
+deeper cut and move faster; a surfacing bit wants to be cutting, not rubbing.
+
+**The plate cracked around a bolt.** Printed, then forced onto an undersized hole.
+Ream to size, and print the replacement at 100% infill in PETG.
 
 ## Files & downloads
 

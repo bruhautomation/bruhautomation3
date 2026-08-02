@@ -1,14 +1,224 @@
 ---
 title: Duct Cap & Adapter
-description: 4' duct adapter and cap, plus a quick-tee for branching an existing run.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: Three printed parts for 4-inch round duct — a honeycomb vent cap, a stepped coupler, and an edge collar that turns a raw cut pipe end into something a cap can grip.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-4" duct adapter and cap, plus a quick-tee for branching an existing run.
+Round 4-inch duct is everywhere in a house — dryer, bath fan, range hood, the
+booster fan somebody put in the attic — and the fittings for it come in exactly
+the shapes a sheet-metal shop stocks and no others. These are the three parts
+that fill the gap: a **collar** that clips onto the raw cut end of a pipe, a
+**cap** that presses onto that collar and breathes through a honeycomb face
+instead of sealing the duct shut, and a 61 mm **adapter** sleeve that steps
+between a collared end and a plain one.
+
+Nothing here is glued, threaded or screwed together. The whole set is held by
+three diameters drawn a tenth of a millimetre apart, which is the good news and
+the bad news at once — read the fits before you slice anything.
+
+<ImagePlaceholder alt="The printed collar, honeycomb cap and stepped adapter sitting beside a length of 4-inch round duct">
+  Hero shot — all three printed parts laid out next to a cut piece of 4 in duct,
+  with the cap pressed onto the collar in a second frame so the honeycomb face
+  and the four pull lugs read clearly.
+</ImagePlaceholder>
+
+## What is actually in the STL
+
+`4_duct_adapter_and_cap_41df03f3_v8.stl` is a Fusion design exported whole, not
+a print plate. There are **five separate solids in it and only three of them are
+parts**:
+
+| Solid | What it is | Print it? |
+|---|---|---|
+| Cap | 110.4 mm skirt, honeycomb face, four pull lugs | Yes |
+| Adapter | 61 mm stepped sleeve | Yes |
+| Collar | 11 mm edge ring with an internal groove | Yes |
+| Flat hex plate, 221 × 134 × 2 mm | The pattern body used to cut the honeycomb, left in the design | **No** |
+| A push-to-connect union tee, 41.5 mm long | A manufacturer's CAD model linked into the design as a reference | **No** |
+
+Split the STL to objects in your slicer and delete the last two before you do
+anything else. The flat plate is a 221 mm sheet of hexagons that will happily
+eat half a spool, and the fitting is a real pneumatic part with a steel grab
+ring and an O-ring inside it — printing a copy gets you the shape, not a
+fitting.
+
+`quick_tee_v1.stl` is the same story at six sizes. It holds vendor models of
+push-to-connect union tees for Ø4, Ø6, Ø8, Ø10, Ø12 and Ø16 mm tube, laid out in
+a row 434 mm long, which is wider than most beds and is the first clue that it
+is a reference file. Open it to lay out a run in CAD, or to model a cradle for a
+fitting. Buy the fitting.
+
+## The numbers that matter
+
+Every dimension below is measured off the solids in the folder, not off a
+drawing. The diameters are what the model says; what your printer does with them
+is the last section of this page.
+
+| Part | Bore | Outside | Depth |
+|---|---|---|---|
+| Cap | 104.5 mm | 110.4 mm skirt, 124.8 mm across the lugs | 25.3 mm |
+| Adapter, small end | 102.0 mm | 106.0 mm | 61.0 mm overall |
+| Adapter, large end | 104.8 mm | 110.4 mm | |
+| Collar | 98.6 mm | 104.6 mm | 11.0 mm |
+
+The collar is the piece that makes the set work. In section it is a **U-channel**
+— two roughly 1 mm walls with a 0.95 mm slot between them, 7.2 mm deep, sitting
+on a Ø101.4 circle. That circle is the wall of 4 in round duct, whose outside
+diameter is 101.6 mm. Push the collar onto a cut pipe end and the raw sheet-metal
+edge disappears into the slot, leaving an 11 mm long, 104.6 mm bead where there
+used to be something that cuts you.
+
+Everything else hangs off that bead:
+
+- **Cap bore 104.5 on a 104.6 collar** — a tenth of interference, so the cap is a
+  press fit. That is what the four lugs are for. They are 22 mm wide, stand 10 mm
+  proud, are gusseted into the skirt, and they exist so you can get the cap back
+  off.
+- **Adapter large end 104.8 on the same bead** — two tenths of clearance, a slip
+  fit.
+- **Adapter small end 102.0 over bare 101.6 pipe** — four tenths, also a slip fit.
+
+So the adapter joins a collared duct end to a plain one, and the cap closes off
+whichever end you are not using.
+
+The honeycomb face is 3.0 mm thick, with cells 8.7 mm across the flats on a
+10.1 mm pitch and 1.4 mm webs, trimmed to a Ø103 opening. It stops leaves,
+rodents and a hand. It does not stop insects and it is not a filter. Through the
+middle runs a 12.2 mm bore tube, 15.0 mm outside, open at both ends over the
+cap's full 25 mm depth — a pass-through for 12 mm OD tube or a fat cable, and
+the reason there is a file of tees sitting next to this one.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PETG, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the default for anything that lives on a duct. Warm exhaust air, an attic in July and a cap in direct sun all take PLA past its glass transition, and a sagged press fit is a cap on the floor
+- [PLA+, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 kg pack of black. Fine on a cool interior run: a bath fan, a fresh-air intake, a capped stub in a basement
+- [Matte white PLA, 1.75 mm](https://www.amazon.com/dp/B089S1HB8K?tag=brau01-20) — if the cap ends up somewhere people look at it. Matte white reads as a vent; gloss black reads as a hole
+- [3M 3340 aluminium foil tape](https://www.amazon.com/dp/B091QCSQXK?tag=brau01-20) — 2.5 in × 50 yd. A printed sleeve is a mechanical joint, not an airtight one, and this is what seals it. Cloth duct tape is not duct tape; it dries out and lets go of galvanised steel in a couple of seasons
+- [4 in flex duct hose, 8 ft, with two clamps](https://www.amazon.com/dp/B0BKZRYXJV?tag=brau01-20) — what the adapter's large end usually ends up joined to, and the two clamps in the kit are the right size for a 4 in run
+- [#8 × 1/2 in self-tapping screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20) — a 200-pack. Short on purpose; three through the adapter into the pipe underneath will hold a joint that tape alone will not
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — not optional on this one. The whole set is decided by tenths of a millimetre and you cannot eyeball those
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — for opening a tight bore by hand when you would rather not reprint
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — knocks the elephant's foot off the first layer of the collar and the adapter, which is exactly where the fit gets measured
+- [4 in round galvanised duct pipe](https://www.amazon.com/s?k=4+inch+round+galvanized+duct+pipe&tag=brau01-20) — the 101.6 mm pipe the collar is drawn around
+- [6 mm push-to-connect union tee](https://www.amazon.com/s?k=6mm+push+to+connect+union+tee+pneumatic+fitting&tag=brau01-20) — the real version of the part modelled in `quick_tee_v1`. The same suppliers sell Ø4 through Ø16; buy the size your tube is
+- [Polyurethane tubing, 6 mm or 12 mm OD](https://www.amazon.com/s?k=12mm+OD+polyurethane+pneumatic+tubing&tag=brau01-20) — 12 mm is the size the cap's centre port is bored for
+
+Printed on a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20).
+The largest part is 124.8 mm across, so any bed will take all three at once.
+
+:::note
+Two other things that belong on a 4 in run, if you are building one rather than
+capping one: a [4 in backdraft damper](https://www.amazon.com/dp/B097DRMC48?tag=brau01-20)
+so the outside does not come back in, and an
+[AC Infinity 4 in inline booster fan](https://www.amazon.com/dp/B0C2W14V6L?tag=brau01-20)
+if the run is long enough to need help. Both sit inside the same 4 in pipe the
+collar clips to.
+:::
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 3–4 |
+| Infill | 20% gyroid |
+| Material | PETG |
+| Supports | None |
+| Orientation | Cap face-down; adapter and collar standing on end |
+
+All three print without supports in the orientation they export in. The cap goes
+honeycomb-face down on the bed, which puts the skirt in the air and leaves the
+lug gussets as 55° overhangs — steep enough to self-support, and the reason they
+are chamfered at all.
+
+The honeycomb webs are 1.4 mm, so at a 0.4 mm nozzle they come out as three or
+four perimeters with nothing inside them. That is fine and it is what you want:
+on that face the wall count is doing all the work and the infill percentage is
+doing none.
+
+:::caution
+**Check the sliced preview of the collar before you print it.** It is two ~1 mm
+walls with a 0.95 mm slot between them — three extrusion widths across a 3 mm
+section. A slicer set to skip thin gaps will quietly fill the slot and hand you a
+solid ring that goes onto nothing. If yours does, turn on thin-wall detection or
+drop the wall width for that object until the preview shows the groove.
+:::
+
+## Fitting it
+
+<Steps>
+
+1. **Split the STL and delete the two solids that are not parts** — the flat
+   221 mm hex plate and the pneumatic fitting. In Bambu Studio or PrusaSlicer
+   that is right-click, Split, to objects.
+
+2. **Print the collar first, on its own, and measure it.** You want 104.6 mm
+   across the outside. That one 11 mm ring tells you everything about whether
+   the other two parts will fit, and it costs ten minutes of filament to find
+   out.
+
+3. **Apply the correction to all three parts.** If the collar came out at
+   104.2 mm, your printer is losing 0.4 mm on outside diameters and every
+   diameter in the set is off by the same amount. Horizontal expansion, or XY
+   hole compensation, is the setting to reach for; a uniform scale factor is the
+   blunt version and works too.
+
+4. **Push the collar onto the cut duct end.** It should go on with thumb
+   pressure and stay there. Sheet-metal duct is thinner than the 0.95 mm groove,
+   so if it rattles, run a lap of foil tape around the pipe end first and push
+   the collar over that.
+
+5. **Press the cap on.** A tenth of interference means it goes on firmly and
+   comes off by the lugs — never by the honeycomb, which is how you snap a
+   1.4 mm web.
+
+6. **Tape both ends of the adapter.** Large end over the collar, small end over
+   the plain pipe, then foil tape around each overlap. Add three self-tappers
+   through the sleeve into the pipe underneath if the joint is somewhere you
+   cannot get back to.
+
+</Steps>
+
+<ImagePlaceholder alt="Close-up of the collar's internal groove sitting on the cut edge of a duct, with the cap pressed on over it">
+  Detail shot — the collar half-pushed onto a cut duct end so the groove and the
+  sheet-metal edge are both visible, then the cap seated on top of it.
+</ImagePlaceholder>
+
+## What will bite you
+
+**Never put this cap on a dryer exhaust termination.** A honeycomb face is a
+screen, and the rule for dryer terminations is no screen at the outlet, for the
+reason you would guess: lint packs into anything it can catch on, and a blocked
+dryer duct is a fire. A backdraft damper is the part that belongs on that end of
+a dryer run. Capped stubs, bath fans, intakes and anything moving clean air are
+what this set is for.
+
+**Nothing fits, and it is not the model's fault.** Every clearance here is
+between 0.1 mm and 0.4 mm, which is smaller than the difference between two
+printers, two filaments, or one filament in January and the same filament in
+July. The design assumes you will measure and compensate. Step 2 exists because
+printing the cheap part first is how you avoid printing the expensive part twice.
+
+**The cap will not stay on.** The press fit is a tenth of a millimetre of
+interference on a 104.5 mm bore, and one fat first layer eats all of it. Deburr
+the collar, check the cap's first layer for elephant's foot, and if it is still
+loose add about 0.15 mm of negative horizontal expansion to the cap alone.
+
+**The run got louder, or weaker, after you fitted it.** The grille is a Ø103
+opening that is roughly three-quarters open, so it is a restriction on any duct
+that is actually moving air. It is a cap and a screen, not a diffuser. If there
+is a fan behind it, put a proper grille on that end instead.
+
+**It went brittle and cracked after a summer outside.** PLA and PETG both chalk
+and embrittle under direct UV. Neither is a multi-year outdoor material; if the
+cap terminates a run on a sunny wall, plan on reprinting it, or move to ASA and
+an enclosed printer.
 
 ## Files & downloads
 

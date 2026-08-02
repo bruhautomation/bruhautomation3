@@ -1,17 +1,147 @@
 ---
 title: Cold Air Return Baffle
-description: HVAC baffle that redirects a cold air return.
+description: A printed baffle that sits in the throat of a cold air return and redirects where it draws from, without opening up the wall.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-HVAC baffle that redirects a cold air return.
+A cold air return is the grille the furnace breathes through, and where it went
+was decided by whoever framed the house. When it ends up somewhere that makes the
+system worse — drawing off a hallway instead of the room it is meant to serve, or
+short-circuiting a supply register a few feet away — the proper fix is sheet metal
+and drywall. This is the printed version: a baffle that goes in behind the grille
+and redirects the return, in an afternoon, for the cost of the filament.
 
-## Hardware
-- 3D-printed baffle
+<ImagePlaceholder alt="A printed baffle fitted inside a cold air return, with the grille removed">
+  Hero shot — the return with its grille off and the baffle sitting in the
+  throat, so the redirect is visible. A second frame with the grille back on
+  shows how little of it you can see once it is closed up.
+</ImagePlaceholder>
+
+:::caution
+**Read this before you download anything.** The folder ships Fusion source and a
+STEP, and the STEP came out empty — it is 3.5 KB of product metadata with no
+solid in it, which is why there is no STL here and nothing to spin in the
+download section below. `bruh_cold_air_return_baffle_v2.f3d` is the real file.
+You need Fusion, or something else that opens an `.f3d`, to get a printable part
+out of this project.
+:::
+
+That is less of a loss than it sounds, because you were going to have to resize
+it anyway. Return openings are not standardised — a 14 x 20 return and a 12 x 12
+return are both completely normal, and the duct throat behind the grille is
+smaller than the grille's outer flange by an amount nobody agrees on. Measure
+yours, drive the sketch off that number, export your own STL.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Matte white PLA, 1.75 mm](https://www.amazon.com/dp/B089S1HB8K?tag=brau01-20) — the one to print it in if any of the baffle is visible through the grille slots. Matte white disappears against a stock white register; gloss black reads as a hole
+- [PLA+, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 kg pack of black, for the case where nobody is going to see it
+- [PETG, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — buy this instead if the return runs through an attic or the baffle ends up within a couple of feet of the furnace plenum
+- [3M 3340 aluminium foil tape](https://www.amazon.com/dp/B091QCSQXK?tag=brau01-20) — 2.5 in x 50 yd. This is the tape that belongs on ductwork, and it is not duct tape. Cloth duct tape dries out, curls off galvanised steel in a couple of seasons and leaves the adhesive behind
+- [3M VHB 5952 tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — 1/2 in x 15 ft, if you would rather stick the baffle to the boot than screw it
+- [Isopropyl alcohol, 99%](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — VHB on unwiped duct metal is a part that falls off in July
+- [#8 x 1/2 in self-tapping screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20) — a 200-pack; you need two or three. Short on purpose, so nothing pokes through into the cavity
+- [6 x 3 mm neodymium discs](https://www.amazon.com/dp/B07873ZCY4?tag=brau01-20) — a 100-pack. Model pockets for four of these and the baffle comes back out of a steel boot with a fingernail, which is what you want the first two or three times you get the shape wrong
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the throat, the grille flange and the screw holes you are matching
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — knocks the elephant's foot off a wide first layer so the part sits flat against sheet metal
+
+Printed on a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20),
+which will take a baffle up to about 250 mm on a side in one piece. Anything
+bigger gets split and joined with foil tape across the seam.
+
+:::note
+There is a store-bought version of this idea, for supply registers rather than
+returns: the [Frost King HD7 air deflector](https://www.amazon.com/dp/B00VTVP4YQ?tag=brau01-20)
+clips onto the front of a grille and throws air away from a wall. It costs about
+ten dollars and it looks like it costs about ten dollars. The reasons to print
+instead are that a printed baffle fits the opening you actually have, and it
+lives behind the grille where nobody sees it.
+:::
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 4 |
+| Infill | 15% gyroid |
+| Material | PLA+, or PETG for attic and near-furnace runs |
+| Supports | Depends on how you orient your export — see below |
+
+The perimeters matter more than the infill. A baffle is a flat plate standing in
+moving air, and what stops it drumming is wall thickness, not what is inside it.
+Four walls at 15% is quieter than two walls at 40% and uses less filament.
+
+Orientation is yours to pick, because you are exporting the STL yourself: lay
+the largest flat face on the bed, and the part will usually need no supports at
+all. If it does, that is a sign to rotate rather than to turn supports on — a
+support interface on the face that seals against sheet metal is a leak.
+
+PLA+ is fine here in most houses. A return carries room air, not the hot supply
+air coming off the heat exchanger, so the usual "PLA sags in a duct" warning does
+not apply to the return side. It does apply if your return trunk runs through an
+attic, where summer air alone will take a PLA part past its glass transition and
+leave you with a curled baffle rattling around in the duct. Attic run, PETG.
+
+## Sizing and fitting
+
+<Steps>
+
+1. **Take the grille off and measure the throat**, not the grille. What you want
+   is the sheet-metal opening in the boot behind it and the depth available in
+   front of any damper. Write down both, plus the spacing of the two screws
+   holding the grille on, because those are the fixings you will reuse.
+
+2. **Check what the grille is doing.** Some returns are filter-back — the grille
+   hinges open and holds a 1 in filter. If yours is one of those, the baffle has
+   to clear the filter frame entirely, and every millimetre of depth you take is
+   a millimetre the filter no longer has.
+
+3. **Open the `.f3d` and drive the sketch off your numbers.** Then export an STL
+   and slice that. Keep the Fusion file; you will come back to it.
+
+4. **Dry fit before you commit to anything.** Drop the baffle in with no tape and
+   no screws, close the grille, and run the blower. You are checking two things:
+   that the grille still sits flat, and that the return did not get louder.
+
+5. **Mount it.** Screws through into the boot are the honest answer if it is
+   staying. VHB is the answer if you are not sure yet — wipe the metal with
+   isopropyl first, because thirty-year-old galvanised duct inside a wall is not
+   a clean surface. Magnets in printed pockets are the answer if you expect to
+   reprint it twice more.
+
+6. **Seal the edges with foil tape** where the baffle meets the boot. Air takes
+   the shortest path it can find, and an unsealed 2 mm gap along one edge is
+   most of what you were trying to redirect.
+
+</Steps>
+
+## What will bite you
+
+**Redirecting is fine. Narrowing is a whistle.** Returns in American houses are
+routinely undersized to start with, and anything that cuts the free area of the
+opening shows up immediately as noise at the grille and, less visibly, as a
+blower working against more static pressure than it was sized for. Keep the flow
+path through the baffle at least as wide as the duct throat. If the system got
+louder after you fitted it, that is not the baffle bedding in — it is too tight,
+and it goes back in the slicer.
+
+**It buzzes at one blower speed and not the others.** A thin printed plate in an
+airstream has a resonance, and your furnace will find it. Add perimeters, or run
+a strip of foil tape across the back face to damp it. The tape is the five-minute
+fix and it works.
+
+**It let go in the summer.** Either PLA in a hot run, or VHB on metal that was
+not cleaned. Both are covered above and both are the same afternoon again.
 
 ## Files & downloads
 

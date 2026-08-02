@@ -1,23 +1,271 @@
 ---
 title: Cellcube Bioreactor Controller
-description: A custom controller for automating Cellcube bioreactors with real-time monitoring and process control.
-# The files are here; the write-up isn't finished. Published, and marked as
+description: A motorised tilt stand and fluidics panel for a CellCube module — Nextion touchscreen, two footswitches, and a pump that dispenses the volume you typed.
+# The printed parts, the cut files and the HMI projects are all here. The
+# controller firmware that sits between the display and the hardware is not, so
+# nobody can build this end to end from the page yet. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A custom-built controller for Cellcube bioreactors. Handles process control, real-time monitoring, and automated media exchange — replacing manual intervention with programmable logic.
+A CellCube runs on media exchanges, and a media exchange done by hand is one
+person tilting a heavy module with both hands while a third hand is supposed to
+work a pump. This is the machine that does the holding: a motorised stand that
+tilts the module to five repeatable positions, a printed pinch-valve panel for
+the lines, and a pump that dispenses a volume you typed rather than a volume you
+watched. Everything runs off a Nextion touchscreen with a footswitch under each
+foot, so both your hands stay on the cube.
 
-{/* Photo needed — A hero photo of the finished Cellcube bioreactor controller — show the assembled control unit connected to the bioreactor with its display on.
-    alt text when it lands: A custom Cellcube bioreactor controller unit wired to a bioreactor setup, with its display active */}
+<ImagePlaceholder alt="The Cellcube bioreactor controller — a motorised tilt stand holding a CellCube module beside a laser-cut fluidics panel, touchscreen lit">
+  Hero shot — the whole rig on the bench: module clamped in the stand, tilted
+  off level, the fluidics panel beside it and the Nextion screen lit.
+</ImagePlaceholder>
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/gfX-IeuXpiY" title="Cellcube Bioreactor Controller" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 :::note
-Detailed build guide, wiring diagrams, and firmware coming soon.
+**The controller firmware isn't in the folder.** What is here is everything
+around it — the printed mechanics, the acrylic cut files, and seven Nextion HMI
+projects that are the entire user interface. The display sends plain text over
+its UART, so what the firmware has to do is fully described by what the HMI
+sends, and that is what the sections below set out. Until the firmware lands,
+this is a page you build the hardware from and write the middle of yourself.
 :::
+
+## What it does
+
+- **Tilts the module to five positions** — `Left`, `Level`, `Right` and two
+  deeper `leftpurge` / `rightpurge` angles — driven by a NEMA 23 stepper through
+  a 50:1 worm reducer onto a 1 in shaft.
+- **A footswitch per direction.** The display's own GPIO reads them, so pressing
+  left or right never takes a hand off the module.
+- **Dispenses a volume, not a run time.** You enter millilitres; the panel
+  converts to motor steps using a calibration factor for the tubing you have on.
+- **Three pump speeds** — slow, medium and fast, fixed at 75,000, 150,000 and
+  305,175 microsteps per second, with medium selected at power-on.
+- **Backs the pump off after every dispense** by an adjustable number of steps,
+  so the line stops dripping into the vessel once the bar hits 100%.
+- **Runs the pump in a loop** for recirculation, counted in whole revolutions
+  rather than in wall-clock time.
+
+The `nextion_10inch_dev_2` project is a second, larger interface for the same
+rig: a schematic of the fluid path that redraws itself as valves change, two
+pumps with independent speed, and named operations — fill and drain the
+reservoir, fill, drain and transfer the cube, recirculate, harvest, stop. Its
+buttons emit Nextion touch events by hand (`printh 65 00 …`) under comments like
+*trigger ESP btn event*, so that generation is driven by an ESP32 rather than by
+the display alone.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [NEMA 23 stepper motor, 1/4 in shaft](https://www.amazon.com/s?k=NEMA+23+stepper+motor+1%2F4+inch+shaft&tag=brau01-20) — the tilt drive. Every printed plate here is cut to the NEMA 23 four-bolt pattern
+- [NMRV-030 worm gearbox, 50:1](https://www.amazon.com/dp/B07W8HKSN9?tag=brau01-20) — the reducer the stand turns on, and the reason it holds a tilt with the power off
+- [NEMA 23 steel motor bracket](https://www.amazon.com/dp/B00Q6GIO5K?tag=brau01-20) — the metal alternative to `nema_23_bracket_v2.stl`
+- [6.35 mm to 11 mm shaft sleeve](https://www.amazon.com/dp/B07W58DQ1Q?tag=brau01-20) — the motor's 1/4 in shaft into the RV030's 11 mm bore. `6.35_to_11mm_bore_adapter.stl` is a printed copy of exactly this part; buy the metal one
+- [Roller-lever microswitches, 10-pack](https://www.amazon.com/dp/B01MQPQGFQ?tag=brau01-20) — end stops. You need two, and the printed mounts come in left and right hands
+- [ME-8108 roller limit switches, 3-pack](https://www.amazon.com/dp/B073SP7SXS?tag=brau01-20) — the bigger CNC-style body, if you would rather have a switch you can see across the room
+- [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — on the gearbox and shaft-collar grub screws. A worm drive vibrates
+- [Nextion Enhanced 3.5 in NX4832K035 with the IO expansion board](https://www.amazon.com/dp/B087RMD9ZD?tag=brau01-20) — **Enhanced, not Basic.** The HMI files are 480×320 and the footswitches hang off the GPIO header, which only the Enhanced has
+- [Momentary foot switches](https://www.amazon.com/s?k=momentary+foot+switch+pedal&tag=brau01-20) ×2 — one per direction
+- [ESP32 development board](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the host that reads the display's UART and drives the motors
+- [24 V 5 A supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20) — the motor rail
+- [Isolated 24 V to 5 V buck converter](https://www.amazon.com/dp/B08H7XRCVQ?tag=brau01-20) — the display and the logic. Do not hang them off the stepper rail directly
+- [2020 aluminium extrusion, 2 m](https://www.amazon.com/dp/B081B8Q5LL?tag=brau01-20) — the frame
+- [2020 extrusion, 400 mm 4-pack](https://www.amazon.com/dp/B07KB7MDGQ?tag=brau01-20) — pre-cut uprights, if you would rather not saw
+- [2020 corner brackets, 10-pack](https://www.amazon.com/dp/B07VW9H99P?tag=brau01-20) and [L joint plates](https://www.amazon.com/dp/B0899S8BBD?tag=brau01-20)
+- [2020 drop-in M5 T-nuts](https://www.amazon.com/dp/B07PR31317?tag=brau01-20) — the roll-in kind, so you can add a bracket without pulling the frame apart
+- [M5 button-head bolt and nut kit](https://www.amazon.com/dp/B07CYHFQ7S?tag=brau01-20)
+- [1/4 in opaque white acrylic, 12 × 36 in](https://www.amazon.com/dp/B01DYSVUZI?tag=brau01-20) — the panels. Buy two; some of the cut files are wider than a single sheet
+- [Peristaltic pump head with a serial stepper drive](https://www.amazon.com/s?k=peristaltic+pump+head+stepper&tag=brau01-20) — read the protocol section below before you buy one
+- [Platinum-cured silicone tubing](https://www.amazon.com/s?k=platinum+cured+silicone+peristaltic+pump+tubing&tag=brau01-20) — for the pump head and the pinch valves
+- [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — the pinch valve lids are M3 throughout
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — for anything you will open more than twice
+- [92 mm quiet fan](https://www.amazon.com/dp/B009NQM7V2?tag=brau01-20) and [40 mm quiet fan](https://www.amazon.com/dp/B072JK9GX6?tag=brau01-20) — `fludics_panel_cut_sides_with_fans.dxf` is the side panel with the cutouts already in it
+- [20 AWG silicone hookup wire](https://www.amazon.com/dp/B071DX3X6M?tag=brau01-20) and [female-to-female jumper leads](https://www.amazon.com/dp/B07GCZBH51?tag=brau01-20)
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the pinch valves and anything else on the fluid path
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — everything else
+
+## The printed parts
+
+Sixty-odd STLs, most of them revisions of six things. What goes on the machine
+is the highest-numbered version of each.
+
+| Group | Files | What it is |
+|---|---|---|
+| Tilt drive | `nema_23_bracket_v2`, `servo_nema_adapter_v3`, `gear_mount_plate`, `gear_mount_box` | Plates drilled to the NEMA 23 four-bolt pattern with a 25.4 mm centre bore for the shaft |
+| Shaft | `6.35_to_11mm_bore_adapter`, `shaft_adapter_v2`, `1in_shaft_adapter`, `1in_cap`, `0.5in_dowel_mount` | Motor to gearbox, gearbox to the 1 in tilt shaft, and end caps |
+| End stops | `limit_mount`, `limit_mount_mirror`, `limit_mount_dual`, `limit_presser_final`, `end_stop_mirror` | Switch plates in both hands, plus the cams that trip them |
+| Readout | `tilt_indicator_4`, `cc_stand_gear_face`, `dots`, `handle` | A 50.8 mm angle dial, the gear face, and a 172 mm knurled handle for turning it by hand |
+| Pinch valves | `cc_pinch_valve_v5`, `cc_pinch_lid_v5`, `double_pinch_top_final_2`, `double_pinch_bottom_final_2`, `press_pull_final`, `valve_push` | Single and twin clamps on the media lines. M3 throughout |
+| Line management | `retainer_clip_v1` / `_v2` / `_v3` | 25.4 mm strips with 1/4 in holes at 2.5 in pitch, in 5, 6 and 8 in lengths |
+| Enclosures | `electronics_box_3`, `electronics_plate`, `component_shelf`, `face_plate`, `face_plate_bottom`, `o2_box`, `o2_box_bottom` | The controller box, its backplate, a shelf and a small sensor box |
+| Extras | `microscope_mount-2`, `cc_stand_triple_cap`, `anyconv.com__ut_logo` | A 1/4 in-bore mount with two M3 holes at 12 mm centres, caps, and a badge |
+
+`anyconv.com__ut_logo.stl` exports at unit scale — under a millimetre across.
+Scale it in the slicer or you will print a speck.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 3, and 4 on the drive parts |
+| Infill | 25% general, 50% on the brackets, gear mounts and shaft adapters |
+| Supports | None, once each part is laid on a flat face |
+| Material | PETG on the fluid path, PLA+ everywhere else |
+
+**Print the pinch valves in PETG.** A pinch valve is a part that lives under
+permanent load, and PLA creeps under a constant squeeze — a clamp that has crept
+is a clamp that leaks, and it does it a week after you stopped watching. The
+frame plates and the boxes have no such problem, and PLA+ is fine there.
+
+**Reorient before you slice.** These came out of Fusion with the thin dimension
+on Y rather than Z — `gear_mount_box` exports 159 × 5.5 × 159, `electronics_plate`
+107 × 1 × 150, `nema_23_bracket_v2` 56 × 10 × 56. Dropped straight onto the bed
+they stand on edge. Lay each one flat on its largest face first; every part here
+prints supportless in that orientation.
+
+## Cutting the panels
+
+Six DXF files, all sized for 1/4 in (6 mm) acrylic.
+
+| File | Size | Notes |
+|---|---|---|
+| `fludics_panel_cut_1` | ~457 × 438 mm | The main fluidics face |
+| `fludics_panel_cut_sides` | ~604 × 400 mm | Sides, no ventilation |
+| `fludics_panel_cut_sides_with_fans` | — | The same sides with the fan cutouts in them |
+| `cell_cube_end_cap` | ~280 mm across | Spline-cut, one closed profile |
+| `pump_profile_dxf` | 101.6 × 120.3 mm | Twelve 4.9 mm holes, two 14.8 mm, two 3.9 mm |
+| `fix_2` | ~444 × 439 mm | A revised panel |
+
+:::tip
+The filenames say *fludics*, not *fluidics*. It is a typo that shipped, and it
+is the reason searching the folder for "fluidics" finds nothing.
+:::
+
+Check the scale on import — some laser software silently rescales a DXF — and
+cut one small profile in scrap before you commit a sheet, because acrylic kerf
+varies by machine and these panels have press-fit cutouts in them.
+
+## The display
+
+Seven HMI projects, all for the same 480×320 Enhanced panel. The six
+`cc_stand_nextion_display_footswitch*` files are one design iterating: `_2` and
+`_2_5_inch` are layout revisions, and the `_float` pair swaps the integer volume
+variable (`va_vol_int`) for a scaled one (`va_vol_float`) so you can dose 2.5 mL
+instead of rounding to 2 or 3. Open the `float_2` project unless you have a
+reason not to.
+
+### GPIO
+
+The panel drives its own IO rather than asking the host to do it. Taken from the
+HMI's own `cfgpio` lines:
+
+| Line | What it does |
+|---|---|
+| `cfgpio 3,1,b2` | IO3 becomes an input bound to button `b2` — the **right** footswitch |
+| `cfgpio 4,1,b1` | IO4 becomes an input bound to button `b1` — the **left** footswitch |
+| `cfgpio 3,2,0` … `cfgpio 7,2,0` | At boot, IO3 to IO7 are push-pull outputs |
+| `n0.val=pio0` | Page 0 reads IO0 as an input |
+
+IO3 and IO4 are therefore an output at power-on and a bound input once the
+footswitch page loads. That is deliberate, and it is also the first thing to
+check when a pedal stops working: a `cfgpio` on the wrong page quietly turns
+your input back into an output.
+
+### What it sends
+
+Everything leaves the display as plain text on the UART, and it is two different
+languages sharing one wire.
+
+Pump commands go out verbatim in the `/1`-addressed serial protocol that
+AllMotion's EZ drivers and Lin Engineering's SilverPak motors speak:
+
+```
+/1V150000R              set velocity, run
+/1P<steps>D<back>R      dispense <steps>, retract <back>, run
+/1gP51200G10R           loop: 51,200 steps (one revolution), ten times
+```
+
+Positions go out as bare words — `Left`, `Level`, `Right`, `leftpurge`,
+`rightpurge` — for the host to act on. The page that handles them writes all
+twenty-five from/to pairs out longhand, because how far the stand has to travel
+depends entirely on where it already was.
+
+:::caution
+If your pump does not speak the `/1` protocol, the HMI still works — the strings
+it prints will simply mean nothing to it. Rewriting them is one page of the
+Nextion project, not a redesign, and it is far easier than teaching your firmware
+to translate.
+:::
+
+## Calibration
+
+Volume per revolution depends on your tubing bore and your pump head, so the
+millilitre figure on screen means nothing until you calibrate. The panel has the
+routine built in, and it is worth knowing what it actually does.
+
+<Steps>
+
+1. **Run the calibration cycle** into a tared vessel. It sends
+   `/1gP1280000G2R` — 25 revolutions, looped twice, so fifty revolutions in
+   total.
+
+2. **Enter what came out**, in millilitres, on the calibration page.
+
+3. **The panel stores `pumped_vol × 2`** as the calibration factor. That number
+   is hundredths of a millilitre per revolution: 80 is 0.8 mL/rev, 380 is
+   3.8 mL/rev. The four presets in the project — 22, 80, 280 and 380 — are four
+   tubing bores.
+
+4. **Set the anti-drip steps** on the same page. They are added to the forward
+   move and then reversed back out, so the net volume is exactly what you asked
+   for and the last thing the pump does is run backwards — which pulls the drop
+   hanging off the line back up it. If it still drips, raise the number.
+
+</Steps>
+
+Re-run it whenever the tubing changes, and again after a long run. Peristaltic
+tubing takes a set as it ages and an old line delivers less per turn than a new
+one — which shows up as a dose that has quietly drifted low, not as anything
+obviously broken.
+
+<ImagePlaceholder alt="Close-up of the printed pinch valves clamped on silicone media lines on the acrylic fluidics panel">
+  Detail shot — the pinch-valve block on the panel with tubing routed through
+  it, so the single and the double clamps are both readable.
+</ImagePlaceholder>
+
+## Troubleshooting
+
+**The stand will not come off a limit.** A 50:1 worm is self-locking. That is
+why the module stays where you put it with the power off, and it is also why
+nothing back-drives out of an overtravel. The end stops are the only thing
+between the drive and the frame, so wire and test them before you first move the
+stand under power, not after.
+
+**The progress bar finishes instantly on small doses.** Its tick period is
+`steps ÷ velocity × 10`, and every Nextion variable is a 32-bit integer. A 1 mL
+dose on 0.8 mL/rev tubing is 64,000 steps, and 64,000 ÷ 150,000 truncates to
+zero — so the timer fires as fast as it can and the bar is at 100% before the
+pump has finished. The dose is still right; only the bar is lying. It starts
+telling the truth once the step count exceeds the velocity, which on the slow
+setting means most useful volumes.
+
+**The footswitches do nothing.** Check you bought the *Enhanced* panel. A Basic
+Nextion of the same size runs these HMI files and shows the same screens, and
+has no GPIO at all.
+
+**Nothing pumps after a power cycle.** The startup code sends
+`prints "/1V150000R\r"` once, at boot, and selects medium speed. If the pump
+missed it, it has no velocity set and will sit there. Touch a speed button to
+resend.
 
 ## Files & downloads
 

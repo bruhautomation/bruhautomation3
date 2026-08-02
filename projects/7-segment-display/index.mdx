@@ -1,18 +1,242 @@
 ---
 title: 7-Segment Display
-description: MAX7219 seven-segment display that shows Home Assistant data.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: Eight red digits in a printed desk wedge, showing any Home Assistant number — an ESP32 driving a MAX7219 over three wires.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-MAX7219 seven-segment display that shows Home Assistant data.
+Eight red digits in a printed wedge on the desk, showing one number out of Home
+Assistant. The config here points at `sensor.youtube_subscribers`, which is what
+it was built for, but that entity is a single line — solar export, watts on the
+main panel, degrees outside, days until a thing. The value is **pushed** to the
+ESP32 over the ESPHome native API, so there is no MQTT broker, nothing polling,
+and no dashboard involved.
 
-## Hardware
-- ESP32 microcontroller
-- 7-segment LED display
+It is a small build. One board, one display module, five jumper wires and two
+printed parts, and the whole thing runs off a phone charger.
+
+<ImagePlaceholder alt="The finished 7-segment display on a desk, eight red digits lit, in its black printed wedge">
+  Hero shot — the wedge on a desk at eye level, digits lit and showing a real
+  number, with the angled face catching a little light so the printed bezel reads.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board (ESP-WROOM-32, 38-pin narrow)](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack. The config's `board: nodemcu-32s` is a generic WROOM-32 key and every pin in the file is addressed by GPIO number, so any WROOM-32 devkit works
+- [MAX7219 8-digit 7-segment display module](https://www.amazon.com/dp/B01D0WSCJA?tag=brau01-20) — a 2-pack, you need one. `num_chips: 1` in the config means exactly one of these
+- [Female-to-female Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — five wires, straight from the module's header to the ESP32's
+- [Right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — the right-angle plug is the reason this one; a straight plug adds 20 mm behind a case that is only 87 mm wide
+- [2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — 3-pack. Eight digits at mid brightness is nothing, but don't run it off a 500 mA charger
+- [Black PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — 4 kg. Black matters here: it is the bezel around a red LED, and it hides the module behind the window
+- [3M VHB 5952 tape, 1/2 in](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — two short strips hold the display module against the back of the window. [Thick CA glue](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) works too if you are confident about placement
+
+## Print settings
+
+Three STLs ship, and only two of them are print files. `esp32_7_seg_v3.stl` is the
+assembled preview — the same mesh the 3D viewer on this page loads. What you print
+is `esp32_7seg_body.stl` and `esp32_7seg_back.stl`.
+
+The body is **87 mm wide, 28 mm front-to-back and 22 mm tall**, with a 66 × 16 mm
+window in a face that leans back at 43°. The lid is a 22 × 25.5 mm plate, 2 mm
+thick, with a stepped plug that locates it in the hatch.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 2–3 |
+| Infill | 15% |
+| Supports | None |
+| Material | PLA |
+| Orientation | Body flat on its back (the 87 × 28 face); lid flat |
+
+The shell is about 1 mm thick, so infill is close to irrelevant on this print —
+perimeters are the whole wall. Set them and stop worrying about the density number.
+
+Printed flat on its back, the window face is a 43° wall, which is steep enough to
+go up unsupported, and the window's top edge is the same angle rather than a
+bridge. If your slicer insists on supporting it, turn supports off entirely rather
+than letting it pack the window with material you then have to dig out.
+
+:::tip
+The body is a constant profile extruded along its length, so standing it on one
+end gives a print with no overhanging surface anywhere. It is 87 mm tall on a
+28 × 22 mm footprint, so it wants a brim, but it is an option if your printer
+struggles with steep walls.
+:::
+
+## Wiring
+
+Five wires. Every pin below comes from the ESPHome config in the folder.
+
+| MAX7219 module | ESP32 | Config key |
+|---|---|---|
+| VCC | **VIN / 5V** | — |
+| GND | **GND** | — |
+| DIN | **GPIO22** | `spi:` → `mosi_pin` |
+| CS | **GPIO23** | `display:` → `cs_pin` |
+| CLK | **GPIO21** | `spi:` → `clk_pin` |
+
+GPIO21 and GPIO22 are the ESP32's default I²C pins. The GPIO matrix does not care
+and SPI works there fine — just don't reflexively hang an I²C sensor off this board
+later without moving one of them first.
+
+:::caution
+The MAX7219 is a 5 V part and the ESP32's logic is 3.3 V, so the three signal lines
+are technically under spec. Most modules do not care. If yours lights up as garbage,
+or not at all, move VCC from VIN to the **3V3** pin — the chip runs below spec quite
+happily and the only cost is a little brightness — or put a level shifter in DIN, CS
+and CLK.
+:::
+
+There is also a `status_led` on **GPIO2**, which is the blue LED already on the
+board. It is useful while you are bringing the thing up on the bench and invisible
+the moment the case is closed.
+
+<ImagePlaceholder alt="The ESP32 and MAX7219 module wired together with five jumper wires, outside the case">
+  Bench shot — board and display module wired with the five jumpers, powered and
+  showing a number, before anything goes in the case. Label the five wires.
+</ImagePlaceholder>
+
+## Assembly
+
+The case is a single closed shell with one opening: a 22 × 25.5 mm hatch at one
+end of the base. **Everything goes in through it, lengthwise, into an 85 mm cavity.**
+That opening is the real constraint on this build — measure your display module and
+your ESP32 against it before you start the print, because MAX7219 boards vary
+between sellers and there is no second way in.
+
+<Steps>
+
+1. **Print the body and the lid.** Dry-fit the lid; it should plug in and stay put
+   without force.
+
+2. **Wire the five leads and flash the board first**, on the bench, with the case
+   nowhere near it. Nothing in here is reachable once it is assembled, and a
+   display that shows the right number on the bench is a display you only have to
+   mount once.
+
+3. **Feed the display module in through the hatch**, digits facing the window, and
+   slide it up to the far end.
+
+4. **Hold it against the back of the window** with a short strip of VHB along each
+   long edge of the PCB. Keep adhesive off the digit faces — a smear of glue on a
+   segment is permanent and shows in every photo you take afterwards.
+
+5. **Put the ESP32 in behind it**, USB port toward the hatch, and dress the five
+   jumpers so nothing presses on the plug.
+
+6. **Notch the lid for the cable and press it home.**
+
+</Steps>
+
+:::caution
+There is no cable hole anywhere in the model — the shell is closed apart from the
+window and the hatch. Cut or file a slot in the edge of the lid for the USB lead
+before you fit it. It is a 2 mm plate; a knife does it in a minute.
+:::
+
+## Configuration
+
+The config is `esphome/bruh-7-segment-display.yaml`, in the download section below.
+
+<Steps>
+
+1. Change the two substitutions at the top so the device gets its own name:
+
+   ```yaml
+   substitutions:
+     device_name: "Desk Display"
+     device_id: "desk-display"
+   ```
+
+2. Fill in `secrets.yaml` — this config uses `wifi_ssid`, `wifi_password` and
+   `ota_password`.
+
+3. Point it at the number you actually want. This is the block that matters:
+
+   ```yaml
+   sensor:
+     - platform: homeassistant
+       name: "Subscribers"
+       entity_id: sensor.youtube_subscribers
+       id: subscribers
+   ```
+
+   `platform: homeassistant` means Home Assistant pushes the value down over the
+   native API. The entity has to exist and has to be numeric. Swap the `entity_id`
+   for yours and leave the `id` alone, because the lambda refers to it.
+
+4. Flash over USB the first time. Everything after that goes over WiFi.
+
+</Steps>
+
+The device is discovered by the ESPHome integration on its own — there is nothing
+to add on the Home Assistant side.
+
+### Things worth changing
+
+**Right-align the number.** The lambda prints at position 0, so a four-digit value
+sits on the left of an eight-digit display with four blanks trailing it. Pad it:
+
+```yaml
+lambda: |-
+  it.printf(0, "%8.0f", id(subscribers).state);
+```
+
+**Handle the entity going unavailable.** An unavailable Home Assistant entity
+arrives as `nan`, and `%.0f` renders that as literal garbage across the digits.
+Guard it:
+
+```yaml
+lambda: |-
+  if (isnan(id(subscribers).state)) {
+    it.print(0, "  ----  ");
+  } else {
+    it.printf(0, "%8.0f", id(subscribers).state);
+  }
+```
+
+**Brightness** is `intensity`, 0 to 15. The config ships at 8, which is right for a
+lit room and too much at 2 a.m. If it sits in a bedroom, drive it from an
+automation instead of hard-coding it.
+
+**Make it a clock instead.** There is an SNTP `time:` block in the config with the
+id `sntp_time` that nothing currently uses — it is in there so you can do this:
+
+```yaml
+lambda: |-
+  it.strftime(0, "%H.%M.%S", id(sntp_time).now());
+```
+
+The dots between the fields are the display's decimal points, which is what those
+otherwise-useless dots on a seven-segment tube are good for.
+
+## Troubleshooting
+
+**Nothing lights up at all.** Check VCC before anything else — the module needs
+power from VIN, not from a 3V3 pin you grabbed because it was closer. Then check
+CS on GPIO23; a swapped CS and CLK is the single most common miswire on this chip
+and it fails silently rather than showing junk.
+
+**Digits show, but they are nonsense.** That is the 3.3 V logic level. Move the
+module's VCC to 3V3 and try again.
+
+**The number is right but reads backwards.** Some MAX7219 boards wire their digit
+order the other way round. Build the string yourself in the lambda and reverse it
+there — it is a display problem, not a wiring one, and it costs one line.
+
+**It shows `nan` or a row of dashes.** The Home Assistant entity is unavailable or
+isn't a number. Check it in Developer Tools → States; a sensor whose state is
+`unknown` or a string will do this every time.
+
+**It never appears in Home Assistant.** The `api:` block has no encryption key in
+this config, so it relies on the ESPHome integration finding it by mDNS. If your
+network drops multicast between VLANs, add the device by IP address manually.
 
 ## Files & downloads
 

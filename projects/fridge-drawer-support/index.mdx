@@ -1,17 +1,154 @@
 ---
 title: Fridge Drawer Support
-description: Bracket that reinforces a sagging refrigerator drawer.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A printed 2 mm bullnose shim that lifts a dropped refrigerator drawer back onto its rail — one flat bar, no fasteners, about 10 g of filament.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Bracket that reinforces a sagging refrigerator drawer.
+Crisper drawers drop. The ledge they ride on wears, the drawer front sags, and
+you get that scrape on the way in and a gap at the top on the way shut. This is
+the fix: a flat printed bar that sits on the ledge and puts the drawer back where
+it was. It takes ten grams of filament and no fasteners at all.
 
-## Hardware
-- 3D-printed plastic bracket
+<ImagePlaceholder alt="A printed white bar sitting on the rail ledge inside a refrigerator, with the crisper drawer pulled halfway out">
+  Hero shot — the bar in place on the ledge with the drawer pulled halfway out,
+  so you can see both the shim and the drawer it carries.
+</ImagePlaceholder>
+
+## What the part actually is
+
+Worth being precise, because "bracket" undersells how simple it is. The model is
+a bar **228 mm long, 18 mm wide and 2 mm thick**. The bottom is flat — the full
+228 × 18 rectangle, sitting on the ledge. The whole top perimeter is rolled over
+with a 2 mm radius, which because the bar is only 2 mm thick means the roll runs
+all the way from the flat top down to the plate. There is no sharp shoulder
+anywhere on the upper face, so the drawer slides on and off it without catching
+on an edge. There are no holes and no fasteners.
+
+The 2 mm thickness is the specification here. That is how much lift you get.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — about 10 g per bar, so a 1 kg spool covers every fridge you will ever own
+- [3M VHB double-sided tape, 1/2 in](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — 12.7 mm wide, which lands neatly down the middle of an 18 mm bar
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — the one tool this project genuinely needs, because 228 mm is one particular fridge and not yours
+- [Wet/dry sandpaper, assorted grit](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — for the bottom edge and for taking the bar down to length
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — optional, but it kills an elephant's foot in one pass where sandpaper takes five minutes
+
+:::note
+Print it in PETG. A fridge is cold and wet, and this is a 2 mm strip you have to
+flex slightly to get past the drawer stops. Cold PLA snaps doing that. PETG bends
+and comes back, and it does not care about condensation. If all you have is
+[PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) it will work — just
+fit it gently, and expect to reprint it the first time you are rough with the
+drawer.
+:::
+
+## Measure before you print
+
+The bar is drawn for one drawer. Pull yours all the way out and take three
+numbers with the caliper:
+
+- **How long the ledge run is.** That sets the 228 mm.
+- **How wide the ledge is.** That sets the 18 mm. Narrower is fine; wider than
+  the ledge and the drawer rides on an unsupported overhang.
+- **How far the drawer has dropped.** That sets the 2 mm.
+
+The three are independent, so do not uniform-scale the STL — scaling it to fit
+the length changes the lift and the width along with it. Change the length in
+the slicer's X axis only, or open `fridge_drawer_support_v1.step` and edit it
+properly. If you need more than 2 mm of lift, raise the thickness in CAD and
+raise the bullnose radius with it: the radius equals the thickness by design,
+and leaving it at 2 mm on a thicker bar gives you back the sharp shoulder the
+part exists to avoid.
+
+The lazy version works too. Print it at 228 mm, mark where it needs to end, and
+take it down with the sandpaper — 2 mm of PETG gives up quickly.
+
+## Print settings
+
+Flat face down, rolled face up, exactly as exported. Nothing overhangs.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.15 mm |
+| Walls | 4 or more |
+| Infill | 100% |
+| Supports | None |
+| Brim | Yes |
+| Material | PETG |
+| Orientation | Flat, as exported |
+
+0.15 mm rather than 0.2 mm because at 2 mm total height the bullnose is only ten
+or thirteen layers of curve, and the difference between those two numbers is
+visible as stepping on the roll. Run it at 0.2 mm if you would rather have the
+time back; it fits the same.
+
+Solid infill is not optional. At 2 mm thick the top and bottom shells almost meet
+anyway, and a hollow bar with a 15% gyroid inside crushes under the drawer and
+stops lifting it. The perimeters are the part that matters — they run the full
+228 mm, which is the direction the load pulls, so more walls is strictly better
+until the cross-section is solid.
+
+:::caution
+**228 mm does not fit an Ender 3's 220 × 220 bed along an axis.** Rotate the bar
+45° on the plate and the diagonal swallows it easily. On a 235 mm plate it fits
+straight with about 3 mm at each end — turn the skirt off, or it prints into the
+bed clips.
+:::
+
+Two other things about a long thin part. It will curl at the ends if you let it,
+which is what the brim is for. And PETG on smooth PEI bonds hard enough to take
+the sheet with it — print this on the textured side.
+
+## Fitting it
+
+<Steps>
+
+1. **Print two.** A drawer runs on a ledge at each side, and lifting one side
+   only racks it — it will bind worse than the sag did. The part is symmetric,
+   so there is no left and right; print the same file twice.
+
+2. **Take the drawer and the shelf out and let them warm up.** VHB will not bond
+   to a cold, damp surface, and the inside of a fridge is exactly that. Give the
+   ledge twenty minutes at room temperature and wipe it down with alcohol.
+
+3. **Dry-fit first, with no tape.** Sit both bars on their ledges, slide the
+   drawer in and out a few times, and check two things: that it no longer scrapes,
+   and that the drawer front now closes flush. If it rocks, the bottom edge has
+   an elephant's foot on it — a pass with the deburring tool or thirty seconds on
+   the sandpaper fixes it.
+
+4. **Tape them down.** One strip of VHB down the centre of the flat bottom of each
+   bar, press hard for thirty seconds. It holds immediately and reaches full
+   strength over about a day.
+
+5. **Put the drawer back and leave it alone overnight** before you load it with
+   anything heavy.
+
+</Steps>
+
+<ImagePlaceholder alt="Close-up of the printed bar with a strip of black VHB tape down the centre of its flat underside">
+  Detail shot — the underside of the bar with the VHB strip applied down the
+  centre line, showing how the 12.7 mm tape sits inside the 18 mm width.
+</ImagePlaceholder>
+
+## Don't glue it
+
+VHB is deliberate. Superglue or epoxy would hold just as well and you would never
+get the bar off again, and this is a part that lives inside a fridge and needs to
+come out when you clean it. Tape lets you peel it, wash it and put it back.
+
+:::caution
+This is a structural part under the drawer, not a surface for food. FDM layer
+lines are not cleanable in any meaningful sense — nothing should sit directly on
+it, and it should come out and get scrubbed whenever the drawer does.
+:::
 
 ## Files & downloads
 

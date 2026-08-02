@@ -1,18 +1,191 @@
 ---
 title: Shelly Case
-description: Protective enclosure for Shelly relays.
+description: A printed shell for a Shelly relay module, for the installs where there is no wall box to hide it in — plus the material, venting and strain-relief choices that matter once printed plastic is sitting on mains.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Protective enclosure for Shelly relays.
+A Shelly is designed to disappear into a wall box behind a switch, and about
+half the useful places to put one have no wall box: a pump in a crawlspace, a
+garage door opener, a fixture fed from a ceiling void, an appliance behind a
+cabinet, a shed. The module arrives as a bare board in an open frame with its
+screw terminals facing the world. This is the shell that closes it in — and,
+because it is plastic rather than a steel handy box, it does not sit between the
+module's antenna and your access point.
 
-## Hardware
-- 3D-printed case
-- Shelly device
+:::danger
+This is a mains-voltage part. Kill the breaker, verify dead at the conductors
+with a tester, and lock the panel or tape the breaker if anyone else is home.
+
+A printed shell is **not** a listed electrical enclosure and does not become one
+because it is nicely fitted. Where your code requires mains splices in an
+approved box — and in most of the US that is most of the time — put an approved
+box there and use this to protect and mount the module inside or downstream of
+it. Protecting the board and keeping fingers, insulation and stray screws off
+the terminals is what this part is for.
+:::
+
+<ImagePlaceholder alt="A Shelly relay module seated in a printed two-part case with the lid off, mains tails landed on the screw terminals">
+  Hero shot — the module sitting in the open bottom half with the conductors
+  landed and the strain-relief tie visible, lid resting beside it. A second
+  frame with the case closed and mounted to a joist.
+</ImagePlaceholder>
+
+## Measure your module first
+
+Shelly has changed the outline more than once across Gen1, Plus and Gen3, and a
+shell that swallows one of them will not necessarily close over another. The
+metering modules also carry a lead out to a CT clamp, which needs its own way
+out of the case. Put calipers on the module you actually own before you commit
+a spool to it.
+
+Work from the terminal legend printed on the module itself and the wiring
+diagram in the box. Not from a diagram you found for a different generation.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Shelly Plus 1 PM](https://www.amazon.com/dp/B09TS24GCH?tag=brau01-20) — a 4-pack, and the one to build around. One relay, power metering, a local API and native Home Assistant support with nothing in the cloud
+- [Shelly 1 PM](https://www.amazon.com/dp/B0965941M8?tag=brau01-20) — the earlier 4-pack, cheaper. Note the listing says **non-UL**, which is the whole argument for putting it in a proper box and not in a wall
+- [Shelly 2.5](https://www.amazon.com/dp/B08J3QP1SG?tag=brau01-20) — a 2-pack. Two relays with metering on each, or one roller shutter. Different footprint from the 1-series, so it wants its own shell
+- [Shelly Dimmer 0/1-10 V PM Gen3](https://www.amazon.com/dp/B0D9JQTP8B?tag=brau01-20) — for 0-10 V LED drivers and commercial fixtures. Gen3 outline, measure it separately
+- [Shelly EM Gen3 with 50 A clamp](https://www.amazon.com/dp/B0DKFY2ZNV?tag=brau01-20) — whole-circuit energy monitoring. The clamp lead has to leave the case, so this one needs a slot rather than a sealed wall
+- [PETG, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the default here, and the reason is below. Anything holding a relay gets warm and PLA does not
+- [ABS, 1.75 mm](https://www.amazon.com/dp/B00J0H6NNM?tag=brau01-20) — better again if you have an enclosed printer. An attic in July plus a metering shunt is the case ABS is for
+- [PLA+, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 kg pack of black. Fine for a low-current switching-only module somewhere cool and indoors, and wrong everywhere else
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — 100 of them, M3 × 5.7 mm. You will open this case again; tapped plastic gives up after three or four cycles and an insert does not
+- [M3 countersunk screws, nuts and washers](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — a 562-piece box, 5 to 20 mm. Two or four screws close the lid
+- [Lever-nut connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) — SPL-2 mini, 2-in/4-out. For joining tails to house wiring without a wire nut fighting you in a tight box
+- [Adhesive-lined heat shrink, assorted](https://www.amazon.com/dp/B0CT88MHXQ?tag=brau01-20) — 446 pieces, 4:1. Sleeve the conductors where they cross the printed edge
+- [Zip ties with a screw-mount head](https://www.amazon.com/dp/B0G5N67YKF?tag=brau01-20) — 200 of them, 6 in. This is the strain relief: one tie on the cable inside the case so the screw terminals never take a pull
+- [Non-contact voltage tester](https://www.amazon.com/dp/B01N99D3MS?tag=brau01-20) — the cheapest part on this page and the one you should not skip
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the measuring above
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — knocks the elephant's foot off the first layer, which is exactly the edge the lid has to sit flat on
+- [#8 × 1/2 in self-tapping screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20) — a 200-pack, short on purpose. Mounts the case to a joist, a stud or the back of a cabinet
+- [Drywall and hollow-wall anchors](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20) — 112 pieces, mixed sizes, for when there is no framing behind the spot you want
+- [3M VHB 5952 tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — 1/2 in × 15 ft, for where you are not allowed to drill. Clean the surface with alcohol first or it lets go in a summer
+- [Brother P-touch Cube label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) — write on the case what it switches and which breaker feeds it. In three years that label is the difference between a five-minute job and an afternoon
+
+Printed on a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20).
+
+:::caution
+If the install is outdoors, damp, or anywhere a printed shell is the wrong
+answer, stop and buy the right box: the
+[IP65 ABS junction box with two cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+is the one to reach for. It is under ten dollars, it seals, and the glands give
+you strain relief for free. Print a bracket that holds the Shelly inside it and
+you get the best of both.
+:::
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 4 |
+| Infill | 30% |
+| Material | PETG, or ABS in an enclosed printer |
+| Supports | None |
+| Orientation | Both halves flat on the bed, open face up |
+
+**Print it in PETG.** PLA starts to soften well before the temperature a warm
+relay in a warm ceiling gets to, and it creeps under a constant load — which is
+what a screw pulling a heat-set insert is. A PLA case does not fail suddenly; it
+sags over a summer, the lid stops sitting flat, and the screw that was tight in
+March is loose in September. PETG and ABS both hold. This is the one material
+decision on the page that is not a preference.
+
+Vent it. Slots in two opposite walls, not one, so air can actually move through
+rather than sit. A metering module measures current through a shunt and the
+relay contacts have resistance of their own; both make heat, and a sealed
+printed box is the worst possible thing to wrap around them. If the module is
+switching anything near its rating, vent generously and put it somewhere air
+moves.
+
+:::note
+The model isn't in the repo yet — the section at the bottom will fill itself in
+when it lands. The settings above are what to print it with, and what to draw
+against if you model your own around the module you own.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Kill the breaker and prove it.** Test the tester on a live circuit first,
+   then test the conductors you are about to touch. Test them again after you
+   strip the first one.
+
+2. **Melt the inserts in** while the printed part is still on the bench and you
+   can get the iron square to it. Low temperature, slow, straight down —
+   pressing an insert in crooked is how a boss splits.
+
+3. **Land the conductors with the module out of the case.** All the terminals
+   are reachable and visible on the bench and about half of them are not once
+   the board is seated. Torque the terminal screws properly; a loose mains
+   terminal is a heater.
+
+4. **Strain-relieve the cable before you close anything.** One zip tie around
+   the cable, anchored inside the shell, so any pull on the cable lands on the
+   case and not on the terminals. This is the step people skip and it is the
+   failure that shows up two years later.
+
+5. **Seat the module and close the lid.** Snug, not tight. A heat-set insert
+   strips at surprisingly little torque, and a cracked lid on a mains part is
+   not a lid.
+
+6. **Power up before you mount it.** Join it to WiFi, add it in Home Assistant,
+   switch the load twice and check the power reading moves. Finding out that the
+   antenna does not reach is much cheaper before the case is screwed to a joist.
+
+7. **Label it** with the load and the breaker, then mount it.
+
+</Steps>
+
+## Mounting
+
+Into framing, use the short self-tappers — they are 1/2 in for a reason, and a
+longer screw through a stud finds cable you cannot see. Into plasterboard with
+nothing behind it, use the anchors. Where you are not allowed to drill at all —
+a rental, a finished cabinet, the side of an appliance — VHB holds a part this
+light indefinitely, provided you wipe the surface with alcohol first and press
+it for thirty seconds.
+
+Mount it where you can reach it. A Shelly needs a firmware update occasionally
+and a factory reset once in a blue moon, and both want a button you can get a
+finger to.
+
+## What will bite you
+
+**It joined WiFi on the bench and drops off in the ceiling.** The module's
+antenna is on its PCB. Plastic is transparent to it and steel is not, so a
+printed case is genuinely better than a metal box here — but foil-faced
+insulation, plaster over wire lath, and the metal box the printed case is
+sitting inside all still count. Move it out of the metal before you blame the
+module.
+
+**Do not print this in carbon-fibre filament.** It is the nicest-looking spool
+on the shelf and it is the wrong one for a radio in a box. Plain PETG or ABS.
+Don't line the case with foil tape either.
+
+**The lid sits proud and the screws never feel tight.** Elephant's foot on the
+first layer of the mating faces. Deburr both halves before you assemble; it is
+thirty seconds with the blade and it fixes a fit you would otherwise reprint.
+
+**The terminals worked loose.** No strain relief, or a PLA case creeping around
+the screw boss, or both. Re-torque the terminals, add the tie, and if the case
+is PLA reprint it in PETG rather than tightening it again.
+
+**The case is warm to the touch.** That is the load telling you the box is too
+closed for what is going through it. More venting, less current, or a real
+enclosure with room around the module.
 
 ## Files & downloads
 

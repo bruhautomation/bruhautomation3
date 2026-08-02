@@ -1,19 +1,206 @@
 ---
 title: Nightlight
-description: ESP32 nightlight, in mono and RGB variants.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: Two ESPHome nightlights — a dimmable single-colour countertop light, and an RGBW build with a warm bulb and a 54-pixel fill strip.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-ESP32 nightlight, in mono and RGB variants.
+There are two configs in this folder and they are two different lights. The
+**mono** one is a single dimmable channel — one PWM pin, one MOSFET, one run of
+white LEDs under a kitchen counter, turned down far enough that you can cross
+the room at 3 a.m. without waking up. The **RGB** one is the kid's-room version:
+a warm bulb on its own dimmer plus 54 addressable RGBW pixels around the roof,
+for colour wipes, twinkles and a police-car mode nobody asked for.
 
-## Hardware
-- LED light module
-- Control circuitry
-- WiFi/Zigbee connectivity
+Both are ESPHome, so both appear in Home Assistant on their own with no YAML to
+write on the Home Assistant side, and both update over WiFi after the first
+flash.
+
+<ImagePlaceholder alt="The two BRUH nightlights — a white strip under a kitchen counter and an RGBW nightlight in a child's bedroom">
+  Hero shot — ideally both builds in one frame, or two shots: the mono strip
+  glowing under a counter edge at night, and the RGB one on a bedside table with
+  the fill strip running a colour wipe.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+**The mono build — "BRUH Countertop"**
+
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the config's `board: nodemcu-32s` is this pinout. A 2-pack, so the spare covers a second light
+- [Dual MOSFET PWM driver module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — 5–36 V, 15 A. A 10-pack; you need one per PWM channel
+- [24 V natural-white high-density strip](https://www.amazon.com/dp/B07FCSHKLV?tag=brau01-20) — 16.4 ft, cut to the counter at the marked lines
+- [24 V 5 A power supply](https://www.amazon.com/dp/B01GC6VS8I?tag=brau01-20)
+- [Isolated 24 V → 5 V buck with USB out](https://www.amazon.com/dp/B08H7XRCVQ?tag=brau01-20) — runs the ESP32 off the same brick so there is one plug, not two
+- [Right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — from that buck into the board, in a box shallow enough to hide
+- [Aluminium U-channel with clear lens](https://www.amazon.com/dp/B08L3K4CQT?tag=brau01-20) — 5 × 1 m. A bare strip under a counter reflects off the worktop as a row of dots; the channel is what makes it a line of light
+
+**The RGB build — "Lev Nightlight"**
+
+- [ESP32-S3-DevKitC-1](https://www.amazon.com/s?k=ESP32-S3-DevKitC-1+development+board&tag=brau01-20) — the config names this board specifically and uses its onboard RGB LED on GPIO48. A plain ESP32 will not do; the pins are different and GPIO48 does not exist on one
+- [SK6812 RGBW strip, 5 V, 144 LEDs/m](https://www.amazon.com/dp/B01N0MA316?tag=brau01-20) — 1 m is 144 pixels, so the 54-pixel run is about 37 cm of it. For a bigger shade, the [5 m 60 LEDs/m reel](https://www.amazon.com/dp/B01N2PC9KK?tag=brau01-20) makes 54 pixels about 90 cm
+- [12 V dimmable warm-white G4 LED bulb](https://www.amazon.com/dp/B06XQKPG13?tag=brau01-20) — 3 W, 2700 K, 5-pack. This is the `bulb_leds` channel
+- [12 V 4 A power supply](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) — ships with a screw-terminal jack, which saves cutting the plug off
+- [MP1495 buck module, 5–16 V → 5 V 3 A](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — makes the 5 V rail for the board and the strip
+- [Dual MOSFET PWM driver module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — same module as above, for the bulb channel
+- [JST-SM 3-pin pigtails](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20) — 20 pairs, so the shade unplugs from the base
+
+**Both**
+
+- [18 AWG two-conductor silicone wire](https://www.amazon.com/dp/B07FMRDP87?tag=brau01-20) for power runs and [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) for signal
+- [Lever-nut connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) — solderless joins where the strip meets the wire
+- A [resistor assortment](https://www.amazon.com/s?k=1%2F4W+resistor+assortment+kit&tag=brau01-20) for the 330 Ω on the pixel data line
+
+:::caution
+Nothing here plugs an LED strip into a GPIO pin. An ESP32 output sources a few
+tens of milliamps and the mono strip wants amps — the MOSFET module is not
+optional, it is the part that does the switching. The pin only ever drives the
+module's gate input.
+:::
+
+## Wiring
+
+**Mono — ESP32 to a single-colour strip**
+
+| Signal | ESP32 pin | Goes to |
+|---|---|---|
+| PWM out | **GPIO32** | MOSFET module signal input |
+| Ground | **GND** | MOSFET module signal ground, and the 24 V supply's negative |
+| Board power | **5V** / **VIN** | 5 V from the buck, or the micro-USB socket |
+| Status LED | **GPIO2** | The board's own blue LED. Nothing to wire |
+
+The MOSFET module sits between the supply and the strip: 24 V in on its input
+terminals, strip on its output terminals, GPIO32 and GND on its signal header.
+The buck taps the same 24 V and hands the board 5 V over USB.
+
+**RGB — ESP32-S3 to a bulb and a pixel strip**
+
+| Signal | ESP32-S3 pin | Goes to |
+|---|---|---|
+| Bulb PWM | **GPIO20** | MOSFET module signal input → 12 V G4 bulb |
+| Pixel data | **GPIO21** | SK6812 strip `DIN`, through 330 Ω |
+| Board LED | **GPIO48** | The DevKitC-1's onboard addressable LED. Nothing to wire |
+| Strip power | **5V** / **GND** | 5 V rail from the MP1495, shared ground with the board |
+
+Put the 330 Ω resistor in series with the data line, at the ESP32 end, and keep
+that lead short. Everything shares one ground — the 12 V negative, the 5 V
+negative and the board's GND are the same net, and the strip will do nothing at
+all if you forget it.
+
+<ImagePlaceholder alt="Wiring diagram for the RGB nightlight showing the ESP32-S3, buck converter, MOSFET module, G4 bulb and SK6812 strip">
+  Wiring diagram, or a labelled photo of the base with the buck, the MOSFET
+  module and the JST pigtail visible.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Set the buck's output before it is connected to anything.** Feed it the
+   supply, put a meter on the output and dial it to 5.0 V. The MP1495 arrives at
+   whatever the last person left it at, and 12 V into an ESP32's 5 V pin is a
+   dead board.
+
+2. **Cut and re-terminate the strip.** Cut on the copper pads, tin them, and
+   solder a JST-SM pigtail on so the shade lifts off the base without a
+   soldering iron. Check the arrows on the strip — data flows one way, and a
+   strip wired backwards is silent, not dim.
+
+3. **Wire the MOSFET module** — supply in, load out, signal from the GPIO. Then
+   bench-test it with the board on USB, before anything is glued or screwed down.
+
+4. **Flash it and confirm the entities** appear in Home Assistant, then close
+   the box. Every flash after the first is over WiFi, but only if the WiFi
+   credentials were right the first time.
+
+5. **Mount the mono strip in its channel** before sticking the channel down.
+   Peel, press, cap the ends, then fix the channel to the underside of the
+   counter. Doing it the other way round means working upside down with a strip
+   that only sticks once.
+
+</Steps>
+
+## Configuration
+
+Both configs read from `secrets.yaml`: `wifi_ssid`, `wifi_password`,
+`ota_password`, and `api_key` for the RGB one.
+
+In the mono config, the two substitutions at the top are the only lines you have
+to change:
+
+```yaml
+substitutions:
+  device_name: "BRUH Countertop"
+  device_id: "bubba-nightlight"
+```
+
+In the RGB config, `name:` and `friendly_name:` do the same job, and the number
+that matters is `num_leds: 54` on the `led_strip_roof` light — set it to however
+many pixels you actually cut. `is_rgbw: true` stays: an SK6812 pixel has a real
+white chip and ESPHome needs to know it is there. `rgb_order: GRB` is correct for
+these strips; if red and green come out swapped, that is the key to change.
+
+Two things worth fixing while you are in there. The mono config's `api:` block
+has no encryption key — give it one, the way the RGB config does. And there is a
+`globals:` block declaring `dim_up` that nothing in the file ever reads. It is
+harmless, and you can delete it.
+
+`restore_mode: restore_default_on` on the mono light means it comes back on by
+itself after a power cut. For a nightlight that is the correct behaviour, and it
+is worth copying into the RGB config, which does not have it.
+
+## What you get in Home Assistant
+
+The mono build is one light entity with pulse, fast pulse, slow pulse, strobe and
+random effects, plus a `Fade Alert` effect that breathes between 100% and 75% on
+a two-second cycle — that is the one to trigger from an automation when you want
+the light to tell you something without changing colour. There is also a WiFi
+signal sensor, a status binary sensor and a restart switch.
+
+The RGB build gives you three lights: the warm bulb, the 54-pixel fill strip, and
+the board's own single onboard pixel, which is genuinely useful as a "did it
+boot" indicator you can then turn off from Home Assistant. The fill strip carries
+the whole ESPHome addressable effect set plus tuned variants — `Color Wipe Mist`
+(a blue three-pixel gradient running backwards), `Police`, `Fireworks Custom`,
+`Twinkle BRUH`, `Flicker BRUH` and a blue-then-green `Strobe Custom`. The last
+entry in the list is `wled:`, which turns on WLED's UDP realtime protocol, so
+anything that can drive a WLED device — an app, xLights — can take the strip over
+across the network without reflashing.
+
+## Troubleshooting
+
+**The pixel strip does nothing, or the first pixel lights and the rest don't.**
+In order: ground not shared between the 5 V rail and the board, data soldered to
+the output end of the strip instead of the input end, or 3.3 V data that the
+first pixel is not reading cleanly. The first two are free to check. For the
+third, a [TXS0108E level shifter](https://www.amazon.com/dp/B088LMJR5K?tag=brau01-20)
+on the data line fixes it, though a short lead and the 330 Ω resistor usually
+make it unnecessary.
+
+**Colours are close but wrong — white looks pink, or red and green are swapped.**
+`rgb_order` and `is_rgbw`. A GRB strip declared as RGB swaps two channels; an
+RGBW strip declared as RGB throws away the white chip and mixes a worse white out
+of the other three.
+
+**The strip browns out or shifts colour at high brightness.** 54 RGBW pixels at
+full white pull well over 3 A, which is more than the MP1495 will give you. A
+nightlight never asks for that, so cap the brightness in Home Assistant — or, if
+you want the full output, feed the strip from its own 5 V supply and keep the
+buck for the board alone.
+
+**The bulb whines at low brightness.** That is the bulb's own driver ringing at
+the PWM frequency. Raise `frequency:` on the `ledc` output — 20000 Hz is above
+hearing, but you lose resolution at the very bottom of the dimming range, which
+is exactly where a nightlight lives. Try 5000 Hz first.
+
+**ESPHome rejects `rmt_channel:`.** That key belongs to the older RMT driver.
+The config pins `framework: type: arduino` deliberately — leave that alone. If a
+newer ESPHome still refuses the key, delete both `rmt_channel:` lines and let it
+allocate the channels itself.
 
 ## Files & downloads
 

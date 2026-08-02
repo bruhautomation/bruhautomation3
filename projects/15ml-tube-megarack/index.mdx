@@ -1,21 +1,111 @@
 ---
 title: 15mL Tube Megarack
-description: An oversized 3D printed rack for holding large quantities of 15mL tubes.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A one-piece printed rack that holds a whole run of 15 mL conical tubes, instead of five small racks that drift apart across the bench.
+# The model isn't posted yet, so this is a parts-and-print-settings page rather
+# than something you can build from today. Published, and marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-An oversized tube rack for when standard racks aren't enough. Prints in one piece.
+A bench covered in twelve-place tube racks is a bench where half the racks are
+somewhere else. This is one printed slab with enough positions to hold an entire
+run of 15 mL conicals in order, in one thing you can pick up with one hand. It
+prints in one piece, so there is nothing to assemble, nothing to glue and nothing
+to lose in a drawer.
 
-{/* Photo needed — A hero photo of the finished 15mL tube megarack — show the printed rack loaded with 15mL tubes.
-    alt text when it lands: A large 3D-printed 15mL tube megarack filled with conical tubes on a lab bench */}
+<ImagePlaceholder alt="A large 3D-printed 15mL tube megarack filled with conical tubes on a lab bench">
+  Hero shot — the printed megarack on the bench, loaded with 15 mL conicals,
+  shot at a low angle so the depth of the block and the row of caps both read.
+</ImagePlaceholder>
 
 :::note
-3D files coming soon.
+The model isn't posted yet. What is below is the bill of materials and the print
+settings this part wants — the STL will land in the download section at the
+bottom.
 :::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [15 mL conical centrifuge tubes](https://www.amazon.com/s?k=15mL+conical+centrifuge+tubes+sterile&tag=brau01-20) — the thing the whole rack is dimensioned around
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print it in this
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the alternative, and the cheaper one if the rack lives on a cool bench (4 × 1 kg, black)
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure the tubes you actually stock before you commit a multi-hour print
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round the top of each bore; this is the difference between a tube dropping in and a tube being screwed in
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — four under the corners so a loaded rack doesn't skate on a wiped-down bench (200 pcs, you need four)
+- [Label maker](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) and [12 mm laminated tape](https://www.amazon.com/dp/B06XCQ79ZM?tag=brau01-20) — for numbering the rows, if you want positions to mean something
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — only if the footprint is bigger than your bed and you cut it in the slicer
+
+## Before you print
+
+Every 15 mL conical is about 17 mm across the barrel and about 120 mm long, and
+it hangs in a rack by its cap, not by its body — the cap is wider than the
+barrel, and that lip is the whole retention mechanism. Brands vary by a few
+tenths of a millimetre. Put a caliper on the tubes in your own store cupboard
+before you start a print that is going to cut sixty of those holes.
+
+If the bores come out wrong, fix them in the model, not with the slicer's scale
+box. Scaling the part scales the pitch, the wall thickness and the deck
+thickness along with the hole, and you will end up with a rack that fits the
+tubes and no longer fits the bench.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 3 |
+| Infill | 15% |
+| Supports | None |
+| Material | PETG |
+| Orientation | Flat on the bed, bores vertical |
+
+Bores vertical is the only sensible orientation — every hole is then a vertical
+tube the printer bridges nothing across, and the part needs no supports at all.
+
+Turn up wall count rather than infill. Fifteen millilitres of water is 15 grams,
+and a megarack holds a lot of tubes, so the load on the deck adds up quickly.
+Perimeters carry that; sparse infill in the middle of a thin deck does very
+little.
+
+## Material
+
+**PETG.** A tube rack lives on a bench next to things that are warm — a
+waterbath, a bead bath, an incubator door, a sunny window over a summer — and
+PLA starts going soft around 60 °C. A rack that sags is a rack whose bores no
+longer line up. PETG holds its shape through all of that and shrugs off being
+dropped, which is the other thing that happens to tube racks.
+
+PLA+ is fine if you know the rack stays cool, and it prints more accurately, so
+the bores come out closer to the number in the model.
+
+:::caution
+Do not autoclave a printed rack. An autoclave cycle runs at 121 °C and both PETG
+and PLA are well past soft by then — you will open the chamber to find a
+puddle. Printed racks are bench organisers, not sterile consumables: the layer
+lines hold liquid that you cannot get back out of them. Wipe it down with 70%
+ethanol and keep it out of the autoclave and the glasswasher.
+:::
+
+## Finishing
+
+Run the deburring tool once round the mouth of every bore. Fresh off the bed,
+the first layer of each hole carries a little elephant's foot and the top edge
+carries a burr, and both of them catch on the tube's cap skirt. A quarter turn
+each and a tube drops in under its own weight — which is what you want when you
+are loading a rack one-handed with a pipette in the other.
+
+Four rubber bumpers under the corners next. A full rack is heavy and the bench
+is usually damp; without feet it will slide the moment you pull a tube.
+
+Then label it. A rack with numbered rows is a rack you can write positions down
+against, and the laminated tape survives an ethanol wipe where a marker line
+does not.
 
 ## Files & downloads
 
