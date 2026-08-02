@@ -1,19 +1,203 @@
 ---
 title: Honda Cupholder
-description: Cupholder and rail for Honda vehicles.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A two-part printed mount for a Honda — a shelled 130 × 122 mm bracket with a 30 mm slot, plus a barbed rail key that snaps into the pocket in its top edge.
+# The parts are fully measured and printable, but the write-up can't yet say
+# which Honda it was cut for or where in the car it mounts. Published, and
+# marked as pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Cupholder and rail for Honda vehicles.
+Two printed parts and no fasteners. A slotted plate slides on and carries the
+load; a small barbed key drops into a pocket in the plate's top edge, snaps
+home, and locks the two together. It is the mount, not the drink — **neither
+part has a cup-shaped anything in it**, and nothing in either one is threaded,
+counterbored or tapped for a screw.
 
-## Hardware
-- Custom mounting rail
-- Cupholder holder
-- Vehicle-specific hardware
+It is also cut to one car. The slot width, the tongue under the plate and the
+ridge that stands proud of the top face are all sized to a specific Honda
+interior, and the numbers are in the table below so you can hold a caliper
+against yours before you spend an afternoon on it.
+
+<ImagePlaceholder alt="The printed bracket and its rail key sitting in the car, with the rail snapped into the pocket in the top edge">
+  Hero shot — the bracket mounted in the car with a drink in place, shot from
+  the seat so it's obvious where in the console it lives.
+</ImagePlaceholder>
+
+## The two parts
+
+Everything here is measured off the STEP files in the folder, not off a spec
+sheet.
+
+| | Bracket (`honda_cup_holder_holder_v2`) | Rail key (`honda_cup_holder_rail_v1`) |
+|---|---|---|
+| Overall | 130 × 138.5 × 21.5 mm | 18 × 12.9 × 16 mm |
+| Plate / body | 130 × 122.5 mm, 21.5 mm thick | 15.5 × 10.4 mm |
+| Model volume | 127 cm³ | 1.5 cm³ |
+| Wall | 2 mm skins over a hollow core | 1.5 mm walls, ribbed |
+
+The bracket is a plate with a **30 mm slot cut into one long edge**, running
+75 mm in to a 15 mm radius end. Five Ø25 mm holes sit on a 45 × 40 mm grid
+across the rest of the plate; the slot occupies the sixth position on that same
+grid. Under the slot edge a **tongue** hangs 16 mm below the plate — 21.5 mm
+across, 9.5 mm thick at its root, tapering to 5.5 mm at the tip. At the other
+end of the same edge is the pocket the rail key goes into.
+
+The plate is not a solid slab. It is shelled to a 2 mm skin front and back over
+a hollow core that runs the full height between the top and bottom rims, and
+that is the single fact that decides how you print it.
+
+## Parts
+
+<AffiliateDisclosure />
+
+There is no hardware in this build. Two printed parts, and the only thing you
+have to get right is the plastic.
+
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — **the material this part has to be.** See the caution below. This one is white; if you want it to disappear into a black interior, buy the same filament in black
+- [ABS filament, 1.75 mm](https://www.amazon.com/dp/B00J0H6NNM?tag=brau01-20) — the step up if your car parks in the sun all day. It needs an enclosure and it will warp on an open printer, so it is the harder build, not the better one by default
+- [Auto trim removal tool kit](https://www.amazon.com/dp/B07R44VJHN?tag=brau01-20) — 13 nylon pry tools. Every interior clip in a Honda breaks if you lever it with a screwdriver, and they break out of sight where you can't glue them back
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for the fit table below. Do this before you print, not after
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round the slot mouth and the pocket, which are the two edges the fit depends on
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — for taking a few tenths off the rail key's barbs when the snap is too stiff
+- [Assorted wet/dry sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — 240 and up, for the slot faces if the plate binds going on
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — a 200-pack. A car part that rattles is a car part you take back out within a week; two dots kill it
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — one drop on the rail key's fin if the snap alone won't hold it. Not on the slot faces, ever
+- [VHB double-sided tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) and [99% isopropyl alcohol](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — if you end up backing the plate against a flat panel. Wipe the panel with the IPA first; car interiors are dressed with silicone and VHB will not stick through it
+
+The plate's footprint on the bed is 130 × 21.5 mm and it stands 138.5 mm tall,
+so bed size is a non-issue — a [Bambu Lab
+A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20) or any 220 mm Ender-class
+machine takes it standing up with room to spare.
+
+:::caution
+**Do not print this in PLA.** A parked car's interior goes past 60 °C on an
+ordinary summer afternoon and a dark trim panel goes a good deal higher than
+that. PLA starts creeping at around 60 °C, and a bracket that creeps does not
+snap — it sags quietly out of shape while it's holding a full drink, and you
+find out on a corner. PETG has roughly 20 °C on it and is the floor for anything
+that lives in a car. ABS or ASA is better still if you have an enclosure.
+:::
+
+## Print settings
+
+| Setting | Bracket | Rail key |
+|---|---|---|
+| Layer height | 0.2 mm | 0.16 mm |
+| Walls | 3 | 3 |
+| Infill | 15% | 40% |
+| Supports | None | None |
+| Brim | Yes | Yes |
+| Material | PETG | PETG |
+| Orientation | Standing on the pocket end, tongue up | Flat on its base |
+
+**Print the bracket standing on edge, on the end that has the pocket in it.**
+That end sits almost flat on the bed and it is the only orientation that works.
+Laid flat on one of its big faces the hollow core becomes an internal bridge
+more than 100 mm across with a 17.5 mm drop under it, and no slicer bridges
+that — you get either a sagged skin or a cavity full of support you can't reach,
+because the only way in is through the Ø25 holes. Standing on edge, the core's
+two skins become vertical walls and there is nothing to support at all.
+
+Three walls is deliberate. The skins are 2 mm and three 0.4 mm perimeters from
+each face fills them solid, which is what you want on the part of the plate
+that actually carries anything. Infill only ever reaches the solid rim.
+
+Two bridges happen in this orientation and both are fine. The roof of the slot
+spans 30 mm across a 21.5 mm width, and the round end of the slot gives the
+first layer of it a gradual start. The top of the hollow core spans 17.5 mm. The
+five Ø25 holes print with their axes horizontal, so the top 30° or so of each
+one droops — they are holes in a plate, not bearing surfaces, and it does not
+matter.
+
+The plate is 138.5 mm tall on a 21.5 mm footprint. Use a brim.
+
+Call it about 140 g of PETG for the plate and 2 g for the key; your slicer will
+give you the real number. Print four keys. They cost nothing, and the barbs are
+the feature most likely to break.
+
+## Assembly
+
+<Steps>
+
+1. **Deburr the pocket and the slot mouth.** One pass each with the deburring
+   tool. These are the two edges the whole fit rides on, and elephant's foot on
+   the first layer of the pocket is exactly where the key will refuse to go.
+
+2. **Check the key against the pocket dry.** The key measures 18.0 mm across
+   its barbs and 15.5 mm across the body. The pocket is 19.5 mm wide inside,
+   necking to 16.5 mm at its mouth, and 12.5 mm deep.
+
+3. **Push the key in base-first, square.** The 2 mm fin on its side lines up
+   with the 2.7 mm slit in the pocket wall — that slit is what stops the key
+   turning, so if it won't start, you have it 180° out. Press straight down.
+   The barbs squeeze through the 16.5 mm mouth and snap out into the 19.5 mm
+   section behind it, and you will hear it.
+
+4. **Check the ridge.** Once it's home, 3.5 mm of the key's tapered ridge stands
+   proud of the plate's top face. That is the locating feature and it is
+   supposed to stick out.
+
+5. **Fit the plate to the car,** slot first, and push it on square. Do not lever
+   one corner on ahead of the other — the two jaws either side of the slot are
+   the thinnest part of the plate.
+
+6. **Stick two rubber bumpers on** wherever it touches trim. Do this before you
+   decide you don't need to; the rattle shows up on the first bad road surface,
+   not in the driveway.
+
+</Steps>
+
+<ImagePlaceholder alt="Close-up of the rail key snapped into the pocket at the top edge of the bracket, with the ridge standing proud">
+  Detail shot — the key half in and fully seated, side by side, so the 3.5 mm of
+  ridge above the plate face and the fin lining up with the slit are both
+  obvious.
+</ImagePlaceholder>
+
+## Will it fit your car?
+
+Four numbers decide it. Measure all four before you print 140 g of PETG.
+
+| Feature | As drawn | What it has to match |
+|---|---|---|
+| Slot | 30.0 mm wide, 75 mm deep to the bottom of its round end, through the full 21.5 mm | Whatever the plate slides onto |
+| Tongue | 16 mm long, 9.5 mm at the root tapering to 5.5 mm, 21.5 mm across | The recess it drops into |
+| Ridge on the key | 3.5 mm proud, 15.5 mm long, tapering from 10.4 mm to 4.5 mm across | The groove it locates in |
+| Plate | 130 × 122.5 mm, 21.5 mm thick | The space it has to live in |
+
+The slot width is the one with no slack in it. Everything else has a taper or a
+lead-in; 30 mm is 30 mm.
+
+Both parts are in the folder below as STEP and as Fusion 360 `.f3d`, so if a
+number is out by a couple of millimetres it is one push-pull rather than a
+redraw. Change the slot last — it is the feature the two jaws are cut around.
+
+## Troubleshooting
+
+**The key won't go into the pocket.** It is an interference fit by design: 18 mm
+of barb through a 16.5 mm mouth, which is 0.75 mm a side against a 1.5 mm wall.
+Warm the pocket with your hands first — PETG goes noticeably more forgiving a
+few degrees above room temperature — and if it still fights you, take a couple
+of tenths off the barb tips with a needle file. Take it off the key, never the
+pocket. The key is a two-gram reprint and the plate is not.
+
+**A barb sheared off going in.** You had it cocked. Both barbs have to enter
+together; start it square and press from directly above, not at an angle.
+
+**The key seats but rattles.** One drop of CA on the fin, in the slit, and
+nowhere near the barbs. Keep glue off the slot faces entirely — those are a
+sliding fit and glue on them means the plate never comes off again.
+
+**The plate binds sliding on.** Support debris first, elephant's foot second.
+If it's genuinely tight, sand the two slot faces with 240 grit — a few passes,
+checking as you go. The slot is the one dimension with nothing to give.
+
+**It went soft over a summer.** You printed it in PLA. Reprint it in PETG; there
+is no fix for the first one.
 
 ## Files & downloads
 

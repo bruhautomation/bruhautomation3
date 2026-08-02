@@ -1,17 +1,215 @@
 ---
 title: Kitchen Chair Footrest
-description: Footrest that clamps onto kitchen chair legs.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: A printed bracket that slides onto a 1 inch square chair leg and locks at any height on one bolt, so a child at the dinner table has somewhere to put their feet.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Footrest that clamps onto kitchen chair legs.
+A dining chair is built around an adult's legs. Sit a four-year-old in one and
+their feet hang in mid-air for the whole meal, which is why they end up kneeling
+on the seat or hooking a toe under the rail. This is the fix: a bracket that
+slides up a chair leg, clamps wherever you want it with one bolt, and gives them
+a 200 mm platform to put their feet on.
 
-## Hardware
-- 3D-printed plastic footrest
+It is one bracket per leg. Print two, put one on each front leg and set them to
+the same height — the two platforms then cover most of the space between the
+legs. Move them down twice a year as the child grows, and the chair goes back to
+being a chair when they don't need them any more.
+
+<ImagePlaceholder alt="Two printed footrest brackets clamped to the front legs of a kitchen chair with a child's feet resting on them">
+  Hero shot — both brackets on a chair, set level, with a child actually sitting
+  in it and their feet on the platforms. Shoot it low and from the front so the
+  gap under the seat and both platforms read.
+</ImagePlaceholder>
+
+:::caution
+**The socket is a 25.4 mm square and nothing else fits it.** That is a 1 inch
+square leg, straight-sided at the height you want the footrest. Measure your
+chair before you print 300 g of plastic. A round leg, a tapered leg, a 22 mm leg
+and a 30 mm leg are all a no — see [If your leg isn't 1
+inch](#if-your-leg-isnt-1-inch) for what to do about it.
+:::
+
+## The shape
+
+Every number here is measured off `kitchen_chair_footrest_v6.step` in this
+folder.
+
+| Feature | Dimension |
+|---|---|
+| Overall | 201 × 182 × 53 mm |
+| Platform | 200 × 180 mm, 8 mm thick |
+| Platform corners | Three on a 50 mm radius; the fourth cut off at 45° over the leg |
+| Leg socket | 25.4 mm square, straight through all 53 mm |
+| Socket bearing band | The top 20 mm, next to the platform |
+| Socket below the band | Opens out to about 34 × 32 mm |
+| Wall between socket and cut corner | 6.8 mm — the thinnest section on the part |
+| Clamp boss | 33 mm diameter, under the platform |
+| Clamp hole | 5.9 mm, axis 16.5 mm above the bottom face |
+| Nut pocket | 9.8 mm across flats × 5 mm, open at the bottom face |
+| Model volume | ~550 cm³ |
+
+Two rows in that table are the whole design, and they are worth spelling out.
+
+**The socket only touches the leg in two places.** It is a true 25.4 mm square
+for the top 20 mm, then steps out to roughly 34 mm for the rest of its depth. The
+other contact is the clamp bolt, 16.5 mm up from the bottom. A load on the
+platform is therefore reacted by the leg pushing on the top band one way and the
+bolt pushing the other way 30 mm lower down — a proper couple, rather than a long
+sloppy sleeve that rocks.
+
+**The bolt points inward, under the platform.** Its axis runs from the boss
+through the centre of the socket and on toward the far corner of the part, so the
+head sits beneath the footrest where nobody kicks it and you tighten it by
+reaching under. It also means the clamp load lands on the socket wall backed by
+that 6.8 mm corner, which is why the print settings below are what they are.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [M6 × 40 mm hex socket cap screw](https://www.amazon.com/s?k=M6+x+40mm+hex+socket+head+cap+screw&tag=brau01-20)
+  — one per bracket. It needs roughly 33 mm under the head to cross the boss and
+  reach the leg; 40 mm gives you travel, and 45 mm is fine too
+- [M6 hex nut, 10 mm across flats](https://www.amazon.com/s?k=M6+hex+nut+DIN+934+stainless&tag=brau01-20)
+  — a plain 5 mm nut, not a nyloc. The pocket is 5 mm deep and press-fit at
+  9.8 mm across, so the nut is captive and you never have to hold it with a
+  spanner
+- [SUNLU PLA+, 4 × 1 kg](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) —
+  the default. About 300 g a bracket at the settings below, so two of them is
+  most of a spool and the multipack is the one to buy
+- [eSUN PETG, 1 kg](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the
+  alternative if the chair lives in a conservatory or anywhere that gets real
+  afternoon sun. PLA is the stiffer of the two, which is what you feel in a
+  cantilevered platform, but it starts going soft somewhere around 55–60 °C
+- [Digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20)
+  — you are fitting a fixed square hole to somebody else's furniture, so measure
+  the leg first, at the height the bracket is going to sit
+- [DEWALT twist drill set](https://www.amazon.com/dp/B07DH55YRX?tag=brau01-20) —
+  the clamp hole is drawn at 5.9 mm and an M6 bolt is 6.0 mm, so it wants a 6 mm
+  bit run through by hand
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) and a
+  [needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — for the
+  mouth of the socket and the walls of the nut pocket
+- [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20) — the
+  platform is 201 × 182 mm, so this needs a 220 mm bed as an absolute minimum. An
+  Ender 3 takes it with about 9 mm to spare each side; a 180 mm machine does not
+  take it at all
+
+Optional, and both worth it:
+
+- [Anti-slip tape, 4 in × 30 ft](https://www.amazon.com/dp/B01M63K167?tag=brau01-20)
+  — a strip across each platform. Printed PLA under a sock is slick. It is 80
+  grit aluminium oxide, so it is meant for shoes and socks rather than bare feet
+- [Clear self-adhesive rubber bumpers, 200 pcs](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20)
+  — stick one on the leg where the bolt tip lands. A steel bolt tightened
+  straight onto a finished chair leg leaves a dent, and it will still be there
+  when the child has outgrown the footrest
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 5 |
+| Infill | 30% |
+| Supports | None |
+| Material | PLA+ indoors, PETG anywhere hot |
+| Orientation | Platform face down on the bed, collar pointing up |
+
+**Flip it in the slicer so the flat top of the platform is on the bed.** As
+exported, the collar and the gusset hang below the platform; turned over, the
+whole part becomes a spire that gets narrower as it climbs, and there is not one
+overhang in it. The gusset tapers inward, the square socket is a vertical hole,
+the nut pocket opens upward at the very top, and the only thing that needs a
+bridge is the 5.9 mm clamp hole, which spans itself.
+
+It also puts the layers the right way round. The platform's layers stack through
+its 8 mm thickness and every extrusion runs the length of the plate, so a foot on
+the end of the cantilever pulls along the lines instead of trying to peel them
+apart. And the smooth first-layer face ends up on top, which is the surface feet
+actually touch.
+
+Five walls, not four. Two of them are doing structural work you can point at: the
+6.8 mm wall between the socket and the cut corner takes the entire clamp load,
+and on a 0.4 mm nozzle five perimeters is 4 mm of solid shell in a 6.8 mm
+section. The 30% infill is there for the platform, not for the collar.
+
+## Fitting it
+
+<Steps>
+
+1. **Measure the leg** at the height you want the platform, on both faces, with
+   the caliper. If it reads 25.4 mm square and straight, carry on. Chair legs are
+   very often tapered — a leg that measures 25.4 mm at seat height can be 22 mm
+   at the floor — and it is the widest point *below* your mounting height that
+   decides whether the bracket will pass at all.
+
+2. **Dress the socket.** Run the deburring tool round both ends of the square
+   hole. The first layer is where the squish lives, and the socket is drawn at
+   nominal with no clearance in it, so a bracket that will not start is nearly
+   always a lip on the bed face rather than a hole that is genuinely too small.
+
+3. **Ream the clamp hole** with a 6 mm bit, turned by hand. It is modelled at
+   5.9 mm on purpose so the bolt runs true rather than rattling, but a printed
+   hole always finishes under size and an M6 will not push through as printed.
+   Don't put the bit in a drill on a trigger; it grabs and winds the plastic out.
+
+4. **Press the nut into its pocket** in the bottom face. It is 9.8 mm across for
+   a 10 mm nut, so it goes in under thumb pressure and stays put. If it fights
+   you, two strokes of a flat needle file on each wall of the pocket — those two
+   walls are the only thing stopping it spinning when you tighten the bolt.
+
+5. **Slide the bracket up the leg from the foot** and hold it where you want it.
+   Which way the platform points is not yours to choose: the socket's square runs
+   at 45° to the platform's edges, so the flats on the leg decide the angle.
+   Dry-fit both brackets before you commit to a height, and see where the
+   platforms actually land.
+
+6. **Run the bolt in** and nip it up. Hand-tight on a short hex key is the whole
+   spec — you are pushing a steel bolt against a 6.8 mm plastic wall, and torque
+   past the point where the bracket stops moving buys you nothing but a split
+   corner.
+
+7. **Set the second one to match.** Measure up from the floor, not down from the
+   seat. Chairs are rarely as symmetrical as they look.
+
+</Steps>
+
+<ImagePlaceholder alt="Close-up of the underside of the bracket showing the M6 bolt in its boss, the captive nut in the pocket and the square socket around the chair leg">
+  Detail shot — the collar from underneath with the leg in it, so the boss, the
+  bolt head and the nut pocket in the bottom face all read in one frame.
+</ImagePlaceholder>
+
+## If your leg isn't 1 inch
+
+Don't scale the part. Scaling it to suit a 28 mm leg takes the platform to
+221 mm, which is off the bed on a lot of printers, and takes the nut pocket to
+10.8 mm — at which point the nut spins in it and there is no clamp at all.
+
+Open `kitchen_chair_footrest_v6.f3d` and change the square in the socket sketch
+instead. The STEP is there too if you would rather work in something other than
+Fusion.
+
+A **round** leg is not a resize job. A square hole on a round leg touches it in
+four lines and pivots on them, so that wants a different sketch rather than a
+different number.
+
+## Two things that will bite you
+
+**The 45° corner is the weak point, and the clamp aims straight at it.** There is
+6.8 mm of plastic between the socket wall and the outside of the platform's cut
+corner, and the bolt's job is to push the leg into exactly that wall. It is
+plenty for hand-tight on a well-printed bracket with five perimeters. It is not
+plenty for a socket wrench, and it is not plenty for three walls and 15% infill.
+
+**It is a footrest, not a step.** The platform is 8 mm of plastic on a
+cantilever, and the gusset under it only reaches about halfway out to the far
+corner — past that it is an unsupported plate. A child's feet, all day. An adult
+standing on the end of it to reach a cupboard, no.
 
 ## Files & downloads
 

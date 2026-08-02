@@ -1,18 +1,246 @@
 ---
 title: Voice Assistant
-description: M5Stack Atom Echo running the Home Assistant voice pipeline.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
-pending: true
+description: An M5Stack Atom Echo flashed with ESPHome — a pocket-sized microphone and speaker that runs Home Assistant's own Assist pipeline, with no Alexa account behind it.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-M5Stack Atom Echo running the Home Assistant voice pipeline.
+Home Assistant has a voice pipeline of its own — wake word, speech-to-text, an
+agent that can actually call your services, text-to-speech — and it needs
+something in the room with a microphone in it. That something is a **voice
+satellite**, and the cheapest one worth owning is an M5Stack Atom Echo: a small
+cube with a PDM microphone, a speaker, a button and one RGB LED. Flash it with
+the config in this folder and it appears in Home Assistant as a device you can
+talk to.
 
-## Hardware
-- Voice assistant device
-- 3D-printed mounting bracket
+The satellite is a microphone and a status light. Everything that thinks — wake
+word, transcription, the conversation agent, the voice that answers — runs on
+your Home Assistant box, which is the whole point: nothing here is tied to an
+account you can be locked out of.
+
+<ImagePlaceholder alt="An M5Stack Atom Echo on a shelf with its LED glowing blue while listening">
+  Hero shot — the Atom Echo sitting on a shelf or bookcase at head height, LED
+  lit blue mid-conversation, USB-C cable running away out of frame.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [M5Stack Atom Echo](https://www.amazon.com/s?k=M5Stack+ATOM+Echo+ESP32+voice+development+kit&tag=brau01-20)
+  — this is the whole build. The config's `board: m5stack-atom` key, the PDM
+  microphone and all six GPIO numbers below are that specific device; nothing
+  else drops in unchanged.
+- [USB-A to USB-C cable, 15 ft](https://www.amazon.com/dp/B078B6SBZ3?tag=brau01-20)
+  — a satellite wants to be where you talk, not where the outlet is. If it is
+  going right beside one, the
+  [right-angle 0.5/1 ft 4-pack](https://www.amazon.com/dp/B07Z9Y9L1P?tag=brau01-20)
+  keeps the cube flat against the wall instead of standing off it.
+- [Dual-port USB charger block, 3-pack](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20)
+  — any phone charger runs it. If the satellite is permanent, an
+  [in-wall USB receptacle](https://www.amazon.com/dp/B07ZJCWVN9?tag=brau01-20)
+  removes the brick entirely.
+- [3M VHB tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) to stick it
+  to a wall or the underside of a shelf, or
+  [industrial hook-and-loop](https://www.amazon.com/dp/B00006RSP1?tag=brau01-20)
+  if you want to take it down again.
+- A Home Assistant server, which you presumably have. A
+  [Raspberry Pi 4 kit](https://www.amazon.com/dp/B07TYK4RL8?tag=brau01-20) and a
+  [fast A2 microSD card](https://www.amazon.com/dp/B09X7CRKRZ?tag=brau01-20)
+  will run this, though local speech-to-text is the part that wants a real CPU —
+  see [The pipeline](#the-pipeline) below.
+
+:::note
+**Put it at head height and away from the TV.** The microphone is one PDM MEMS
+part in a plastic cube, not a seven-mic beamforming array. The difference
+between "it never hears me" and "it always hears me" is usually two feet of
+height and not pointing it at a speaker.
+:::
+
+## The pin map
+
+You don't wire any of this — the Atom Echo is a finished device and the cable is
+the only thing you plug in. The table is here because these are the numbers in
+the config, and they are what you'd have to change to build the same thing on
+other hardware.
+
+| Function | GPIO | Config detail |
+|---|---|---|
+| I²S word select (LRCLK) | **33** | Microphone and speaker share one `i2s_audio` bus |
+| I²S bit clock (BCLK) | **19** | Same bus |
+| Microphone data in | **23** | `adc_type: external`, **`pdm: true`** |
+| Speaker data out | **22** | `dac_type: external` |
+| RGB LED | **27** | SK6812, one pixel, `rgb_order: grb` |
+| Button | **39** | `inverted: true` — the LED is the button |
+
+The microphone is **PDM**, not standard I²S. That single line is what most
+"I swapped in a different mic breakout" attempts trip over.
+
+## What the LED is telling you
+
+The whole conversation is on one pixel, so it is worth learning. Every colour
+below comes from the `voice_assistant:` triggers and the `reset_led` script in
+the config.
+
+| LED | State |
+|---|---|
+| Dim warm white | Idle, wake word armed, waiting |
+| Blue, slow pulse | Heard the wake word — it is listening to you now |
+| Blue, fast pulse | You stopped talking; it is transcribing and thinking |
+| Solid blue | Speaking the reply |
+| Red for one second | The pipeline threw an error |
+| Dark | Wake word off, listen light off — **or Home Assistant is unreachable** |
+
+That last row is the useful one. The device turns the LED off when the API
+client disconnects, so a satellite sitting in the dark that ignores its button
+has usually lost Home Assistant, not broken its microphone.
+
+## Configuration
+
+Copy `bruh-voice-assistant.yaml` out of the download section into your ESPHome
+folder, alongside a `secrets.yaml` containing `wifi_ssid`, `wifi_password`,
+`ota_password` and `api_key`. There is a `secrets.yaml.example` in the repo with
+every key these configs use.
+
+<Steps>
+
+1. **Rename it.** The top of the file is two substitutions:
+
+   ```yaml
+   substitutions:
+     name: "bruh-voice-assistant"
+     friendly_name: "BRUH Voice Assistant"
+   ```
+
+   Change both per device — `kitchen-echo`, `office-echo`. This matters more
+   here than on most configs; see the caution below.
+
+2. **Password the fallback hotspot.** `ap:` is declared with nothing under it,
+   which puts up an open access point whenever the device can't reach your WiFi.
+   Add a password:
+
+   ```yaml
+   wifi:
+     ap:
+       password: !secret ap_password
+   ```
+
+3. **Flash it over USB the first time.** It builds with `esp-idf`, not the
+   Arduino framework, so the first compile takes a while — that is normal and it
+   is cached afterwards. Every flash after the first goes over WiFi.
+
+4. **Adopt it in Home Assistant.** ESPHome devices are discovered; you enter the
+   API encryption key and it appears. No YAML on the Home Assistant side.
+
+</Steps>
+
+:::caution
+**`name_add_mac_suffix: false` means the second one collides with the first.**
+The hostname comes straight from the substitution, so two Atom Echos flashed
+with the file as shipped both try to be `bruh-voice-assistant` on your network,
+and mDNS picks a winner at random. Rename before you flash the second unit, not
+after.
+:::
+
+:::caution
+**BLE provisioning is unauthenticated.** `esp32_improv` is configured with
+`authorizer: none`, so anything in Bluetooth range can hand the device WiFi
+credentials without anybody pressing the button. The config closes the window
+itself — `on_connect` waits 5 s and calls `ble.disable` — but it is open from
+power-on until it joins your network, and it reopens on `on_disconnect` every
+time WiFi drops. That is a convenience feature working as designed. If it is not
+a trade you want, delete the `esp32_improv:` block and provision over USB with
+`improv_serial`.
+:::
+
+## The pipeline
+
+There is no `micro_wake_word:` block in this config, which tells you where the
+work happens: the satellite streams audio, and **the wake word is detected on
+your Home Assistant server**, along with everything after it. Build the pipeline
+under *Settings → Voice assistants*, then assign it to the device.
+
+The choice that decides how this feels is speech-to-text. Home Assistant Cloud
+does it remotely and is fast from anywhere. Running Whisper locally keeps
+everything in the house and turns a Raspberry Pi into the bottleneck — a Pi 4
+will do it, slowly, with the smallest model. A spare mini PC is the honest
+answer if you want local *and* quick.
+
+The config already tunes the audio it sends: `noise_suppression_level: 2`, auto
+gain at 31 dBFS, and `volume_multiplier: 2.0`. Those are sensible starting
+values. Raise the noise suppression if it triggers on the television; raise the
+volume multiplier if it hears you but transcribes gibberish.
+
+## The two switches
+
+The device exposes two template switches to Home Assistant, both of which
+restore to **on** after a reboot:
+
+**Use wake word.** On, the satellite listens continuously and starts a
+conversation when it hears the phrase. Off, it does nothing until you press the
+button — which is the setting for a satellite in a bedroom, or one sitting
+beside a TV that keeps setting it off.
+
+**Use listen light.** Whether the LED glows warm white while idle. Turn it off
+for anything in a bedroom; the conversation colours still work, so you keep the
+feedback and lose the nightlight.
+
+## The button
+
+The Atom Echo's whole top face is the button, and it does two things.
+
+**One press** starts or stops a conversation. With the wake word switch off,
+that is your push-to-talk. With it on, a press stops whatever is happening,
+waits a second, and restarts continuous listening — the reset for a satellite
+stuck mid-answer.
+
+**Hold it for ten seconds** and it presses the factory reset button. That wipes
+the stored WiFi credentials and you are back to provisioning it over USB or BLE.
+It is deliberate, it is in the config as an `on_multi_click` timing, and it is
+worth knowing before you hand the cube to a curious four-year-old.
+
+## Troubleshooting
+
+**It answers but you can barely hear it.** The speaker is a few millimetres
+across and the config is already compensating with `volume_multiplier: 2.0`.
+This device is a microphone with a confirmation beep attached. If you want
+audible replies, point the pipeline's text-to-speech at a real media player and
+let the Echo be the ears.
+
+**The wake word never fires, but the button works.** Either the *Use wake word*
+switch is off, or the pipeline assigned to this device has no wake-word engine
+selected. The satellite has no wake word of its own to fall back on.
+
+**The colours are wrong — red where blue should be.** The LED is declared
+`rgb_order: grb`. A different pixel revision wants `grb` swapped for `rgb`, and
+that is the only line to change.
+
+**It cuts you off mid-sentence.** That is voice activity detection deciding you
+finished, which is a pipeline setting on the Home Assistant side rather than
+anything in this file.
+
+**Home Assistant can't connect after a reflash.** The `api:` block is encrypted
+with `!secret api_key`. Change that key and the existing device entry stops
+working until you re-enter it.
+
+## Building one out of parts
+
+You can put the same pipeline on a bare ESP32 with an I²S microphone and a
+Class-D amplifier, and it is a better-sounding device when you do — a real 2 in
+driver instead of a buzzer. Be clear about what you are taking on, though: this
+config does not fit that hardware. All six GPIO numbers change, and `pdm: true`
+comes out, because an SPH0645 is standard I²S rather than PDM.
+
+- [ESP32 DevKit, 38-pin, 2-pack](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+- [Adafruit SPH0645LM4H I²S MEMS microphone](https://www.amazon.com/dp/B06XNL2GBW?tag=brau01-20)
+- [MAX98357 I²S Class-D amplifier, 2-pack](https://www.amazon.com/dp/B08SLPRYPJ?tag=brau01-20)
+- [2 in 4 Ω 3 W full-range speaker, 2-pack](https://www.amazon.com/dp/B01CHYIU26?tag=brau01-20)
+
+The Atom Echo is the one to build first. Get the pipeline working against
+hardware that is known good, then go rebuild it in a box you like.
 
 ## Files & downloads
 
