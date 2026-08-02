@@ -7,53 +7,58 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 import { REPO_URL, groupByCategory, readProjects } from '../../catalog.mjs';
 
 {/* Generated from the project folders themselves — a new folder is a new entry
-    here, and a project re-filed in its README moves category on its own. A
-    project is shown as a card once it has a guide; until then it is a link to
-    its folder, which already holds the CAD, the firmware and the notes. */}
+    here, and a project re-filed in its README moves category on its own. Every
+    project has a page; the ones whose write-up is still coming are listed under
+    their category, marked, rather than held back until the prose catches up. */}
 
 export const showDrafts = import.meta.env.MODE !== 'production';
 export const projects = readProjects().map((p) => ({ ...p, guide: p.guide && (showDrafts || !p.draft) }));
 export const groups = groupByCategory(projects);
-export const written = projects.filter((p) => p.guide).length;
+export const written = projects.filter((p) => p.guide && !p.pending).length;
 
 All {projects.length} of them. Every project lives in its own folder in the
 <a href={`${REPO_URL}/tree/main/projects`}>GitHub repo</a> — the write-up, the photos, the print
-files, the CAD source and the firmware, all in one place — and every one has a page here with
-its parts in a 3D viewer and its files ready to download. Some are full build guides; some are
-a paragraph and the files, which is the honest length for a bracket.
+files, the CAD source and the firmware, all in one place — and every one has a page here, with
+whatever files it has in a 3D viewer and ready to download.
+
+{written} have their build guide written. The rest are marked **write-up pending** — rough
+pages whose description is a first pass I haven't checked over, and most, though not all, have
+their files attached. The files are the real thing; the words are what I'm catching up on. If
+you want a particular one done sooner, <a href={`${REPO_URL}/discussions`}>say so in
+Discussions</a> and I'll bump it up the list.
 
 {groups.map((group) => (
 	<section>
 		<h2 id={group.id}>{group.label}</h2>
 		<p>{group.blurb}</p>
-		{group.projects.some((p) => p.guide) && (
+		{group.projects.some((p) => p.guide && !p.pending) && (
 			<CardGrid>
-				{group.projects.filter((p) => p.guide).map((p) => (
+				{group.projects.filter((p) => p.guide && !p.pending).map((p) => (
 					<LinkCard title={p.title} href={`/projects/${p.slug}/`} description={p.summary} />
 				))}
 			</CardGrid>
 		)}
-		{group.projects.some((p) => !p.guide && p.files) && (
-			<p>
-				<strong>Files only, no guide yet:</strong>{' '}
-				{group.projects.filter((p) => !p.guide && p.files).map((p, i, all) => (
-					<>
-						<a href={`${REPO_URL}/tree/main/projects/${p.slug}`}>{p.title}</a>
-						{i < all.length - 1 ? ', ' : '.'}
-					</>
-				))}
-			</p>
-		)}
-		{group.projects.some((p) => !p.guide && !p.files) && (
+		{group.projects.some((p) => p.guide && p.pending) && (
 			<p>
 				<strong>Write-up pending:</strong>{' '}
-				{group.projects.filter((p) => !p.guide && !p.files).map((p, i, all) => (
+				{group.projects.filter((p) => p.guide && p.pending).map((p, i, all) => (
+					<>
+						<a href={`/projects/${p.slug}/`}>{p.title}</a>
+						{i < all.length - 1 ? ', ' : '.'}
+					</>
+				))}
+				{' '}Files are ready; the guide is still being written.
+			</p>
+		)}
+		{group.projects.some((p) => !p.guide) && (
+			<p>
+				<strong>Files only, no page yet:</strong>{' '}
+				{group.projects.filter((p) => !p.guide).map((p, i, all) => (
 					<>
 						<a href={`${REPO_URL}/tree/main/projects/${p.slug}`}>{p.title}</a>
 						{i < all.length - 1 ? ', ' : '.'}
 					</>
 				))}
-				{' '}Built, not yet written up or published — the folder is a placeholder for now.
 			</p>
 		)}
 	</section>

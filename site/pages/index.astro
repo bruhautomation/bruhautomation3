@@ -17,7 +17,10 @@ const projects = readProjects().map((p) => ({
 const groups = groupByCategory(projects);
 const stats = [
 	{ number: projects.length, label: 'Open Source<br />Projects' },
-	{ number: projects.filter((p) => p.guide).length, label: 'Build<br />Guides' },
+	// Guides that are actually written. A project whose write-up is pending is
+	// published and usable, but counting it here would make the number a count
+	// of folders and the label a claim the site does not meet.
+	{ number: projects.filter((p) => p.guide && !p.pending).length, label: 'Build<br />Guides' },
 	{ number: projects.filter((p) => p.tags.includes('esphome')).length, label: 'ESPHome<br />Devices' },
 	{ number: 2, label: 'HA<br />Apps' },
 ];
@@ -65,6 +68,9 @@ const cards = [...groups, APPS].map((group) => ({
 		<meta name="twitter:image" content="https://bruhautomation.com/og-image.png" />
 		<meta name="theme-color" content="#1e90ff" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		{/* iOS composites a home-screen icon onto an opaque tile of its own
+		    choosing, so it gets a deliberate one rather than a guess. */}
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 		{/* Block render until theme is set — prevents flash */}
 		<script is:inline>

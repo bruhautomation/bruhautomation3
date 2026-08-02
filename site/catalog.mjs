@@ -234,6 +234,9 @@ export function readProjects() {
 			status: meta.status || 'complete',
 			guide: Boolean(guideFile),
 			draft: guide?.draft === true,
+			// Published, with the write-up still to come. Distinct from `draft`,
+			// which is hidden: a pending project is one someone can use today.
+			pending: guide?.pending === true,
 			files: hasBuildableFiles(join(PROJECTS_DIR, slug)),
 		});
 	}

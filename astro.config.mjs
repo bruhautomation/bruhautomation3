@@ -28,7 +28,21 @@ const publishedGroups = groupByCategory(allProjects.filter((p) => !p.draft));
 const projectGroups = publishedGroups.map((group) => ({
 	label: group.label,
 	collapsed: true,
-	items: group.projects.map((p) => ({ label: p.title, slug: `projects/${p.slug}` })),
+	// A pending project stays in its own category rather than being herded into
+	// a list of its own: it is a magnetic hook whether or not the write-up is
+	// finished, and someone browsing Around the House is looking for the hook.
+	//
+	// It is marked with an attribute rather than a Starlight badge. A badge is a
+	// pill with a word in it, and fifty-six of them down a sidebar is a wall of
+	// yellow that reads as a warning about the site rather than a note about a
+	// page. The attribute lets the stylesheet hide these rows until someone asks
+	// for them (site/components/PendingToggle.astro) and mark them quietly when
+	// they do — see `--- Pending write-ups ---` in site/styles/custom.css.
+	items: group.projects.map((p) => ({
+		label: p.title,
+		slug: `projects/${p.slug}`,
+		...(p.pending && { attrs: { 'data-pending': 'true' } }),
+	})),
 }));
 const draftProjects = allProjects
 	.filter((p) => p.draft)
@@ -189,6 +203,10 @@ export default defineConfig({
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
 				SocialIcons: './site/components/SocialIcons.astro',
+				// Renders the "write-up pending" notice on a project whose files
+				// are published ahead of its prose, and still passes a page's own
+				// `banner:` through.
+				Banner: './site/components/Banner.astro',
 			},
 			logo: {
 				dark: './site/assets/bruh-logo-light.svg',
@@ -206,6 +224,18 @@ export default defineConfig({
 				// The sidebar group icons, generated above from the sidebar's own
 				// running order so the two can never drift apart again.
 				{ tag: 'style', content: sidebarIconCss },
+				// iOS composites a home-screen icon onto an opaque tile of its
+				// own choosing; this is a deliberate one instead of a guess.
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+				// Set the pending-rows class before first paint. Read in `head`
+				// rather than by the toggle's own script, which runs after the
+				// sidebar has already been laid out without them.
+				{
+					tag: 'script',
+					content:
+						"try{if(localStorage.getItem('bruh:show-pending')==='true')" +
+						"document.documentElement.classList.add('show-pending')}catch(e){}",
+				},
 				// Amazon OneLink. Product links are written once, tagged for the US
 				// store (`brau01-20`); this rewrites them per reader to whichever
 				// Amazon marketplace actually ships to them. Without it a reader in

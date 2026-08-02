@@ -14,9 +14,12 @@
 import config from 'virtual:starlight/user-config';
 import { Icon } from '@astrojs/starlight/components';
 import { version } from '../../package.json';
+import PendingToggle from './PendingToggle.astro';
 
 const links = config.social || [];
 ---
+
+<PendingToggle />
 
 <a class="site-version" href="/changelog/" title={`Site v${version} — what's changed`}>
 	<span class="sr-only">Changelog, site version </span>v{version}
