@@ -31,12 +31,17 @@ const projectGroups = publishedGroups.map((group) => ({
 	// A pending project stays in its own category rather than being herded into
 	// a list of its own: it is a magnetic hook whether or not the write-up is
 	// finished, and someone browsing Around the House is looking for the hook.
-	// The badge is what says the prose is still coming, next to the name, where
-	// it is read before the click rather than after it.
+	//
+	// It is marked with an attribute rather than a Starlight badge. A badge is a
+	// pill with a word in it, and fifty-six of them down a sidebar is a wall of
+	// yellow that reads as a warning about the site rather than a note about a
+	// page. The attribute lets the stylesheet hide these rows until someone asks
+	// for them (site/components/PendingToggle.astro) and mark them quietly when
+	// they do — see `--- Pending write-ups ---` in site/styles/custom.css.
 	items: group.projects.map((p) => ({
 		label: p.title,
 		slug: `projects/${p.slug}`,
-		...(p.pending && { badge: { text: 'Write-up pending', variant: 'caution' } }),
+		...(p.pending && { attrs: { 'data-pending': 'true' } }),
 	})),
 }));
 const draftProjects = allProjects
@@ -219,6 +224,15 @@ export default defineConfig({
 				// The sidebar group icons, generated above from the sidebar's own
 				// running order so the two can never drift apart again.
 				{ tag: 'style', content: sidebarIconCss },
+				// Set the pending-rows class before first paint. Read in `head`
+				// rather than by the toggle's own script, which runs after the
+				// sidebar has already been laid out without them.
+				{
+					tag: 'script',
+					content:
+						"try{if(localStorage.getItem('bruh:show-pending')==='true')" +
+						"document.documentElement.classList.add('show-pending')}catch(e){}",
+				},
 				// Amazon OneLink. Product links are written once, tagged for the US
 				// store (`brau01-20`); this rewrites them per reader to whichever
 				// Amazon marketplace actually ships to them. Without it a reader in
