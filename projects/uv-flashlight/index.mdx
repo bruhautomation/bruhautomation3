@@ -108,9 +108,9 @@ emitter when you order the right one.
 Building this makes sense when you want a specific form factor, a fixed bench
 head, or three emitters' worth of output. If you want a 365 nm light in your
 pocket by Thursday, the
-[DARKBEAM 365 nm](https://www.amazon.com/dp/B0CNSLGFWG?tag=brau01-20) is fifteen
-dollars, USB-C rechargeable and focusable, and it is the reference I check my
-own builds against. The
+[DARKBEAM 365 nm](https://www.amazon.com/dp/B0CNSLGFWG?tag=brau01-20) is cheap,
+USB-C rechargeable and focusable, and it is worth owning either way as the
+reference you check a build against. The
 [BORUIT V10](https://www.amazon.com/dp/B0C2CHWNY9?tag=brau01-20) is the same
 idea with red, green and blue inspection modes in the same body.
 :::
@@ -145,7 +145,7 @@ clean every press.
 ## Setting the drive current
 
 Do this before the LEDs are anywhere near it. A CC/CV module arrives with both
-trimmers at an arbitrary position and one wrong press kills three emitters.
+trimmers wherever the factory left them, and one wrong turn kills three emitters.
 
 <Steps>
 
@@ -217,8 +217,14 @@ is the driver — it needs **6 V minimum on its input**, so a single 18650 at
 Two cells in series is the answer. Use
 [Samsung INR18650-35E cells](https://www.amazon.com/dp/B0762LDVF8?tag=brau01-20)
 in [snap-in holders](https://www.amazon.com/dp/B00LSG5BKO?tag=brau01-20), wire
-the holders in series for 7.4 V nominal, and drop the string to two emitters
-(6.2 V) so the driver still regulates as the pack falls towards 6.4 V.
+the holders in series for 7.4 V nominal, and drop the string to two emitters —
+6.2 V instead of 9.3 V, which is what leaves the buck any headroom at all off a
+pack that starts at 8.4 V.
+
+You get roughly the top half of the pack that way. Below about 7.2 V the driver
+runs out of headroom, falls out of constant current, and the light starts to
+dim. That is a readable low-battery warning rather than a fault, and it is the
+price of not carrying a boost stage as well.
 
 Charge them out of the light on a
 [four-bay cell charger](https://www.amazon.com/dp/B07428G1G2?tag=brau01-20)
@@ -232,11 +238,13 @@ next. That is worth more than the convenience of a latch.
 :::danger
 365 nm UV damages eyes and skin and does it without hurting at the time. Wear
 [UV-blocking eye protection](https://www.amazon.com/dp/B00X0LPX1M?tag=brau01-20)
-— those are tanning-bed goggles, which block the band and nothing else, so they
-cover your eyes but not your face; sunglasses are not eye protection here and
-polycarbonate safety spectacles are only sometimes. Never point it at anyone,
-never look into the emitter to check whether it is on, and remember that cheap
-chips leak wavelengths shorter than the one on the label.
+— those are tanning-bed goggles, so they cover the eyes and nothing around them.
+Clear polycarbonate safety glasses block this band too and cover more of your
+face. Tinted plastic carrying no UV rating blocks nothing, whatever it looks
+like, and fashion sunglasses are worse than none because the dark lens opens
+your pupil. Never point it at anyone, never look into the emitter to check
+whether it is on, and remember that cheap chips leak wavelengths shorter than
+the one on the label.
 :::
 
 ## Files & downloads
