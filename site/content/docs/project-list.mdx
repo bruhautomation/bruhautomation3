@@ -33,15 +33,27 @@ a paragraph and the files, which is the honest length for a bracket.
 				))}
 			</CardGrid>
 		)}
-		{group.projects.some((p) => !p.guide) && (
+		{group.projects.some((p) => !p.guide && p.files) && (
 			<p>
 				<strong>Files only, no guide yet:</strong>{' '}
-				{group.projects.filter((p) => !p.guide).map((p, i, all) => (
+				{group.projects.filter((p) => !p.guide && p.files).map((p, i, all) => (
 					<>
 						<a href={`${REPO_URL}/tree/main/projects/${p.slug}`}>{p.title}</a>
 						{i < all.length - 1 ? ', ' : '.'}
 					</>
 				))}
+			</p>
+		)}
+		{group.projects.some((p) => !p.guide && !p.files) && (
+			<p>
+				<strong>In development:</strong>{' '}
+				{group.projects.filter((p) => !p.guide && !p.files).map((p, i, all) => (
+					<>
+						<a href={`${REPO_URL}/tree/main/projects/${p.slug}`}>{p.title}</a>
+						{i < all.length - 1 ? ', ' : '.'}
+					</>
+				))}
+				{' '}Built, not yet written up or published — the folder is a placeholder for now.
 			</p>
 		)}
 	</section>

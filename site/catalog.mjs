@@ -154,6 +154,28 @@ function readFrontmatter(file) {
 	return data;
 }
 
+/**
+ * Extensions that make a folder worth visiting: something to print, cut, flash
+ * or open in CAD. Images and the README don't count — a project list saying
+ * "files" about a folder holding a README is the list telling you something
+ * false, and it is the one sentence on that page a reader acts on.
+ */
+const BUILDABLE = ['.stl', '.step', '.stp', '.f3d', '.yaml', '.yml', '.ino', '.h', '.cpp', '.dxf', '.svg', '.hmi', '.fzz'];
+
+/** Whether the folder holds anything buildable, at any depth. */
+function hasBuildableFiles(dir) {
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		if (entry.name === 'images') continue;
+		const path = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			if (hasBuildableFiles(path)) return true;
+		} else if (BUILDABLE.some((ext) => entry.name.toLowerCase().endsWith(ext))) {
+			return true;
+		}
+	}
+	return false;
+}
+
 /** The `# Heading` and the paragraph under it, for a README with no guide. */
 function readHeadings(file) {
 	const body = readFileSync(file, 'utf8').replace(/^---[\s\S]*?\n---\n/, '');
@@ -212,6 +234,7 @@ export function readProjects() {
 			status: meta.status || 'complete',
 			guide: Boolean(guideFile),
 			draft: guide?.draft === true,
+			files: hasBuildableFiles(join(PROJECTS_DIR, slug)),
 		});
 	}
 	return projects;
