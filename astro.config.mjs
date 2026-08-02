@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
 import { APPS, OTHER_PROJECTS, groupByCategory, iconMaskUrl, readProjects } from './site/catalog.mjs';
+import { APPS_ONLY } from './site/stage.mjs';
 
 // Draft workflow (see site/scripts/build.mjs and site/content.config.ts):
 // A page with `draft: true` is HIDDEN on the Vercel production deployment (the
@@ -23,7 +24,10 @@ const showDrafts =
 // project's README says which category it belongs to, so adding a project is
 // adding a folder and nothing else, and re-filing one is a one-line edit
 // inside that folder. See site/catalog.mjs.
-const allProjects = readProjects().filter((p) => p.guide);
+// On the `apps` stage nothing under projects/ becomes a page, so the sidebar
+// must not name one: Starlight fails the build on a slug the collection does
+// not hold, which is the good failure — it is how the two stay in step.
+const allProjects = APPS_ONLY ? [] : readProjects().filter((p) => p.guide);
 const publishedGroups = groupByCategory(allProjects.filter((p) => !p.draft));
 const projectGroups = publishedGroups.map((group) => ({
 	label: group.label,
@@ -172,7 +176,12 @@ export default defineConfig({
 	// pictures and files; `site/` holds the machinery that renders them.
 	srcDir: './site',
 	publicDir: './site/public',
-	redirects: { ...retiredAppUrls, ...liveProjectUrls },
+	// On the `apps` stage the project URLs have nothing to land on, so they are
+	// dropped rather than pointed at a missing page, and the root goes to the
+	// add-on docs — the reason the site is up at that stage.
+	// `/` is a real page (site/pages/index.astro) and a page beats a redirect
+	// entry, so the root's apps-stage behaviour lives in that file instead.
+	redirects: APPS_ONLY ? retiredAppUrls : { ...retiredAppUrls, ...liveProjectUrls },
 	integrations: [
 		starlight({
 			plugins: [starlightImageZoom()],
@@ -194,7 +203,7 @@ export default defineConfig({
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bruhautomation' },
-				{ icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@BRUHAutomation' },
+				{ icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@BRUHAutomation1' },
 			],
 			customCss: [
 				'./site/styles/custom.css',
@@ -291,14 +300,22 @@ export default defineConfig({
 				},
 			],
 			sidebar: [
-				{
-					label: 'Welcome',
-					items: [
-						{ label: 'Home', link: '/' },
-						{ label: 'Projects', slug: 'project-list' },
-						{ label: 'Smart Home Fundamentals', slug: 'smart-home-fundamentals' },
-					],
-				},
+				// On the `apps` stage the project list and the fundamentals article
+				// are not built, and a sidebar entry naming a slug the collection
+				// does not hold fails the build — so the whole group goes rather
+				// than being trimmed to a single "Home" that links to a redirect.
+				...(APPS_ONLY
+					? []
+					: [
+							{
+								label: 'Welcome',
+								items: [
+									{ label: 'Home', link: '/' },
+									{ label: 'Projects', slug: 'project-list' },
+									{ label: 'Smart Home Fundamentals', slug: 'smart-home-fundamentals' },
+								],
+							},
+						]),
 				// Home Automation, Mounts & Enclosures, Around the House,
 				// Workshop & Garage, Lab & Science — generated from the projects
 				// themselves, so a new project folder is a new sidebar entry and

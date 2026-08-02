@@ -3,6 +3,29 @@
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
 import { APPS, groupByCategory, readProjects } from '../catalog.mjs';
+import { APPS_ONLY, APPS_ONLY_HOME } from '../stage.mjs';
+
+// On the `apps` stage there is no project list to land on and no counts to
+// show, so the root goes where the site's reason for being up is. The redirect
+// lives here rather than in the config's `redirects` map because this file is a
+// real page at `/`, and a page beats a redirect entry.
+// Astro's own `Astro.redirect` renders a meta-refresh with a two-second delay,
+// which is a long time to sit on a blank page at the root of a site. This is
+// the same document without the wait: the refresh fires immediately, and the
+// script beats it and replaces the history entry so Back doesn't bounce.
+if (APPS_ONLY) {
+	return new Response(
+		`<!doctype html><html lang="en"><head><meta charset="utf-8">` +
+			`<title>BRUH Automation</title>` +
+			`<meta http-equiv="refresh" content="0;url=${APPS_ONLY_HOME}">` +
+			`<meta name="robots" content="noindex">` +
+			`<link rel="canonical" href="https://bruhautomation.com${APPS_ONLY_HOME}">` +
+			`<script>location.replace(${JSON.stringify(APPS_ONLY_HOME)})<\/script>` +
+			`</head><body><a href="${APPS_ONLY_HOME}">Continue to the documentation</a>` +
+			`</body></html>`,
+		{ headers: { 'content-type': 'text/html; charset=utf-8' } }
+	);
+}
 
 // Counts come from the project folders, so the numbers on the front page are
 // the repo — not a figure anyone has to remember to bump. A project counts as
@@ -494,7 +517,7 @@ const cards = [...groups, APPS].map((group) => ({
 			<div class="nav-right">
 				<a href="/project-list/" class="nav-link">Docs</a>
 				<a
-					href="https://www.youtube.com/@BRUHAutomation"
+					href="https://www.youtube.com/@BRUHAutomation1"
 					class="nav-link"
 					target="_blank"
 					rel="noopener">YouTube</a
@@ -597,7 +620,7 @@ const cards = [...groups, APPS].map((group) => ({
 						</svg>
 					</a>
 					<a
-						href="https://www.youtube.com/@BRUHAutomation"
+						href="https://www.youtube.com/@BRUHAutomation1"
 						class="btn btn-outline"
 						target="_blank"
 						rel="noopener"

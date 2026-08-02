@@ -83,6 +83,27 @@ The dev server starts at `localhost:4321`.
 reach them. That output is generated and gitignored — the STL in the project
 folder is the only copy anyone edits.
 
+### How much of the site gets published
+
+Two switches, on separate axes. Neither one edits a page to take effect, so both
+are reversible by changing the environment and rebuilding.
+
+| Variable | Effect |
+| :------- | :----- |
+| `SHOW_DRAFTS=true\|false` | Whether pages marked `draft: true` are built. Defaults to hidden on Vercel production, shown on Preview and in local dev. One page its author hasn't finished. |
+| `SITE_STAGE=apps` | Publishes **only** the add-on docs — brAIn and BRUH Minecraft, plus the changelog and 404 — and sends `/` to `/brain/`. Unset (or anything else) publishes the whole site. How much of a finished site is open yet. |
+
+```bash
+SITE_STAGE=apps npm run build     # 35 pages: the add-on docs
+npm run build                     # 101 pages in preview, 78 on production
+```
+
+`SITE_STAGE=apps` exists so the add-ons' "Full documentation" links resolve
+against a finished site while the project guides are still being written. It
+gates by deciding which files become pages (`site/stage.mjs`,
+`site/content.config.ts`), so nothing under `projects/` is moved or marked —
+going back is removing the variable.
+
 ## Tech Stack
 
 - [Astro](https://astro.build) + [Starlight](https://starlight.astro.build) — static site framework
