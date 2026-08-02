@@ -34,7 +34,7 @@ wifi:
   password: !secret wifi_password
   ap:
     ssid: "Bruh-Uv-Sensor-1"
-    password: "sWTqhAXESxxw"
+    password: !secret ap_password
 
 captive_portal:
 
