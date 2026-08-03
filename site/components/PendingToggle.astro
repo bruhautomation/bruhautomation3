@@ -1,7 +1,13 @@
 ---
 /**
- * "Pending write-ups" — the switch that reveals the projects whose files are
- * published ahead of their prose.
+ * "Show drafted write-ups" — the switch that reveals the projects whose files
+ * are published ahead of their prose.
+ *
+ * *Drafted* is the reader-facing word for the `pending` flag, and it is not the
+ * `draft:` frontmatter, which hides a page outright. The internals keep the
+ * `pending` name — the flag, the class, the storage keys — because renaming a
+ * localStorage key silently resets the preference of everyone who has already
+ * set it, which is a worse trade than two words for one idea in the source.
  *
  * Those pages are real and reachable by URL, by search and from the project
  * list; what this controls is only whether they clutter the sidebar. Most of
@@ -17,8 +23,11 @@
  *
  * The confirmation is shown the first time it is switched on and never again —
  * it exists to set the expectation before someone opens a thin page and decides
- * the project is thin, which a switch label has no room to do. Turning it back
- * off is silent; nobody needs a dialog to hide something.
+ * the project is thin, which a switch label has no room to do. It says outright
+ * that some of the prose is AI-generated: a reader who finds that out for
+ * themselves on the third page stops trusting the finished guides too, and
+ * "some of this is slop" is only disarming while it is still our sentence to
+ * say. Turning it back off is silent; nobody needs a dialog to hide something.
  *
  * Everything is a class on <html>, so the stylesheet does the showing and there
  * is no per-page state to keep in step. The initial read is inline in `head`
@@ -26,7 +35,7 @@
  * appear after paint.
  */
 interface Props {
-	/** How many pending projects there are. The switch is not rendered for none. */
+	/** How many drafted projects there are. The switch is not rendered for none. */
 	count?: number;
 }
 
@@ -38,25 +47,29 @@ const { count = 0 } = Astro.props;
 		<div class="pending-toggle">
 			<label class="pending-toggle__label">
 				<input type="checkbox" class="pending-toggle__input" />
-				<span class="pending-toggle__text">Pending write-ups</span>
+				<span class="pending-toggle__text">Show drafted write-ups</span>
 				<span class="pending-toggle__count">{count}</span>
 			</label>
 		</div>
 	)
 }
 
-<dialog class="pending-dialog" aria-label="Show projects that aren't written up yet?">
-	<h2>Show projects that aren't written up yet?</h2>
+<dialog class="pending-dialog" aria-label="Show projects that are still drafted?">
+	<h2>Show projects that are still drafted?</h2>
 	<p>
 		These pages are rough. The write-up on each one is a first pass — some of it
-		generated and not checked over yet — so the descriptions may be off. I'm
+		is probably AI-generated slop, so take it with a grain of salt. I'm
 		backfilling the real documentation as fast as I can.
 	</p>
 	<p>
-		Most of them do have their files attached, and those are the real thing: print
-		files, CAD sources and configs. A few have nothing up yet.
+		Most of them already have the useful files attached — print files, CAD sources
+		and configs — so you can get started without the words. These write-ups don't
+		have a ton of value in the AI era anyway. 🙃
 	</p>
-	<p>Turning this on adds them to the list, marked with a small dot.</p>
+	<p>
+		This setting adds the drafted write-ups to the list so you can see them, marked
+		with a small dot.
+	</p>
 	<form method="dialog" class="pending-dialog__actions">
 		<button value="cancel">Not now</button>
 		<button value="confirm" class="pending-dialog__confirm" autofocus>

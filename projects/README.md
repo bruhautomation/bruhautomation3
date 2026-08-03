@@ -82,14 +82,11 @@ generated from these folders and is always current.
 | Project | What it is | Guide |
 |---|---|---|
 | [7-Segment Display](7-segment-display/) | MAX7219 seven-segment display that shows Home Assistant data. |  |
-| [BLE Hub](ble-hub/) | Bluetooth presence-detection proxy for Home Assistant. |  |
 | [BRUH Playhouse](playhouse/) | An outdoor playhouse with Home Assistant-controlled lights, sounds, and interactive features. | [Guide](https://bruhautomation.com/projects/playhouse/) |
 | [Desk Controller](desk-controller/) | Standing-desk height controller with position presets. |  |
-| [Dog Treat Dispenser](dog-treat-dispenser/) | Automated treat dispenser you can trigger from Home Assistant. |  |
 | [ESP32-CAM](esp32-cam/) | Camera node with an OLED status display. |  |
 | [Hype Button](hype-button/) | Physical multi-click button controller with NeoPixel feedback and rotary encoder support. | [Guide](https://bruhautomation.com/projects/hype-button/) |
 | [Irrigation System](irrigation-system/) | Large-scale automated irrigation system with flow monitoring and zone control. | [Guide](https://bruhautomation.com/projects/irrigation-system/) |
-| [Laser Turret](laser-turret/) | Pan-tilt laser turret for entertaining the cat. Concept renders only — no build files yet. |  |
 | [Multisensor](multisensor/) | Room sensor — temperature, humidity, motion and light. |  |
 | [Neopixel Strip](neopixel-strip/) | Addressable RGB LED strip with effects and OTA updates. |  |
 | [Nextion Touch Panel](nextion-touch-panel/) | Wall-mounted Home Assistant touch display, 3.5" and 5". |  |
@@ -122,19 +119,9 @@ generated from these folders and is always current.
 | Project | What it is | Guide |
 |---|---|---|
 | [Childproof Doorknob](childproof-doorknob/) | A low-profile, 3D printed child-proof cover for Schlage Bowery doorknobs. | [Guide](https://bruhautomation.com/projects/childproof-doorknob/) |
-| [Christmas Ornaments](christmas-ornaments/) | Smart-home themed ornaments with electronics inside. |  |
-| [Cold Air Return Baffle](cold-air-return-baffle/) | HVAC baffle that redirects a cold air return. |  |
 | [Couch Cupholder](couch-cupholder/) | A 3D printed cupholder that slips over the arm of a couch, with swappable inserts for different cup sizes. | [Guide](https://bruhautomation.com/projects/couch-cupholder/) |
-| [Dinner Bowl Rest](dinner-bowl-rest/) | Dish support that stops bowls tipping on the counter. |  |
-| [Duct Cap & Adapter](duct-cap/) | 4" duct adapter and cap, plus a quick-tee for branching an existing run. |  |
-| [Folding Wall Hooks](folding-wall-hooks/) | Space-saving hooks that fold flat against the wall. |  |
-| [Fridge Drawer Support](fridge-drawer-support/) | Bracket that reinforces a sagging refrigerator drawer. |  |
 | [Kitchen Chair Footrest](kitchen-chair-footrest/) | Footrest that clamps onto kitchen chair legs. |  |
-| [Magnetic Hook](magnetic-hook/) | Wall-mounted magnetic hook. |  |
-| [Magnetic Ring Unlocker](magnetic-ring-unlocker/) | A magnetic ring for quickly unlocking childproof cabinet and gate latches. |  |
-| [Outlet Cover](outlet-cover/) | Adds a switched outlet to an existing one. |  |
 | [Peltier Bottle Warmer](peltier-bottle-warmer/) | Peltier-driven baby bottle warmer. Prototype photo only — no build files yet. |  |
-| [Popup Key Holder](popup-key-holder/) | Spring-loaded key holder that pops the keys up to meet your hand. |  |
 | [Village Lights](village-lights/) | Decorative village scene with controllable lighting. |  |
 | [Wire Rack Shelf Brackets](wire-rack-shelf-brackets/) | Reinforcement brackets for wire shelving. |  |
 

@@ -11,8 +11,8 @@ No screws — the base's lip presses into the lid. 71 × 64 mm and 12.9 mm tall
 assembled, with a 65.6 × 57.6 × 10.9 mm cavity inside.
 
 Happy Bubbles the company is gone. The case is still useful because an ESP32
-running the ESPHome config from the `ble-hub` project does the same job and fits
-in the same cavity — with the caveats in `index.mdx`.
+running ESPHome's Bluetooth proxy does the same job and fits in the same cavity —
+with the caveats in `index.mdx`.
 
 ## What's in this folder
 

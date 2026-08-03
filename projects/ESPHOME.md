@@ -38,7 +38,6 @@ no `!include` dependencies between them, so a config can be copied out on its ow
 ### Specialized Controllers
 - [`irrigation-system/esphome/bruh-pump.yaml`](irrigation-system/esphome/bruh-pump.yaml) - Irrigation pump controller with 7 zones, flow sensors, TDS monitoring
 - [`irrigation-system/esphome/bruh-pump-s3.yaml`](irrigation-system/esphome/bruh-pump-s3.yaml) - ESP32-S3 variant of pump controller
-- [`ble-hub/esphome/bruh-ble-hub.yaml`](ble-hub/esphome/bruh-ble-hub.yaml) - Bluetooth LE tracker/proxy hub
 - [`sourdough-monitor/esphome/bruh-sourdough-monitor.yaml`](sourdough-monitor/esphome/bruh-sourdough-monitor.yaml) - Smart jar for fermentation tracking
 
 ### Entertainment
