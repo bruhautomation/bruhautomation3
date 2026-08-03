@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
+import vercel from '@astrojs/vercel';
 import { APPS, OTHER_PROJECTS, groupByCategory, iconMaskUrl, readProjects } from './site/catalog.mjs';
 
 // Draft workflow (see site/scripts/build.mjs and site/content.config.ts):
@@ -181,6 +182,10 @@ const liveProjectUrls = Object.fromEntries(
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://bruhautomation.com',
+	output: 'static',
+	adapter: vercel({
+		webAnalytics: { enabled: true }
+	}),
 	// The repo is sorted by project: `projects/` and `apps/` hold the words,
 	// pictures and files; `site/` holds the machinery that renders them.
 	srcDir: './site',
