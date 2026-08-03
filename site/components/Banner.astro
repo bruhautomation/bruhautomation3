@@ -1,15 +1,17 @@
 ---
 /**
- * Starlight's banner slot, plus the "write-up pending" notice.
+ * Starlight's banner slot, plus the "drafted write-up" notice.
  *
  * A project marked `pending: true` has its files in the repo and its prose
  * unfinished. It is published rather than hidden, so the notice has to say that
- * on the page itself — someone who lands here from a search should know what
- * they are looking at before they read a thin page and conclude the project is
- * thin.
+ * on the page itself — someone who lands here from a search never saw the
+ * sidebar switch or its confirmation, and should know what they are looking at
+ * before they read a thin page and conclude the project is thin. It carries the
+ * same admission as that dialog, for the same reason: better said here than
+ * worked out by a reader who then doubts the finished guides too.
  *
  * It lives in an override rather than in each page's `banner` frontmatter
- * because fifty-six copies of the same paragraph is fifty-six places to edit
+ * because four dozen copies of the same paragraph is four dozen places to edit
  * when the wording changes, and they would drift.
  *
  * A page can still set its own `banner:` — the smart candle's "Don't build
@@ -27,11 +29,11 @@ const hasOwnBanner = Boolean(entry.data.banner);
 
 {
 	pending && (
-		<aside class="pending-note" aria-label="Write-up pending">
+		<aside class="pending-note" aria-label="Drafted write-up">
 			<p>
-				<strong>🚧 Write-up pending.</strong> I haven't written this one up properly
-				yet. What's on this page is a rough first pass — some of it generated and
-				not checked over — so take the details with a pinch of salt until I have.
+				<strong>🚧 This write-up is still a draft.</strong> I haven't written this
+				one up properly yet. What's on this page is a first pass — some of it is
+				probably AI-generated slop — so take it with a grain of salt until I have.
 			</p>
 			<p>
 				Most projects have their files at the bottom, and those are the real thing.

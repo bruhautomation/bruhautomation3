@@ -456,11 +456,14 @@ img[src$="-phone.webp"] {
 	margin-right: 0.35rem;
 }
 
-/* --- Pending write-ups ------------------------------------------------------
+/* --- Drafted write-ups ------------------------------------------------------
    A project marked `pending: true` has its files published and its guide still
-   being written (see site/content.config.ts). Fifty-six of sixty-four projects
-   are pending, so listing them all in the sidebar by default buries the eight
-   finished guides in a list four times longer than the site people came for.
+   being written — "drafted", in the words the reader sees (see
+   site/content.config.ts and site/components/PendingToggle.astro). Nearly every
+   project is one, so listing them all in the sidebar by default buries the
+   handful of finished guides in a list several times longer than the site
+   people came for. No count is written down here: it changes with every guide
+   finished, and a stale number in a comment is worse than none.
 
    The rows are hidden until someone asks for them with the switch above them
    (site/components/PendingToggle.astro), which adds `.show-pending` to <html>.
@@ -477,8 +480,8 @@ img[src$="-phone.webp"] {
 }
 
 /* Shown, and quietly marked. A dot rather than a badge: it sits in the line
-   without setting the row's height, and fifty-six of them read as a texture
-   down the list instead of fifty-six warnings. */
+   without setting the row's height, and four dozen of them read as a texture
+   down the list instead of four dozen warnings. */
 :root.show-pending .sidebar-content a[data-pending]::after {
 	content: '';
 	flex: none;

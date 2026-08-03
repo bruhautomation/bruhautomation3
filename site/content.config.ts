@@ -56,8 +56,10 @@ const projectsLoader = glob({
 // site/catalog.mjs. One fact, one place: the sidebar, the project list and the
 // landing page all read that, and a guide page never has to agree with it.
 // `pending: true` means the files are in the repo and the write-up is not
-// finished. It is not `draft:` — a draft is hidden, and these are deliberately
-// published. The point is that someone looking for a part can find it, print it
+// finished. Everything the reader sees calls that a *drafted* write-up; the flag
+// keeps the older name so that the class, the storage key and the frontmatter on
+// four dozen pages do not all have to move at once. It is emphatically not
+// `draft:` — a `draft:` page is hidden, and these are deliberately published. The point is that someone looking for a part can find it, print it
 // and read the config today, and knows before they start that the prose around
 // it is still coming. The flag drives three things: the banner at the top of the
 // page (site/components/Banner.astro), the badge beside it in the sidebar, and

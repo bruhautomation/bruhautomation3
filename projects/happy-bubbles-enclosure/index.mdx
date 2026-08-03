@@ -20,8 +20,8 @@ for the USB cable.
 
 Happy Bubbles the company is gone and the board has not been buyable for years.
 The case is still worth printing, because the thing that replaced it — an ESP32
-running ESPHome as a [BLE Hub](/projects/ble-hub/) — is also a bare board on a
-shelf, and there is room for it in here. Every measurement you need to check
+running ESPHome as a Bluetooth proxy — is also a bare board on a shelf, and there
+is room for it in here. Every measurement you need to check
 that is below.
 
 <ImagePlaceholder alt="The printed oval enclosure closed, sitting on a bookshelf with the status LED showing through the lid">
@@ -155,8 +155,10 @@ That makes it a generous, indifferent home for almost any small ESP node — a
 DevKit uses about half the floor — and it makes the port notch the only thing you
 have to get right.
 
-Flash the ESP32 with the config from the [BLE Hub](/projects/ble-hub/) project.
-That is the direct descendant of what the Happy Bubbles board did: it hands Home
+Flash the ESP32 with ESPHome's
+[`bluetooth_proxy`](https://esphome.io/components/bluetooth_proxy.html), on top of
+[`esp32_ble_tracker`](https://esphome.io/components/esp32_ble_tracker.html). That
+is the direct descendant of what the Happy Bubbles board did: it hands Home
 Assistant a Bluetooth radio in that room, and tracks iBeacons by UUID on top of
 it. One per area, same as before. It must be an ESP32 and not an ESP8266 — the
 ESP8266 has no Bluetooth radio at all.

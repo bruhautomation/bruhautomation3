@@ -150,7 +150,6 @@ const retiredProjectUrls = {
 	'/home-projects/tablet-wall-mount/': '/projects/tablet-wall-mount/',
 	'/home-projects/led-light-for-lawnmower/': '/projects/lawnmower-led-light/',
 	'/home-projects/3d-prints/couch-cupholder/': '/projects/couch-cupholder/',
-	'/home-projects/3d-prints/magnetic-ring-unlocker/': '/projects/magnetic-ring-unlocker/',
 	'/lab-projects/50ml-tube-mixer/': '/projects/50ml-tube-mixer/',
 	'/lab-projects/96-well-plate-inverter/': '/projects/96-well-plate-inverter/',
 	'/lab-projects/cellcube-bioreactor-controller/': '/projects/cellcube-bioreactor-controller/',
@@ -203,13 +202,13 @@ export default defineConfig({
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
 				SocialIcons: './site/components/SocialIcons.astro',
-				// Starlight's sidebar with the pending-write-ups switch on top of
+				// Starlight's sidebar with the drafted-write-ups switch on top of
 				// it. The switch has to render exactly once, and this is the only
 				// slot that is on screen at every width — the header's right group
 				// is `display: none` below 50rem, and the mobile menu footer is a
 				// second copy of the same component.
 				Sidebar: './site/components/Sidebar.astro',
-				// Renders the "write-up pending" notice on a project whose files
+				// Renders the "still a draft" notice on a project whose files
 				// are published ahead of its prose, and still passes a page's own
 				// `banner:` through.
 				Banner: './site/components/Banner.astro',
