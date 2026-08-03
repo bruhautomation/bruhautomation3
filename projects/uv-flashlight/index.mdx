@@ -1,81 +1,251 @@
 ---
 title: UV Flashlight
-description: A portable, 3D printed UV light source for gel visualisation and contamination checks.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A 365 nm UV inspection light built from star-mounted COB emitters and a constant-current driver — bench version or handheld, and why the 395 nm torches everyone sells are the wrong part.
+# The electrical side is finished and buildable. The printed body has no STL
+# published yet, so the page stays flagged until it does.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
 import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A handheld UV source for the bench — checking gels, spotting contamination, and
-finding what a spray bottle missed. A printed body around a UV LED array and a
-battery, with no microcontroller in it at all.
+A UV source for the bench — checking gels, spotting contamination, finding what
+a spray bottle missed. Three high-power emitters on star PCBs, a constant-current
+driver, a switch, and a lump of aluminium to dump the heat into. There is no
+microcontroller in it and nothing to flash.
 
-:::note[This one is still a write-up, not a build]
-The print files for this haven't been published yet, and there is no firmware —
-it is a light and a switch. What's below is the parts list and the reasoning, so
-you can build the electrical side today; the printed body follows when the CAD
-is cleaned up.
+:::note[The electronics are finished; the printed body isn't]
+There are no STLs in this folder yet, so what follows is the parts list, the
+circuit and the two things that will bite you. That is enough to build the light
+on a bit of aluminium bar today. The body follows when the CAD is worth
+publishing.
 
-If you're looking for the **UV sensor** — an LTR390 that reports UV index to
+If what you actually want is a **UV sensor** — an LTR390 reporting UV index into
 Home Assistant — that is a [separate project](/projects/uv-sensor/) with a
 complete ESPHome config.
 :::
 
 <ImagePlaceholder alt="A 3D-printed UV flashlight assembled and switched on, held in hand">
-  Hero photo — the assembled flashlight switched on, ideally lighting something
-  fluorescent so the output is visible rather than just a purple glow.
+  Hero photo — the assembled light switched on, pointed at something fluorescent
+  so the output reads as fluorescence rather than as a purple glow.
 </ImagePlaceholder>
 
-## Wavelength matters more than anything else
+## 365 nm, or don't bother
 
-This is the part worth getting right, because most "UV" torches sold online are
-the wrong one for lab work.
+This is the only decision on the page that you cannot fix later, because it is
+baked into the emitter you solder down.
 
 | Band | Wavelength | What it's for |
 |---|---|---|
-| UV-A "blacklight" | 395–405 nm | Pet stains, counterfeit notes. **Sold as UV, barely is** |
+| UV-A "blacklight" | 395–405 nm | Resin curing, pet stains, party props. **Sold as UV, barely is** |
 | **UV-A** | **365 nm** | Fluorescent dyes, gel work, contamination checks |
-| UV-B / UV-C | < 320 nm | Sterilisation. **Not this project** |
+| UV-B / UV-C | Below 320 nm | Sterilisation, and a different set of hazards. **Not this project** |
 
-395 nm emitters are cheaper and look brighter to the eye — which is exactly the
-problem, because that visible purple swamps the fluorescence you are trying to
-see. **Buy 365 nm** and accept that it looks dimmer.
+395 nm emitters are cheaper, and to your eye they look far brighter — which is
+exactly the problem. What you are seeing is visible violet, and that violet
+floods the thing you are trying to look at. A 365 nm emitter of the same wattage
+looks disappointing right up until you point it at a gel, at which point the gel
+is the only lit thing in the room. Buy 365 nm and accept that it looks dim.
 
 ## Parts
 
 <AffiliateDisclosure />
 
-- [365 nm UV LED array or emitter](https://www.amazon.com/s?k=365nm+UV+LED+emitter+high+power&tag=brau01-20) — not 395 nm
-- [Constant-current LED driver](https://www.amazon.com/s?k=constant+current+LED+driver+module+1A&tag=brau01-20) matched to the emitter
-- [18650 cell and holder](https://www.amazon.com/s?k=18650+battery+holder+with+leads&tag=brau01-20), or a USB power bank
-- [Momentary or latching push switch](https://www.amazon.com/s?k=16mm+latching+push+button+switch&tag=brau01-20)
-- [ZWB2 / UG-1 filter glass](https://www.amazon.com/s?k=ZWB2+UV+pass+filter+glass&tag=brau01-20) — optional, and the single biggest improvement
-- A small heatsink for anything above about 3 W
+- [Chanzon 3 W COB UV emitter, 10-pack](https://www.amazon.com/dp/B01DBZINRW?tag=brau01-20)
+  — **read the caution below: these are the 395 nm ones.** They are the emitter
+  this was prototyped on and they are excellent for curing resin and for props.
+  For gel work, buy the same physical part at
+  [365 nm](https://www.amazon.com/dp/B0727YYJ6L?tag=brau01-20)
+  instead. Either way the numbers on the listing are what the rest of this page
+  is built on: 3.0–3.2 V, 400–500 mA per chip.
+- [20 mm star PCBs, 25-pack](https://www.amazon.com/dp/B06XKTRSP7?tag=brau01-20)
+  — the aluminium-core discs the bare chips solder onto. The emitter is useless
+  without one; there is nowhere else for the heat to go.
+- [CC/CV step-down module](https://www.amazon.com/dp/B07Y7YB14L?tag=brau01-20)
+  — 6–40 V in, 1.2–36 V out, with a current trimmer as well as a voltage one.
+  Ships as a 2-pack. This is a driver, not a power supply: you set the current
+  and it holds it as the LEDs warm up and their forward voltage sags.
+- [12 V 4 A supply](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) for the
+  bench version, plus
+  [5.5 × 2.5 mm panel jacks](https://www.amazon.com/dp/B078YNW3JZ?tag=brau01-20).
+  That brick's plug is 2.5 mm ID, and it will sit loose and intermittent in the
+  2.1 mm jacks that come in most assortments — check the number before you
+  order, because the two sizes look identical in a photo.
+- [Aluminium heatsink bar, 100 × 25 × 10 mm, 5-pack](https://www.amazon.com/dp/B07D9ZTTN2?tag=brau01-20)
+  — the stars bond to this. Cut one to length and it is also the spine the
+  printed body wraps around.
+- [Silicone thermal adhesive](https://www.amazon.com/dp/B072MSXHJD?tag=brau01-20)
+  — this is what bonds star to bar. Not hot glue, not epoxy, and not
+  [thermal tape](https://www.amazon.com/dp/B087D48T61?tag=brau01-20), which is
+  fine for a MOSFET and marginal under a watt and a half of LED.
+- A switch. [Mini momentary buttons, 30-pack](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20)
+  at 1 A rating, or a
+  [latching rocker](https://www.amazon.com/dp/B00RYGY5FY?tag=brau01-20) if you
+  want it to stay on without being held. The momentary is the better choice, for
+  a reason worth reading before you decide: see
+  [Making it handheld](#making-it-handheld).
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  — silicone, because the strands nearest the emitter live somewhere warm and
+  PVC insulation shrinks back off a joint you cannot see.
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the
+  body when the files land. Not PLA — see [Heat](#heat).
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and
+  an [M3 screw assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+  for closing the body onto the heatsink bar.
 
-:::danger
-365 nm UV damages eyes and skin, and it does it without hurting at the time.
-Wear [UV-blocking safety glasses](https://www.amazon.com/s?k=UV+protection+safety+glasses+400nm&tag=brau01-20) — not sunglasses — and never point it at anyone.
-Cheap emitters also leak shorter wavelengths, which is another reason for the
-filter.
+:::caution[The emitter linked above is 395 nm, not 365 nm]
+That is the substitute, and it is a real difference rather than a shade of
+purple. A 395 nm chip puts most of its output where your eye can see it, so a
+gel under it sits in a violet wash. Everything else on this page — the star, the
+driver, the current, the thermal path, the arithmetic — is identical for a
+365 nm chip of the same 3 W package, so build it either way and swap the
+emitter when you order the right one.
 :::
 
-## Why the filter glass is worth it
+:::tip[If you only want a torch, buy a torch]
+Building this makes sense when you want a specific form factor, a fixed bench
+head, or three emitters' worth of output. If you want a 365 nm light in your
+pocket by Thursday, the
+[DARKBEAM 365 nm](https://www.amazon.com/dp/B0CNSLGFWG?tag=brau01-20) is cheap,
+USB-C rechargeable and focusable, and it is worth owning either way as the
+reference you check a build against. The
+[BORUIT V10](https://www.amazon.com/dp/B0C2CHWNY9?tag=brau01-20) is the same
+idea with red, green and blue inspection modes in the same body.
+:::
 
-A ZWB2 filter passes UV and blocks the visible violet that comes with it. Without
-one you get a bright purple flood and washed-out fluorescence; with one the beam
-looks almost dark and whatever is fluorescing lights up clearly. On a cheap build
-it is the part that makes the difference between a novelty and a tool.
+## Wiring
+
+Three emitters in series is the arithmetic that makes a 12 V brick work.
+3.1 V × 3 puts the string at about 9.3 V, which leaves the buck converter the
+couple of volts of headroom it needs and lands the whole light at roughly 4 W.
+Four in series is 12.4 V and will not regulate off 12 V at all.
+
+| From | To | Notes |
+|---|---|---|
+| Barrel jack **+** | Switch | |
+| Switch | Driver **IN+** | Switch the driver's input, never its output |
+| Barrel jack **−** | Driver **IN−** | |
+| Driver **OUT+** | Star 1 **+** | |
+| Star 1 **−** | Star 2 **+** | Series |
+| Star 2 **−** | Star 3 **+** | Series |
+| Star 3 **−** | Driver **OUT−** | Closes the loop |
+
+The switch goes on the input side because opening the output of a
+constant-current supply drives its loop straight to the voltage limit, and the
+current overshoots when you reconnect. Switch the 12 V in and the driver starts
+clean every press.
+
+<ImagePlaceholder alt="Wiring diagram showing three star-mounted UV emitters in series, a CC/CV driver and a switch">
+  Wiring diagram, or a labelled photo of the three stars bonded to the aluminium
+  bar with the series links visible between them.
+</ImagePlaceholder>
+
+## Setting the drive current
+
+Do this before the LEDs are anywhere near it. A CC/CV module arrives with both
+trimmers wherever the factory left them, and one wrong turn kills three emitters.
+
+<Steps>
+
+1. **Turn both trimmers fully anticlockwise** and feed the module 12 V with
+   nothing on the output.
+
+2. **Short the output through your meter** on its 10 A current range. Wind the
+   voltage trimmer up until current starts to flow, then set the current trimmer
+   to **0.45 A** — mid-range of the emitter's rated 400–500 mA.
+
+3. **Remove the short.** With the output open, set the voltage trimmer to about
+   **10 V**. That is above the string's 9.3 V and well below the 12 V input, so
+   an accidental open circuit cannot spike.
+
+4. **Connect the string.** It should settle around 9.3 V at 0.45 A, and the
+   module's CC indicator should be lit — if it is in CV instead, the current
+   trimmer is set higher than the string will draw.
+
+5. **Feel the bar after a minute.** Warm is correct. Too hot to keep a finger on
+   means the thermal path isn't finished, and you should turn it off rather than
+   find out how it ends.
+
+</Steps>
+
+:::caution
+Do not run a UV emitter straight off a battery through a resistor and call it
+done. Forward voltage falls as the die heats, current climbs, the die gets
+hotter, and the failure mode is that the light quietly loses half its output
+over a few hours and never gets it back. That is what the constant-current
+module is for, and it is the reason it is not optional here.
+:::
 
 ## Heat
 
-UV LEDs are less efficient than white ones — most of what you put in comes out as
-heat, and they dim permanently if you cook them. Bond the emitter to aluminium,
-not directly to the printed body, and if you are running more than a couple of
-watts print the body in **PETG** rather than PLA.
+UV LEDs are far less efficient than white ones. Most of what you put in comes
+straight back out as heat, and unlike a white LED they do not fail loudly — they
+just dim, permanently, and you have no way of knowing by how much.
+
+So: emitter onto a star, star bonded to aluminium with thermal adhesive, and
+aluminium in contact with air. Three stars at 450 mA is about four watts into a
+100 mm bar, which the bar handles on its own without a fan.
+
+The printed body is a shell around that bar, not a heatsink, and it should touch
+the aluminium as little as it can get away with. **Print it in PETG.** PLA goes
+soft around 60 °C, which a 4 W head reaches without trying, and PLA is also the
+filament that yellows and embrittles under exactly the wavelength this thing
+emits. A UV light with a PLA body is a slow experiment in photodegradation
+conducted on itself.
+
+## The filter is the upgrade that matters
+
+A ZWB2 / UG-1 filter is a piece of glass that passes UV and blocks the visible
+violet riding along with it. Without one you get a bright purple flood and
+washed-out fluorescence; with one the beam looks almost dark and whatever
+fluoresces is the only lit thing in front of you.
+
+Nothing in this build needs it and every part of this build is better with it.
+[ZWB2 filter glass](https://www.amazon.com/dp/B07JNBK6BC?tag=brau01-20)
+is sold in 20 mm and 25 mm rounds that sit neatly over a star, and it is also
+the reason a cheap emitter becomes usable: these chips leak a broad shoulder of
+visible light, and the filter takes it away.
+
+## Making it handheld
+
+The bench version is the one the parts above build. To carry it, the constraint
+is the driver — it needs **6 V minimum on its input**, so a single 18650 at
+3.7 V will not run it no matter what else you do.
+
+Two cells in series is the answer. Use
+[Samsung INR18650-35E cells](https://www.amazon.com/dp/B0762LDVF8?tag=brau01-20)
+in [snap-in holders](https://www.amazon.com/dp/B00LSG5BKO?tag=brau01-20), wire
+the holders in series for 7.4 V nominal, and drop the string to two emitters —
+6.2 V instead of 9.3 V, which is what leaves the buck any headroom at all off a
+pack that starts at 8.4 V.
+
+You get roughly the top half of the pack that way. Below about 7.2 V the driver
+runs out of headroom, falls out of constant current, and the light starts to
+dim. That is a readable low-battery warning rather than a fault, and it is the
+price of not carrying a boost stage as well.
+
+Charge them out of the light on a
+[four-bay cell charger](https://www.amazon.com/dp/B07428G1G2?tag=brau01-20)
+rather than building a balance charger into a torch. Two removable cells and no
+BMS is a simpler and safer object than a sealed 2S pack you cannot inspect.
+
+**Use the momentary switch, not the rocker.** A deadman switch on a UV source
+means it cannot be left on, face-up, on a bench, pointed at whoever walks past
+next. That is worth more than the convenience of a latch.
+
+:::danger
+365 nm UV damages eyes and skin and does it without hurting at the time. Wear
+[UV-blocking eye protection](https://www.amazon.com/dp/B00X0LPX1M?tag=brau01-20)
+— those are tanning-bed goggles, so they cover the eyes and nothing around them.
+Clear polycarbonate safety glasses block this band too and cover more of your
+face. Tinted plastic carrying no UV rating blocks nothing, whatever it looks
+like, and fashion sunglasses are worse than none because the dark lens opens
+your pupil. Never point it at anyone, never look into the emitter to check
+whether it is on, and remember that cheap chips leak wavelengths shorter than
+the one on the label.
+:::
 
 ## Files & downloads
 

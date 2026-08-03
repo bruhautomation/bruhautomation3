@@ -1,31 +1,319 @@
 ---
 title: BRUH Playhouse
-description: An outdoor playhouse with Home Assistant-controlled lights, sounds, and interactive features.
+description: A servo-driven switch box, LED strip and DFPlayer audio built into a cedar backyard playhouse, with a separate ESPHome fan node — ESP32, printed mechanism, all local.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-An outdoor playhouse for kids with Home Assistant-controlled lights, DFPlayer audio, servo-driven animated features, and multiple input controls (buttons, joystick, rotary encoder). A complete interactive entertainment system.
+A cedar swing-set clubhouse in the back yard, with a control panel bolted into
+one wall that does something when a kid touches it. The panel is a printed box:
+five lids in the top face, a big bat-handle toggle, a strip of pixels down the
+middle, a speaker, and standard servos underneath with arms that reach up and
+flip the switch back. It is a useless box at playhouse scale, plus a separate
+ESPHome node for a fan.
 
-## How It Works
+<ImagePlaceholder alt="The playhouse control panel mounted in the clubhouse wall, lids open, LED strip lit">
+  Hero shot — the panel in the playhouse wall with a couple of lids flipped up,
+  the centre strip lit, a kid's hand on the toggle. A second shot of the inside
+  of the box with the servos and arms visible would carry the whole page.
+</ImagePlaceholder>
 
-An ESP32 controls multiple playhouse subsystems: the DFPlayer Mini streams sound effects and music via UART, addressable LED strips provide lighting effects, PCA9685 servo controller manages animated mechanisms, and multiple input devices allow kids to trigger actions. Everything integrates with Home Assistant for automation and remote control.
+:::note
+**Read this before you budget a weekend.** The CAD in this folder is real and
+measurable, and the parts list below comes out of it. The ESPHome configs are
+not finished: between the three of them they assign exactly two pins. The fan
+node is complete and will build as-is; `bruh-playhouse.yaml` is a shell — WiFi,
+API, OTA, a status LED and one saved calibration value — with the servo, audio
+and light blocks still to write. Everything the header comments in that file
+name (DFPlayer over UART, PCA9685, addressable strip, joystick, encoder) is
+intent, not configuration, so no pin numbers for those parts are published here.
+Nobody is served by a confident wrong pin.
+:::
 
-## Hardware
+## Parts
 
-- **Board:** ESP32
-- **Audio:** DFPlayer Mini (UART via GPIO16/17 at 9600 baud)
-- **Servos:** PCA9685 servo controller (I2C) for animated features
-- **LEDs:** Addressable LED strips (WS2812B via GPIO)
-- **Inputs:** Multiple buttons, joystick, rotary encoder
-- **Power:** 5V supply for playhouse system
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — every config in this folder is `board: esp32dev` on the Arduino framework,
+  which is exactly this DevKitC-style board. Ships as a 2-pack, and you want two
+  anyway: the fan is a second node.
+- [MG996R standard servos, 6-pack](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20)
+  — three bays in the box, so a 6-pack leaves spares for the ones you strip.
+  The model's file name says MG995 and the component inside it is an MG996R;
+  they share the standard 40 × 20 × 40 mm case and the bays are cut 53.6 mm
+  across the mounting tabs, so either drops in. Buy the MG996R — metal gears,
+  and the arm is going to get slapped.
+- [PCA9685 16-channel servo driver, 2-pack](https://www.amazon.com/dp/B082QT9D5F?tag=brau01-20)
+  — I²C, two pins for all three servos, and a screw terminal for servo power
+  that is not the ESP32's regulator. That last part is the whole reason it's
+  here.
+- [DFPlayer Mini, 4-pack](https://www.amazon.com/dp/B0BVH1KLSP?tag=brau01-20)
+  — serial MP3 playback off a microSD, with a 3 W amp already on the board.
+  These are YX5200 clones rather than DFRobot originals; ESPHome's `dfplayer`
+  component drives them fine.
+- [32 GB microSD card](https://www.amazon.com/dp/B06XWN9Q99?tag=brau01-20) —
+  small on purpose. A DFPlayer reads FAT32, and a 256 GB card formatted exFAT
+  out of the packet is a silent module and an afternoon gone.
+- [2-inch 4 Ω 3 W speaker, 2-pack](https://www.amazon.com/dp/B01CHYIU26?tag=brau01-20)
+  — the pocket in the CAD is 52.5 mm square and 22.9 mm deep with a 37.4 mm
+  cone, which is a 2-inch driver. The DFPlayer drives it straight off SPK1/SPK2.
+- [SK6812 RGBW strip, 5 m, IP65](https://www.amazon.com/dp/B01N2PC9KK?tag=brau01-20)
+  — two channels run down the centre of the box, 13 mm wide and about 352 mm
+  long each. That width is a sleeved strip, not a bare 10 mm one, and IP65 is
+  what you want in something a hose will eventually reach. It is RGBW, so the
+  light block you write needs the RGBW chipset type and a real white channel to
+  play with.
+- [Heavy-duty bat-handle toggle switch, IP65](https://www.amazon.com/dp/B08S34VYX6?tag=brau01-20)
+  — 30 × 17 mm in the panel with the lever standing 20 mm proud, which is what
+  the model reserves. Get one with a rubber boot and **not** one with a flip
+  guard: the guard is exactly where the servo arm needs to be.
+- [Four-position monolever joystick switch](https://www.amazon.com/dp/B0BZQLL344?tag=brau01-20)
+  — spring-return, four normally-open contacts, industrial. It is the input a
+  six-year-old can't break, which is the specification that matters here.
+- [EC11 rotary encoders, 10-pack](https://www.amazon.com/dp/B07D3DF8TK?tag=brau01-20)
+  — bare panel-mount encoders with a push switch, for the knob.
+- [22 mm mushroom-head momentary buttons, IP65](https://www.amazon.com/dp/B0B8R7R9YM?tag=brau01-20)
+  — big, sealed, and satisfying to hit. Buy more than you think.
+- [5 V 60 A rainproof supply](https://www.amazon.com/dp/B07G7S44CW?tag=brau01-20)
+  — far more than this build draws, and it is the 5 V chassis supply rated to
+  live outdoors. Three MG996Rs stalling together is where a 2 A USB brick
+  browns out the ESP32 and you spend an evening blaming the WiFi.
+- [Silicone wire, 20 AWG spool](https://www.amazon.com/dp/B071DX3X6M?tag=brau01-20)
+  for the 5 V runs and
+  [24 AWG in ten colours](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  for signal, plus
+  [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) on the
+  bench and [JST-SM 3-pin pigtails](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20)
+  at the strip.
+- [Lever nuts](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) inside the
+  box and [solder-seal butt connectors](https://www.amazon.com/dp/B0BZ88G8JJ?tag=brau01-20)
+  for anything that leaves it — a crimp in a playhouse wall is a corroded crimp
+  by next spring.
+- [IP65 hinged junction box](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  for the ESP32 and the supply, and
+  [liquid-tight conduit](https://www.amazon.com/dp/B0C9PDSF3L?tag=brau01-20)
+  for the run out to the house.
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and
+  an [M3 screw assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) —
+  the lids come off more than once during calibration, so tapped plastic isn't
+  good enough. [Short #8 wood screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20)
+  hold the finished box to the cedar.
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for
+  everything printed, and see the material note below before you reach for
+  [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) instead.
+
+### For the fan node
+
+- A second ESP32 from the pack above, a
+  [MOSFET trigger module, 10-pack](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20)
+  — the config puts an LEDC output on a GPIO at 1 kHz, which is PWM on the fan's
+  *power*, so it needs a low-side switch and not a 4-pin fan header — and a
+  [12 V inline blower](https://www.amazon.com/dp/B08T6GNRPT?tag=brau01-20),
+  which is the part that actually moves air through a closed cedar box in
+  August. Add a [buck converter](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+  to take the 12 V rail down to 5 V for the board.
+
+### And the playhouse
+
+- [Backyard Discovery Skyfort cedar swing set](https://www.amazon.com/dp/B081S9PT8P?tag=brau01-20)
+  — the elevated clubhouse with the covered roof and bay windows. This is the
+  structure the panel goes into. Obviously fit it to whatever you already have;
+  it's here because "outdoor playhouse" is doing a lot of work in the title.
+
+## The box
+
+Every number below is measured off `smart_useless_box_box_mg995_copy_v2.stl` in
+the download section.
+
+The shell is **269 × 353 mm in plan and 100 mm deep**, with a separate
+**260 × 344 × 3.5 mm** base plate closing the bottom. The top face carries
+**five lids, each 71.5 × 59.7 mm and 8 mm thick**, in two columns — two on the
+left, three on the right, on a 60.7 mm pitch. The toggle sits in its own
+30 × 17 mm opening at the servo end.
+
+Inside: three servo bays at 53.6 mm across the tabs and 20 mm wide, one printed
+arm 44 mm long, a 52.5 mm square speaker pocket 22.9 mm deep, and two 13 mm
+channels 2.5 mm deep running almost the full 353 mm length for the pixel strips.
+
+:::caution
+**The STL is an assembly, not a print.** It contains 24 bodies, and only about
+half of them are plastic — the three servos, the speaker with its cone, the two
+strips of LEDs and the toggle switch are all modelled in it. Slice that file and
+you get a solid MG996R. Open the `.f3d` or the `.step`, export the shell, the
+lids, the base plate and the arm, and print those.
+
+While you're in there, **split the shell.** At 269 × 353 mm it does not fit a
+Bambu A1's 256 mm bed, and it does not come close to an Ender's 235 mm. Either
+cut it into panels with a locating joint, or print the mechanism — bays, lids,
+arm, speaker pocket — and build the outer box out of ply to match the cedar.
+:::
+
+### Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 4 |
+| Infill | 25% |
+| Supports | None for the lids, base plate or arm; the shell needs them under the internal servo and speaker shelves |
+| Material | PETG |
+| Orientation | Lids and base plate flat; shell top-face-down |
+
+**Print it in PETG.** This lives outside, in a wooden box, in the sun, and a
+PLA lid will bow out of its recess by the end of the first summer — the same
+summer the servo arm starts missing the switch because the geometry moved. PLA+
+is fine for a bench prototype and nothing else here.
+
+Four walls rather than the usual two is not fussiness. The lids get slammed and
+the arm gets grabbed, and the failure is always a wall splitting at a screw boss.
+
+## Wiring
+
+The shipped configs assign two pins between them. This is all of it:
+
+| Function | GPIO | Config | Notes |
+|---|---|---|---|
+| Fan PWM output | **14** | `bruh-playhouse-fan.yaml` | `ledc` output at 1000 Hz, driving `fan.speed` |
+| Status LED | **2** | all three | The board's own blue LED, claimed by `status_led` |
+
+GPIO2 blinking is not a fault. `status_led` flashes it when WiFi or the API
+connection is down and leaves it dark when everything is healthy, so you can
+read a node's health from across the yard without opening anything.
+
+Everything else — the PCA9685's I²C pair, the DFPlayer's UART, the strip's data
+pin, the joystick and encoder inputs — is yours to assign and add to
+`bruh-playhouse.yaml`. Pick pins that are not strapping pins, keep the DFPlayer
+off the pins the ESP32 chatters on at boot, and write them into the file rather
+than into a notebook.
+
+<ImagePlaceholder alt="Inside of the playhouse control panel showing three servos on a PCA9685, the DFPlayer and the LED strip runs">
+  Wiring photo — the open box with the base plate off, so the servo bays, the
+  PCA9685 and the two strip channels are all visible at once. This is the shot
+  the wiring table can't replace until the configs are finished.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Melt the inserts first.** Every M3 hole in the lids, the servo bays and the
+   base plate gets a heat-set insert before a single wire goes in. You will take
+   this apart more times than you expect while you are getting the arm sweep
+   right.
+
+2. **Fit the servos and the arm dry**, with no power anywhere, and swing the arm
+   through its travel by hand. The arm has to clear the lid on the way up and
+   land on the toggle's bat handle square. If it catches the lid, fix it in CAD
+   now — not with a percentage in the config later.
+
+3. **Mount the toggle** with its rubber boot on, then re-check the arm. The boot
+   adds a few millimetres and it is enough to change where the arm hits.
+
+4. **Drop the strips into the two centre channels** and take their power and
+   data out of the box on a JST-SM pigtail, so the lid assembly can come off
+   without unsoldering anything.
+
+5. **Wire servo power to the PCA9685's screw terminal**, not to the ESP32. Share
+   the ground. This is the single most common way this build fails: the board
+   resets every time three servos start together, and it looks exactly like a
+   flaky WiFi problem.
+
+6. **Calibrate before you close it** — below — then screw the base plate on and
+   mount the box to the wall with the short wood screws.
+
+</Steps>
+
+## Calibration
+
+`bruh-playhouse.yaml` carries one global, and it is the interesting line in the
+file:
+
+```yaml
+globals:
+  - id: s_toggle_1_top_max_pct
+    type: float
+    restore_value: yes
+    initial_value: '0.65'
+```
+
+That is how far up the servo's travel the arm is allowed to go — 65% — and
+`restore_value: yes` means it survives a reboot, so you tune it once from Home
+Assistant and it stays tuned. Every servo, arm and switch combination lands on a
+different number, and 0.65 is one particular box's.
+
+**Start low and creep up.** An MG996R makes about 10 kg·cm and it does not know
+the switch has stopped moving; tell it to travel past the end of the bat handle
+and it will snap the printed arm, or the handle, and it will do it in under a
+second. Command a low percentage, watch where the arm stops, raise it a little,
+repeat. Stop at the first value that reliably throws the switch, not the value
+that throws it hardest.
+
+## The fan node
+
+`bruh-playhouse-fan.yaml` is a separate device — its own name, its own
+credentials, its own ESP32. It is also the only complete config in the folder:
+an LEDC output on GPIO14 at 1 kHz, a `fan.speed` platform on top of it, and the
+status LED. Flash it, and a speed-controllable fan appears in Home Assistant
+with nothing else to write.
+
+The 1 kHz matters. That frequency is PWM on the fan's supply, through the MOSFET
+module — it is not the 25 kHz control signal a 4-pin PC fan expects on its blue
+wire. Wire a two-wire fan through the MOSFET's output and drive the module's
+trigger input from GPIO14.
+
+`bruh-playhouse-mini.yaml` is a third node with nothing on it but WiFi, OTA and
+the status LED. It is a starting point for a second panel, not a build.
 
 ## Firmware
 
-This project runs [ESPHome](https://esphome.io/). The full configuration is below — copy it into your ESPHome directory and adjust the substitutions at the top.
+<Steps>
+
+1. Copy the configs from the download section into your ESPHome folder.
+
+2. Fill in `secrets.yaml` — `wifi_ssid`, `wifi_password`, `api_key`,
+   `ota_password`. There is a `secrets.yaml.example` in the repo listing every
+   key these files use.
+
+3. Change `name` and `friendly_name` at the top of each file so the nodes don't
+   collide. Note that `bruh-playhouse.yaml` and `bruh-playhouse-mini.yaml` ship
+   with device names of `bruh-playground` and `bruh-playground-mini`, which is
+   what will show up on your network until you change them.
+
+4. Flash over USB the first time; everything after that is OTA, which is the
+   entire point once the box is screwed to a wall eight feet up a ladder.
+
+</Steps>
+
+## Troubleshooting
+
+**The board reboots whenever a servo moves.** Servo power is coming from the
+ESP32. Move it to the PCA9685's V+ terminal, fed from the 5 V supply, and tie
+the grounds together.
+
+**The DFPlayer plays nothing and reports nothing.** Three things, in order: the
+card is FAT32 and not exFAT; the files are named as four digits in an `mp3`
+folder; and there is a 1 kΩ resistor in series with the module's RX pin. That
+last one is a DFPlayer quirk, not superstition — driven straight from a 3.3 V
+TX it picks up enough noise to swallow commands.
+
+**One servo hums and gets hot at rest.** It is being commanded past its
+mechanical stop. Lower that toggle's percentage and check the arm clears the lid
+by hand with the power off.
+
+**The strip's far end is the wrong colour.** 5 V over 350 mm is fine, but two
+runs off one skinny pair of wires is not. Take 20 AWG to each run separately
+from the supply rather than daisy-chaining them.
+
+**It drops off WiFi at the bottom of the garden.** Before you buy a repeater,
+turn the box. An ESP32's PCB antenna is directional enough that 90 degrees of
+rotation is worth more than most of what you'd spend money on.
 
 ## Files & downloads
 

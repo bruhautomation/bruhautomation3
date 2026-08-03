@@ -1,6 +1,9 @@
 ---
 title: Multisensor
-description: The original BRUH room sensor — temperature, humidity, motion, light level and an RGB status LED on a $5 board.
+description: The original BRUH room sensor — temperature, humidity, motion, light level and an RGB status LED on a $5 ESP8266, running ESPHome in a two-part printed case.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
+pending: true
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -29,15 +32,44 @@ maintaining a node they flashed years ago.
 
 <AffiliateDisclosure />
 
-- [NodeMCU v2 (ESP8266)](https://www.amazon.com/s?k=NodeMCU+v2+ESP8266+development+board&tag=brau01-20) — the board the case is designed around
-- [DHT22 / AM2302 temperature and humidity sensor](https://www.amazon.com/s?k=DHT22+AM2302+temperature+humidity+sensor&tag=brau01-20)
-- [HC-SR501 PIR motion sensor](https://www.amazon.com/s?k=HC-SR501+PIR+motion+sensor&tag=brau01-20)
-- [Photoresistor / LDR assortment](https://www.amazon.com/s?k=photoresistor+LDR+5528+assortment&tag=brau01-20) plus a 10 kΩ resistor
-- [Common-cathode RGB LED](https://www.amazon.com/s?k=common+cathode+RGB+LED+5mm&tag=brau01-20) and three 220 Ω resistors
-- [Micro-USB power supply](https://www.amazon.com/s?k=5V+2A+micro+USB+power+supply&tag=brau01-20)
+- [NodeMCU v2 (ESP8266)](https://www.amazon.com/dp/B010O1G1ES?tag=brau01-20) — this
+  has to be the narrow v2 that `board: nodemcuv2` names. The printed tray is 54 mm
+  long on the outside; a wide LoLin/v3 board is 58 mm and simply doesn't go in.
+- [DHT22 / AM2302 module](https://www.amazon.com/dp/B01N9BA0O4?tag=brau01-20) —
+  buy the three-pin module rather than the bare sensor. It carries its own
+  pull-up, which is one resistor you don't have to add.
+- [Mini pyroelectric PIR module](https://www.amazon.com/dp/B016Y10B3O?tag=brau01-20)
+  — the small one. See the note below before you order the other kind.
+- [Photoresistor light module, 10-pack](https://www.amazon.com/dp/B01N1FKS4L?tag=brau01-20)
+  — the divider is already on the board, so its analogue output goes straight to
+  A0 with nothing between.
+- [5 mm common-cathode RGB LED](https://www.amazon.com/dp/B09L14295S?tag=brau01-20)
+  and [an assorted resistor kit](https://www.amazon.com/dp/B06WRQS97C?tag=brau01-20)
+  — you need three 220 Ω for the LED legs.
+- [5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20),
+  or a USB block you already own plus a
+  [right-angle 1 ft micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20),
+  which is what lets the case sit flat against a wall.
+- [Perfboard, headers and terminal blocks](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
+  if you're soldering, or [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20)
+  if you're not — the female-to-female ones go from the sensor modules straight
+  onto the NodeMCU's header, no iron involved.
+- [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) or
+  [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the case —
+  `nodemcu_top.stl` and `nodemcu_bottom.stl`, both in the download section below.
 
-Plus the printed case — `nodemcu_top.stl` and `nodemcu_bottom.stl`, both in the
-download section below.
+:::caution
+**The hole size picks your PIR.** The bottom half has three 9.4 mm holes across
+it (measured off the STL — details under [The case](#the-case)). An HC-SR501's
+lens dome is far bigger than that and will not go through one, which is why the
+list above has the mini module. That is the part these were built with, bought
+by the handful alongside the DHT22s and the light modules.
+
+If you're putting the electronics in a box of your own, the
+[HC-SR501 five-pack](https://www.amazon.com/dp/B00FDPO9B8?tag=brau01-20) is the
+nicer part to live with: it has sensitivity and retrigger trimmers the mini
+module doesn't.
+:::
 
 :::note
 The DHT22 is the accurate one. A DHT11 will fit the same three pins and is a few
@@ -45,9 +77,20 @@ dollars cheaper, but it reads to a whole degree and drifts. If you plan to
 automate a thermostat off this, buy the DHT22.
 :::
 
-## Print settings
+## The case
 
-Both halves print flat on the bed with no supports.
+Two parts, and between them they tell you most of what you need to know about
+the build. The tray (`nodemcu_bottom.stl`) is 54 × 30.5 mm and 8.3 mm deep. The
+lid (`nodemcu_top.stl`) is the same footprint and 17 mm tall, so the assembled
+sensor is about 54 × 31 mm on the wall and around 25 mm proud of it.
+
+Every opening is in the tray. Three 9.4 mm holes sit on one centreline, 17.5 mm
+and 18.5 mm apart, with a 46 × 2.4 mm slot running along each long edge. That is
+the face the sensors look through, and those two slots are the only air path the
+DHT22 gets — don't tape over them or fill them with hot glue. The lid is blank:
+no holes, no cutouts, nothing to line up.
+
+### Print settings
 
 | Setting | Value |
 |---|---|
@@ -57,27 +100,36 @@ Both halves print flat on the bed with no supports.
 | Material | PLA or PETG |
 | Orientation | Flat, as exported |
 
-PETG is the better pick if the sensor is going anywhere warm — a car, a garage,
-a south-facing window. PLA will sag over a summer in a hot room.
+Both halves are open on one side, so printed as exported they have nothing
+overhanging and need no supports. PETG is the better pick if the sensor is going
+anywhere warm — a car, a garage, a south-facing window. PLA will sag over a
+summer in a hot room.
 
 ## Wiring
 
-Every pin below is the pin the config expects. If you wire it differently you'll
-need to change the config to match, which is a one-line edit per sensor.
+Every pin below is the pin `bruh-multisensor.yaml` expects. If you wire it
+differently you'll need to change the config to match, which is a one-line edit
+per sensor. The GPIO column is there because ESPHome's logs and the ESP32 config
+talk in GPIO numbers even when the silkscreen says `D`.
 
-| Part | NodeMCU pin | Notes |
-|---|---|---|
-| DHT22 data | **D7** | 10 kΩ pull-up between data and 3V3 if your module has no breakout resistor |
-| PIR motion out | **D5** | The HC-SR501's OUT pin. It is 3.3 V logic — safe direct |
-| Photoresistor | **A0** | In a divider with 10 kΩ to ground |
-| RGB LED red | **D1** | 220 Ω in series |
-| RGB LED green | **D2** | 220 Ω in series |
-| RGB LED blue | **D3** | 220 Ω in series |
-| Everything's power | 3V3 and GND | The PIR will also run from VIN/5 V |
+| Part | NodeMCU pin | GPIO | Notes |
+|---|---|---|---|
+| DHT22 data | **D7** | 13 | `platform: dht`, `model: DHT22`, every 5 s |
+| PIR out | **D5** | 14 | `binary_sensor` with `device_class: motion` |
+| Light module AO | **A0** | ADC | Analogue out, not the digital threshold pin |
+| RGB LED red | **D1** | 5 | 220 Ω in series |
+| RGB LED green | **D2** | 4 | 220 Ω in series |
+| RGB LED blue | **D3** | 0 | 220 Ω in series — and see Troubleshooting |
+| Status LED | — | 2 | The board's own blue LED, claimed by `status_led` |
+| Power | 3V3 and GND | — | The PIR will also run from VIN/5 V |
 
 The RGB LED in the config is **common cathode** — the long leg goes to GND. If
-yours is common anode the colours will come out inverted, and the fix is
+yours is common anode the colours come out inverted, and the fix is
 `inverted: true` on each of the three `output:` entries.
+
+That onboard blue LED blinking is not a fault. `status_led` on GPIO2 is
+deliberate: it flashes when WiFi or the API connection is down and sits dark when
+everything is healthy, so you can diagnose a node from across the room.
 
 <ImagePlaceholder alt="Wiring diagram for the BRUH multisensor showing DHT22, PIR, photoresistor and RGB LED connected to a NodeMCU">
   Wiring diagram — either a photo of the assembled perfboard with pins labelled,
@@ -91,24 +143,24 @@ breadboard layout than a table.
 
 <Steps>
 
-1. **Print both halves** and dry-fit the NodeMCU into the bottom. It should drop
-   in with the USB port lined up to the cutout.
+1. **Print both halves** and dry-fit the NodeMCU into the tray before you wire
+   anything. If the board doesn't drop in, you have the wide one.
 
-2. **Wire the sensors** on a small piece of perfboard, or straight to the board's
-   header pins if you're comfortable soldering to those. Keep the DHT22 leads
-   short — it is the one part where long unshielded leads cause bad readings.
+2. **Wire the sensors.** Female-to-female jumpers onto the NodeMCU header is the
+   fast route and it works; perfboard is the tidy one. Either way keep the DHT22
+   leads short — it is the one part where long unshielded leads cause bad
+   readings.
 
-3. **Mount the DHT22 and PIR** so they poke through the front of the top half.
-   The PIR's white dome wants to sit proud of the case; the DHT22 needs airflow,
-   so don't seal it behind a wall of plastic.
+3. **Fit the sensors to the three holes** in the tray so each one looks out
+   through the front, and leave the two edge slots clear for the DHT22.
 
-4. **Set the PIR's two trimmers** before you close the case. The one nearest the
-   dome is sensitivity, the other is how long OUT stays high after a trigger —
-   turn it most of the way down, because ESPHome and Home Assistant handle the
+4. **Set the PIR's trimmers** before you close the case, if yours has them. One
+   is sensitivity, the other is how long OUT stays high after a trigger — turn
+   the second most of the way down, because ESPHome and Home Assistant handle the
    "how long until we call it clear" part better than the sensor does.
 
 5. **Flash it** (below), confirm the entities appear in Home Assistant, and only
-   then close the case.
+   then put the lid on.
 
 </Steps>
 
@@ -116,7 +168,8 @@ breadboard layout than a table.
 
 <Steps>
 
-1. Copy the config from the download section below into your ESPHome folder.
+1. Copy `bruh-multisensor.yaml` from the download section below into your ESPHome
+   folder.
 
 2. Fill in `secrets.yaml` — `wifi_ssid`, `wifi_password`, `ota_password`,
    `ap_password`. There is a `secrets.yaml.example` in the repo with every key
@@ -140,38 +193,84 @@ there is no YAML to write on the Home Assistant side.
 ## What you get in Home Assistant
 
 - **Temperature** and **Humidity** from the DHT22, updating every 5 seconds.
-  Temperature is converted to °F by a filter in the config; delete that filter
-  block to get °C.
+  Temperature is converted to °F by a lambda filter in the config; delete that
+  filter block and the `unit_of_measurement` line to get °C.
 - **Motion** as a `binary_sensor` with `device_class: motion`, so it drives
   presence automations directly.
 - **Luminance** as a percentage, calibrated with a two-point `calibrate_linear`
-  and a 3% delta filter so it isn't reporting noise every two seconds.
+  and a `delta: 3` filter so it isn't reporting noise every two seconds.
 - **A light entity** for the RGB LED, with flicker, strobe and random effects.
-- WiFi signal, uptime status, and a restart button.
+- WiFi signal every 5 minutes, a connection status sensor, and a restart switch.
+
+The logger is set to `ERROR` in the shipped config. Turn it up to `DEBUG` while
+you're calibrating and put it back afterwards — a chatty ESP8266 spends real time
+formatting strings it could spend serving the API.
 
 ## The ESP32 variant
 
-There is a second config in the folder for an ESP32 build. It is a different
-sensor stack, not just a different board — **BME280** at `0x76` for temperature,
-pressure and humidity, and a **TSL2561** at `0x39` for a real lux reading rather
-than a photoresistor's rough percentage. It also computes altitude, absolute
-humidity and dew point from those readings.
+`bruh-multisensor-esp32.yaml` is a different sensor stack, not just a different
+board. Build it if you want accuracy; build the ESP8266 one if you want to make
+six of them for the cost of two. **There is no printed case for this one** — the
+STLs in this folder are the NodeMCU tray, and nothing here fits a 38-pin ESP32.
 
-Build that one if you want accuracy. Build the ESP8266 one if you want to make
-six of them for the cost of two.
+- [ESP32 dev board, 38-pin ESP-WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — a DevKitC-style board rather than a literal NodeMCU-32S, but it is the same
+  ESP-WROOM-32 module on the same pinout, and the config's `board: nodemcu-32s`
+  key builds for it unchanged. Ships as a 2-pack.
+- [BME280 module, 2-pack](https://www.amazon.com/dp/B07KR24P6P?tag=brau01-20) —
+  temperature, humidity **and** barometric pressure on I²C. The config expects it
+  at `0x76`, which is the default for these purple boards.
+- [TSL2561 module, 2-pack](https://www.amazon.com/dp/B01HTC5OYI?tag=brau01-20) —
+  a real lux figure with IR compensation, instead of a photoresistor's rough
+  percentage. The config expects `0x39`, the float-address default.
+- [SK6812 RGBW strip, 1 m](https://www.amazon.com/dp/B01N0MA316?tag=brau01-20) —
+  the config drives four pixels, so cut four off the end. RGBW, not RGB: it
+  declares `type: GRBW` and there is a real white LED in each pixel.
+- The same [mini PIR](https://www.amazon.com/dp/B016Y10B3O?tag=brau01-20) as the
+  ESP8266 build, and the same 5 V supply — this board takes power over its own
+  micro-USB socket too.
+
+| Function | GPIO | Notes |
+|---|---|---|
+| I²C SDA | **5** | BME280 and TSL2561 share the bus |
+| I²C SCL | **4** | |
+| PIR out | **18** | 300 ms `delayed_on` filter |
+| SK6812 data | **19** | 4 pixels, `method: ESP32_I2S_1` |
+| Status LED | **2** | Onboard, same idea as the ESP8266 build |
+
+On top of the raw readings it computes altitude from pressure and temperature,
+plus dew point and absolute humidity — all in lambdas you can read in the config
+rather than in a Home Assistant template.
+
+:::caution
+**Delete the two offsets before you trust a single reading.** The shipped config
+carries `offset: -5.3` on temperature and `offset: 29` on humidity. Those are one
+particular sensor's corrections, and +29% relative humidity is not a small nudge
+— it is the difference between "dry" and "damp". Comment both out, let the board
+read raw for a day beside a reference you trust, then put your own numbers in.
+:::
+
+`i2c:` has `scan: true`, so the boot log lists every address it found. That is
+the first thing to read if a sensor is missing — a BME280 clone strapped to
+`0x77` shows up there immediately.
 
 ## Troubleshooting
 
-**The temperature reads `nan`.** Almost always the DHT22 pull-up. Add a 10 kΩ
-resistor between data and 3V3.
+**The temperature reads `nan`.** Almost always the DHT22 pull-up. If you're using
+a bare four-pin sensor rather than the module, add a 10 kΩ resistor between data
+and 3V3.
+
+**It won't boot, or won't flash, with the LED connected.** D3 is GPIO0, the pin
+the ESP8266 samples at reset to decide whether to enter flash mode. If the board
+misbehaves, pull the blue leg off while you flash and put it back afterwards.
 
 **Motion triggers constantly.** The PIR's retrigger timer is turned up too far,
 or it is looking at a heat source — a vent, a radiator, direct sun on a wall.
 Turn sensitivity down and move it off the heat.
 
-**Luminance sits at 0 or 100.** The `calibrate_linear` block is tuned for a
-particular divider resistor. Watch the raw value in the ESPHome log and change
-the two calibration points to the range you actually see.
+**Luminance sits at 0 or 100.** The `calibrate_linear` block is two points from
+somebody else's room. Turn the logger up, watch the raw value with the lights on
+and then off, and replace the two points with what you actually see.
 
 **It drops off WiFi in a far room.** The ESP8266's antenna is not strong. Before
 adding a repeater, try rotating the node 90° — orientation is worth a surprising

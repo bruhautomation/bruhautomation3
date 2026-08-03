@@ -1,19 +1,287 @@
 ---
 title: Neopixel Strip
-description: Addressable RGB LED strip with effects and OTA updates.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: An ESP8266 driving a run of addressable RGB strip — one Home Assistant light entity with per-pixel effects, over WiFi, with no hub and no remote.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Addressable RGB LED strip with effects and OTA updates.
+A length of addressable strip, an ESP8266, and a power supply. Every pixel is
+independently controllable, so the strip can be one colour, a gradient, a slow
+sunrise on a bedroom shelf, or a red chase down the hallway when a door is left
+open. In Home Assistant it is a single light entity with brightness, a colour
+wheel and a dropdown of ten effects.
 
-## Hardware
-- ESP8266/ESP32 microcontroller
-- WS2812B (Neopixel) addressable LED strip
-- WiFi/MQTT connectivity
+This is cove lighting, under-cabinet lighting and behind-the-TV lighting that
+answers to an automation instead of a remote you have lost. The controller costs
+about as much as a smart bulb and drives as much strip as your supply can feed.
+
+It has been built twice. **The ESPHome config is the one to build today** — it is
+a file rather than a sketch, it updates over WiFi, and it needs no MQTT broker.
+The original Arduino sketch is still in the folder at the bottom, because a lot
+of people are still running it and it does animations ESPHome has no equivalent
+for.
+
+<ImagePlaceholder alt="A run of addressable LED strip in aluminium channel under a shelf, lit in a colour gradient">
+  Hero shot — the finished run installed and lit, ideally mid-gradient so the
+  per-pixel control is obvious, with the aluminium channel and diffuser visible.
+</ImagePlaceholder>
+
+## Pick your voltage first
+
+Everything else follows from this, so decide before you buy anything.
+
+**5 V WS2812B** gives you control of every single LED and runs off one rail, so
+the board and the strip share a supply. It is the right choice up to about five
+metres. Past that the far end goes dim and yellow, because the voltage has
+dropped on its way down the copper, and you end up injecting power every couple
+of metres to fix it.
+
+**12 V WS2811** groups the LEDs in threes — one controllable pixel per three
+LEDs — and loses far less voltage over a long run. You give up resolution and
+gain the ability to light a whole room's perimeter without a power tap every two
+metres. This is what the legacy sketch's 186-pixel run was.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [NodeMCU v2 (ESP8266)](https://www.amazon.com/dp/B010O1G1ES?tag=brau01-20) — the
+  board `board: nodemcuv2` names. Any ESP8266 will do the job; the pin labels
+  below are this one's.
+- The strip, one of:
+  - [WS2812B, 5 V, 30 pixels/m, 5 m reel](https://www.amazon.com/dp/B019HAAVLQ?tag=brau01-20)
+    — 150 individually addressable LEDs. This is the strip `type: GRB` in the
+    config expects.
+  - [WS2811, 12 V, 60 LEDs/m at 20 pixels/m, 5 m reel](https://www.amazon.com/dp/B01CNL6MNM?tag=brau01-20)
+    — 100 pixels over 5 m, IP65 jacket, for long runs.
+  - [WS2815, 12 V, 144 pixels/m, 1 m](https://www.amazon.com/dp/B07LG5JG3Z?tag=brau01-20)
+    — per-LED control *and* 12 V, plus a backup data line so one dead pixel
+    doesn't blank everything after it. It is the best of the three and the most
+    expensive per metre.
+- Power, matched to the strip:
+  - 12 V builds: a [12 V 10 A brick with an 8-way splitter](https://www.amazon.com/dp/B018G3ABWY?tag=brau01-20)
+    — the splitter is the point, because it is how you feed three segments from
+    one supply. Plus an [MP1495 adjustable buck module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+    (5-pack) set to 5 V, to run the NodeMCU off that same 12 V.
+  - 5 V builds, short: a [5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20).
+  - 5 V builds, long: a [5 V 60 A 300 W enclosed supply](https://www.amazon.com/dp/B07G7S44CW?tag=brau01-20)
+    — screw terminals, and the only sane way to feed a few hundred 5 V pixels.
+- [JST-SM 3-pin pigtail pairs, 20 pairs](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20)
+  — solder these to every cut end and you can take a segment down without ever
+  reaching for the iron again. Or
+  [solderless 10 mm clip connectors](https://www.amazon.com/dp/B01E902DY2?tag=brau01-20)
+  if you would rather not solder at all.
+- [2-conductor 20 AWG LED wire, 20 m](https://www.amazon.com/dp/B01N42RLM1?tag=brau01-20)
+  for power runs, [18 AWG red/black silicone](https://www.amazon.com/dp/B07FMRDP87?tag=brau01-20)
+  for the main feed and any injection taps, and
+  [24 AWG silicone in ten colours](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  for the short data hop.
+- [5.5 × 2.1 mm panel jacks and pigtails, 20-pack](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20)
+  — matches the 12 V brick's plug, so the controller box gets a socket instead of
+  a captive lead.
+- [Aluminium U-channel with a clear lens, 5 × 1 m](https://www.amazon.com/dp/B08L3K4CQT?tag=brau01-20),
+  or [V-channel for a 45° corner run](https://www.amazon.com/dp/B01F6WDQHU?tag=brau01-20).
+  Not optional anywhere you can see the LEDs directly — bare strip reads as a row
+  of dots, channel and lens read as a line of light.
+- [IP65 project box with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  for the board, the buck and the barrel jack, plus
+  [perfboard, headers and terminal blocks](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20)
+  to mount them on.
+- [A 470 Ω resistor](https://www.amazon.com/dp/B072BL2VX1?tag=brau01-20)
+  in series with the data line, and
+  [a 1000 µF electrolytic capacitor](https://www.amazon.com/dp/B07YN6DS58?tag=brau01-20)
+  across the strip's power at the first pixel. Two-cent parts that stop the first
+  pixel misbehaving, and they get left out of every build until it misbehaves.
+
+## Wiring
+
+Every pin below comes from `bruh-neopixel-strip.yaml`. The GPIO column is there
+because ESPHome's logs talk in GPIO numbers even when the silkscreen says `D`.
+
+| Signal | NodeMCU pin | GPIO | Goes to |
+|---|---|---|---|
+| Strip data in | **RX** | 3 | The strip's DIN, through the 470 Ω resistor |
+| Board 5 V in | **VIN** | — | The 5 V rail, or the buck's output on a 12 V build |
+| Board ground | **GND** | — | Supply ground — shared with the strip, always |
+| Strip +V | — | — | Straight off the supply, never off the board |
+| Strip ground | — | — | Supply ground |
+| Status LED | — | 2 | The ESP module's own blue LED, claimed by `status_led:` |
+
+The strip does not get its power from the NodeMCU. The board's regulator exists
+to run the board; a metre of pixels at full white pulls more than it can give,
+and the board browns out and reboots in a loop.
+
+Ground is the connection people skip and it is the one that has to be there. The
+data signal is measured against ground, so a board and a strip on separate
+supplies with no ground between them means the strip is reading noise.
+
+:::caution
+**The data pin is not a free choice in this config.** `method: ESP8266_DMA` uses
+the ESP8266's I2S peripheral, and that peripheral can only drive GPIO3 — which is
+why the config says `GPIO3`, and why moving the wire to a nicer-looking pin makes
+the strip go dark. Changing the pin means changing the method too:
+`ESP8266_UART1` gives you GPIO2 (already taken by `status_led:` here),
+`ESP8266_UART0` gives you GPIO1, and `ESP8266_BIT_BANG` takes any pin at the cost
+of timing a busy WiFi stack can disturb.
+
+GPIO3 is also the board's serial **RX**. Nothing breaks, but the strip flashes
+nonsense while you flash the board over USB, because the USB-serial chip is
+driving that same wire. Pull the data lead if it bothers you.
+:::
+
+**The legacy sketch uses a different pin.** `#define DATA_PIN 5` is GPIO5, which
+is **D1** on this board. Flashing the Arduino sketch onto hardware you wired for
+the ESPHome config means moving the data lead from RX to D1.
+
+<ImagePlaceholder alt="Wiring diagram showing a NodeMCU, a 12V supply, a buck converter and an addressable LED strip">
+  Wiring diagram — the controller box laid open, with the barrel jack, the buck
+  module, the NodeMCU and the three-wire strip lead labelled.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Cut the strip at a copper pad**, never between them. Every strip has its cut
+   lines marked; on a 12 V WS2811 strip they come every three LEDs, so your
+   length is quantised whether you like it or not. Measure the run, cut, then
+   count the pixels — that number goes in the config.
+
+2. **Check the arrows.** Addressable strip is directional. Data enters at the end
+   the arrows point away from, and a strip wired backwards is completely dead
+   with no other symptom to go on. Fit the connector to the input end.
+
+3. **Put JST pigtails on both ends of every segment.** Ten extra minutes now,
+   and an hour saved every time you move something later.
+
+4. **Seat the strip in the channel** and snap the lens on. Clean the aluminium
+   first — the adhesive on the back of the strip is mediocre and lets go in a
+   warm room about a month in. A dab of clear silicone at each end helps.
+
+5. **Build the controller in the box.** Barrel jack through a gland, buck module
+   set to 5 V *before* anything is connected to its output, board on perfboard,
+   three-wire lead out the other gland. Meter the buck's output with nothing
+   attached — these arrive set to wherever the last person left the trimmer.
+
+6. **Feed the strip at the strip, not through the box.** The supply goes straight
+   to the strip's power pads. Only the data line and a ground reference need to
+   reach the controller.
+
+7. **Flash it, watch the log, then close the box.** Not the other way round.
+
+</Steps>
+
+## Configuration
+
+Copy `bruh-neopixel-strip.yaml` into your ESPHome directory and put a
+`secrets.yaml` beside it. This config uses exactly three keys — `wifi_ssid`,
+`wifi_password` and `ota_password`. There is a `secrets.yaml.example` in the repo
+with every key these configs use.
+
+Then change the name, and the two lines that describe your particular strip:
+
+```yaml
+substitutions:
+  device_name: "Kitchen Strip"
+  device_id: "kitchen-strip"
+```
+
+```yaml
+light:
+  - platform: neopixelbus
+    type: GRB
+    num_leds: 24
+```
+
+`num_leds` is the count of **controllable pixels**, not LEDs. On a 12 V WS2811
+strip those differ by a factor of three: a 5 m reel of 60 LEDs/m is 100 pixels,
+not 300. Set it too low and the tail of the strip stays dark; set it too high and
+the extra pixels are simply thrown away.
+
+`type` is the order the three colour dies are wired in inside the package, and it
+varies by strip. `GRB` is what the config ships with and what most WS2812B use;
+the legacy sketch is set to `BRG` for the strip it was written against. If you
+send red and get blue, this is the line, and it is the only line.
+
+The effects are already in the file: flicker, strobe, random, rainbow, scan,
+colour wipe, twinkle, random twinkle, fireworks and addressable flicker. They
+arrive as the light entity's effect dropdown. Delete the ones you will never use
+— a dropdown of ten is a dropdown nobody reads.
+
+Flash over USB the first time; every flash after that is over WiFi. The device
+turns up in Home Assistant on its own, with a WiFi signal sensor, a status binary
+sensor and a restart switch alongside the light.
+
+## Sizing the power supply
+
+Take the strip's rated watts per metre — printed on the reel and in the listing —
+and multiply by the metres you are running. That is the load at full white on
+every pixel, which is the only figure worth designing for, because it is what
+your first `light.turn_on` with no colour set will produce. Buy a supply with
+headroom above that number, not one that matches it.
+
+If the total is more than one supply can give, the fix is not thicker wire. Feed
+the run from both ends, or split it into segments and feed each one — which is
+why the 12 V brick above ships with an eight-way splitter. Every ground still
+ties back together.
+
+## Troubleshooting
+
+**The first pixel is a different colour to the rest, or flickers.** This is the
+3.3 V data line driving a 5 V input, and it is the most common problem with this
+build by a distance. Put the 470 Ω resistor in series at the board end, keep the
+lead from board to first pixel under about 20 cm, and add the 1000 µF capacitor
+across the strip's power at the first pixel. If it still misbehaves, buffer the
+data through a
+[74AHCT125](https://www.amazon.com/dp/B00XW2L39K?tag=brau01-20).
+Don't reach for a bidirectional auto-direction level shifter such as a TXS0108E —
+they sense direction with deliberately weak drivers and are the wrong shape for a
+one-way 800 kHz line.
+
+**Nothing lights at all.** Nine times in ten the data is on the wrong end of the
+strip. Check the arrows. Then check that board ground and supply ground are
+actually joined.
+
+**Red comes out blue.** Change `type:` in the config. See above.
+
+**The far end is dim and orange.** Voltage drop. Inject power at the far end from
+the same supply, or move to a 12 V strip.
+
+**The board reboots every time the light turns on.** The strip is being fed from
+the NodeMCU. Take it off and give the strip its own feed.
+
+**The strip strobes randomly while you flash over USB.** Expected — the data pin
+is the serial RX line. It settles as soon as the board reboots.
+
+## The legacy Arduino sketch
+
+`bruh_mqtt_json_ota_rgb_leds_with_effects_github.ino` is the original: an MQTT
+JSON light with a pile of hand-written FastLED animations that ESPHome has no
+equivalent for — candy cane, fire, lightning, police lights, ripple, juggle,
+cyclon rainbow, noise, confetti. If those are why you are here, this is the file
+you want.
+
+It publishes state to `bruh/porch` and listens on `bruh/porch/set`, using Home
+Assistant's JSON light schema: `state`, `color`, `brightness`, `effect`,
+`transition` and `flash`. Change `SENSORNAME` and both topic strings at the top,
+along with the WiFi, MQTT and OTA credentials. Data is on `DATA_PIN 5` (D1),
+`NUM_LEDS` is 186 as shipped, and `COLOR_ORDER` is `BRG`.
+
+:::caution
+It needs **ArduinoJson 5.x**. The sketch uses `StaticJsonBuffer` and
+`parseObject`, which version 6 removed — install 5.13.5 from the Library Manager
+and it compiles, install the current version and it will not. The other two
+libraries are FastLED and PubSubClient.
+:::
+
+OTA is on port 8266 with its own password, so after the first USB flash you can
+push updates to it from the Arduino IDE over WiFi, the same as the ESPHome build.
 
 ## Files & downloads
 

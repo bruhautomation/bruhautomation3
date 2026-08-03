@@ -1,6 +1,9 @@
 ---
 title: Sonoff S31
-description: Flash a Sonoff S31 with ESPHome and get local, real-time power monitoring with no cloud account.
+description: Flash a Sonoff S31 with ESPHome for local, real-time voltage, current and power monitoring from the CSE7766 metering chip — no cloud account, no vendor app.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
+pending: true
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -8,88 +11,234 @@ import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro
 import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-The S31 is the smart plug worth buying, because it has a **CSE7766** metering
-chip inside — real voltage, current, wattage and energy totals, not an estimate.
-Flashed with ESPHome it reports all of that to Home Assistant locally, keeps
-working when the internet is down, and never talks to a vendor server again.
+The S31 is the smart plug worth buying, because there is a **CSE7766** metering
+chip inside it — real voltage, current and wattage measured on the mains, not a
+number derived from what the plug thinks the load ought to be drawing. Flashed
+with ESPHome it reports all of that to Home Assistant locally, keeps switching
+when the internet is down, and never talks to a vendor server again.
 
-It is also the easiest Sonoff to flash. The board slides out of the case and the
-programming pads are a labelled, properly spaced header — no scraping at test
-points with a probe.
+It is also the easiest Sonoff to flash. Two screws, the board slides out, and the
+programming connection is four labelled holes in a row rather than test points
+you have to hold a probe against.
 
-<ImagePlaceholder alt="A Sonoff S31 opened with the board slid out, showing the four programming pads">
-  The S31 opened up — end cap off, board partly slid out, with the four
-  programming pads visible and ideally a USB-to-serial adapter clipped on.
+<ImagePlaceholder alt="A Sonoff S31 opened with the board slid out, showing the four programming holes">
+  The S31 opened up — end cap off, board partly slid out, the four programming
+  holes visible with a soldered header and the serial adapter clipped on.
 </ImagePlaceholder>
 
-## What you need
+## Parts
 
 <AffiliateDisclosure />
 
-- [Sonoff S31 smart plug](https://www.amazon.com/s?k=Sonoff+S31+smart+plug&tag=brau01-20) — make sure it is the **S31**, not the S31 Lite, which has no metering chip
-- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
-- [Pogo pins or jumper wires](https://www.amazon.com/s?k=pogo+pin+programming+jig+header&tag=brau01-20)
-- A small Phillips screwdriver and a plastic prying tool
+- [Sonoff S31, 2-pack](https://www.amazon.com/dp/B07BTLHWFM?tag=brau01-20) —
+  make sure it is the plain **S31**. The S31 Lite is the same shell with the
+  metering chip left out, and no amount of config brings it back.
+- [FT232RL USB-to-TTL serial adapter](https://www.amazon.com/dp/B00IJXZQ7C?tag=brau01-20)
+  — it has a voltage jumper. **Move it to 3.3 V before you plug anything in.**
+  5 V on an ESP8285 is a dead plug.
+- [2.54 mm header pins](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20) —
+  snap a four-pin strip off and solder it into the board. This kit is mostly
+  perfboard, but the header strips in it are what you want here.
+- [Female-to-female Dupont jumpers](https://www.amazon.com/dp/B07GCZBH51?tag=brau01-20)
+  — four of them, from the adapter's pins to the header you just soldered.
+- [Soldering station](https://www.amazon.com/dp/B0DMFBGPWB?tag=brau01-20),
+  [lead-free solder](https://www.amazon.com/dp/B07QZX9LG2?tag=brau01-20) and
+  [liquid flux](https://www.amazon.com/dp/B0FR3SKG1W?tag=brau01-20) — four
+  through-holes is a two-minute job, but it is a soldering job.
+- [Precision screwdriver set](https://www.amazon.com/dp/B0747HLF1P?tag=brau01-20)
+  — the case screws are small and recessed under the label.
+- [Plastic pry tools](https://www.amazon.com/dp/B07R44VJHN?tag=brau01-20) — this
+  is an automotive trim kit, but the nylon wedges in it are exactly right for
+  splitting a plastic shell without scarring it. A guitar pick works too.
+
+You can hold four jumper wires in the holes at an angle and flash it that way.
+People do. Solder the header instead — it takes two minutes, it frees both hands
+for the button-and-USB timing in step 4, and it means the second flash isn't
+another wrestling match. Every flash after the first one is over WiFi anyway, so
+you only pay for this once per plug.
+
+:::note
+If you want metering without opening anything, the
+[Shelly Plus 1PM](https://www.amazon.com/dp/B09TS24GCH?tag=brau01-20) does the
+same job with firmware that already speaks to Home Assistant. It is a wall-box
+device, not a plug — you're trading a soldering iron for wiring behind a switch.
+:::
 
 :::danger
-The board is mains-powered in normal use. **Unplug it from the wall before you
-open it, and never plug it into mains while the serial adapter is attached.**
-Flash it on the bench, close it up, then plug it in.
+This is a mains device. **Unplug it from the wall before you open it, and never
+plug it into mains while the serial adapter is attached** — the adapter's ground
+is your computer's ground. Flash it on the bench, close the case, then plug it
+in. There is no step in this guide where the board is both open and live.
 :::
+
+## Wiring
+
+Four connections, and the data pair crosses. That is the whole job.
+
+| Serial adapter | S31 board | Note |
+|---|---|---|
+| 3V3 | **3V3** | Jumper the adapter to 3.3 V first |
+| TX | **RX** | Crossed |
+| RX | **TX** | Crossed |
+| GND | **GND** | |
 
 ## Flashing
 
 <Steps>
 
-1. **Open it.** Remove the two screws under the label on the end, then slide the
-   board out of the plastic shell.
+1. **Open it.** Peel back the label on the end cap, remove the two screws under
+   it, and slide the board out of the shell.
 
-2. **Find the four pads** — `3V3`, `RX`, `TX`, `GND` — in a row near the edge of
-   the board.
+2. **Solder a four-pin header** into the row of holes marked `3V3`, `RX`, `TX`,
+   `GND`, then wire the adapter to the table above.
 
-3. **Wire the adapter**, crossing the data lines: adapter TX to board **RX**,
-   adapter RX to board **TX**, then 3V3 to 3V3 and GND to GND.
+3. **Hold the S31's button down while you connect the adapter to USB.** That is
+   what puts the ESP8285 into flash mode — GPIO0 pulled low at boot. Keep holding
+   for a second or two after power arrives.
 
-4. **Hold the button down while connecting the adapter to USB.** That is what
-   puts the ESP8266 into flash mode. Keep holding for a second or two after.
+4. **Flash `sonoff-s31.yaml`** from ESPHome, over the serial port. Read the
+   configuration section below first; there are three edits worth making before
+   the first flash rather than after it.
 
-5. **Flash the config** below from ESPHome. After this first wired flash,
-   everything is over WiFi.
+5. **Confirm it appears in Home Assistant** while it is still on the bench and
+   still on USB power. The switch, the LED and the WiFi signal sensor all work on
+   3.3 V alone.
 
-6. **Close it up before it goes anywhere near a socket.**
+6. **Close the case before it goes anywhere near a socket.** The metering sensors
+   read zero until there is mains on the board, so that is the one thing you
+   cannot verify until it is back together.
 
 </Steps>
 
-## What the config gives you
+## Configuration
 
-The board is an `esp01_1m` — 1 MB of flash, which is why the config keeps the
-logger quiet and the feature list tight.
+Two substitutions at the top name the device. Change both so each plug is
+distinct:
 
-| Function | GPIO | Notes |
+```yaml
+substitutions:
+  device_name: "Dryer Plug"
+  device_id: "dryer-plug"
+```
+
+The rest comes from `secrets.yaml` — `wifi_ssid`, `wifi_password` and
+`ota_password`. There is a `secrets.yaml.example` in the repo with every key
+these configs use.
+
+`board_flash_mode: dout` is not optional and not a preference. The S31 carries an
+ESP8285, whose flash is inside the chip package and only speaks DOUT. Delete that
+line and the board boot-loops the moment the flash finishes.
+
+### What the config gives you
+
+| Function | Pin | Entity |
 |---|---|---|
-| Relay | **GPIO12** | The switch entity in Home Assistant |
-| Status LED | **GPIO13** | Inverted, driven as a PWM light |
-| Button | **GPIO0** | Inverted; also the flash-mode button |
-| CSE7766 metering | **UART RX** | Serial, not GPIO — the chip streams readings |
+| Relay | **GPIO12** | Switch — the outlet itself |
+| LED | **GPIO13** | Monochromatic light, inverted, PWM, with flicker and strobe effects |
+| Button | **GPIO0** | Binary sensor, pulled up and inverted — also the flash-mode button |
+| CSE7766 | **RX** | Voltage, current and power sensors, each averaged over 5 s |
 
-In Home Assistant you get a switch, the LED as a dimmable light, and sensors for
-voltage, current, power and cumulative energy. The energy sensor is a
-`total_daily_energy`, so it plugs straight into the Energy dashboard.
+Plus a WiFi signal sensor every five minutes, a connection status sensor, a
+restart switch, and SNTP time. The relay's `restore_mode` is
+`RESTORE_DEFAULT_ON`, so after a power cut it comes back to whatever it was doing
+and defaults to on if it can't tell. That is right for a fridge and wrong for a
+space heater — change it to `RESTORE_DEFAULT_OFF` for anything that gets hot.
+
+### Three edits to make before you flash
+
+**Silence the serial logger.** The CSE7766 streams its readings in on `RX`, which
+is the ESP8266's hardware UART — the same UART the logger writes to by default.
+They cannot share it. Add this at the top of the file:
+
+```yaml
+logger:
+  baud_rate: 0
+```
+
+That only turns off logging over the serial pins. ESPHome's log stream over WiFi,
+which is the one you actually read, is unaffected.
+
+**Pick one owner for GPIO13.** The config declares it twice — once as the
+`esp8266_pwm` output behind the light, and again in the `status_led:` block at the
+bottom. Two components cannot own one pin. Delete `status_led:`. The dimmable
+light is the more useful of the two, and connection health is already reported by
+the `platform: status` binary sensor a few lines above it.
+
+**Decide what the button does.** As shipped, pressing the plug's button toggles
+the *LED*, not the outlet. That is a fine debugging behaviour and a surprising
+one to hand somebody standing at a wall socket. To make it switch the load:
+
+```yaml
+    on_press:
+      then:
+        - switch.toggle: relay
+```
+
+### Worth adding
+
+There is no `ap:` block, so a mistyped WiFi password means opening the case
+again. Add a fallback access point under `wifi:` using the `ap_password` key
+that's already in the shared secrets file, and the plug puts up a hotspot instead
+of going silent.
+
+The `api:` block has no encryption key. `secrets.yaml.example` carries an
+`api_key` for exactly this — add `encryption:` with `key: !secret api_key` and
+the link between plug and Home Assistant stops being plaintext on your network.
+
+Keep it lean beyond that. `esp01_1m` means 1 MB of flash, and an over-the-air
+update needs room for the new image beside the running one. `web_server` is
+usually the component that pushes an S31 past the point where it can update
+itself over WiFi, and getting back from there means the screwdriver again.
+
+### Energy dashboard
+
+The config reports **power**, not energy — instantaneous watts, nothing
+cumulative. Home Assistant's Energy dashboard wants kilowatt-hours, so it will
+not see this device as shipped. Give the CSE7766's power sensor an `id:`, then
+add a `total_daily_energy` sensor pointing at that id with
+`unit_of_measurement: kWh`. That's the sensor the Energy dashboard picks up, and
+it is roughly four lines.
+
+## Calibration
+
+Out of the box the readings are close enough to tell you the dryer finished. They
+are not close enough to argue with a utility bill.
+
+Plug in a load you know — a resistive one, a heater or an incandescent lamp,
+because anything with a switching supply has a power factor that muddies the
+comparison — and compare what the plug reports against what the load is rated
+for. If it's off, the voltage, current and power sensors each take a
+`calibrate_linear` filter alongside the `throttle_average` already there. Two
+points, measured on your plug, not copied from anyone else's.
+
+Do it per plug. The CSE7766's shunt tolerance is the dominant error, and it
+varies unit to unit.
 
 ## Troubleshooting
 
-**The flash never starts.** The button has to be held *as* USB power arrives,
-not after. Try again holding it from before you plug in until a second after.
+**The flash never starts.** The button has to be held *as* USB power arrives, not
+after it. Unplug the adapter from the computer, hold the button, plug it back in,
+keep holding for two more seconds. If it still fails, check the adapter is on 3.3
+V and that TX and RX are crossed.
 
-**It flashes but the power readings are zero.** That is the S31 Lite — no
-CSE7766. The relay and button will work; the metering never will.
+**It flashes but the power readings are zero.** Two candidates. Either it is an
+S31 Lite, which has no CSE7766 and never will report anything — the relay and
+button will work perfectly, which is what makes this confusing — or the plug is
+running on the serial adapter's 3.3 V with nothing in the socket. The metering
+chip measures mains. No mains, no numbers.
 
-**It flashes, then won't connect to WiFi.** The S31's antenna is inside a plastic
-brick behind a mains transformer. Check signal strength before blaming the flash.
+**Readings appear but the logs are garbage, or the sensors update erratically.**
+That's the logger and the CSE7766 fighting over the UART. Set `logger:` to
+`baud_rate: 0`.
 
-**Readings are slightly off.** The CSE7766 can be calibrated in the config —
-worth doing if you're billing anything off it, unnecessary if you just want to
-know the dryer finished.
+**It flashes, then won't join WiFi.** The antenna sits inside a plastic brick
+behind a mains transformer, which is about the worst place in the house for it.
+Check the signal at that socket with a phone before blaming the flash — and if
+the plug went quiet the moment it left the bench, the credentials are wrong and
+there is no fallback AP to catch it.
+
+**The LED does nothing, or fights itself.** GPIO13 is claimed twice in the
+shipped config. See above.
 
 ## Files & downloads
 

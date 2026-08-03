@@ -1,18 +1,259 @@
 ---
 title: Pipette Controller
-description: Motorised electronic pipette system.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A cordless, pump-driven controller for serological pipettes — two mini air pumps, two triggers, a speed dial and a printed body that grips the pipette.
+# The design and the bill of materials are here; the STLs and the sketch are
+# not, so nobody can build this end to end from the page yet. Published, and
+# marked as pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Motorised electronic pipette system.
+A serological pipette is a graduated tube and nothing else — every part of it
+that behaves like a tool sits on top of it. In most labs that part is either a
+thumbwheel pump you roll 25 mL at a time, which is fine for one tube and
+miserable for forty, or a rechargeable pipette aid that costs a few hundred
+dollars. This is the second thing built at the first thing's price: two mini
+diaphragm pumps, two buttons, a speed dial and a printed body that grips the
+pipette and stays in one hand.
 
-## Hardware
-- Motor control system
-- Pipette interface
+:::note
+**The design is here. The parts that make it a print-and-flash build are not.**
+There are no STLs and no sketch in the folder yet. What follows is the bill of
+materials, the air path, and the rules the firmware has to obey — enough to buy
+for, and enough to build from if you are happy modelling your own body. The
+printed parts and the firmware land here when they are done.
+:::
+
+<ImagePlaceholder alt="A 3D-printed cordless pipette controller held in one hand, gripping a 25 mL serological pipette">
+  Hero shot — the controller in a gloved hand with a 25 mL pipette in the nose,
+  ideally drawing medium out of a bottle so the column is visible.
+</ImagePlaceholder>
+
+## How it works
+
+Nothing in a pipette controller touches liquid. It pulls air out of the top of
+the pipette and the liquid follows; it pushes air back in and the liquid leaves.
+That makes the numbers much smaller than they look. A full 25 mL pipette is
+about 30 cm of water, and 30 cm of water is roughly 3 kPa — a thirtieth of an
+atmosphere. Any of these little diaphragm pumps lifts that with the throttle
+nearly shut.
+
+So the design problem is not suction, it is restraint. Run one of these pumps
+flat out on a 5 mL pipette and the meniscus goes straight past the graduation
+you wanted and into the filter. Everything below — PWM on the pump instead of a
+relay, a dial that sets a ceiling, a ramp instead of a step — exists to make a
+nine-dollar aquarium pump behave like a thumb.
+
+It uses two pumps rather than one pump and a valve. One has its **inlet** on the
+line to the pipette and does the aspirating; the other has its **outlet** on the
+same line and does the dispensing; a barbed Y joins them. That is one more
+cheap pump instead of a valve block, and there is nothing to machine.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Mini 5–6 V vacuum / air pump](https://www.amazon.com/dp/B078H8V563?tag=brau01-20)
+  — **two of them**, one plumbed each way. These are the 370-motor diaphragm
+  pumps sold for fish tanks and small vacuum pickups.
+- [3/16 in aquarium airline tubing](https://www.amazon.com/dp/B01N8SNNOI?tag=brau01-20)
+  — 25 ft, of which a build uses about eight inches. It is soft enough to push
+  onto a barb cold and stiff enough not to collapse under vacuum.
+- [1/8 in barbed Y splitter, 4-pack](https://www.amazon.com/dp/B08S6T79JD?tag=brau01-20)
+  — joins both pumps into the single line that runs to the pipette.
+- [A hydrophobic membrane syringe filter](https://www.amazon.com/dp/B06XPWBN2D?tag=brau01-20)
+  — 0.45 µm PTFE, Luer barrel. Buy a box; it is a consumable. See the warning
+  below before you decide to skip it.
+- [Dual MOSFET trigger module, 10-pack](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20)
+  — one module has two channels, so a single board runs both pumps, and it takes
+  a PWM input rather than just on and off. That last part is the whole reason it
+  is here instead of a relay.
+- [ESP32 board with a 1.14 in colour LCD](https://www.amazon.com/dp/B07X1W16QS?tag=brau01-20)
+  — a T-Display-style board: the microcontroller and the screen are one part, on
+  a footprint that fits in a hand. A [plain ESP32 devkit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  works too if you would rather have no screen than a wide body.
+- [Mini momentary push buttons, 30-pack](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20)
+  — two, up and down, under printed caps.
+- [KY-040 rotary encoder, 5-pack](https://www.amazon.com/dp/B06XQTHDRR?tag=brau01-20)
+  — the speed dial. A printed button cannot read how hard you are pressing it,
+  so the speed has to live somewhere else.
+- [3.7 V 3000 mAh LiPo pack, 4-pack](https://www.amazon.com/dp/B08T6GT7DV?tag=brau01-20)
+  — these ship on a JST 1.25 plug, which is the connector a T-Display-style
+  board takes.
+- [TP4056 charger with an adjustable boost converter, 6-pack](https://www.amazon.com/dp/B08GWTBD3T?tag=brau01-20)
+  — charges the cell over micro-USB and steps 3.7 V up to the 5 V the pumps
+  want. Read [Power](#power) before you wire this; it is the part people get
+  wrong.
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  — silicone rather than PVC because it stays flexible where a handheld body is
+  packed tight, and it does not go stiff after a few hundred alcohol wipes.
+- [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the body and
+  [TPU](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) for the nose insert
+  and the button caps.
+- [M3 brass heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+  and [stainless M3 hardware](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20)
+  — stainless, not black zinc. Anything on a bench tool that gets wiped with 70%
+  alcohol every day blooms rust within months otherwise.
+- The [25 mL manual pipette pump](https://www.amazon.com/dp/B0B1Q7XW1Y?tag=brau01-20)
+  is what this replaces. Keep one in the drawer anyway — it is what you reach
+  for when the battery is flat, and it costs nine dollars.
+
+The pipettes themselves are whatever your lab already stocks. **Measure the ones
+you have before you model the nose**: the shank diameter above the cotton plug
+is not the same between 5, 10 and 25 mL, and it is not the same between brands.
+
+## The filter is not optional
+
+:::danger
+**The membrane filter is the only thing between your culture and the pump.**
+Over-aspirate — and you will, on the first day — and liquid runs up the pipette
+towards the controller. A 0.45 µm hydrophobic membrane stops it: the membrane
+passes air freely and blocks water, so the column halts at the filter face
+instead of going into the tubing.
+
+Without one, the first mouthful of medium ends up inside a diaphragm pump you
+cannot open, clean or autoclave, and every dispense after that blows whatever
+grew in there back down a pipette and into your next flask. The same filter also
+sterilises the air going the other way, which is the reason a commercial pipette
+aid has one even though the pump is inside a sealed body.
+:::
+
+Fit it at the nose end of the line, not at the pump end — a filter at the pump
+protects the pump and leaves the tubing contaminated. Change it when it wets
+out. You will know: a wetted hydrophobic membrane stops passing air altogether,
+so the controller goes from working to completely dead in one press.
+
+## Power
+
+The pumps are rated 5–6 V. A single lithium cell is 3.7 V nominal and sags under
+load, so wired straight to a cell these pumps are slow, and they get slower as
+the pack drains — which is the worst possible failure mode for a tool you are
+learning to feel through your thumb. The boost converter is what makes the speed
+you dialled in this morning the same speed at four o'clock.
+
+Give the pumps their own 5 V from the boost module and let the ESP32 run from
+the cell on its own regulator. Do not power the board through the boost output
+as well: the pumps are brushed motors on a shared rail and the inrush when one
+starts is enough to brown out an ESP32 mid-write.
+
+## Wiring
+
+There is no sketch in the folder, so there are no pin numbers to give you and I
+am not going to invent any. What is fixed is what connects to what.
+
+| Part | Connects to | Notes |
+|---|---|---|
+| Aspirate pump | MOSFET module, channel 1 out | Inlet side on the line to the pipette |
+| Dispense pump | MOSFET module, channel 2 out | Outlet side on the same line |
+| MOSFET module IN1 / IN2 | Two PWM-capable GPIOs | PWM, not on/off — this is the speed control |
+| MOSFET module V+ | Boost converter 5 V out | Pumps only; not the board's rail |
+| Up button | One GPIO, pulled up | Momentary, to ground |
+| Down button | One GPIO, pulled up | Momentary, to ground |
+| Encoder CLK / DT / SW | Three GPIOs | Two of them should be interrupt-capable |
+| Battery | Board's JST 1.25 header, and the TP4056 | One cell feeds both the board and the boost |
+
+<ImagePlaceholder alt="The inside of the pipette controller showing two mini pumps, the Y splitter, the MOSFET module and the battery packed into the printed body">
+  Inside shot with the shell open — both pumps, the Y splitter and the filter in
+  line, so the air path is obvious without a diagram.
+</ImagePlaceholder>
+
+## The printed parts
+
+Three of them: the body, the nose that grips the pipette, and the button caps.
+
+**A printed air path leaks.** Anything the air actually passes through — a
+moulded-in duct, a printed barb — will whistle through the infill no matter how
+carefully you slice it. Design the body so the air never touches printed plastic:
+push a barb into the nose, run tubing to the pumps, and let the print be
+structure. It is the single decision that separates one of these that holds a
+column from one that does not.
+
+Body in **PETG**, because this is a bench tool that gets wiped with 70% alcohol
+every day and lives on a shelf under a hood's lights, and because a PLA part
+under a permanent clamp load creeps. The nose insert and the button caps in
+**TPU** — the insert grips the pipette by squeeze rather than by fit, which is
+what lets one nose take a 10 mL and a 25 mL, and the caps make two hard printed
+buttons feel like something you can find without looking.
+
+Heat-set inserts everywhere the body opens. A handheld gets opened repeatedly
+while you are getting the speed curve right, and a screw threaded into printed
+PETG survives about four of those.
+
+Nothing here is autoclavable and nothing here should ever go in an autoclave.
+The pipette is the sterile part; this is the handle.
+
+## Assembly
+
+<Steps>
+
+1. **Bench the air path first, before anything is in a body.** Two pumps, the Y,
+   the filter and a length of airline, alligator-clipped to a supply. Put a
+   pipette in the end and draw water out of a beaker. If it does not work loose
+   on the bench it will not work packed into a shell.
+
+2. **Check which way round each pump goes.** These have an inlet and an outlet
+   and they are not marked usefully. Run one on the bench, feel both ports, and
+   put the one that sucks on the line for the aspirate pump. Getting this
+   backwards makes a controller that blows bubbles into your flask when you ask
+   it to fill.
+
+3. **Set the boost converter to 5 V with a meter on the output** before it is
+   connected to anything. These modules ship at whatever the last person on the
+   line left the pot at.
+
+4. **Melt the inserts in, then fit the electronics.** Buttons and encoder into
+   the shell while it is still open and reachable; pumps last, because they are
+   the parts with tubing attached.
+
+5. **Flash and calibrate before you close it** — pick a speed ceiling that fills
+   a 10 mL pipette in a few seconds rather than instantly, and confirm both
+   buttons drive the pump you think they do.
+
+</Steps>
+
+## What the firmware has to do
+
+The sketch is not published yet. It is a short one, and these are the rules that
+matter more than the code:
+
+**PWM both pumps, and ramp them.** A pump that goes from stopped to full in one
+loop iteration jerks the column and throws droplets up the pipette. Ramp up over
+a couple of hundred milliseconds and stop immediately on release.
+
+**The dial sets a ceiling, not a speed.** Hold a button and the pump ramps to
+whatever the encoder is currently set to. Fill fast, then dial down for the last
+millilitre — that last bit is where a pipette either meets its graduation or
+overshoots it.
+
+**Interlock the two channels.** Both buttons down must never mean both pumps on:
+they fight each other across the Y, both stall, and the only symptom is a warm
+controller. First press wins, second press is ignored until the first is
+released.
+
+**Show the pack voltage if the board brings the battery out to an ADC.** The
+failure you want to avoid is discovering the cell is flat with 25 mL of medium
+up the tube.
+
+## In use
+
+**Do not park a loaded pipette.** Neither pump seals when it is off, so a column
+held in a pipette slowly leaks back down and out of the tip — onto the bench, or
+into whatever is under it. This is the one real behavioural difference between
+this and a commercial aid with a valve block in it. Draw and dispense in one
+movement, and if you must pause, blip the aspirate button to bring the meniscus
+back up.
+
+**Point the exhaust away from your work.** The aspirate pump vents wherever you
+put its outlet. In a biosafety cabinet that means routing it out of the back of
+the body, not down at an open plate.
+
+**It is louder than you expect.** Two 370-motor pumps in a printed shell buzz.
+A strip of TPU under each pump mount takes most of it out; hard-mounting them to
+the wall of the body makes the whole shell a speaker.
 
 ## Files & downloads
 

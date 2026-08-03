@@ -1,6 +1,9 @@
 ---
 title: Sonoff S20
-description: The simplest ESPHome flash there is — a Sonoff S20 turned into a local smart plug with no cloud account.
+description: Flash a Sonoff S20 with ESPHome — a relay, a button and a dimmable status LED, running on your own network with no vendor cloud in the path.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
+pending: true
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -8,76 +11,180 @@ import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro
 import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-The S20 is a plug and a relay and nothing else — no power monitoring, no
-metering chip. That makes it the right first ESPHome flash: four pads, a short
-config, and a device that stops phoning home the moment it reboots.
+The S20 is a relay, a button and an LED in a plastic shell. No metering chip, no
+sensors, nothing clever — which is exactly why it is the right first ESPHome
+flash. Four pads, a forty-line config, and a device that stops phoning home the
+moment it reboots.
 
-If you want to know how much the thing plugged into it is drawing, build the
-[Sonoff S31](/projects/sonoff-s31/) instead — same flashing procedure, real
-metering inside.
+If you want to know what the thing plugged into it is actually drawing, build the
+[Sonoff S31](/projects/sonoff-s31/) instead. Same flashing procedure, same GPIO
+map, real metering inside.
 
-<ImagePlaceholder alt="A Sonoff S20 opened on a bench with a serial adapter connected to its programming header">
-  The S20 opened up, board visible, serial adapter connected to the four
-  programming pads.
+<ImagePlaceholder alt="A Sonoff S20 opened on a bench with a USB-to-serial adapter clipped to its four programming pads">
+  Hero shot — the S20 open on the bench, board visible, serial adapter wired to
+  the four programming pads, with the case halves and the peeled label beside it.
 </ImagePlaceholder>
 
-## What you need
+## Parts
 
 <AffiliateDisclosure />
 
-- [Sonoff S20 smart plug](https://www.amazon.com/s?k=Sonoff+S20+smart+plug&tag=brau01-20) — check the socket type matches your country
-- [USB to serial adapter (3.3 V)](https://www.amazon.com/s?k=CP2102+USB+to+TTL+serial+adapter+3.3V&tag=brau01-20)
-- [Jumper wires or a pogo-pin jig](https://www.amazon.com/s?k=dupont+jumper+wires+female&tag=brau01-20)
-- A small Phillips screwdriver
+- [Sonoff S20 smart plug](https://www.amazon.com/dp/B0749KD5V2?tag=brau01-20) — check the socket type matches your country before you order
+- [USB-to-serial adapter, FT232RL](https://www.amazon.com/dp/B00IJXZQ7C?tag=brau01-20) — **move the voltage jumper to 3.3 V before you plug anything in.** At 5 V you will kill the ESP8266 on the first connection
+- [Dupont jumper wires, all three genders](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — you want the female-to-female ones
+- [Pin header strip, 2.54 mm](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20) — snap four pins off a 40-pin strip. This kit is sold for its perfboard; the headers are what you're after here
+- [Precision screwdriver set](https://www.amazon.com/dp/B0747HLF1P?tag=brau01-20) — the case screw is small and recessed
+- [Soldering iron](https://www.amazon.com/dp/B0DMFBGPWB?tag=brau01-20) and [lead-free solder](https://www.amazon.com/dp/B07QZX9LG2?tag=brau01-20) — four joints, once
+
+Two optional things that make the job nicer:
+
+- [Spring-loaded test probes](https://www.amazon.com/dp/B07WT77D4K?tag=brau01-20) — the no-solder route. These are bare pogo pins, not a finished jig: you drill four holes in a scrap of acrylic or a printed block, press them in, and hold the whole thing against the pads. Worth building once if you plan to flash more than two of these
+- [Plastic pry tools](https://www.amazon.com/dp/B07R44VJHN?tag=brau01-20) — sold as a car trim kit, but the wide nylon wedges are the right shape for the case clips and won't leave screwdriver scars in the shell
+
+:::note
+The S20 is not in production any more, so what you'll find is old stock and
+clones. If you're buying new today, buy the S31 — the
+[two-pack](https://www.amazon.com/dp/B07BTLHWFM?tag=brau01-20) is the one worth
+having, because it adds a CSE7766 metering chip for a couple of dollars more.
+It is a **different device with a different config**; the build is on the
+[S31 page](/projects/sonoff-s31/).
+:::
 
 :::danger
-Unplug it from the wall before opening it, and never connect the serial adapter
-while it is in a socket. Flash on the bench, reassemble, then plug it in.
+Unplug it from the wall before you open it, and never connect the serial adapter
+while the plug is in a socket. The board is mains-referenced in normal use.
+Flash it on the bench, close it up, then plug it in.
 :::
+
+## Wiring
+
+The four pads on the board are `3V3`, `RX`, `TX` and `GND`. On most revisions
+they are bare holes with no header soldered in — that is the four-pin strip in
+the parts list.
+
+| Adapter | S20 pad | Note |
+|---|---|---|
+| 3V3 | **3V3** | Jumper on 3.3 V. Do not use the adapter's 5 V pin |
+| GND | **GND** | |
+| TX | **RX** | Crossed |
+| RX | **TX** | Crossed |
+
+Crossed data lines are the thing people get wrong. The adapter transmits into
+the board's receiver, not into its transmitter.
+
+<ImagePlaceholder alt="Close-up of the Sonoff S20 board showing the four-pad programming header with a soldered pin strip">
+  Close-up of the programming header with a four-pin strip soldered in and the
+  jumper wires attached, ideally with the pads' silkscreen readable.
+</ImagePlaceholder>
 
 ## Flashing
 
 <Steps>
 
-1. **Open the case** — one screw under the label, then release the clips.
+1. **Peel the label off the back** and undo the screw underneath. Work the shell
+   apart at the seam with a nylon wedge — the rest of it is clips.
 
-2. **Find the four-pad header** on the board: `3V3`, `RX`, `TX`, `GND`. On some
-   revisions it is unpopulated and you will need to solder in a header or hold
-   pogo pins against it.
+2. **Solder a four-pin header into the programming pads**, or press your pogo-pin
+   jig against them. If you're holding jumper wires in the holes by hand, stop:
+   one twitch mid-flash and you're starting over.
 
-3. **Wire the adapter with the data lines crossed** — adapter TX to board RX,
-   adapter RX to board TX, plus 3V3 and GND.
+3. **Wire the adapter to the table above** with the USB end unplugged.
 
-4. **Hold the button down as you connect USB.** That is what selects flash mode.
+4. **Hold the button down, then plug the adapter into USB.** The button is on
+   GPIO0, and pulling GPIO0 low as power arrives is what selects flash mode. Keep
+   holding for a second after. Nothing on the plug will tell you it worked —
+   ESPHome failing to find a device is how you find out it didn't.
 
-5. **Flash the config below**, then reassemble. Everything after this is over WiFi.
+5. **Flash the config**, then unplug, reassemble, and plug the closed plug into a
+   socket. Every flash after this one is over WiFi.
 
 </Steps>
 
-## What the config gives you
+## Configuration
 
-An `esp01_1m` board — 1 MB flash, which is why the config stays small.
+The config is `esphome/sonoff-s20.yaml` in the download section. Change the two
+substitutions at the top so each plug gets its own name:
+
+```yaml
+substitutions:
+  device_name: "Fish Tank"
+  device_id: "fish-tank"
+```
+
+It reads three keys out of `secrets.yaml` — `wifi_ssid`, `wifi_password` and
+`ota_password`. There is a `secrets.yaml.example` in the repo with every key
+these configs use.
+
+`board_flash_mode: dout` is not optional on Sonoff hardware. Leave it where it
+is; a device flashed in the wrong mode boot-loops and has to be done again over
+serial, which means opening the case a second time.
+
+There is no `ap:` block and no encryption on the API. If you want the recovery
+access point — the one a device puts up when it can't reach your WiFi — add an
+`ap:` under `wifi:` with `ap_password`. If you want the Home Assistant link
+encrypted, add `encryption: key: !secret api_key` under `api:`. Both keys are
+already in the secrets example.
+
+## What you get in Home Assistant
+
+The board is an `esp01_1m` — 1 MB of flash, half of which has to stay free for
+an OTA image to land in. That is the whole reason this config is short.
 
 | Function | GPIO | Notes |
 |---|---|---|
-| Relay | **GPIO12** | The switch entity in Home Assistant |
-| Status LED | **GPIO13** | Inverted, driven as a PWM light |
-| Button | **GPIO0** | Inverted; also the flash-mode button |
+| Relay | **GPIO12** | The switch entity |
+| LED | **GPIO13** | Inverted, driven as a PWM output |
+| Button | **GPIO0** | Inverted, `INPUT_PULLUP`; also the flash-mode button |
 
-In Home Assistant you get a switch, the LED as a dimmable light, WiFi signal and
-uptime. The physical button toggles the relay locally, so the plug still works
-if Home Assistant is down — which is most of the reason to run it locally.
+ESPHome devices are discovered, so there is nothing to write on the Home
+Assistant side. You get the relay as a switch, the LED as a dimmable light with
+flicker and strobe effects, the physical button as a binary sensor, a
+connectivity sensor, a WiFi signal reading every 300 seconds, and a restart
+switch.
+
+The button toggles the relay on the device itself, not through an automation, so
+the plug still works with Home Assistant switched off. That is most of the reason
+to run it locally.
+
+## Two edits worth making
+
+**GPIO13 is claimed twice.** It is the PWM output behind the `led` light, and it
+is claimed again at the bottom of the file by `status_led`. They are fighting
+over the same LED. Keep `status_led` while you're bringing the plug up and the
+LED reports WiFi and API state, which is what you want on the bench. Delete the
+`status_led:` block once it's on the wall and the LED becomes yours to drive from
+an automation.
+
+**The LED only follows the relay when you press the button.** The button's
+`on_press` toggles the relay and the light together; switching the relay from
+Home Assistant doesn't touch the light. If you want them locked together, put
+`light.turn_on` / `light.turn_off` actions on the relay's own `on_turn_on` and
+`on_turn_off` and delete them from the button.
+
+:::caution
+`restore_mode: RESTORE_DEFAULT_ON` means the plug comes back **on** after a power
+cut if it has never stored a state. That is right for a fridge and wrong for a
+space heater. Change it to `RESTORE_DEFAULT_OFF` on anything you would not want
+to switch itself on while you're away.
+:::
 
 ## Troubleshooting
 
-**Nothing happens on flash.** The button must be held *as* power arrives. Also
-check TX/RX aren't straight-through — crossed is correct.
+**ESPHome never finds the device.** The button has to be held *as* power arrives,
+not after. Unplug USB, hold the button, plug back in, and keep holding. If that
+doesn't do it, check TX and RX — straight-through is the other common mistake.
 
-**It flashes but never joins WiFi.** 2.4 GHz only; the ESP8266 cannot see a 5 GHz
-network. If your router publishes both under one name, that is usually the cause.
+**It flashes, then never joins WiFi.** 2.4 GHz only; the ESP8266 cannot see a
+5 GHz network. If your router publishes both bands under one SSID, that is
+usually the cause. The S20's antenna is also inside a plastic brick sitting
+behind a mains transformer, so a marginal corner of the house is a real
+possibility — check the WiFi signal sensor before blaming the flash.
 
 **The relay clicks but the socket is dead.** That is a mains-side fault, not a
-firmware one. Stop and check your work before plugging anything else in.
+firmware one. The firmware's job ends at the relay coil. Unplug it and check
+your work before anything else goes into that socket.
+
+**The LED does something you didn't ask for.** See the `status_led` note above.
 
 ## Files & downloads
 

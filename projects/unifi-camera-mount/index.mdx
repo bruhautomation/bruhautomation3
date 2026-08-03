@@ -1,18 +1,300 @@
 ---
 title: UniFi Camera Mount
-description: Bracket for Ubiquiti UniFi security cameras.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed bracket for a UniFi camera, plus the Ethernet run, the siding hardware and the weatherproofing that actually decide whether it stays up and stays dry.
+# The bracket itself isn't exported into this folder yet, so the page can't be
+# built from end to end. Published, and marked as pending on the page, in the
+# sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Bracket for Ubiquiti UniFi security cameras.
+Every UniFi camera ships with a wall plate that assumes a flat, solid, plumb
+surface to screw into. A house does not have many of those outside. Vinyl siding
+is a run of overlapping curves, a soffit is a thin hollow panel, and the one spot
+with the view you actually want is never the spot with a stud behind it. This is
+the adapter between the camera's own plate and whatever you are really fixing
+it to.
 
-## Hardware
-- 3D-printed mount bracket
-- Camera mounting hardware
+:::note
+The bracket geometry isn't in this folder yet, so the page carries the pending
+flag. What is below is the part list and the install — which is the half that
+decides whether a camera stays up, stays dry and gives you usable night video.
+:::
+
+<ImagePlaceholder alt="A UniFi turret camera on a printed bracket under the eave of a house, Ethernet entering the wall behind it">
+  Hero shot — the camera on the finished bracket, mounted on the house, taken
+  from below so the underside of the bracket and the cable entry are both
+  visible.
+</ImagePlaceholder>
+
+## Which camera you are mounting
+
+Two UniFi cameras live on this network and they ask a bracket for completely
+different things.
+
+The **G6 Turret** is the current one — 8 megapixel, 4K, outdoor, and one Ethernet
+run carries both its power and its video. Nothing about the bracket is hard; the
+cable is the whole job.
+
+The **G3-Micro** is the old one — WiFi, indoor-rated, fed from a USB lead rather
+than PoE. It is a much smaller object and a much easier bracket, and a much
+worse idea outside, because "indoor" on a camera means the enclosure, not the
+optics.
+
+| | G6 Turret | G3-Micro |
+|---|---|---|
+| What reaches it | One outdoor-rated Cat cable | A USB power lead, plus WiFi |
+| Bracket needs | A path for the cable through the plate, and a drip point below it | The same hole, smaller |
+| Lives outside | Yes | Only under real cover |
+
+Whichever one you are holding, print an **adapter, not a replica**. Do not try to
+reproduce the camera's own mounting interface in plastic — print a plate that the
+camera's supplied bracket bolts flat onto, and let Ubiquiti's part be the thing
+that touches the camera. A printed copy of somebody else's ball joint is a part
+that creeps a few degrees every hot afternoon until the frame is all gutter.
+
+## Parts
+
+<AffiliateDisclosure />
+
+### The camera
+
+- [UniFi G6 Turret, 4K](https://www.amazon.com/dp/B0F81MRNMC?tag=brau01-20) — 8 MP,
+  colour, white, and it takes power over the Ethernet run, so there is one cable
+  to get to the mount instead of two.
+- [UniFi G3-Micro](https://www.amazon.com/dp/B077H91CM7?tag=brau01-20) — the small
+  wireless one, if what you want is a bracket for an indoor camera on an indoor
+  wall. It is an older part and it is not weather-rated. Under a deep porch
+  ceiling it survives; on an exposed wall it is a matter of time.
+- The recorder is whatever you already run Protect on. If you are adding a 4K
+  camera to an existing one, add the disk at the same time —
+  [a 4 TB Skyhawk](https://www.amazon.com/dp/B07H231394?tag=brau01-20) is a
+  surveillance-rated drive built for a write stream that never stops, which is
+  not what a desktop drive is for.
+
+### Getting network out to it
+
+- [Outdoor Cat 7, 50 ft, direct burial](https://www.amazon.com/dp/B07KKHVQZD?tag=brau01-20)
+  — shielded, waterproof jacket, rated to be buried. This is the one bought twice
+  here, and the reason is that the run is always longer than you measured. For a
+  longer pull there is
+  [100 ft of outdoor braided Cat 8](https://www.amazon.com/dp/B097GZD853?tag=brau01-20).
+  Do not run indoor patch cable outside; the jacket chalks and cracks in a couple
+  of summers and the failure looks like a flaky camera, not a bad cable.
+- [Gigabit PoE injector, 30 W, 802.3af/at](https://www.amazon.com/dp/B07PR9CBGL?tag=brau01-20)
+  — one camera, one injector, done. If you would rather do it properly at the
+  rack, a [UniFi Switch 8 60W](https://www.amazon.com/dp/B01MU3WUX1?tag=brau01-20)
+  powers the cameras and puts them on the same controller as everything else.
+- [RJ45 crimper, tester and 100 plugs](https://www.amazon.com/dp/B008UY5WL0?tag=brau01-20)
+  — you crimp the camera end after the cable is through the wall, because a
+  moulded plug and boot need a far bigger hole than the bare jacket does.
+- [Network tester with a PoE test](https://www.amazon.com/dp/B09P55SCXH?tag=brau01-20)
+  — it tells you the pairs are right *and* that power is arriving, from the
+  ground, before the ladder goes away.
+- [Screw-down cable clips, 100-pack](https://www.amazon.com/dp/B01N7KY5FE?tag=brau01-20)
+  for a run along trim, and
+  [UV-resistant zip ties](https://www.amazon.com/dp/B0D97ZC72N?tag=brau01-20) or
+  [screw-mount zip ties](https://www.amazon.com/dp/B0G5N67YKF?tag=brau01-20) for
+  everything else. Plain black nylon ties go brittle and let go after two seasons
+  in the sun; the UV-rated ones are the same price.
+- [Flat 16 ft micro-USB extension, 2-pack](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20)
+  — only for the G3-Micro. It is flat enough to run under trim and comes with its
+  own clips.
+
+### The mount
+
+- [PETG, 1 kg](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — not PLA. See
+  [Print settings](#print-settings); this is the single decision on the page that
+  will cost you the whole part if you get it wrong.
+- [M2/M3/M4 stainless cap screws and nuts, 1080 pcs](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20)
+  — stainless, specifically. The black alloy M3 kits everyone has in a drawer are
+  grade 10.9 steel with a zinc flash, and they weep rust down white siding in
+  about one winter.
+- [M3 brass heat-set inserts, 100-pack](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+  — melt them into the bracket so the camera can come off and go back on more than
+  twice. A screw driven straight into plastic gets one good bite and then you are
+  reprinting.
+- [#8 × 1-5/8 in exterior deck screws](https://www.amazon.com/dp/B0CRJY3BDD?tag=brau01-20)
+  for going into wood, and a
+  [hollow-wall anchor assortment](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20)
+  for the indoor camera on drywall.
+- [Stud finder](https://www.amazon.com/dp/B0917VXLDK?tag=brau01-20) — a camera on
+  a bracket on a lever arm is a surprising amount of moment on two screws. Find
+  the framing.
+
+### Siding, if that is what you are mounting to
+
+- [Vinyl siding hooks, 10-pack](https://www.amazon.com/dp/B07XG17SPY?tag=brau01-20)
+  — sold literally for hanging a security camera on lap siding without drilling
+  it. They hook the lip of a course and carry a small camera fine. They will not
+  hold a bracket you can aim, and they do nothing about the cable.
+- [Siding removal tool](https://www.amazon.com/dp/B00004SUQW?tag=brau01-20) — a
+  six-dollar hook that unzips one course of vinyl so you can get behind it. Trying
+  to do this with a flat bar is how a panel ends up cracked, and vinyl that has
+  been on a wall for ten years does not come off in cold weather at all.
+- [Arlington siding mounting block with a built-in box](https://www.amazon.com/dp/B0069KVZZ4?tag=brau01-20)
+  — for 1/2 in double lap siding. This is the answer if you want the job to look
+  like it was done by an electrician: a flat, plumb pad standing proud of the
+  siding, with a sealed cavity behind it for the cable to come through.
+
+### Drilling and sealing
+
+- [1 in × 17 in ship auger](https://www.amazon.com/dp/B00004RGZI?tag=brau01-20) —
+  it will reach through sheathing, a rim joist and whatever is behind it in one
+  pass, which a spade bit will not.
+- [Twist drill bit set](https://www.amazon.com/dp/B07DH55YRX?tag=brau01-20) — the
+  split points do not walk on vinyl, which matters when the thing you are drilling
+  is the outside of your house.
+- [Exterior-grade sealant](https://www.amazon.com/s?k=exterior+silicone+sealant+for+siding+and+trim&tag=brau01-20)
+  and a [caulk gun](https://www.amazon.com/dp/B08LYKSGL1?tag=brau01-20) — for the
+  wall penetration and nothing else. Do not caulk the bracket to the wall.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Material | PETG |
+| Layer height | 0.2 mm |
+| Walls | 4 perimeters minimum |
+| Infill | 40% |
+| Supports | Only where the model needs them |
+| Orientation | Layers across the load, never along it |
+
+**PETG, and it is not close.** PLA softens at a temperature a sunlit wall reaches
+on an ordinary summer afternoon, and a bracket is a static load held for months.
+It does not snap. It droops, slowly, until the camera is looking at the driveway
+instead of the door and you assume something knocked it. PETG holds its shape in
+the sun and shrugs off UV far better. If the mount is in genuine full sun all day,
+ASA is better again, but it needs an enclosure and PETG is the sensible answer for
+most walls.
+
+**Walls before infill.** A bracket fails at a corner in tension, not in the middle,
+so four perimeters buys more than raising infill to 60% and costs less time. What
+you are guarding against is the layer line splitting, which is why orientation
+matters more than either number: print the part so the arm's load pushes *across*
+the layers rather than trying to peel them apart.
+
+## Running the cable
+
+Do this first, all of it, before the bracket goes anywhere near the wall. The
+mounting screws are ten minutes; the cable is the afternoon.
+
+<Steps>
+
+1. **Pick the spot from the picture, not from the wall.** Hold the camera up on a
+   stick and look at the live view on your phone before you drill anything. Every
+   camera on this house ended up somewhere other than where it was going to go.
+
+2. **Drill from inside out where you can.** You control where the hole lands in the
+   stud bay, and a hole that misses framing from inside is a hole you can move; a
+   hole that hits framing from outside is a hole in your siding forever. Angle it
+   slightly upward as you go in, so the exit is lower than the entry and water
+   cannot run the bore.
+
+3. **Pull the cable bare.** No plug on the outside end. Push it through, then crimp
+   the plug on once it is out in the open where you can see the pair order.
+
+4. **Leave a service loop.** A metre coiled in the wall cavity or the attic. The
+   day you re-terminate a crimp that has gone bad, or move the camera 300 mm along
+   the wall, that loop is the difference between a ten-minute job and pulling a new
+   run.
+
+5. **Form a drip loop at the camera.** The cable should hang *below* the entry point
+   and come back up to it. Water runs down a jacket, and a drip loop is where it
+   leaves. This is the single most-skipped step in every camera install and the one
+   that kills cameras two winters later.
+
+6. **Test the run from the ground** — pairs and PoE both — before the ladder goes
+   away and before you seal anything.
+
+7. **Seal the penetration, not the bracket.** Sealant around where the cable enters
+   the wall. The bracket itself should stay unsealed so anything that gets behind it
+   can get back out.
+
+</Steps>
+
+:::caution
+**A PoE injector has an in port and an out port, and they are not the same.** The
+one marked for the network goes to the switch; the one carrying power goes to the
+camera. Reversed, nothing is damaged and nothing works, and you will spend twenty
+minutes blaming the crimp. Check the labels before you climb.
+:::
+
+## Getting it onto vinyl siding
+
+Three approaches, in increasing order of how much you will like it in five years.
+
+**Siding hooks.** No holes at all — they hook over the lip of a course and hang
+whatever you screw to them. Fastest, reversible, and fine for a small light
+camera. The catch is that they carry the camera and not the cable, so you still
+have to solve the wall penetration some other way, and there is nothing rigid
+about the result: a hooked bracket rocks in wind, and a 4K sensor shows you every
+bit of it.
+
+**A printed pad that follows the siding profile.** This is the interesting option
+and the reason this project exists — a printed block whose back face is the
+negative of one lap and whose front face is flat and plumb. It is one part, it
+looks deliberate, and it puts the load on the sheathing behind rather than on the
+vinyl. There is a
+[Vinyl Mounting Block](/projects/vinyl-mounting-block/) project here that is
+exactly that shape for exactly this reason.
+
+**A proper siding mounting block with a box behind it.** The Arlington part in
+the list above. It is the option a professional would use, it costs less than a
+spool of filament, and the built-in box means the cable crosses from outside to
+inside within a sealed cavity rather than at a hole you caulked and hoped about.
+Print the camera bracket to bolt onto its flat face and the whole siding profile
+stops being something you have to model.
+
+<ImagePlaceholder alt="Printed bracket bolted to a siding mounting block on lap siding, with the Ethernet cable entering the box behind it">
+  Detail shot of the mounting interface — the printed bracket on its pad or
+  block, screws visible, cable disappearing into the wall behind.
+</ImagePlaceholder>
+
+## Aim it, then leave it alone
+
+Point it at what you want to *identify*, not at everything. A 4K sensor spread
+across a whole front yard is a wide shot of a person-shaped smudge; the same
+sensor covering a driveway apron reads a licence plate. Two narrow views beat one
+wide one every time, and that is why people end up buying a second camera rather
+than a higher-resolution first one.
+
+:::caution
+**Night video is what the bracket ruins.** The camera's infrared ring lights up
+whatever is nearest, and if that is the underside of your bracket, a white
+soffit, or a spider's web across the lens, the sensor stops down for that bright
+object and the actual scene goes black. Keep the bracket entirely behind the
+lens plane, stand the camera off any pale surface, and never mount an IR camera
+looking through glass or a screen — you get a picture of the glass.
+:::
+
+## Troubleshooting
+
+**The camera never comes up.** Injector ports reversed, or you are past the PoE
+budget — the US-8-60W has 60 W for all of its powered ports between them, and a
+4K camera with the IR ring on at night draws considerably more than it does at
+noon. A camera that works all day and drops at dusk is a power problem, not a
+network one.
+
+**The link is flaky or it negotiates at 100 Mb.** Almost always the crimp you did
+on a ladder. Re-terminate it on the bench, and check for an inline coupler
+somebody added to make a short cable reach — a coupler in the middle of an
+outdoor run is two more connections to corrode and it is the first thing to
+suspect.
+
+**Water inside the camera housing.** No drip loop. The cable ran water straight
+into the connector. Cut it back to dry copper, re-terminate, and form the loop
+this time.
+
+**The view has drifted a few degrees since summer.** PLA. Reprint it in PETG.
+
+**The image is a white blur at night and fine by day.** IR bouncing off something
+close — see the caution above. Move the camera off the surface before you touch
+any setting in Protect.
 
 ## Files & downloads
 

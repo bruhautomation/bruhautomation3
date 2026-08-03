@@ -203,6 +203,12 @@ export default defineConfig({
 				// docs site" page does not deserve the same weight as the
 				// projects people come here for.
 				SocialIcons: './site/components/SocialIcons.astro',
+				// Starlight's sidebar with the pending-write-ups switch on top of
+				// it. The switch has to render exactly once, and this is the only
+				// slot that is on screen at every width — the header's right group
+				// is `display: none` below 50rem, and the mobile menu footer is a
+				// second copy of the same component.
+				Sidebar: './site/components/Sidebar.astro',
 				// Renders the "write-up pending" notice on a project whose files
 				// are published ahead of its prose, and still passes a page's own
 				// `banner:` through.
@@ -224,8 +230,14 @@ export default defineConfig({
 				// The sidebar group icons, generated above from the sidebar's own
 				// running order so the two can never drift apart again.
 				{ tag: 'style', content: sidebarIconCss },
+				// The favicon is the BRUH lockup, cut from the same vector as the
+				// header wordmark. Starlight emits the SVG link itself; this is
+				// the fallback for anything that won't take an SVG icon, and for
+				// the bare `/favicon.ico` request a browser makes anyway.
+				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '32x32' } },
 				// iOS composites a home-screen icon onto an opaque tile of its
-				// own choosing; this is a deliberate one instead of a guess.
+				// own choosing; this is a deliberate one instead of a guess. It
+				// is drawn square, because iOS rounds it again on the way in.
 				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
 				// Set the pending-rows class before first paint. Read in `head`
 				// rather than by the toggle's own script, which runs after the

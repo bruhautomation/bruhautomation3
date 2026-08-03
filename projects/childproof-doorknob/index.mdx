@@ -1,71 +1,234 @@
 ---
 title: Childproof Doorknob
-description: A low-profile, 3D printed child-proof cover for Schlage Bowery doorknobs.
+description: A 3D printed slip-ring cover for Schlage Bowery knobs — captive behind the knob, low-profile enough that it still looks like the knob, and a toddler can't turn it.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
 import doorknobBase from './images/doorknob-base.jpg';
 import doorknobTrim from './images/doorknob-trim.jpg';
 import doorknobClip from './images/doorknob-clip.jpg';
+import doorknobBare from './images/doorknob-alt-angle-2.jpg';
+import doorknobCollar from './images/doorknob-alt-angle-6.jpg';
 import doorknobDetail1 from './images/doorknob-detail-1.jpg';
 import doorknobDetail2 from './images/doorknob-detail-2.jpg';
 import doorknobDetail3 from './images/doorknob-detail-3.jpg';
 import doorknobCover from './images/doorknob-cover.jpg';
 import doorknobPrototypes from './images/doorknob-prototypes.jpg';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-## The Problem
+I put Schlage Bowery knobs on every door in the house, and then had kids. Every
+childproof cover I could buy was a white plastic clamshell that clipped over the
+top and made nice hardware look like a hospital fitting. This is the replacement:
+a printed shell that goes on *behind* the knob during installation, is trapped
+there when the knob clicks onto the spindle, and spins uselessly in a small hand.
 
-I replaced all the doorknobs in my house with [Schlage Bowery](https://amzn.to/467wrSB) knobs — then had kids. Every child-proof cover I could find was a plastic clamshell that looked terrible on nice hardware. So I designed my own.
+<Image src={doorknobDetail3} alt="The printed cover installed on a Schlage Bowery knob, seen from the latch side of the door" />
+
+It costs about 20 mL of resin per door. A 1 kg bottle is forty of them, which is
+more doors than most houses have.
+
+## Parts
 
 <AffiliateDisclosure />
 
-## The Knob
+- [Schlage F10 Bowery knob with Greyson trim, matte black](https://www.amazon.com/dp/B00MR3QG3I?tag=brau01-20) — this is the knob the cover is modelled to, one per door. It is the passage version: no lock, which is exactly why it needs a cover
+- [ELEGOO water-washable 405 nm resin, black, 1 kg](https://www.amazon.com/dp/B095WG26X3?tag=brau01-20) — rigid enough to work, soft enough not to scratch the knob, and a near-exact match to the matte black finish
+- [ELEGOO Mars 3 MSLA printer](https://www.amazon.com/dp/B095K3JWP3?tag=brau01-20) — the part is 63 mm across and 40.5 mm tall, so it fits any resin printer made in the last decade
+- [ELEGOO Mercury Plus 2-in-1 wash and cure station](https://www.amazon.com/dp/B09CTGZWWQ?tag=brau01-20) — water-washable resin means the wash tank takes tap water, no isopropyl
+- [Nitrile gloves](https://www.amazon.com/dp/B08CH7KX8Q?tag=brau01-20) — uncured resin is a sensitiser, and you only get to develop that allergy once
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) and [wet/dry sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) for the collar bore and the rim
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — you will be measuring a 23 mm hole against a knob neck
 
-The Schlage Bowery comes in a lot of finishes and configurations. I went with [Matte Black with the Greyson Trim](https://amzn.to/3r8wOh0). The knobs are "screwless" — the base screws in, the trim piece snaps on, and the knob clips onto the stem.
+Printing it on FDM instead: a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20)
+and a spool of [black PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20)
+will make a working cover. Print it in plain PLA or PETG, not carbon-filled —
+CF filament is abrasive, and this part rubs against a painted knob every time
+somebody opens the door.
+
+:::note
+The cover only fits the Bowery. Schlage's knobs are not interchangeable — a
+Georgian or a Plymouth has a different neck diameter and a different head
+profile, and the STL will not fit either. The STEP file is in the download
+section for exactly that reason.
+:::
+
+## The knob
+
+The Bowery is a "screwless" knob, and that detail is what makes this design
+possible. The base screws to the door, the trim ring snaps over the base, and
+the knob itself clips onto the spindle last.
 
 <div class="image-grid">
   <figure>
-    <Image src={doorknobBase} alt="Screw in base" />
-    <figcaption>1) Screw in base</figcaption>
+    <Image src={doorknobBase} alt="Schlage Bowery base screwed to the door" />
+    <figcaption>1) Screw in the base</figcaption>
   </figure>
   <figure>
-    <Image src={doorknobTrim} alt="Snap in trim ring" />
-    <figcaption>2) Snap in trim ring</figcaption>
+    <Image src={doorknobTrim} alt="Greyson trim ring snapped over the base" />
+    <figcaption>2) Snap on the trim ring</figcaption>
   </figure>
   <figure>
-    <Image src={doorknobClip} alt="Click in doorknob" />
-    <figcaption>3) Click in doorknob</figcaption>
+    <Image src={doorknobClip} alt="Knob clipped onto the spindle" />
+    <figcaption>3) Click in the knob</figcaption>
   </figure>
 </div>
 
-## The Design
+Because the knob goes on last, anything you thread onto its neck first is stuck
+there for good. That's the whole trick.
 
-Standard child-proof covers act like a slip ring — you squeeze down on the outer shell to grip the knob and turn it. Since the Bowery clips onto the stem, I designed a slip ring that goes behind the knob before installation and is held captive when the knob clicks into place. The cover is low-profile and barely visible from the front.
+<Image src={doorknobBare} alt="A bare Bowery knob on the door, showing the exposed spindle and the rectangular release slot in the knob's neck" />
 
-<Image src={doorknobCover} alt="Insert knob into cover before installation" />
+Look at the neck in that photo: there is a rectangular slot in it. That's the
+release. Push a pin in there and the knob pulls straight off the spindle, which
+is how you get an already-installed door apart without touching the trim.
+
+## How it works
+
+A conventional childproof cover is a slip ring — a shell that turns freely on
+the knob until you squeeze it hard enough to grip. The problem with clipping one
+onto a Bowery is that there's nowhere to clip. So the cover goes on from behind
+instead and is held captive by the knob's own installation.
+
+<Image src={doorknobCover} alt="The knob above and the printed cover below, ready to be threaded together before installation" />
+
+It's a 63 mm cup with a 3 mm wall and a 40.5 mm rise, narrowing to a Ø23.2 mm
+collar that sleeves over the knob's neck. The knob head drops into the cup, the
+neck passes out through the collar, and the whole assembly clicks onto the
+spindle as one piece.
+
+The two openings in the wall are the release, not decoration. Each is roughly
+30 mm wide and 14 mm tall, cut into opposite sides of the shell starting 4.5 mm
+below the rim. An adult hand spans both, presses fingertips through onto the
+knob itself, and turns. A toddler's hand can reach one at most, and one is not
+enough — grab the shell anywhere else and it just rotates.
+
+<ImagePlaceholder alt="An adult hand squeezing the cover, thumb and forefinger pressed through the two side windows onto the knob beneath">
+  The one shot the page is missing — a hand demonstrating the grip, thumb in one
+  window and forefinger in the other, mid-turn.
+</ImagePlaceholder>
+
+There's a third cutout you can see from the door side: a notch about 10 mm wide
+and 6.6 mm deep in the collar's door-facing edge. That lines up with the knob's
+release slot, so the knob still comes off the spindle with the cover fitted.
+Without it you'd be prising a permanently installed knob apart.
+
+<Image src={doorknobCollar} alt="Close-up of the printed collar sleeved over the knob's neck, with the knob's release slot visible through the notch" />
+
+From the front it barely registers — a slightly proud ring around the knob, and
+that is all.
 
 <div class="image-grid">
   <figure>
-    <Image src={doorknobDetail1} alt="Doorknob detail — front view" />
+    <Image src={doorknobDetail1} alt="The covered knob head-on" />
+    <figcaption>Head-on</figcaption>
   </figure>
   <figure>
-    <Image src={doorknobDetail2} alt="Doorknob detail — side view" />
-  </figure>
-  <figure>
-    <Image src={doorknobDetail3} alt="Doorknob detail — close-up" />
+    <Image src={doorknobDetail2} alt="The covered knob at an angle, one side window visible" />
+    <figcaption>One window visible at an angle</figcaption>
   </figure>
 </div>
 
-## Printing
+## Print settings
 
-Best results came from an MSLA printer ([Elegoo Mars](https://amzn.to/3r8xZge)), but FDM works fine too. I used [water-washable resin](https://amzn.to/453EP4R) which was rigid enough to function without being hard enough to scratch the knob. It also happened to be an exact color match, and the surface finish was good right off the print bed.
+Print it **mouth-down** — rim flat on the plate, collar pointing up. That puts
+the whole outer wall vertical, so the one surface anybody looks at never gets a
+support mark, and it puts every support inside the bowl where nothing shows.
 
-<Image src={doorknobPrototypes} alt="Prototypes" />
+The part is open at both ends, so there is no trapped volume and no suction cup
+to fight on the peel. Do not tilt it looking for a smaller cross-section; the
+rim ring is only about 5 cm² and lifts fine on its own.
 
-## Make Your Own
+| Setting | MSLA | FDM |
+|---|---|---|
+| Layer height | 0.05 mm | 0.16 mm |
+| Orientation | Mouth-down, rim on the plate | Mouth-down, rim on the plate |
+| Supports | Light, inside the bowl and under the two window arches | Same — none on the outer wall |
+| Material | Standard 405 nm resin, water-washable | PLA, PLA+ or PETG. Not carbon-filled |
+| Walls / infill | n/a | 4 perimeters, 25% |
+| Material used | About 20 mL | About 25 g |
 
-Remix it for your knob model and printer tolerances — the STEP file is in the project folder alongside the STL.
+Exposure is per-resin and per-printer — run the vendor's profile or an exposure
+test wedge before you commit. The shallow cone inside the bowl is the surface
+that punishes an over-exposed setting, and it's the one that has to seat flat
+against the back of the knob.
+
+Two things to clean up after curing. Knock the support nubs off the inner cone
+and take them back flush, because that cone is what the knob's head rests
+against. Then run a needle file round the Ø23.2 mm collar bore until it is
+smooth — that bore is a bearing surface and it will be turning against the
+knob's paint for years.
+
+<Image src={doorknobPrototypes} alt="A bin of printed prototype covers in black, white and grey resin" />
+
+That bin is what "print one and check the fit" actually looks like.
+
+## Fitting it
+
+<Steps>
+
+1. **Print, wash and cure it.** Water-washable resin goes in plain tap water.
+   Don't leave it in the cure station for twenty minutes — resin keeps shrinking
+   as it cures, and this part's whole job is a Ø23.2 mm hole staying Ø23.2 mm.
+
+2. **Get the knob off.** On a door that's already hung, push a pin into the
+   release slot in the knob's neck and pull the knob straight off the spindle.
+   On a new install, do the base and the trim ring first and leave the knob off.
+
+3. **Thread the cover onto the knob.** Neck through the collar bore from inside
+   the bowl, knob head seated down into the cup.
+
+4. **Rotate the cover so the collar notch sits over the release slot.** Do this
+   now. Once the knob is clicked back on you cannot get at the slot to take it
+   off again, and you will be taking the trim ring apart instead.
+
+5. **Push the knob back onto the spindle** until it clicks. The cover is now
+   captive between the knob head and the trim ring, and there is no way to
+   remove it that a child will find.
+
+6. **Check it spins.** Hold the shell and turn — the knob should stay put. If
+   the cover drives the knob, the bore is too tight. Go to the next section.
+
+</Steps>
+
+## Getting the fit right
+
+This is the part of the project that takes more than one print, and printer
+tolerance is why. The bore has to be loose enough that grabbing the shell does
+nothing and tight enough that it doesn't rattle or sit crooked. Aim for a shell
+that turns freely with a fingertip and has no visible wobble.
+
+**Too tight** — the cover binds and turns the knob with it, which means it isn't
+childproof at all. Open the bore up with a round needle file first; it only takes
+a couple of tenths. If a whole batch is tight, scale the model to 100.5% and
+reprint.
+
+**Too loose** — it rattles and sits off-axis. Scale to 99.5%. Resin shrinks on
+cure, so an over-cured part lands here on its own; cut the cure time before you
+change the model.
+
+Scale uniformly, in all three axes. Scaling one axis warps the collar into an
+oval and it will bind in one rotational position and flop in another, which is
+worse than either failure on its own.
+
+:::caution
+Fit the cover on the side of the door you want blocked, then think hard about
+which side of that door a child ends up on. A cover on the inside of a bedroom
+or bathroom is a child who cannot get out — put it on the outside of the pantry,
+the garage door, the laundry, and leave the rooms they sleep in alone.
+
+This stops a toddler. It is not a lock, it is not certified as a child-safety
+device, and a determined five-year-old who has watched you open it twice will
+work it out.
+:::
+
+## Make your own
+
+The STEP file is in the download section alongside the STL, so the sketch that
+drives the collar bore and the two windows is editable. If your knob is a
+different Schlage model, that's the file to start from — change the bore and the
+head pocket, leave the window geometry alone, it works.
 
 <ProjectFiles slug="childproof-doorknob" />

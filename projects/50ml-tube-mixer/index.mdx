@@ -1,23 +1,161 @@
 ---
 title: 50mL Tube Mixer
-description: A motorized mixer for 50mL conical tubes — 3D printed, adjustable speed.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A 50 mL conical tube on a two-servo gimbal — end-over-end inversion with the speed on a knob, driven by an ESP32.
+# The mechanism and the parts are documented; the STLs and the sketch are not
+# in the folder yet. Published, and marked as pending on the page, in the
+# sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A motorized mixer for 50mL conical tubes. 3D printed frame, adjustable speed, and compact enough to sit on a bench without taking up much space.
+A lab tube rotator is a motor, a clamp and a knob, and it costs several hundred
+dollars. This is the same job done with two hobby servos and an ESP32: a 50 mL
+conical tube sits in a printed cup on a two-axis gimbal, and the whole thing
+tumbles end over end at whatever speed you dial in. It is small enough to leave
+running on a shelf inside a cabinet, which is the reason to build one rather
+than stand there inverting a tube by hand for twenty minutes.
 
-{/* Photo needed — A hero photo of the finished 50mL tube mixer — show the assembled bench unit with a 50mL conical tube mounted.
-    alt text when it lands: A 3D-printed motorized 50mL tube mixer on a lab bench with a conical tube loaded */}
+<ImagePlaceholder alt="A 3D-printed motorized 50mL tube mixer on a lab bench with a conical tube loaded">
+  Hero shot — the assembled unit with a 50 mL conical tube loaded, ideally
+  mid-inversion, with the OLED and the speed knob readable.
+</ImagePlaceholder>
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/zeHGRXw_lrM" title="50mL Tube Mixer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+## How it moves
+
+Two standard-size servos sit at right angles to each other in a printed yoke.
+The lower one's shaft is horizontal and swings the whole yoke through the
+inversion — that is the end-over-end axis. The upper one sits inside the yoke
+with its shaft pointing up, and the printed tube cup bolts straight to its horn,
+so it rotates the tube about its own long axis at the same time.
+
+Run one and you get a rocker. Run both and the liquid never travels the same
+path twice, which is what a proper rotator does and what a rocker doesn't. The
+rest of the build is one ESP32, a 0.96" OLED and a single knob: turn it to set
+the speed, read it off the display.
+
 :::note
-Parts list, 3D files, and assembly guide coming soon.
+This page is written from the build in the video. **The STLs and the sketch are
+not in the project folder yet** — the cup, the yoke and the electronics deck are
+all printed parts you would currently have to model, and the firmware you would
+have to write. The parts list below is complete and correct; the files are what
+is still owed.
 :::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 DevKit, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — 2-pack. Any ESP32 dev board works; this is the one the build uses
+- [MG996R metal-gear servos](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20) — 6-pack, you need **×2**. Metal gear matters here, see below
+- [0.96" I2C OLED, 128×64](https://www.amazon.com/dp/B076PDVFQD?tag=brau01-20) — 3-pack SSD1306, four wires
+- [KY-040 rotary encoder module](https://www.amazon.com/dp/B06XQTHDRR?tag=brau01-20) — 5-pack, and it ships with the knurled knob cap
+- [Pan/tilt bracket for MG996R](https://www.amazon.com/dp/B07PQ12TXS?tag=brau01-20) — 2 sets. The video uses a printed yoke; this is the shop-bought part with the same two-axis geometry, and it saves you modelling it. The tube cup still has to be printed either way
+- [12 V 4 A power brick](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) — ships with a screw-terminal barrel jack
+- [Adjustable buck converter, 5 A](https://www.amazon.com/dp/B08HS76XG1?tag=brau01-20) — set to 6.0 V, this is the servo rail
+- [MP1495 step-down modules](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — 5-pack, one set to 5 V for the ESP32
+- [Panel-mount DC jacks and pigtails](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20) — 5.5 × 2.1 mm, matches the brick above
+- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — all three genders
+- [Silicone hookup wire, 24 AWG](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — for anything longer than a jumper reaches
+- [M3 screw, nut and washer kit](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) and [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — the servo horns and brackets are all M3
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the mechanism, or [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) if it is only ever going to live on a room-temperature bench
+
+The 50 mL conical tubes are the ones you already have. Model the cup around the
+tube you actually run — conicals from different suppliers are close but not
+identical at the shoulder — and print one before you print six.
+
+## Printing it
+
+Print the tube cup and the yoke in **PETG**. PLA is fine on a bench at room
+temperature and is the wrong answer anywhere warm: a PLA part under constant
+load creeps long before it looks soft, and the cup is under constant load every
+time the tube swings past horizontal. PETG also takes an alcohol wipe, which
+anything living near a bench eventually gets.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Infill | 40% for the cup and yoke, 20% for the deck |
+| Perimeters | 4 — the load is on the walls, not the infill |
+| Supports | Only under the cup's overhanging flange |
+| Material | PETG for anything that moves; PLA+ for the deck |
+
+Print the cup with its open end **up**, so the layer lines run around the tube
+rather than across the thin flange that takes the screws. A cup printed on its
+side will split along a layer line the first time a full tube swings through.
+
+## Wiring
+
+There is no sketch in the folder, so this table is functions rather than pin
+numbers — pick your own GPIOs and write them into your own code. Every one of
+these is a normal ESP32 assignment, and none of them is fussy.
+
+| Part | Connects to | Notes |
+|---|---|---|
+| Tilt servo signal | Any output-capable GPIO | The orange lead |
+| Spin servo signal | Any output-capable GPIO | The orange lead |
+| Both servos, power | The **6 V rail**, not the ESP32 | Red and brown leads |
+| OLED SDA / SCL | The ESP32's default I2C pins, 21 and 22 | 3V3 and GND |
+| Encoder CLK / DT / SW | Three GPIOs with pull-ups enabled | 3V3 and GND |
+| Grounds | All commoned | Including the two supply rails |
+
+:::caution
+**Do not run the servos off the ESP32's 5 V pin.** Two MG996Rs starting a sweep
+together draw far more in that instant than a USB port or a dev board's 5 V
+trace will hand over. The rail sags, the ESP32 browns out and reboots, and it
+looks exactly like a firmware bug — so you go and rewrite working code. Two
+step-downs off the one 12 V brick ends it: 6.0 V for the servos, 5 V for the
+ESP32, grounds tied together at a single point.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Melt the heat-set inserts in first**, while the printed parts are still
+   loose and you can get an iron square to the hole. Doing it after the servos
+   are in means working around them.
+
+2. **Centre both servos before you bolt anything to a horn.** Power them up and
+   drive them to their mid-position first. A horn fitted at a random angle costs
+   you half the travel on one side, and on the tilt axis that is the difference
+   between inverting and nearly inverting.
+
+3. **Mount the spin servo in the yoke**, then the cup on its horn. Check the cup
+   runs true — a cup that wobbles will throw the balance off through the whole
+   sweep.
+
+4. **Hang the yoke on the tilt servo's horn** and balance it with a full tube
+   loaded. Get the tube's centre of mass as close to the tilt axis as the
+   geometry allows. Every millimetre off-axis is torque the servo holds
+   continuously, and an MG996R held against a load all afternoon gets hot.
+
+5. **Wire the deck last**, with the two supply rails set on a meter before
+   anything is plugged into them. Set 6.0 V and 5 V with no load connected, then
+   check them again with the servos moving.
+
+</Steps>
+
+## Traps worth naming
+
+**Seat the cap properly.** This is a machine whose entire job is turning a tube
+of liquid upside down. A cap that is finger-tight and not quite square empties
+itself into the servo. Check it every single run — it costs a second and the
+alternative is a stripped gearbox.
+
+**Leave headspace.** Fill to 40 mL at most in a 50 mL tube. Inversion mixes
+because the bubble travels the length of the tube; fill it to the shoulder and
+nothing moves but the tube.
+
+**Buy metal-gear servos.** The MG996R's gears are metal. The plastic-gear
+equivalent in the same case will strip a tooth the first time the tube swings
+past horizontal and the load reverses, and a stripped servo does not announce
+itself — it just quietly stops holding position at one end of the sweep.
 
 ## Files & downloads
 

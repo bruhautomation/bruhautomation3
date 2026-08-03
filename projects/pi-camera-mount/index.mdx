@@ -1,19 +1,184 @@
 ---
 title: Pi Camera Mount
-description: Mount and pipe clamp for Raspberry Pi camera modules.
+description: A printed snap-on clamp that puts a Raspberry Pi camera module on a 15 mm pipe, with an 18-inch ribbon running back to the Pi.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Mount and pipe clamp for Raspberry Pi camera modules.
+A Raspberry Pi camera board is smaller than a postage stamp, weighs nothing, and
+the only cable it needs is the ribbon. That makes it the easiest camera to
+put somewhere awkward — pointed at a printer bed, down a greenhouse row, at a
+bird feeder — as long as you have something to hold it there. This is that
+something: a clamp that snaps onto a 15 mm pipe, with the Pi itself sitting
+somewhere dry on the end of a long ribbon.
 
-## Hardware
-- Raspberry Pi camera
-- Pipe clamp mounting
-- 3D-printed bracket
+The CAD folder holds two parts. `bruh_pi_2_camera_mount` is the bracket the
+camera bolts to, and it has never been exported — it lives in the Fusion file as
+a mesh body, which is also why the STEP beside it is empty. `cam_pipe_clamp` is
+the part that puts it on the pipe, and that one *is* exported, so it is the part
+this page can measure and tell you how to print.
+
+<ImagePlaceholder alt="A Raspberry Pi camera module on a printed clamp, snapped onto a pipe, ribbon running back along the pipe">
+  Hero shot — the camera on its bracket, clamped to a pipe, with the ribbon
+  strapped along the pipe and disappearing off frame toward the Pi.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Raspberry Pi Camera Module V2](https://www.amazon.com/dp/B01ER2SKFS?tag=brau01-20)
+  — the 8 MP CSI board, and the camera this project is named for.
+- [Adafruit 18 in / 457 mm camera flex cable](https://www.amazon.com/dp/B00QSJLWMW?tag=brau01-20)
+  — the ribbon in the camera's box is about six inches, which puts the Pi right
+  next to the lens. This is the part that lets the camera go on a pipe and the Pi
+  go somewhere sensible. Ben bought it two days after the camera module, in the
+  same order as the screws below.
+- [Raspberry Pi 4 kit](https://www.amazon.com/dp/B07TYK4RL8?tag=brau01-20) — board,
+  supply and cables in one box, which is the shortest route to a working camera.
+  If you already have a supply, [the Pi 3 B+ board on its own](https://www.amazon.com/dp/B07P4LSDYV?tag=brau01-20)
+  plus [a 5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20)
+  is cheaper and does the same job here. The original mount is named for a
+  [Raspberry Pi 2 Model B](https://www.amazon.com/dp/B00T2U7R7I?tag=brau01-20) —
+  the four board mounting holes have not moved since, so anything from the 2 B up
+  to the 4 B bolts to the same pattern.
+- [SanDisk 256 GB Extreme microSDXC](https://www.amazon.com/dp/B09X7CRKRZ?tag=brau01-20)
+  — an A2 card. Buy the rated one; a camera Pi writes constantly and a cheap card
+  is how you find out what card wear looks like.
+- [M2 / M3 / M4 stainless cap screws and nuts, 1080 pcs](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20)
+  — the camera board's four corner holes take M2, which the M3-only print kits
+  don't cover. If you are bolting the Pi down as well you also want
+  [M2.5 standoffs](https://www.amazon.com/dp/B01N9Q8YLE?tag=brau01-20).
+- [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the clamp if it
+  is going outdoors, [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20)
+  if it isn't. This matters more than usual — see [Print settings](#print-settings).
+- [ONE-WRAP hook-and-loop tie, cut to length](https://www.amazon.com/dp/B005755YSQ?tag=brau01-20)
+  — for strapping the ribbon to the pipe. Use this rather than a zip tie. A zip
+  tie pulled one click too far creases a flex cable and that crease is permanent.
+- Optional: [an IP65 box with two cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  if the Pi end is living outside.
+- Optional: [a metal super clamp with a 1/4"-20 stud](https://www.amazon.com/dp/B06XWTL7LC?tag=brau01-20)
+  — if your pipe is nowhere near 15 mm and you would rather not rescale the
+  print, this is the bought answer.
+
+:::caution
+**Check which Pi you are buying before you order the camera.** The Pi 5 dropped
+the wide 15-pin CSI connector that every board up to the Pi 4 used, so this
+camera and this ribbon plug into a Pi 4 or older and need an adapter cable on a
+Pi 5. The Pi 4 kit linked above is the safe pairing.
+:::
+
+## The clamp
+
+Measured off `cam_pipe_clamp_v2.stl`, because the model is the only thing that
+knows.
+
+The sleeve is a **15.0 mm bore with an 18.0 mm outside diameter** — a 1.5 mm wall
+— and it is **57 mm long**. It wraps 305° of the pipe and leaves a 55° mouth,
+which is a 7 mm opening onto a 15 mm tube. That is a snap fit, not a slip fit:
+the sleeve has to spring about 8 mm wider to get over the pipe and then hold.
+
+Around the outside sits a second, curved cover, hinged to the sleeve by three
+curved links at 20 mm centres. Each link has a 1.9 mm hole at both ends and rides
+on a 1.6 mm rod that runs the full length of the sleeve and the cover. Opposite
+the hinge, a hook stands off the sleeve's other edge for the cover's free end to
+latch onto.
+
+**If your pipe isn't 15 mm, scale the whole part uniformly** by your pipe's
+outside diameter divided by 15. That is the only change that keeps the mouth,
+the wall and the hinge in proportion with each other — stretching one axis in
+the slicer turns the bore into an oval and the clamp stops gripping.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.16 mm |
+| Perimeters | 4, at a 0.4 mm nozzle |
+| Infill | 0% — nothing in this part is thicker than its own walls |
+| Supports | None |
+| Material | PETG outdoors, PLA+ indoors |
+| Orientation | Standing on end, bore axis vertical |
+
+Stand it on end. Every layer of the sleeve is then the same cross-section, the
+1.5 mm wall comes out as four solid perimeters with no infill involved, and the
+latch hook prints without a single overhang. Laid on its side it needs support
+inside a 15 mm bore, which you then have to pick out of a part with a 1.5 mm wall.
+
+**Material is a structural choice here, not a colour choice.** The sleeve is a
+spring — it gets flexed 8 mm every time it goes on or comes off a pipe. PLA is
+brittle in that job and will crack at the mouth after a handful of cycles; PETG
+takes the flex and takes the sun. Print it in PETG unless the clamp is going
+somewhere indoors and staying there.
+
+:::caution
+**The STL is the assembly, not a print plate.** All five bodies are in the one
+file, sitting where they sit when the clamp is built — the three links are
+interlocked with the sleeve and the cover rather than laid out beside them, and
+the hinge gap is 0.13 mm on the radius. No FDM printer running a 0.4 mm line
+gives you a free-moving hinge out of that, and the links can't be assembled
+afterwards either, because their holes are closed circles on rods that are part
+of the sleeve.
+
+What does work is printing the sleeve on its own. On its own it is a complete
+snap-on clamp for a 15 mm pipe, and it is what the rest of this page assumes you
+have printed. The hinged cover is the part of this project that is still CAD.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Print the sleeve** standing on end, then run a knife or a deburring blade
+   around both ends of the mouth. The first layer's elephant's foot is exactly
+   where the clamp has to flex, and leaving it there is where the first crack
+   starts.
+
+2. **Snap it onto the pipe** before anything else is attached. Push it on
+   square, not at an angle — twisting a C-clip on tends to split it at one end.
+   If it fights you in PETG, thirty seconds with a hot air gun on low makes it
+   compliant and it stiffens again as it cools.
+
+3. **Bolt the camera board to the bracket** with four M2 screws through its
+   corner holes. Do them up finger-tight and no more; the camera PCB is thin and
+   the mounting holes are close to the edge.
+
+4. **Route the ribbon along the pipe** with hook-and-loop, not zip ties, and
+   leave a loose loop at the camera end. The loop is what absorbs the pull when
+   somebody knocks the cable, instead of the connector doing it.
+
+5. **Seat the ribbon at both ends last.** Lift the black retainer on each
+   connector, slide the ribbon fully home, press the retainer down. Contacts face
+   the HDMI port on the Pi. Backwards, the camera simply isn't detected — there
+   is no partial failure mode to diagnose.
+
+</Steps>
+
+## The ribbon is the part that fails
+
+Everything else here you can drop on the floor. The ribbon you cannot, and it is
+worth knowing the three ways it goes wrong before it goes wrong.
+
+**The camera isn't detected at all.** The ribbon is in backwards, or it is not
+pushed fully home under the retainer. Both ends. Check the Pi end first — it is
+the one people get right by accident and then never look at again.
+
+**It works on the bench and not on the pipe.** Eighteen inches is a long run for
+a CSI ribbon, and it is unshielded. Keep it away from mains cable and away from
+anything switching — a relay board, a PWM LED driver, a motor. Running it
+alongside a live 12 V lighting feed for a foot is enough to put noise in the
+image.
+
+**Intermittent dropouts after a few weeks outdoors.** The ribbon has been flexing
+in the wind at a fixed point, usually right where a tie holds it. Move the tie,
+add the slack loop from step 4, and replace the cable — a creased flex doesn't
+recover.
 
 ## Files & downloads
 

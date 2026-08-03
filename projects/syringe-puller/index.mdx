@@ -1,14 +1,168 @@
 ---
 title: 10mL Syringe Puller
-description: A 3D printed jig for consistent syringe plunger pulling.
-# The files are here; the write-up isn't finished. Published, and marked as
+description: A printed jig that draws a 10 mL syringe plunger evenly and one-handed, so a sample draw or a chip prime is the same pull every time instead of a stiction lurch.
+# The model isn't posted yet, so this is a parts, sizing and print-settings page
+# rather than something you can build from today. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A simple 3D printed jig for pulling syringe plungers with consistent force — useful for microfluidics work and sample preparation.
+Pulling a 10 mL plunger by hand has a lurch in it. The stopper sticks, you pull
+harder, it breaks free, and the first two millilitres arrive in a rush. That is
+fine for drawing up saline and useless when the far end of the syringe is a
+chip, a septum or a sample port and the rate of the draw was the thing you were
+trying to control. It is also a two-handed job, and the second hand is usually
+already holding the line.
+
+This is a printed jig that holds the barrel by its finger flange and takes the
+plunger back against a stop — an even pull, one hand, and the same draw on the
+twentieth sample as on the first.
+
+<ImagePlaceholder alt="A 3D printed syringe puller jig on a lab bench holding a 10 mL syringe with the plunger part drawn">
+  Hero shot — the jig on the bench with a 10 mL Luer-lock syringe loaded and the
+  plunger part-drawn, from the side, so the flange capture and the plunger stop
+  both read.
+</ImagePlaceholder>
+
+:::note
+The model isn't posted yet. What is below is the bill of materials, the
+measurements to take before you slice anything, and the print settings this part
+wants — the STL will land in the download section at the bottom.
+:::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [10 mL Luer-lock syringes](https://www.amazon.com/dp/B0F989T859?tag=brau01-20) — **lock, not slip.** A slip tip is held on by friction, and the one thing this jig is good at is applying a steady pull to a line that is trying to come apart. A slip fitting walks off under vacuum, usually quietly, and you find out from a volume that never arrives.
+- [eSUN PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — print the real one in this. Why, below.
+- [SUNLU PLA+ 1.75 mm, 4 × 1 kg black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — for the fit-check print. PLA+ prints closer to the number in the model, so it tells you the truth about the flange slot faster than PETG will.
+- [Overture TPU, 1.75 mm, white](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) — a thin pad where the barrel flange lands. Rigid plastic on a moulded flange either crushes it or lets it slide, and both show up as a draw that isn't repeatable.
+- [ruthex M3 brass heat-set inserts, 100 pcs](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — anywhere a screw gets undone more than once. A thread cut straight into PETG survives about four cycles.
+- [VIGRUE M2/M3/M4 stainless screws and nuts, 1080 pcs](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20) — **stainless, not the black alloy assortment kits.** Black-zinc hardware blooms rust after a few months of daily alcohol wipes.
+- [Neiko digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — you need the dimensions of the syringes your own store cupboard stocks before you print anything. See below.
+- [AFA deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round every opening and along the base.
+- [Needle file set, 8 pcs](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — the flange slot is the one feature you will end up fitting by hand. A flat needle file takes it from tight to sliding in about a minute.
+- [Self-adhesive clear rubber bumpers, 200 pcs](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — four under the base. You are pulling horizontally against a jig sitting on a wiped-down bench; without feet it skates, and a jig that skates is a jig you are holding down with your other hand again.
+- [Solimo 99% isopropyl alcohol, 16 oz × 12](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — cut it to 70% before you wipe anything, roughly seven parts alcohol to three parts water. Neat 99% flashes off the plastic before it has done anything.
+
+Optional:
+
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) — only if the base is longer than your bed and you split it in the slicer.
+- [Aquarium airline tubing, 3/16 in, 25 ft](https://www.amazon.com/dp/B01N8SNNOI?tag=brau01-20) — soft, low-pressure line for the tip end. It pushes straight onto a slip tip; on a Luer lock you need a barbed lock adapter, which is a lab-supply item rather than an Amazon one.
+
+## Sizing it to your syringes
+
+A 10 mL syringe is not a standard part. Barrel diameter, flange width and the
+shape of the thumb rest all vary between brands, and often between the Luer-slip
+and Luer-lock versions of the same product line. Take four measurements off the
+syringes you actually stock, with calipers, before you slice:
+
+| Measurement | Why it matters |
+|---|---|
+| Barrel outside diameter | Sets the cradle. Too tight and you cannot load it gloved |
+| Finger flange width and thickness | The flange is the whole retention mechanism — it is the only feature stopping the barrel following the plunger out |
+| Thumb rest diameter | Whatever pulls the plunger has to capture this without twisting it |
+| Barrel length, tip included | A Luer lock adds a collar past the tip, and that is length the base has to allow for |
+
+Fix a bad fit in the model, not in the slicer's scale box. Scaling the part
+scales the flange slot, the wall thickness and the screw bosses together, and
+you end up with something that fits the syringe and no longer fits itself.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 4 |
+| Infill | 30% |
+| Supports | None |
+| Material | PETG |
+| Nozzle and bed | Whatever your slicer's PETG profile uses |
+
+Four perimeters rather than the usual two. Every load path in this thing runs
+through a thin section beside a slot, and perimeters are what carries that;
+sparse infill in the middle of a thin wall does almost nothing.
+
+Orientation is worth thinking about for one reason: an FDM part comes apart
+between layers long before it comes apart across one. Print each part so the
+layers run across the direction it is pulled, not along it. If a part has to be
+laid down the wrong way to avoid supports, take the supports.
+
+## Material
+
+**PETG, and this is the one decision on the page worth arguing about.**
+
+Printed plastic under a sustained load creeps — it keeps deforming slowly, at
+room temperature, long after you stopped increasing the force. PLA is the worst
+of the common filaments for it. A jig whose job is to apply the same pull every
+time is exactly the part you do not want quietly changing shape between the
+first sample and the fiftieth, and if you leave a plunger drawn and locked
+overnight, that is a whole shift under load.
+
+The other half of it is alcohol. This thing gets wiped with 70% every time it is
+used. PLA crazes with repeated alcohol contact — fine cracks that start at
+corners and stress risers, which is where the load is. PETG shrugs both off.
+
+Print the fit-check in PLA+ because it is cheaper and dimensionally honest.
+Print the one you keep in PETG.
+
+:::caution
+Do not autoclave it. PETG softens around 80 °C and an autoclave cycle runs at
+121 °C, so it comes out as a puddle. It is bench hardware, not a sterile
+consumable — the layer lines are porous and hold liquid nothing gets back out
+of. The syringe is the sterile part; the jig never touches anything that has to
+stay that way.
+:::
+
+## Using it
+
+**Set the stop before you pull, every time.** Take a 10 mL plunger past its last
+graduation and the stopper leaves the barrel — the sample is on the bench, the
+syringe is scrap, and if there was vacuum on the line it goes to air at the same
+moment.
+
+**Don't pull hard against a closed line.** Drop the pressure enough and
+dissolved gas comes out of solution: bubbles appear at every fitting and grow
+while you watch. They collapse again when you release, so the volume you read on
+the barrel was never the volume you drew. Open the line, then pull slowly.
+
+**A drawn-back syringe is a decaying vacuum, not a pump.** Pull the plunger on a
+sealed syringe and the air in the barrel expands and the pressure drops; as
+liquid comes in, that gas volume shrinks back towards where it started and the
+pressure climbs back towards ambient. Flow starts fast and tails off. That is
+perfectly usable for priming a chip or pulling a fixed volume through it, and it
+is not a constant-flow source — if you need one of those, it is a syringe pump
+you want, not a puller.
+
+## Finishing
+
+<Steps>
+
+1. **Deburr and file.** One pass with the deburring tool round every opening and
+   along the base to knock the elephant's foot off, then the flat needle file in
+   the flange slot until a syringe slides in and out without being persuaded.
+
+2. **Dry-fit before you assemble.** Load an empty syringe and run the plunger
+   through its full travel by hand. Anything that racks, springs or binds is
+   easier to fix now than with inserts melted in.
+
+3. **Melt the inserts in**, then assemble with the stainless hardware. Set the
+   iron around 240 °C for PETG and let each insert sink under the weight of the
+   iron rather than pushing it.
+
+4. **Wash it** in warm soapy water and dry it completely. A fresh print carries
+   plastic dust and finger oil, neither of which belongs near a sample.
+
+5. **Bumpers on last**, onto a surface you have just wiped, so the adhesive gets
+   a clean start.
+
+</Steps>
 
 ## Files & downloads
 

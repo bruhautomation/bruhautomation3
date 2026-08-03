@@ -1,18 +1,233 @@
 ---
 title: Dog Treat Dispenser
-description: Automated treat dispenser you can trigger from Home Assistant.
+description: A 245 mm printed magazine with a closed floor and a 15 mm outlet at the bottom — a servo pushes one biscuit out sideways, fired from Home Assistant.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Automated treat dispenser you can trigger from Home Assistant.
+Treats stack in a printed column with a closed floor. A servo pushes the bottom
+one out through a gap in the side, the stack drops by one, and the next biscuit
+is in position. That is the whole machine. It is worth building because it is the
+rare automation with an audience — the dog learns within a week that the thing on
+the wall is worth watching, and a button in Home Assistant becomes a way to say
+hello to him from work.
 
-## Hardware
-- Stepper motor or servo
-- Hopper and dispenser mechanism
+:::note
+**One part is in this folder, and it is the magazine.** `dog_treat_dispenser_1.stl`
+is the column. The pusher, the servo mount and the catch tray were built around
+the spot the dispenser lives in and never made it into a model file. So this page
+documents the column properly — every dimension below is measured off the STL —
+lists the parts that drive it, and says what the column's numbers tell you about
+the mechanism you have to design. That is why it still carries the unfinished
+flag.
+:::
+
+<ImagePlaceholder alt="The dog treat dispenser mounted on a wall with the printed column full of biscuits">
+  Hero shot — the column mounted vertically with biscuits visible through the
+  window, the servo and pusher at the bottom, and the dog waiting underneath.
+</ImagePlaceholder>
+
+## What the printed part is
+
+| Measurement | Value |
+|---|---|
+| Outside | 67 × 34 mm, corners rounded 2 mm |
+| Length | 245 mm |
+| Wall | 2.0 mm, uniform |
+| Bore | 63 × 30 mm, sharp internal corners |
+| Top | Fully open — the whole 63 × 30 bore |
+| Base | Closed, 2.0 mm thick |
+| Outlet | A 15 mm band above the base with the front and both sides missing |
+| Window | 10 mm slot down the centre of one 67 mm face, 228 mm long |
+
+**The part settles its own orientation.** One end is the bare 63 × 30 bore, wide
+open, and that is the top — it is how you load it. The other end is a solid 2 mm
+plate, and that is the floor a biscuit rests on. It does not run the other way up.
+
+The bottom 17 mm is where the design is. Two of those millimetres are the floor;
+the 15 mm above it has no front wall and no side walls, because one 67 mm face
+runs the full 245 mm and everything else stops short. So the bottom biscuit in
+the stack sits on a closed floor with three of its four sides open to the room.
+Nothing slides across the bore here — a pusher reaches in through the 15 mm band
+and shoves one treat out sideways, and the single wall that runs past the outlet
+is the back the whole mechanism bolts to.
+
+The window is the other thing the geometry tells you. It is 10 mm wide, dead
+centre on the front face, and it runs from the top of the outlet clear off the
+open end — 228 mm, so it leaves a 10 mm notch in the rim at the top. It is a
+level gauge you can read from across a room and a slot you can get a finger into
+when something bridges.
+
+Measure your treats before you print 245 mm of tube, because nothing about the
+bore adapts. They have to fall freely down 63 × 30 mm, and they have to leave
+through a 15 mm gap — a biscuit thicker than that will not clear the outlet no
+matter what pushes it. Hard, flat, uniform biscuits stack and slide; soft
+training treats bridge across the bore and stay there. Filled to the rim it holds
+about 460 cm³ of them.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack; any ESP32 or ESP8266 with a spare GPIO does this job
+- [MG90S metal-gear micro servo, 180°](https://www.amazon.com/dp/B0925V3X2S?tag=brau01-20) — a 12-pack, you need one
+- [5V 2.4A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — a 3-pack; the servo and the board share it
+- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a straight plug sticks out further than the box is deep
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the column is 90 cm³ of plastic, 111 g off a 1 kg spool
+- [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — for the servo bracket and the wall mounts; the horn screws come with the servo
+- [Silicone hookup wire, 24 AWG](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) and [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20)
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure the treats, then the bore, before the print starts
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — the bore is what treats slide down, and a rough edge at the outlet will catch every one
+
+Buy the **metal-gear MG90S, not the plastic SG90**. A treat wedges against the
+pusher sooner or later and the servo stalls trying to return; a plastic output
+gear strips the first time that happens, and it always happens when nobody is
+home.
+
+Optional, and each one earns its place:
+
+- [VL53L0X time-of-flight sensor](https://www.amazon.com/dp/B0D7LWDBVX?tag=brau01-20) — a 3-pack; point one down the tube from the open top and it reads the top of the stack in millimetres, which is a "treats remaining" number in Home Assistant
+- [IR obstacle-avoidance modules](https://www.amazon.com/dp/B01I57HIJ0?tag=brau01-20) — a 10-pack; one aimed across the outlet confirms a treat actually left, rather than assuming the servo moving meant something happened
+- [Momentary push buttons](https://www.amazon.com/dp/B07KX144DT?tag=brau01-20) — a 30-pack; somebody standing in front of the dispenser should not have to find their phone
+- [Wyze Cam](https://www.amazon.com/dp/B076H3SRXG?tag=brau01-20) — the point of dispensing a treat remotely is watching it land
+- [PETG filament](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — instead of PLA+ if you want to wash the column in hot water
+- [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — for the bracket and servo mount you design, **not** for the column: these are 5.7 mm long and the column's wall is 2.0 mm
+
+If you would rather turn a drum or an auger than push a treat, the same servo
+comes as a [continuous-rotation MG90S](https://www.amazon.com/dp/B0925TDT2D?tag=brau01-20).
+It gives you speed and direction instead of an angle, which means the firmware
+has to time the dose rather than command a position — harder to get repeatable,
+and nothing in this folder is built for it.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 5 |
+| Top and bottom layers | 5 each |
+| Infill | 0% |
+| Supports | None lying flat; 17 mm of them standing up |
+| Material | PLA+, or PETG if it will be washed hot |
+| Orientation | Flat, back face on the bed |
+
+Every wall in the part is exactly 2.0 mm, and 2.0 mm is both five 0.4 mm
+perimeters and ten 0.2 mm layers. Set five walls, five top and five bottom solid
+layers, and zero infill, and every wall comes out solid whichever way it happens
+to be standing when it prints — no infill seam anywhere in the bore. That is
+almost certainly why it was drawn at 2 mm.
+
+**Lie it flat on the back face** — the unbroken one, opposite the window. It is
+the only face that runs the whole 245 mm, so it puts 63 × 245 mm of plastic on
+the bed and the part cannot tip. The one overhang is the front face, and the
+window pays for itself there too: it splits that face into two 26.5 mm bridges
+rather than one 63 mm span, which any printer crosses cleanly.
+
+That wants a 245 mm bed. A 250 × 210 Prusa or a 256 mm Bambu takes it lengthways;
+a 220 × 220 Ender does not, at any angle — rotated 45° it still needs 220.6 mm.
+On a 220 mm bed, stand it on the closed base instead. It is 245 mm tall that way,
+which clears a 250 mm Z axis by five millimetres, and it needs supports for the
+first 17 mm only: the front and both side walls begin in mid-air where the outlet
+band ends. Three short support columns, nothing above them.
+
+Don't scale it to get a taller magazine. It is not a plain prism — stretching the
+long axis stretches the 2 mm base and the 15 mm outlet with it, and a 20 mm
+outlet lets two treats out at once. Cut it instead, anywhere in the parallel
+section between the outlet and the top.
+
+## Wiring
+
+There is no firmware in this folder, so there are no pin numbers to quote — you
+pick the GPIO. What is worth writing down is the servo's lead colours, because
+they are the thing people get backwards:
+
+| Servo lead | Goes to |
+|---|---|
+| Brown | GND |
+| Red | 5V |
+| Orange | The GPIO you chose |
+
+Run the red lead to the 5V rail feeding the board, not to the board's 3.3V pin.
+An MG90S pulls close to an amp when it stalls, and a 3.3V regulator asked for
+that is a board that reboots every time it hands out a treat.
+
+## Assembly
+
+<Steps>
+
+1. **Deburr the bore and the outlet**, before anything else. The three cut edges
+   around the outlet band are what the bottom biscuit drags across on its way out,
+   and a printed edge left as printed will catch it.
+
+2. **Dry-stack the treats.** Load the column by hand, stand it up, and watch where
+   they hang up on the way down. Fix that with sandpaper now, not after the servo
+   is mounted.
+
+3. **Build the pusher to the 15 mm band.** It has to sweep the bottom treat clear
+   of the column and be back before the one above has dropped far enough to
+   follow — how far that is depends entirely on your treats, which is what step 2
+   was for. Come in from one 30 mm side and out the 63 mm front, or straight out
+   the front; all three faces are open to you.
+
+4. **Bolt the servo to the back face, M3 and a nut.** That face is the only wall
+   that runs past the outlet, so it is the only thing at the bottom of the column
+   there is to fix to. It is 2 mm thick: it will not hold a heat-set insert, and
+   it will not hold a self-tapper for long.
+
+5. **Mount the column vertically**, closed base down, window facing where you can
+   see it. It is a 245 mm lever with treats in it, so bracket it near the top as
+   well as at the base.
+
+6. **Test with the column empty**, then with three treats, then full. A pusher
+   that works empty can stall under the weight of a full column.
+
+</Steps>
+
+<ImagePlaceholder alt="The bottom of the treat dispenser column showing the servo, the pusher and the catch tray">
+  Detail shot of the bottom 17 mm — the closed base, the 15 mm outlet band, the
+  servo and what it drives. This is the part of the build the STL doesn't cover.
+</ImagePlaceholder>
+
+## Firmware
+
+Write this one yourself; there is no config in the folder to copy. In ESPHome it
+is three pieces: a `servo` component on a PWM output — `ledc` on an ESP32,
+`esp8266_pwm` on an ESP8266 — a `script` that moves it to the open angle, waits,
+and moves it back, and a `button` that runs the script. The button is what
+appears in Home Assistant, and `button.press` in an automation is then the whole
+integration — a schedule, a voice command or a card on the dashboard all do the
+same thing.
+
+Two things to get right. Detach the servo between presses, or it will hum against
+the pusher all day and cook itself. And put the two angles in `substitutions` at
+the top of the file, because those are the numbers you will change ten times
+while tuning step 3.
+
+If you added the VL53L0X, it is the `vl53l0x` platform on I²C and it reports a
+distance; a `calibrate_linear` block turns that into a treat count, and a
+template binary sensor turns the count into "the dispenser is empty" — which is
+the automation actually worth having, because a dispenser everyone believes is
+loaded and isn't teaches the dog to stop checking.
+
+## Keeping it clean
+
+:::caution
+A 3D-printed part is not food-safe in the strict sense. Layer lines hold crumbs,
+crumbs hold everything else, and no filament sold as food-safe stays that way
+once a 0.4 mm nozzle has drawn grooves down the inside of it. Dry biscuits only —
+no wet food, nothing greasy. Empty the column and wipe the bore out monthly.
+:::
+
+That is also the argument for printing it in PETG rather than PLA+. PETG takes
+hot soapy water without going soft; PLA+ starts to sag around 60 °C, which is
+well inside what a tap can do. Neither belongs in a dishwasher, but only one of
+them survives a rinse you weren't paying attention to.
 
 ## Files & downloads
 

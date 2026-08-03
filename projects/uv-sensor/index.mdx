@@ -1,22 +1,245 @@
 ---
 title: UV Sensor
-description: UV index and environmental sensor with an OLED display.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: An ESP32 that reports the real UV index where you're standing, plus lux, temperature, humidity and pressure — an LTR390 and a BME280 on two separate I2C buses, with a small OLED reading out the two numbers you actually watch.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-UV index and environmental sensor with an OLED display.
+A weather app gives you the UV index for your postcode. This gives you the UV
+index where you are actually standing — the patio, the greenhouse, the corner of
+the garden that only gets four hours of sun and can't work out why the tomatoes
+sulk. An LTR390 measures UV and light level, a BME280 adds temperature, humidity
+and barometric pressure, and a 0.96 in OLED shows the two live numbers so you
+don't have to open Home Assistant to read them.
 
-## Hardware
+It is one ESPHome config and three I2C modules. No soldering required if you have
+female-to-female jumpers.
 
-- Board: ESP32
-- Sensor: LTR390 UV/ambient light (I2C)
-- Sensor: BME280 temperature/humidity/pressure (I2C)
-- Display: SSD1306 128x64 OLED (I2C)
-- Dual I2C buses for sensor isolation
+<ImagePlaceholder alt="The BRUH UV sensor — an ESP32 with an LTR390, a BME280 and a small OLED showing light level and UV index">
+  Hero shot — the assembled sensor with the OLED lit and readable, ideally in
+  direct sun so the UV figure on screen isn't zero.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin ESP-WROOM-32, 2-pack](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — a DevKitC-style board, which is what the config's `board: esp32dev` key
+  builds for. **Get the WROOM version, not a WROVER.** WROVER modules use GPIO16
+  and GPIO17 for their PSRAM, and GPIO16 and GPIO17 are the second I2C bus in
+  this config. If you're building several,
+  [the 6-pack of ESP32-WROOM-32D boards](https://www.amazon.com/dp/B08MFBQ8LV?tag=brau01-20)
+  is cheaper per node and the same silicon.
+- [LTR390-UV module, I2C](https://www.amazon.com/dp/B09FDGTKLX?tag=brau01-20) —
+  this exact board. It puts out a UV index and an ambient light level over two
+  wires, which is why it has replaced the old analogue UV parts. The config sets
+  no I2C address for it, so leave whatever address strap the board ships with
+  alone.
+- [BME280 module, 2-pack](https://www.amazon.com/dp/B07KR24P6P?tag=brau01-20) —
+  temperature, humidity **and** barometric pressure on one I2C part. The config
+  asks for `0x76`, which is the default on these purple boards.
+- [SSD1306 0.96 in OLED, 128×64 I2C, 3-pack](https://www.amazon.com/dp/B076PDVFQD?tag=brau01-20)
+  — the four-pin I2C version, not the seven-pin SPI one. The config declares
+  `model: "SSD1306 128x64"` at address `0x3C`.
+- [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — the
+  female-to-female ones go from each module's header straight onto the ESP32's,
+  no iron involved. If you'd rather solder it once,
+  [perfboard, headers and terminal blocks](https://www.amazon.com/dp/B07CK3RCKS?tag=brau01-20).
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  — for the BME280's tail, which wants to live away from the board. See
+  [Calibration](#calibration) for why.
+- [5 V 2.5 A micro-USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20).
+  If the sensor goes outside and the socket doesn't, the
+  [16.4 ft flat micro-USB extension](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20)
+  is thin enough to run under a window sash; a
+  [right-angle 1 ft cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20)
+  is what lets the board sit flat in a shallow box.
+- [IP65 project box with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  and [nylon standoffs](https://www.amazon.com/dp/B00MMWDYI4?tag=brau01-20) —
+  there is no printed case in this folder. Read the caution below before you
+  mount the LTR390 behind that box's clear lid.
+
+:::caution
+**Nothing clear is clear to UV.** The clear cover on that junction box, a
+double-glazed window, a sheet of acrylic — all of them pass visible light
+happily and cut UV hard. Put the LTR390 behind any of them and the lux reading
+stays sensible while the UV index collapses to a fraction of the real figure,
+which is the worst kind of wrong: it looks like it is working.
+
+The sensor needs a hole in the lid and a bead of sealant around it, or it needs
+to be outside the box entirely on a short lead. If you leave it behind glass,
+treat the UV number as a relative trend for that one spot and never as an index
+you would base sunscreen on.
+:::
+
+## Wiring
+
+Every pin here comes out of `bruh-uv-sensor.yaml`. Both buses run at 400 kHz.
+
+| Signal | ESP32 GPIO | Bus | Goes to |
+|---|---|---|---|
+| SDA | **GPIO5** | `bus_a` | LTR390 SDA **and** OLED SDA |
+| SCL | **GPIO4** | `bus_a` | LTR390 SCL **and** OLED SCL |
+| SDA | **GPIO17** | `bus_b` | BME280 SDA |
+| SCL | **GPIO16** | `bus_b` | BME280 SCL |
+| 3V3 | — | — | VCC on all three modules |
+| GND | — | — | GND on all three modules |
+
+**Power all three from 3V3, not from the 5 V pin.** All three modules will run
+from 5 V, and all three will then pull their I2C lines up to 5 V — into an ESP32
+whose pins are 3.3 V parts. It works right up until it doesn't.
+
+### Why there are two buses
+
+The README calls it sensor isolation. In practice the split buys you two things.
+The BME280 gets its own pair of pins, so it can sit on a length of wire well away
+from the board without dragging the display's bus out to the same place. And the
+display and the UV sensor — the two parts that talk constantly — keep a bus to
+themselves, so a BME280 that stops answering cannot wedge the screen.
+
+There is a wrinkle worth knowing: `bus_a` is declared with `scan: false` and
+`bus_b` with `scan: true`. The boot log will therefore list what it found on the
+BME280's bus and say nothing at all about the display's. Flip `bus_a` to
+`scan: true` while you are bringing the board up, and put it back afterwards.
+
+<ImagePlaceholder alt="Wiring diagram showing an ESP32 with the LTR390 and OLED on one I2C bus and the BME280 on a second">
+  Wiring diagram, or a labelled photo of the assembled board showing the two
+  separate SDA/SCL pairs leaving the ESP32.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Wire `bus_a` first** — the OLED and the LTR390 both onto GPIO5 and GPIO4.
+   Flash the config with the BME280 left off entirely. If the screen lights up
+   and shows a lux figure, the hard half is done.
+
+2. **Add the BME280 on `bus_b`** on a lead long enough to reach wherever it is
+   going to live. Keep it as short as that allows; I2C at 400 kHz is not a
+   long-run bus.
+
+3. **Mount the LTR390 so it looks at open sky**, through a hole rather than
+   through the lid. Nothing else in the build cares which way up it sits.
+
+4. **Put the BME280 somewhere with air and shade** — not sealed in the same box
+   as the ESP32, and out of the sun. Again, see [Calibration](#calibration).
+
+5. **Close it up last**, once every entity has appeared in Home Assistant and
+   the numbers look plausible.
+
+</Steps>
+
+## Firmware
+
+Copy `bruh-uv-sensor.yaml` from the download section below into your ESPHome
+folder, then handle these before you hit compile.
+
+<Steps>
+
+1. **Put `Roboto-Medium.ttf` next to the YAML.** The `font:` block names it as a
+   plain relative path, so ESPHome looks for it beside the config and the build
+   fails outright if it isn't there. Roboto is a free download from Google Fonts.
+   This is the most common first-compile failure on this config.
+
+2. **Fill in `secrets.yaml`** — `wifi_ssid`, `wifi_password`, `ota_password`,
+   `ap_password` and `api_key`. There is a `secrets.yaml.example` in the repo
+   with every key these configs use.
+
+3. **Rename it if you are building more than one.** There is no `substitutions:`
+   block here: the device is `bruh-uv-sensor-1` and the fallback hotspot is
+   `Bruh-Uv-Sensor-1`, both written out in full. Edit `esphome.name`,
+   `friendly_name` and the AP `ssid` for each additional node.
+
+4. **Flash over USB the first time.** Every flash after that is over WiFi, and
+   `captive_portal` plus the fallback AP is what gets you back in if it loses
+   the network.
+
+</Steps>
+
+It appears in Home Assistant on its own — ESPHome devices are discovered, so
+there is nothing to write on the Home Assistant side.
+
+### The display
+
+The lambda draws two lines: light level at the top, UV index at the bottom, both
+in the 15 px Roboto. `rotation: 180` is set, so if the screen comes up upside
+down in your box, that key is the one to change.
+
+Both lines are formatted `%.0f`, so the screen rounds. A UV index of 5.4 shows as
+`UV:  5`. The entity in Home Assistant keeps the decimals — the rounding is on
+the glass only, and at that font size it is the right call.
+
+The repaint is hooked to the light reading: `on_value` on the LTR390's `light`
+sensor calls `component.update: my_display`, and a `delta: 1` filter sits above
+it, so a lux reading that hasn't moved a whole lux never gets that far. If you
+would rather the screen ticked on a fixed cadence, add an `update_interval:` to
+the `display:` block and drop the `on_value`.
+
+## What you get in Home Assistant
+
+From the LTR390, every 10 seconds: **UV index** and **light** in lux, plus **UV
+sensor counts** and **light sensor counts**, which are the raw values the other
+two are computed from. The raw pair is worth having while you calibrate and worth
+hiding afterwards.
+
+From the BME280, every 30 seconds: **temperature** (16× oversampled),
+**humidity** and **pressure**.
+
+Nothing in this config carries a calibration offset, which is deliberate. The
+numbers you get are what your parts measured, not somebody else's corrections
+baked into a file you copied.
+
+## Calibration
+
+**The BME280 will read hot if you seal it in with the ESP32.** A WiFi ESP32 in a
+closed plastic box is a small heater, and the BME280 is a small, fast
+thermometer. Put it on a lead, outside the box or at least at the far end of it,
+shaded, with air moving past. This is the entire reason `bus_b` exists as its own
+pair of pins, and it is worth using.
+
+**Check the UV index against a forecast, at solar noon, on a cloudless day.** The
+figure the LTR390 reports is computed from raw counts and assumes an unobstructed
+view of the sky. If it reads consistently low against your local published index,
+something is over the sensor — glass, a lid, a soffit, or dust on the hole you
+cut for it.
+
+**The lux figure is a real lux figure**, not a percentage, so it can be checked
+against the light meter in a phone app. If the two disagree wildly, make sure the
+sensor isn't shadowed by the OLED or by its own wiring.
+
+## Troubleshooting
+
+**The build fails before it flashes anything.** `Roboto-Medium.ttf` is not beside
+the YAML. It is not bundled with ESPHome.
+
+**The screen is dark and no UV entities appear.** Both live on `bus_a`, and
+`bus_a` has `scan: false`, so the boot log won't tell you a thing about it. Set
+`scan: true`, reflash, and read the log — you get either two addresses or none,
+and none means GPIO5 and GPIO4 are swapped or unpowered.
+
+**Temperature, humidity and pressure are missing.** `bus_b` does scan, so the
+boot log lists what answered. A BME280 clone strapped to `0x77` instead of `0x76`
+shows up there immediately; change the `address:` line under the `bme280_i2c`
+platform to match.
+
+**The screen says `nan`.** No reading has landed yet. The LTR390 updates every
+10 seconds, so give it that long after boot. If it is still `nan` a minute later
+it is the bus, not the display.
+
+**Readings drop out once the BME280 is on a long lead.** 400 kHz down a metre of
+jumper wire is asking a lot. Change `frequency: 400kHz` to `100kHz` on `bus_b`
+only — the display's bus can stay fast.
+
+**UV reads near zero all day.** You are behind glass. See the caution under
+[Parts](#parts).
 
 ## Files & downloads
 

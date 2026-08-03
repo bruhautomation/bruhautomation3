@@ -1,17 +1,172 @@
 ---
 title: Laser Turret
-description: Pan-tilt laser turret for entertaining the cat. Concept renders only — no build files yet.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A pan-tilt laser turret for the cat — two servos, a 5 mW red diode and an ESP32 on ESPHome, so Home Assistant runs playtime on a schedule.
+# Concept stage — two renders, no STLs, no CAD, no firmware. The parts are
+# decided, the build isn't. Published, and marked as pending on the page, in
+# the sidebar and on the project list.
 pending: true
 ---
 
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Pan-tilt laser turret for entertaining the cat. Concept renders only — no build files yet.
+A pan-tilt bracket, two servos and a red laser diode, driven by an ESP32 so
+Home Assistant can run the cat around the living room at 3pm on a Tuesday while
+nobody is home. A shop-bought laser toy runs its own pattern on its own timer;
+the point of building one is that the pattern comes from an automation, so it
+can start because the house is empty, stop because somebody walked in, and never
+repeat itself.
 
-![Concept render of the pan-tilt laser turret](./images/laser-turret-concept-alt.png)
-![Concept render of the pan-tilt laser turret](./images/laser-turret-concept.png)
+:::note
+**This is at concept stage.** The two images below are AI renders, not photographs —
+there are no STLs, no CAD and no firmware in the folder yet. What is real is the
+parts list: every part below is a specific thing that exists, and the build
+described is the one those parts make. Treat it as a shopping list and a set of
+design decisions already taken, not a build guide.
+:::
+
+![Concept render of the pan-tilt laser turret, aimed across a table](./images/laser-turret-concept-alt.png)
+
+While we are being honest about the renders: a 5 mW diode will not light that
+candle, will not cut anything, and will not leave a mark on a wall. It makes a
+dot. That is the entire job.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 DevKit, 38-pin](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — 2-pack. The ESP32's hardware LEDC timers give clean servo PWM; an ESP8266 generates it in software and the jitter shows up as twitch
+- [650 nm 5 mW red laser diode module](https://www.amazon.com/dp/B07L4225TM?tag=brau01-20) — 2-pack, so you have a spare. The variant here is the cross-line head, which throws an X rather than a dot; the cat does not care, but pick the dot version if you want the classic
+- [Pan/tilt servo bracket](https://www.amazon.com/dp/B07PQ12TXS?tag=brau01-20) — 2 sets. This is the part that decides the whole build: it is cut for standard-size servos, so that is what goes in it
+- [MG996R metal-gear servos](https://www.amazon.com/dp/B08CH2SJLR?tag=brau01-20) ×2 — 6-pack. Standard size, metal gears, and the exact frame the bracket above is drilled for
+- [MOSFET trigger module](https://www.amazon.com/dp/B07XJSRY6B?tag=brau01-20) — 10-pack. Switches the laser's ground from a 3.3 V GPIO
+- [12 V 4 A power supply](https://www.amazon.com/dp/B07H493GHX?tag=brau01-20) — one barrel jack in, everything derived from it
+- [20 A CC/CV buck converter](https://www.amazon.com/dp/B07Y7YB14L?tag=brau01-20) — 2-pack. Set to 6.0 V, feeds the servos
+- [MP1495 buck module](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20) — 5-pack. Set to 5.0 V, feeds the ESP32 and the laser
+- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) and [24 AWG silicone wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — servo leads are short and you will need to extend them
+- [PLA+ filament](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the base, plus [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) and an [M3 screw assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) to bolt the bracket down
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — feet, so a fast pan does not walk the turret off the shelf
+
+Optional, if you would rather it only ran when the cat is actually in the room
+than on a blind schedule: an [HC-SR501 PIR](https://www.amazon.com/dp/B00FDPO9B8?tag=brau01-20)
+on a spare input, or any presence sensor Home Assistant already has.
+
+You do not need a [PCA9685 servo driver](https://www.amazon.com/dp/B082QT9D5F?tag=brau01-20)
+for this. Two servos are two GPIOs; that board starts earning its place at four
+or five.
+
+## Power
+
+Two servos and a laser is not a USB-powered project. An MG996R pulls well over an
+amp the instant it changes direction, and if it is taking that out of the ESP32's
+regulator the board browns out mid-sweep and reboots. The board reboots, the servos
+snap to whatever the config's default is, and you have just flung a laser at the
+ceiling.
+
+One 12 V brick, two buck converters off the same rail:
+
+- **6.0 V** from the CC/CV module → the two servos' red wires. MG996Rs run 4.8–7.2 V
+  and are noticeably stronger and quicker at 6 than at 5.
+- **5.0 V** from the MP1495 → the ESP32's 5V pin and the laser module.
+
+Deriving both from one supply means the grounds are common by construction, which
+is the failure everybody hits when they run the servos off a separate wall wart and
+wonder why the signal is garbage.
+
+:::caution
+Set both bucks with a multimeter across the output terminals **before** anything is
+connected to them. They ship with the pots at an arbitrary position, and the first
+thing a 12 V output does to an MG996R is destroy it. The CC/CV module has two pots,
+not one — wind the current limit up as well, or it drops out of constant voltage
+the moment both servos move at once and the 6 V rail sags with them.
+:::
+
+## Wiring
+
+There is no firmware in this folder, so there are no authoritative pin numbers to
+publish. What follows is the electrical layout — the GPIO choices are yours to make
+in the config.
+
+| From | To | Notes |
+|---|---|---|
+| 12 V brick + | Input of both bucks | Common 12 V rail |
+| CC/CV buck out (6.0 V) | Servo red ×2 | Servos only — never the ESP32 |
+| MP1495 out (5.0 V) | ESP32 5V pin, laser module + | |
+| All grounds | Tied together | Bucks, servos, laser, ESP32, MOSFET module |
+| Pan servo signal (orange) | An ESP32 GPIO | |
+| Tilt servo signal (orange) | A second GPIO | |
+| MOSFET module trigger in | A third GPIO | Laser on/off |
+| Laser module − | MOSFET module switched output | The module switches the low side |
+
+Do not hang the laser straight off a GPIO. It is only tens of milliamps, which is
+close enough to the pin's limit to work on the bench and fail in a box in July.
+
+Two rules when you pick the pins. Leave GPIO 0, 2, 12 and 15 alone — the ESP32 reads
+those at reset to decide how to boot, and GPIO 12 held high is the one that stops
+it booting at all. And skip GPIO 34–39, which are input-only and cannot drive
+anything.
+
+## Design notes
+
+The bracket is the constraint everything else follows from. It is drilled for
+standard-size servos, which is why the parts list says MG996R rather than a micro
+servo — a 9 g servo will not bolt into it without new holes. The trade is noise:
+MG996Rs hunt around their setpoint and buzz when they are holding still, which is
+audible across a quiet living room and is exactly the kind of thing a cat learns to
+ignore. ESPHome's `servo` component has an `auto_detach_time`, and setting it means
+the PWM stops once the turret has arrived and the whole thing goes silent between
+moves. Use it.
+
+Centre both servos before you fit the horns. Drive each one to its mid position,
+*then* screw the arm on square. Fit the horns first and you will find one axis has
+30° of travel one way and 150° the other, and no amount of config fixes it.
+
+![Concept render of the turret and its target](./images/laser-turret-concept.png)
+
+The base is the part that does not exist yet, and it has one real requirement: mass.
+A pan servo snapping 90° will drag a light printed puck across a table. Print it with
+high infill, or make it big enough to sit a weight inside, and put rubber feet under
+it. The pan axis only ever sweeps 180° — that is an MG996R's limit — so the tilt
+servo's lead and the laser's wires flex rather than wind up, and nothing here needs
+a slip ring.
+
+<ImagePlaceholder alt="The assembled laser turret on a shelf, laser on, dot visible on the floor">
+  Hero shot once it is built — the real turret on a low shelf, laser on, the dot
+  visible on the floor, so the page stops leading with renders.
+</ImagePlaceholder>
+
+## Laser safety
+
+:::danger
+A 650 nm 5 mW module is Class 3R. It will not burn anything, but it can damage an
+eye — a cat's or yours — and a servo makes it point wherever the firmware says,
+which includes at a face at the exact moment a config reload lands.
+
+Solve it with geometry, not software. Mount the turret low, aim it down, and put a
+**physical** stop on the tilt axis so the beam cannot rise above the skirting board
+at the far wall. Software limits are worth setting too, but they are the second line
+of defence: a reboot happens before the config does.
+:::
+
+Never chase the cat's face with it, and never let a guest hold the phone.
+
+## The cat part
+
+A laser is the one toy a cat can never catch, and a session that ends with the dot
+just switching off leaves an animal wound up with nothing to show for it. Land the
+dot on a real toy or a treat and turn it off there. That is one line at the end of
+the automation and it is the difference between a good toy and an annoying one.
+
+Five minutes is plenty, and the whole value is in being unpredictable: random
+interval, random position, no sweep the cat can learn.
+
+## What still has to happen
+
+For this to become a build guide rather than a plan: a printed base with the
+bracket's bolt pattern and a mount for the laser barrel, a tilt-axis end stop, and
+an ESPHome config with the two `servo` outputs, the laser switch and a pattern
+generator. None of that is in the folder yet.
 
 ## Files & downloads
 

@@ -1,18 +1,214 @@
 ---
 title: Microscope Dock
-description: Microscope mounting dock and accessories.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed dock that clamps to a microscope eyepiece and holds a phone on the optical axis, so what you saw down the tube gets photographed instead of described.
+# The write-up is here; the models aren't. Published, and marked as pending on
+# the page, in the sidebar and on the project list, until the STLs land in the
+# folder.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Microscope mounting dock and accessories.
+Everything anyone sees down a microscope gets written down as a word. *About
+80%. Looks healthy. Some debris.* A photograph settles all three, and the camera
+to take it is already in your pocket — the only hard part is holding it still,
+square, and at the right height over a 20 mm circle of glass. This is the printed
+dock that does the holding: a collar that clamps the eyepiece barrel, a cradle
+that puts the phone's camera on the optical axis, and a bench arm underneath
+carrying the weight so none of it hangs off the microscope.
 
-## Hardware
-- 3D-printed dock structure
-- Microscope mounting hardware
+<ImagePlaceholder alt="A 3D printed dock clamped to a microscope eyepiece holding a phone over it, with a cell culture flask on the stage">
+  Hero shot — the dock on the scope with a phone in it, shot from slightly
+  above and to the side so the collar on the eyepiece barrel and the phone's
+  camera lined up over it both read. A flask on the stage in frame.
+</ImagePlaceholder>
+
+:::note
+The models aren't posted yet. What is below is the bill of materials, the print
+settings this part wants, and the measuring and camera work that decide whether
+it produces anything usable — the STLs will land in the download section at the
+bottom.
+:::
+
+:::tip
+**If your microscope has a trinocular photo port, don't build this.** A proper
+C-mount camera on that port beats any phone dock, permanently. This is for the
+binocular scope in the corner that nobody is ever going to buy a camera for.
+:::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — the eyepiece barrel diameter is the whole project. Measure it before anything else
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — the collar goes in this
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the cradle, and the cheaper spool for test rings (4 × 1 kg, black)
+- [TPU filament, 1.75 mm](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) — a thin band inside the collar, and pads in the cradle floor if you'd rather print them than stick the rubber ones in. Nothing rigid touches the eyepiece or the phone
+- [M3 heat-set threaded inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20) — one in the collar's clamp boss, one in the cradle where the standoff bolts on (100 pcs, you need two)
+- [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20) — 562 pieces, and you will use about four of them
+- [M3 knurled thumb screws](https://www.amazon.com/dp/B0DMCRDK2N?tag=brau01-20) — worth it. Gloved hands and a hex key are a bad combination, and a collar you can only loosen with a tool is a collar that never comes off
+- [Articulating magic arm with a bench clamp](https://www.amazon.com/dp/B077BWMNG5?tag=brau01-20) — clamps to the bench and carries the phone. This is the part that stops a phone hanging off an eyepiece
+- [1/4 in-20 mounting screw](https://www.amazon.com/dp/B083KFG4YN?tag=brau01-20) — the cradle onto the arm. The arm's mounting stud screws out and this goes up through the cradle into the thread it came out of, so the printed part needs a clearance hole and nothing else
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — one pass round the inside of the collar. A burr on the bore is a scratch on the eyepiece
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — two in the floor of the cradle, so the phone's back rests on rubber rather than on layer lines (200 pcs, you need two)
+- [Optical lens tissue](https://www.amazon.com/dp/B08FY32NY9?tag=brau01-20) — for the eye lens afterwards, because a phone dock is a machine for putting fingerprints on an eyepiece
+
+The microscope is the one you already have. So is the phone.
+
+## Before you print
+
+**Measure the barrel, not the eyecup.** The collar clamps the metal tube of the
+eyepiece, below the rubber eyecup, which folds down or pulls off. Eyecups are
+soft, they are different on every eyepiece, and a clamp tightened onto one goes
+slowly out of alignment as the rubber relaxes. Put the caliper on the metal and
+work from that number.
+
+Do not take the microscope tube bore as the answer either. A lab scope's tubes
+are usually 23.2 mm or 30 mm, but that is the hole the eyepiece drops *into* —
+the part you are clamping is the shoulder above it, and it is a different
+diameter on every eyepiece I have measured. There is no standard here worth
+trusting over thirty seconds with a caliper.
+
+**Then find out where your phone's camera actually is.** It is not centred, it
+is not in the same corner on two models, and a modern phone has three of them a
+centimetre apart. Pick the lens you are going to use — the main wide, not the
+ultrawide — and measure from the phone's edges to *that* one. The cradle exists
+to put that single lens over the optical axis; everything else about the phone
+is packaging.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 4 on the collar, 3 on the cradle |
+| Infill | 20% |
+| Supports | None |
+| Material | PETG for the collar, PLA+ for the cradle |
+| Orientation | Collar axis vertical, cradle flat on its back |
+
+**The collar prints with its axis vertical**, so the clamp band's extrusions run
+round the bore rather than across it. Printed on its side, the band is a stack of
+layer lines pulling apart in exactly the direction the clamp screw pulls, and it
+splits the first time somebody over-tightens it.
+
+Turn up wall count rather than infill on the collar. It is a thin ring under a
+permanent squeeze; perimeters carry that load and sparse infill does nothing.
+
+## Material
+
+**PETG for the collar.** It is a clamp, and a clamp is a part that lives under a
+constant load — PLA creeps under one, and a collar that has crept is a collar
+that lets go, a week after you stopped watching, with a phone in it. PETG also
+takes a 70% ethanol wipe, which anything that goes into a tissue culture room
+gets whether you planned for it or not.
+
+PLA+ is fine for the cradle. It carries the phone in compression, sees no
+sustained clamping load, and prints more accurately, so the camera cutout lands
+where the model says it does.
+
+TPU for the band inside the collar, and nothing hard in its place. The two
+things this part touches are somebody's optics and somebody's phone. The
+adhesive bumpers do the same job in the cradle floor if you don't want to swap
+filament for two pads.
+
+## Fitting it
+
+<Steps>
+
+1. **Print a test ring first.** A 10 mm slice of the collar's bore and nothing
+   else — minutes rather than hours. Slide it onto the eyepiece. It should go on
+   dry with light thumb pressure and no rocking. Adjust the bore in the model and
+   print another; do not fix it with the slicer's scale box, which scales the
+   screw boss and the wall thickness along with the hole.
+
+2. **Melt the inserts in.** One in the collar's clamp boss, one in the cradle
+   where the standoff bolts on. Soldering iron at 200 °C or so, straight down,
+   and let it cool before you thread anything into it.
+
+3. **Line the collar** with a strip of TPU, and stick the two rubber bumpers in
+   the cradle floor. Nothing rigid touches glass or phone, and nothing adhesive
+   goes anywhere near the barrel.
+
+4. **Clamp the arm to the bench first.** Unscrew its mounting stud, bring the
+   arm up under the cradle and run the 1/4 in-20 screw up through the cradle into
+   the arm. Set the arm so it is holding the phone's weight before you tighten
+   the collar — the collar is there to hold *alignment*, not load.
+
+5. **Focus the microscope on something with hard edges** before you go anywhere
+   near the phone. A slide with writing on it, or the edge of a flask's growth
+   surface. You cannot centre a camera on a grey blur.
+
+6. **Drop the phone in and slide the cradle** until the bright circle sits in the
+   middle of the frame. Lock it there. This is the ten minutes that decides
+   whether the dock is worth having, and it only has to be done once per phone.
+
+</Steps>
+
+## Getting a picture worth keeping
+
+**Zoom in about 2×.** The eyepiece throws a small image circle and a phone's
+wide lens sees the black tube all the way round it, so the raw frame is a
+postage stamp in a ring of nothing. Zooming crops that away in the camera app
+instead of you doing it afterwards, and it costs nothing, because the pixels you
+are throwing out only ever held the inside of a brass tube. Check it hasn't
+switched lenses on you, though — on a lot of phones 2× is the telephoto, which
+sits a centimetre from the wide the cradle was aligned to.
+
+**Lock focus and exposure.** Press and hold on the field until the camera shows
+its AE/AF lock. A phone left on auto hunts continuously on a low-contrast field
+of cells, and it meters the bright empty background rather than the specimen, so
+it underexposes the one thing in the frame you care about.
+
+**Lock white balance too if the app will let you.** A halogen lamp on a dimmer
+changes colour as you change brightness. Two pictures of the same flask a week
+apart, taken at different lamp settings, come out different colours — and the
+first thing anyone does with a colour difference is read it as a change in the
+culture.
+
+**Take the picture with the volume button or a timer.** Tapping the screen
+pushes the phone, and a phone sitting on an eyepiece is a lever with the pivot
+in the wrong place.
+
+## Living with it
+
+The cradle is the expensive part to get right and the collar is the cheap part,
+so print a collar per scope rather than a whole dock per scope. Same cradle, same
+phone alignment, a different bore for each eyepiece in the room, and it moves
+between them in the time it takes to loosen one thumbscrew.
+
+:::caution
+**Nothing printed goes in the autoclave.** An autoclave cycle runs at 121 °C and
+both PETG and PLA are well past soft by then. Wipe it with 70% ethanol and keep
+it out of the chamber and the glasswasher.
+
+**Take it off a shared microscope when you are done.** Somebody else's scope,
+somebody else's alignment, and the next person to sit down at it did not agree
+to a phone bracket on the eyepiece. Ask first if it is not yours.
+:::
+
+## Troubleshooting
+
+**The image is a small circle in a black frame.** Zoom in, and check the height.
+The camera has to sit at the eyepiece's eye point — the plane where all the
+light from the objective comes to a narrow bundle. Too high or too low and the
+circle shrinks. If zoom alone can't fix it, shorten or lengthen the cradle
+standoff rather than living with it.
+
+**One side of the field is dark.** The camera is off axis. Slide the cradle, do
+not tilt the collar — tilting also swings the phone's centre of mass out over
+the eyepiece.
+
+**Everything is sharp except the cells.** The phone focused on dust on the eye
+lens. Clean the eyepiece with lens tissue and lock focus again on the specimen.
+
+**It drifts out of alignment during a session.** The collar is clamped on the
+rubber eyecup instead of the metal barrel, or the arm is not actually taking the
+weight. Both show up as an image that was centred when you set it up and is not
+an hour later.
 
 ## Files & downloads
 

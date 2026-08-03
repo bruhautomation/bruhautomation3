@@ -1,18 +1,132 @@
 ---
 title: Google Mini Mount
-description: Wall mount for the Google Home Mini.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed bracket that gets a Google Home Mini off the shelf and onto the wall, with the cable hidden and the microphones pointed at the room.
+# The bracket itself isn't in the repo yet — no STL, nothing to print. The
+# write-up below is complete; the download section is not. Published, and marked
+# as pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Wall mount for the Google Home Mini.
+A Google Home Mini is a puck that wants a flat surface, and every flat surface in
+a house is already spoken for. This is a printed cradle that screws to the wall
+and holds it there instead — off the counter, out of the way of the toaster, with
+its microphones up at head height where they can actually hear you.
 
-## Hardware
-- 3D-printed mounting bracket
-- Wall anchors
+The other half of the job is the cable. A Mini sitting on a shelf trails a cord
+down the back of the furniture; a Mini on a wall trails it down the middle of
+the paint, which is worse. Getting the cable short, flat and hidden is most of
+what makes this look deliberate rather than improvised.
+
+<ImagePlaceholder alt="A Google Home Mini held on a wall by a printed bracket, cable hidden in a raceway below it">
+  Hero shot — the Mini mounted on a wall at head height, bracket barely visible
+  behind it, cable disappearing into a raceway. Shoot it straight on and again
+  from below at an angle so the cradle and the cable exit both read.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Google Home Mini](https://www.amazon.com/s?k=Google+Home+Mini+smart+speaker&tag=brau01-20) — the first-generation puck, the one with a micro-USB port on the back
+- [PLA+ filament](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the bracket, or [matte PLA](https://www.amazon.com/dp/B0DR7XN26N?tag=brau01-20) if it is going somewhere you look at every day — matte hides layer lines, and this part sits in a room rather than in a box
+- [Drywall anchor assortment](https://www.amazon.com/dp/B016HJ0O7Q?tag=brau01-20) — 112 pieces, you need two of them and the screws that come with them
+- [#8 × 1/2 in wood screws](https://www.amazon.com/dp/B0CS2ZZMQG?tag=brau01-20) if you hit a stud and can skip the anchors
+- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a 3-pack, and the single part that most changes how this looks
+- [Dual-port USB wall charger, 2.4 A](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — Google's adapter has its cable moulded in, so replacing the cable means bringing your own plug
+- [Cord raceway](https://www.amazon.com/dp/B07D8WVJWF?tag=brau01-20) to hide the drop to the outlet, or [self-adhesive cable clips](https://www.amazon.com/dp/B01JOFKPHY?tag=brau01-20) if the run is short enough to just tack down
+- [Self-adhesive rubber bumpers](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — a couple inside the cradle stop the Mini rattling and stop the print marking its fabric
+- [3M VHB tape](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) as the no-drill alternative, if you rent
+
+:::note
+This is for the **first-generation Google Home Mini** (2017). The Nest Mini that
+replaced it in 2019 has a wall-mount hole moulded into its base and a barrel
+jack instead of micro-USB, so it needs neither this bracket nor the cable — hang
+it on a screw and use the adapter in the box.
+:::
+
+## Print settings
+
+This is a bracket that holds a device off a wall on two screws, and that decides
+most of the settings. The load lives in the screw bosses and in the joint where
+the cradle meets the back plate, and both of those are carried by perimeters,
+not by infill — so spend the plastic on walls.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 4 |
+| Infill | 30% |
+| Supports | None, with the back plate on the bed |
+| Material | PLA+, or PETG in a sunny room |
+| Orientation | Flat wall-facing face down |
+
+Print it with the flat back against the bed. That gets you the one surface that
+has to be genuinely flat for free, and it puts the screw holes vertical so they
+need no supports.
+
+PLA is fine on an interior wall. Print it in PETG if the wall gets afternoon sun
+through a window — PLA softens and creeps under a constant load in a hot room,
+and the failure mode is the cradle slowly drooping over a summer rather than
+snapping.
+
+## Mounting
+
+<Steps>
+
+1. **Pick the spot before you print in a colour.** Head height or a little above,
+   away from a corner, and not directly above a sink, a hob or a vent. The Mini's
+   microphones are on top and they hear a room better from high on a wall than
+   from a worktop, which is the actual reason to do this.
+
+2. **Plug the cable in first.** Once the Mini is seated in the cradle you cannot
+   reach the micro-USB port, and the right-angle plug wants to be turned so the
+   cable exits downwards. Sort that out on the bench.
+
+3. **Hold the bracket against the wall and mark the two holes** with a pencil.
+   Eyeball it level against a door frame or the edge of a picture — a bracket
+   that is a degree off reads as crooked once the Mini is in it.
+
+4. **Drill and set the anchors.** The bit size is stamped on the anchor itself.
+   Tap each one flush, then screw the bracket on. If you have hit a stud, throw
+   the anchors away and drive a #8 wood screw straight in.
+
+5. **Snug the screws, then stop.** Driving them home in a printed part splits the
+   boss, and it splits it on the last quarter turn, when you think you are done.
+
+6. **Stick two rubber bumpers inside the cradle** where it touches the Mini's
+   fabric, drop the Mini in base-first, and check it does not rock.
+
+7. **Run the cable down** to the nearest outlet in the raceway, or tack it with
+   clips if it is a short hop. Cut the raceway a little long and trim it — you
+   cannot add a centimetre back.
+
+</Steps>
+
+:::caution
+Two things on the Mini itself have to stay reachable. The **microphone mute
+switch is on the back edge**, right beside the power port, which is exactly
+where a cradle wants to wrap around — check you can still flick it with the
+Mini mounted. And the **volume controls are taps on the left and right of the
+fabric top**, so a cradle that grips the fabric rather than the rubber base will
+turn the volume up every time you push the Mini back into place.
+:::
+
+## In Home Assistant
+
+A mounted Mini is a speaker on a wall, and Home Assistant already knows how to
+talk to it — the **Google Cast** integration discovers it and gives you a
+`media_player` entity. Point a `tts.speak` action at that entity and the thing
+you screwed to the hallway wall becomes the doorbell announcement, the
+laundry-is-done announcement, and the you-left-the-garage-open announcement.
+
+That is the argument for putting it in a hallway or a landing rather than in a
+room where a person already is. A speaker somewhere nobody sits is the one that
+gets heard everywhere.
 
 ## Files & downloads
 

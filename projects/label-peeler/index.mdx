@@ -1,18 +1,217 @@
 ---
 title: Label Peeler
-description: Tool for taking labels off containers cleanly.
+description: A printed blade holder and the small kit that goes with it — heat, the right blade for the surface, and the angle that takes a jar label off in one piece instead of forty.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Tool for taking labels off containers cleanly.
+A label comes off a jar in one piece or it comes off in forty, and the
+difference is almost never how hard you scrape. It is temperature, the angle you
+pull at, and whether the thing touching the container is steel or plastic. This
+is the printed holder that fixes the blade at that angle and keeps your thumb
+behind the edge, plus the small kit of consumables that does the actual work.
 
-## Hardware
-- 3D-printed mechanism
-- Optional heated element
+Reusing jars is the reason to build it. Spice jars, pasta sauce jars, reagent
+bottles, a growler you want to relabel — all of them come with a label somebody
+expected to stay on forever, and all of them are worth more clean than they are
+in the recycling.
+
+:::note
+The printable parts aren't in this folder yet, so the download section at the
+bottom is thin and the page is still flagged as unfinished. What is written up
+here is the kit and the method, which is the part that decides whether a label
+comes off cleanly — the holder is a convenience on top of it.
+:::
+
+<ImagePlaceholder alt="A glass jar mid-peel, label coming away in one continuous piece with the printed blade holder in shot">
+  Hero shot — a jar halfway through, label lifting in one continuous strip, the
+  printed holder in hand and the heat gun set down beside it. Shoot it so the
+  shallow angle of the blade against the glass is what reads.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Steel razor blade scraper, 2 tools + 20 blades](https://www.amazon.com/dp/B08SC9HKY5?tag=brau01-20)
+  — the blades are the consumable this whole project is built around, and 20 of
+  them is a year of jars. Buy this even if you print a holder: the retracting
+  handle is the thing you keep in a drawer with children in the house.
+- [Plastic razor blade scraper, 2 tools + 100 plastic blades](https://www.amazon.com/dp/B07TVM7W35?tag=brau01-20)
+  — the same edge in polypropylene. This is the one that touches anything that
+  isn't glass. See below; it matters more than it sounds like it does.
+- [Cordless heat gun, DeWalt 18V/20V MAX, 4 nozzles](https://www.amazon.com/dp/B0C9Q557HV?tag=brau01-20)
+  — the optional heated element, and the thing that turns a twenty-minute job
+  into a two-minute one. It ships as a bare tool, so you also need
+  [a 20V MAX battery](https://www.amazon.com/dp/B01M751WC3?tag=brau01-20) if you
+  aren't already on the platform. Any
+  [corded heat gun with a low setting](https://www.amazon.com/dp/B078S5QMFG?tag=brau01-20)
+  does the same job, and so does a hair dryer on a paper label.
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20)
+  — print the holder in this, not PLA. Reason under
+  [Print settings](#print-settings).
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20)
+  — fine if you are only ever going to soak and scrape cold.
+- [M3 screw, nut and washer assortment](https://www.amazon.com/dp/B0BLCFZF14?tag=brau01-20)
+  and [M3 heat-set inserts](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+  — clamp the blade, don't glue it. A blade you can't change in ten seconds is a
+  blade you'll keep using long after it stopped cutting.
+- [99% isopropyl alcohol](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20)
+  — for the adhesive left behind, which is the half of the job nobody photographs.
+  Twelve pints is a lot; it is also the cheapest way to buy it and it never goes off.
+- [Glass and polishing microfibre cloths](https://www.amazon.com/dp/B08BWBMTX2?tag=brau01-20)
+  — a paper towel shreds on wet adhesive and leaves lint welded into it.
+- [Fine-mist spray bottle](https://www.amazon.com/dp/B0CSBZVR6F?tag=brau01-20)
+  — decant the alcohol into this. Wetting the residue and leaving it to dwell is
+  what does the work; pouring it on just runs it into your sleeve.
+- [Nitrile gloves](https://www.amazon.com/dp/B08CH7KX8Q?tag=brau01-20) — solvent,
+  hot glass and an exposed razor edge, in that order.
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — the
+  printed holder wants its edges knocked off before it lives in your hand.
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure
+  your blade across its back and its thickness before you print a pocket for it.
+
+## Steel on glass, plastic on everything else
+
+This is the one decision that ruins containers, so make it first.
+
+**Glass takes the steel blade.** Nothing you can do with a single-edge razor at a
+shallow angle marks annealed glass, and steel is the only edge that will get
+under old, hardened adhesive without flexing away from it.
+
+**Everything else takes the plastic blade.** HDPE bottles, PET, painted tins,
+powder-coated lids, anodised aluminium, acrylic — a steel blade scratches all of
+them, and on a curved surface it doesn't take much pressure to skate off the
+label and into the container. Or your thumb. The plastic blades are effectively
+free at 100 to a pack, they dull in about one bottle, and you throw them away
+rather than push a blunt one harder.
+
+:::caution
+The blade only ever moves away from your hand. A jar is a curved, wet, slippery
+thing to hold, and the moment the blade breaks free of the label it accelerates.
+Hold the container against the bench rather than in mid-air, and keep the hand
+that isn't holding the tool behind the edge, not in front of it.
+:::
+
+## Heat
+
+Warm, not hot. The adhesive under a pressure-sensitive label goes soft and
+stringy long before anything else on the jar changes, and the target is the point
+where the glass is uncomfortable to keep hold of — not the point where it's
+smoking. Set the gun low, keep it moving, hold it a hand's width back, and warm
+the whole label rather than the corner you're working on.
+
+:::danger
+**Never park a heat gun on one spot of cold glass.** That is thermal shock, and a
+jar that cracks in your hand is doing it while you have a razor blade in the
+other one. Bring the whole container up together, and don't take a jar straight
+out of a cold garage and heat it.
+
+**Don't heat plastic containers at all.** PET starts to shrink and go oval well
+below the temperature that softens the adhesive, and once a bottle has drawn in
+it never comes back. Plastic gets the soak and the solvent, not the gun.
+:::
+
+The soak is the alternative and it costs you nothing but time: hot tap water, a
+squeeze of dish soap, twenty minutes fully submerged. The paper comes away on its
+own and you go straight to the residue. Heat is what you use when the label is
+the plasticised, water-proof kind that laughs at a soak, or when you have thirty
+jars and no patience.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 4 |
+| Infill | 40% |
+| Supports | None |
+| Material | PETG |
+| Orientation | Layers running along the blade slot, never across it |
+
+**PETG, because of the heat gun.** PLA goes soft somewhere around 60 °C and a
+heat gun on its low setting blows straight past that; the first time you rest the
+holder against a jar you have just warmed, a PLA one takes a set and the blade
+stops sitting square. PETG buys you another 20 °C or so, which is the whole
+margin you need. Neither will survive being pointed at directly, so don't.
+
+Orientation is the other thing that will bite you. A slot printed across the
+layers splits along a layer line the first time you lever with it, and levering
+is the entire load case of this tool. Lay the part down so the layers run the
+length of whatever holds the blade, and put the walls up to four so the pocket
+has some meat around it — this is a part where extra perimeters matter far more
+than extra infill.
+
+## The method
+
+<Steps>
+
+1. **Pick the blade for the surface.** Steel on glass, plastic on everything
+   else. Snap a fresh one in; a blade that has done a jar is already dull.
+
+2. **Warm the label** — whole thing, gun moving, hand's width back — or soak the
+   container in hot soapy water for twenty minutes. Skip both if the label is
+   plain paper and already lifting at a corner.
+
+3. **Get under one corner** with the blade almost flat to the surface. If you are
+   fighting it, the label isn't warm enough. Do not solve it with a steeper
+   angle.
+
+4. **Pull the label back over itself**, close to 180°, and keep going slowly.
+   Peel force climbs steeply with the angle: fold it back on itself and paper
+   that would tear at 45° comes away whole. Slow and continuous beats fast and
+   stuttering every time.
+
+5. **Follow the peel with the blade**, not the other way round. The blade's job
+   is to break the adhesive line just ahead of where the paper is already
+   lifting. Leading with it is what shreds labels.
+
+6. **Deal with the residue** while the container is still warm — see below. It
+   never gets easier than it is at this moment.
+
+</Steps>
+
+## Residue
+
+The paper was never the problem. What's left is a film of adhesive, and it comes
+off with dwell time rather than force.
+
+Spray it with the 99% isopropyl, leave it 30 to 60 seconds, then work it into a
+ball with a microfibre cloth. It rolls up on itself and lifts. Re-wet and repeat
+rather than scrubbing dry — dry scrubbing smears it into a haze that then takes
+three times as long.
+
+On glass you can escalate: a plastic blade to shear the softened film off, and
+acetone if the alcohol won't touch it. **On plastic, alcohol and nothing
+stronger.** Acetone crazes PET and polystyrene on contact, and a hazy, crackled
+bottle is worse than one with a label on it.
+
+## Troubleshooting
+
+**The label tears into confetti.** Too cold, or you are pulling at too steep an
+angle. Both are fixed by the same thing — more warmth, flatter pull, slower hand.
+
+**The jar cracked.** The gun was held still on cold glass. Warm the whole
+container, keep the gun moving, and never start on a jar that's been out in the
+cold.
+
+**The bottle went oval.** That was plastic and it got heat. There is no fixing
+it; use the soak on the next one.
+
+**The blade skates off the label.** Either the angle is too steep or the blade is
+blunt. Blades are consumables and a dull one is what makes people push harder,
+which is exactly how a steel blade ends up somewhere it shouldn't be.
+
+**A ghost of adhesive the alcohol won't shift.** That is a rubber-based glue
+rather than an acrylic one. Give it a long soak in hot soapy water first, or lay
+an alcohol-soaked cloth over it and leave it five minutes — the solvent needs to
+get through the whole thickness, and it can only do that with time.
 
 ## Files & downloads
 

@@ -1,21 +1,196 @@
 ---
 title: Magnetic Ring Unlocker
-description: A magnetic ring for quickly unlocking childproof cabinet and gate latches.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed ring that carries the key magnet for childproof magnetic cabinet locks, so the key is on your hand instead of on top of the fridge.
+# The write-up isn't finished — there is no printable file in the folder yet.
+# Published, and marked as pending on the page, in the sidebar and on the
+# project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A magnetic ring for quickly unlocking childproof latches on gates and cabinets.
+Magnetic cabinet locks are the good kind of childproofing — nothing screwed to
+the outside of the door, nothing for a toddler to chew on, and the cabinet still
+looks like a cabinet. Then they hand you one key: a plastic puck that lives on
+top of the fridge, three rooms from the cupboard you are trying to open, while
+you are holding a kid in one arm and a saucepan in the other. This is that key,
+printed as a ring, so it is already on the hand that reaches for the door.
 
-{/* Photo needed — A hero photo of the finished magnetic ring unlocker — show the ring on a finger releasing a childproof latch.
-    alt text when it lands: A 3D-printed magnetic ring worn on a finger, held up to a childproof cabinet latch */}
+<ImagePlaceholder alt="A 3D-printed magnetic ring worn on a finger, held up to a childproof cabinet latch">
+  Hero photo of the finished magnetic ring unlocker — show the ring on a finger
+  releasing a childproof latch. Shoot it at the moment the latch drops, close
+  enough that the ring and the cabinet edge are both readable.
+</ImagePlaceholder>
 
 :::note
-Design files and build guide coming soon.
+The printable file is not in this folder yet — that is what the pending notice at
+the top is about. Everything below is what the part has to do and what to buy for
+it, which is enough to size one to your own finger and your own magnet in the
+meantime.
 :::
+
+## What actually has to happen
+
+The lock is a spring-loaded steel latch screwed to the inside of the cabinet
+door. Bring a strong enough magnet to the outside of the door front and the latch
+is pulled clear of its catch; take the magnet away and the spring puts it back.
+There is no mechanism, no code and no fit — the key never touches the lock.
+
+So the whole project is one question: **does your magnet swing that latch through
+your door front?** A cabinet door is typically around 3/4 in of wood between the
+magnet and the latch, and magnetic field falls off fast over that distance. The
+ring is just a comfortable way to hold a magnet that already works. Sort out the
+magnet first and print second.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [Magnetic child-safety cabinet locks](https://www.amazon.com/dp/B00XH80MZ0?tag=brau01-20)
+  — the locks themselves, if you don't already have them. Sold in sets of four,
+  eight or twelve with a key or two in the box. Buy one set for the whole house so
+  every lock answers to the same magnet
+- [Neodymium cup magnet, countersunk, 110 lb, 10-pack](https://www.amazon.com/dp/B0B1M7FVSF?tag=brau01-20)
+  — a neodymium disc in a steel cup with a countersunk hole straight through the
+  middle, and the screws in the pack. The hole is what makes it worth using here:
+  the ring screws to the magnet instead of being glued to it. Read the section
+  below before you order, because a cup magnet is not quite what the factory key
+  is
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) —
+  the pick for anything you wear. It is tougher than PLA and much less brittle,
+  and a ring gets caught on things
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) —
+  fine indoors, and a couple of grams a ring, so print five and keep one in the
+  car
+- [Flexible TPU filament, 1.75 mm](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20)
+  — the other way to solve sizing. A TPU band stretches onto any finger, at the
+  cost of letting a heavy magnet flop about
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) —
+  belt and braces on the magnet, even when it is screwed on. See the danger note
+  below for why that matters more here than on most projects
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — you are
+  matching a pocket to a magnet and a bore to a finger, and both are measurements,
+  not guesses
+- [Needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) and a
+  [deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — for the
+  magnet pocket and the inside edge of the band, which is the edge that decides
+  whether you wear this or leave it in a drawer
+
+## Picking the magnet
+
+The factory key in the lock box is a plain disc about an inch across with a steel
+plate behind it. The steel is not decoration: backing a magnet with steel pushes
+more of its field out the front, which is exactly the trick you want when the
+target is on the far side of 3/4 in of door.
+
+A cup magnet is the same idea taken one step further, and that step costs you
+something. The steel wraps the sides as well as the back, so it hits like nothing
+else on contact — 110 lb of it — but the flux loops home through the rim, and the
+reach at distance is shorter than a bare disc of the same diameter. It is still
+by far the strongest, widest thing in most parts drawers, and diameter is what
+gets you through a door.
+
+**Test it before you model anything.** Hold the bare magnet flat against the
+outside of a locked door, over where the latch sits, and slide it around. If the
+latch drops, you have your key and the rest is printing. If it doesn't, no ring
+design will fix that, and what you want instead is a plain uncupped
+[neodymium disc around an inch across](https://www.amazon.com/dp/B0GQ3GB3RQ?tag=brau01-20).
+
+Two things that follow from the cup:
+
+**Fit it open face out.** Only the face the magnet shows works. Mount it backwards
+and the ring is a steel washer on your finger.
+
+**Small discs are not a substitute.** Stacking
+[6 × 3 mm discs](https://www.amazon.com/dp/B07873ZCY4?tag=brau01-20) makes a
+taller magnet, not a longer-reaching one — at these distances the diameter of the
+pole face is what counts, and 6 mm of it is nothing. A stack will pop a thin
+drawer front and will not touch a proper door. They are useful for the mock-up
+you print to check the band size, and that is about it.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.15 mm |
+| Walls / perimeters | 4 or more |
+| Infill | 40% |
+| Supports | None |
+| Material | PETG, or PLA+ indoors |
+| Orientation | Band flat on the plate, magnet pocket opening upward |
+
+**Lay the band flat on the plate.** Then the hoop of the ring is one continuous
+extrusion going round and round, and the load a ring actually sees — being pulled
+off a finger, being spread to get it on — pulls along the extrusions instead of
+across the joints between layers. Stand it up on edge and the band becomes a
+stack of layer joints in exactly the plane it wants to split on. It will last
+until the first time you catch it on a drawer handle.
+
+Flat also puts the magnet pocket opening upward, so it slices as a plain vertical
+hole with nothing to bridge and no supports anywhere in the part.
+
+Walls do the work at this size — four perimeters on a 0.4 mm nozzle is most of a
+thin band solid, and the infill percentage barely gets a say.
+
+## Assembly
+
+<Steps>
+
+1. **Measure the magnet.** Diameter and thickness with the caliper, and the
+   countersink too if you are going to screw through it. Do this before you draw
+   the pocket rather than after, because a magnet that does not sit flush stands
+   the ring off the door and costs you the distance you were fighting for.
+
+2. **Measure the finger you will wear it on**, and print the band on its own once
+   before you print the whole thing. A ring is a part where half a millimetre is
+   the difference between wearing it all day and taking it off after an hour.
+
+3. **Open the pocket up.** A printed hole always finishes under size, so if the
+   magnet does not drop in under thumb pressure, take the walls back with a
+   needle file rather than reprinting the ring 2% larger — scaling moves the
+   finger bore with it.
+
+4. **Fit the magnet open face out**, screw it down through the countersink if the
+   design takes the screw, and put a drop of CA around the seat either way.
+
+5. **Break the inside edge of the band** with the deburring tool. This is the
+   step people skip and then wonder why they never wear it.
+
+6. **Test it on the cabinet you built it for.** Then hang off it — pull the magnet
+   hard, twist it, knock the ring against the counter. Whatever comes off in your
+   hand now is better than it coming off on the kitchen floor later.
+
+</Steps>
+
+:::danger
+**Neodymium magnets are a surgical emergency if a child swallows two of them.**
+They find each other through the wall of the gut and pinch it closed. This is a
+project you are building because there is a small person in the house, and it
+puts a very strong magnet within their reach by design, so treat the bond between
+magnet and ring as the safety-critical part of the build: screw it, glue it, and
+check it now and then. The rest of the pack goes somewhere they cannot get to —
+not a drawer, not a bowl by the door.
+:::
+
+:::caution
+A 110 lb magnet is not a toy in the other direction either. It will jump the last
+centimetre to any steel it can see and it does not care what is between — a
+fingertip against a fridge door or a tool chest is a genuine blood blister. Slide
+it onto steel from the side rather than dropping it on. Keep it away from cards
+with a stripe, mechanical drives, watches, hearing aids and pacemakers, and
+remember it is on your hand now, so it goes wherever your hand goes.
+:::
+
+## The thing nobody tells you about magnetic locks
+
+The lock is only as childproof as the key is out of reach. The whole design
+assumes an adult carries the key and a child cannot find it. Wear the ring and
+that is exactly what happens. Leave it on the counter beside the cupboard it
+opens and you have spent an evening printing yourself a slightly worse fridge
+puck.
 
 ## Files & downloads
 

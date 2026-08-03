@@ -1,29 +1,293 @@
 ---
 title: Hype Button
-description: Physical multi-click button controller with NeoPixel feedback and rotary encoder support.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A 22 mm mushroom button on an ESP32 that counts how you hit it — one click through five, or a long hold — and fires a different Home Assistant scene for each, with an eight-pixel bar beside it.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A physical button that triggers custom actions and celebrations in Home Assistant. Supports single click, double click, triple click, long press, and up to 5-click sequences with addressable LED feedback.
+One big button on a wall, and what it does depends on how you hit it. An ESP32
+counts the presses — one, two, three, four, five, or a hold — and publishes each
+pattern to Home Assistant as a different string, so one button drives six
+automations. Eight pixels next to it show a level you set with the same button,
+so the same input is a dial as well as a trigger.
 
-## How It Works
+The button is a 22 mm industrial mushroom head in a two-hole control station box.
+That is the whole point: it is the size and the weight of a thing you *hit*, not
+a tactile switch you find with a fingernail.
 
-An ESP32 monitors a capacitive button with advanced multi-click detection logic. Each click pattern (single, double, triple, etc.) triggers different Home Assistant automations or scenes. An 8-LED NeoPixel strip provides visual feedback showing the selected mode or intensity level.
+<ImagePlaceholder alt="The hype button — a 22 mm mushroom head in a small grey control box, with an eight-pixel LED bar lit beside it">
+  Hero shot — the finished button mounted on a wall or sitting on a desk, hand
+  about to hit it, the eight-pixel bar lit and showing a partial level.
+</ImagePlaceholder>
 
-## Hardware
+## What a press does
 
-- **Board:** ESP32
-- **Input:** Capacitive touch button or momentary switch (GPIO22)
-- **Output:** 8-LED NeoPixel strip (GPIO13)
-- **Optional:** Rotary encoder for value adjustment (future)
+Every pattern publishes to one text sensor, `${device_name} Action`. Two of them
+also move the level the LED bar shows.
+
+| Press | `Action` becomes | Also |
+|---|---|---|
+| One short click | `single short click` | Level **+1** |
+| Hold for 1 s or more | `single long click` | Level **−1** |
+| Two clicks | `double click` | — |
+| Three clicks | `triple click` | — |
+| Four clicks | `four click` | — |
+| Five clicks | `five click` | — |
+
+The timings are strict, and they come straight from the config: each press must be
+down for **1 s or less**, each gap between presses **1 s or less**, and the
+sequence closes after **0.5 s** with the button up. So a single click is not a
+single click until half a second after you let go — there is no way around that
+delay, because until the window closes the device cannot know a second click isn't
+coming. The long press is the exception: it fires while your hand is still on it,
+the moment you cross a second.
+
+One second after publishing, the sensor resets itself to `standby`.
+
+:::note
+Trigger your automations on the **transition to** a value, not on the value being
+present. The string is only there for a second, and any automation that polls for
+`state == "triple click"` will miss it most of the time.
+:::
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [ESP32 dev board, 38-pin WROOM-32](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — the config's `board: esp32dev`. Ships as a 2-pack
+- [22 mm momentary mushroom-head push button](https://www.amazon.com/dp/B0B8R7R9YM?tag=brau01-20) — IP65, SPST: two screw terminals and one normally-open contact, so there is no block to wire up wrong
+- [22 mm two-hole control station box](https://www.amazon.com/dp/B07GMZ9DSY?tag=brau01-20) — the button and the box are the same 22 mm standard, so it drops straight in
+- [8-pixel WS2812 board](https://www.amazon.com/dp/B07KD6ZB88?tag=brau01-20) — a rigid PCB, not cut strip. `num_leds: 8`, `type: GRB`. 2-pack
+- [22 mm key switch, 1NO1NC maintained](https://www.amazon.com/dp/B07L59N466?tag=brau01-20) — optional, and one thing the box's second hole can be. The config does not read it; you would add a second `binary_sensor`
+- [EC11 rotary encoder with push switch](https://www.amazon.com/dp/B07D3DF8TK?tag=brau01-20) — optional, and read the section below first. 10-pack, and a 7 mm threaded bushing rather than a 22 mm one
+- [24 AWG silicone hookup wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) — for the run from the button's screw terminals to the board
+- [Dupont jumper assortment](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20) — female-to-female for the LED board's header
+- [2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — 3-pack, and the 2.4 A is shared across its two ports, so give this one the button to itself
+- [Short right-angle micro-USB cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — 3-pack of 1 ft cords. The right-angle plug is what makes an ESP32 fit in a box this shallow
+
+:::caution
+**Buy the momentary one.** The 22 mm mushroom head also comes in a latching
+version — identical hole, identical look, and it stays down until you press it
+again. Multi-click detection needs a contact that closes and opens with your
+hand, so on a latching head every automation above becomes unreachable except the
+long press. Check the listing says *momentary*, not *latching* or *maintained*.
+:::
+
+There is nothing to print. The control station box is the enclosure, and it
+arrives with both 22 mm holes already cut.
+
+### About the encoder
+
+The comment at the top of the config says "rotary encoder with push button", and
+that is what the pin is named after — `encoder_sw`. But there is no
+`rotary_encoder:` component anywhere in the file. **Only the switch is read.**
+Turning a knob does nothing; the level moves by clicking, up on a short press and
+down on a long one. Fit the mushroom head and ignore the name. If you want the
+knob, you are adding a `rotary_encoder:` component and two more pins yourself,
+and an EC11 needs a 7 mm hole drilled somewhere the box does not have one.
+
+## Wiring
+
+Three wires to the LED board, two to the button.
+
+| Part | ESP32 pin | Notes |
+|---|---|---|
+| Button, one terminal | **GPIO22** | The config sets `pullup: true` and `inverted: yes`, so the pin idles high and the press pulls it down. No external resistor |
+| Button, other terminal | **GND** | |
+| LED board DIN | **GPIO13** | Keep this lead short |
+| LED board 5V | **5V / VIN** | Not 3V3 — the pixels are 5 V parts |
+| LED board GND | **GND** | |
+
+The button above has one normally-open contact on two screw terminals, so there
+is no polarity and nothing to choose: either terminal to GPIO22, the other to
+GND. Heads that ship with a screw-on 1NO1NC block give you four terminals
+instead, and only the NO pair works here.
+
+Eight WS2812s at full white pull roughly 60 mA each, so about half an amp with
+everything on. That comes out of the ESP32's 5 V pin, which is the USB rail, which
+is why the parts list says a 2.4 A charger and not the 500 mA one in the drawer.
+
+<ImagePlaceholder alt="Inside the control box — the ESP32 wired to the mushroom button's screw terminals and to the eight-pixel LED board">
+  Wiring shot — the inside of the box with the button's screw terminals, the two
+  wires to GPIO22 and GND, and the three-wire run to the LED board.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Decide where the pixels go** before anything else, because it decides what
+   the second 22 mm hole is for. The LED board is a straight bar — eight 5050
+   packages in a row, over 40 mm end to end — so it does not sit behind a 22 mm
+   round hole. Either pass a three-wire lead out through that hole and stick the
+   bar where you can see it from across the room, or file the hole into a slot and
+   mount the bar behind a strip of white plastic. Fit the key switch there instead
+   and the bar goes outside.
+
+2. **Fit the button.** It drops into a 22 mm hole from the front and clamps with
+   the ring nut from behind. Snug, not gorilla-tight — it is a plastic box.
+
+3. **Wire the button** to GPIO22 and GND with the silicone wire, under its two
+   screw terminals. Bring the USB cable in at this point too — the switch body
+   fills most of the box once it is in, and threading a plug past it afterwards is
+   miserable.
+
+4. **Wire the LED board** to 5 V, GND and GPIO13. Short leads. A long data run to
+   the first pixel is the usual cause of a first pixel that shows the wrong
+   colour.
+
+5. **Flash it over USB and test it with the box open.** Press once, twice, three
+   times, and watch the text sensor in Home Assistant change. Closing the box on
+   a wire that has pulled out of a screw terminal is the one mistake that costs
+   you the whole assembly again.
+
+</Steps>
 
 ## Firmware
 
-This project runs [ESPHome](https://esphome.io/). The full configuration is below — copy it into your ESPHome directory and adjust the substitutions at the top.
+The config is `esphome/bruh-switch.yaml` in the download section below. It is
+plain ESPHome — nothing to install beyond ESPHome itself, and the only C++ in it
+is the lambda that draws the level bar.
+
+<Steps>
+
+1. Copy it into your ESPHome directory.
+
+2. Change the two substitutions at the top:
+
+   ```yaml
+   substitutions:
+     device_name: "Hype Button"
+     device_id: "hype-button"
+   ```
+
+3. Fill in `secrets.yaml`. This config uses four keys: `wifi_ssid`,
+   `wifi_password`, `ota_password` and `api_key`. There is a
+   `secrets.yaml.example` in the repo with every key these configs use.
+
+4. Flash over USB the first time. Every flash after that is over WiFi.
+
+</Steps>
+
+The `ota:` block in this config has no `platform:` key. Current ESPHome wants
+`platform: esphome` nested under `ota:` — add that line if the compile complains
+about it.
+
+### Two things in the file that are not this project
+
+`bruh-switch.yaml` also carries a `xiaomi_hhccjcy01` block and an
+`esp32_ble_tracker:`, reporting temperature, moisture, illuminance, conductivity
+and battery for a plant sensor called "Yard 1". That has nothing to do with the
+button — it is there because an ESP32 will happily be a Bluetooth receiver and a
+button at the same time, and this one happened to be near a plant. Delete both
+blocks unless you have that sensor, and give the WiFi stack back the memory the
+Bluetooth radio was holding. If you *are* keeping it, put your own sensor's MAC
+in `mac_address:`; the one in the file is Ben's and will never advertise on your
+network.
+
+There are also two internal template text sensors, `last_message_line_1` and
+`last_message_line_2`, that nothing ever writes to. They are harmless and they
+are dead weight. Delete them.
+
+## The level bar
+
+`switch_1_value` is a template number, 0 to 7, and the `Status` light effect draws
+it: pixels below the value light in whatever colour the light is currently set to,
+pixels above it stay dark. A short click adds one, a long press takes one away.
+
+Two things about it are worth knowing before you wonder why nothing is happening.
+**The light has to be on and `Status` has to be the selected effect** — it is an
+effect, not a separate entity, so with the light off the bar is off too. And the
+number has neither `restore_value` nor `initial_value`, so after a reboot it comes
+up with no value at all and the first click has nothing to add to. One line fixes
+that:
+
+```yaml
+number:
+  - platform: template
+    id: switch_1_value
+    restore_value: true
+```
+
+One more quirk you will see before you look for it: the effect lights the pixels
+*below* the value and `max_value` is 7, so the eighth pixel never comes on. A full
+level is seven lit and one dark. Set `max_value: 8` if you want the whole bar.
+
+The light carries fourteen more effects beyond `Status` — flicker, addressable
+flicker, strobe, random, rainbow, scan, colour wipe, twinkle, random twinkle,
+fireworks, a two-colour `Police` wipe and three BRUH-tuned flicker and twinkle
+variants. Those are what you fire from the celebration scene.
+
+## In Home Assistant
+
+The device is discovered by ESPHome, so there is no YAML on the Home Assistant
+side. With the substitutions above you get:
+
+- **`sensor.hype_button_action`** — the string in the table at the top. This is
+  the thing you automate on.
+- **`binary_sensor.hype_button_button`** — the raw contact, on while your hand is
+  down. Check your wiring against this one before anything else; it should be
+  `off` at rest and flick `on` under your palm.
+- **`light.hype_button_led`** — the eight pixels, with the whole effects list.
+- **`number.hype_button_switch_1`** — the 0–7 level.
+- **`switch.hype_button_alert_mode`** — an optimistic template switch. It does
+  nothing on the device; it is a flag you can set from the button's automations
+  and test from other ones. Delete it if you have no use for it.
+
+A triple click firing a scene:
+
+```yaml
+automation:
+  - alias: "Hype button — triple click"
+    triggers:
+      - trigger: state
+        entity_id: sensor.hype_button_action
+        to: "triple click"
+    actions:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.hype
+```
+
+Repeat that with `to: "double click"`, `to: "five click"` and so on. Six patterns,
+six automations, one button.
+
+## Troubleshooting
+
+**Every press comes back as a double click.** Contact bounce. A big mechanical
+switch bounces far harder than a tactile button, and multi-click counts every
+edge it sees. Add a filter to the binary sensor:
+
+```yaml
+binary_sensor:
+  - platform: gpio
+    id: encoder_sw
+    filters:
+      - delayed_on_off: 20ms
+```
+
+**Two clicks report as one.** The `on_multi_click` timings got reordered. They are
+listed longest-first in the config on purpose — ESPHome takes the first block that
+matches, and a single-click pattern sitting above a double-click pattern will
+match first and the longer one never fires. Put them back in the order the file
+ships in.
+
+**The button reads pressed all the time and clears while you hold it.** You are on
+a normally-closed pair. Only a head with a 1NO1NC block can do this — move both
+wires to the NO terminals.
+
+**Nothing on the LEDs.** In order: the light entity is off, or the effect isn't
+`Status`; then 5 V wired to 3V3; then the data lead on the wrong pin. GPIO13.
+
+**The first pixel is the wrong colour and the rest are fine.** That is the 3.3 V
+data line and a lead that is too long. Shorten it before reaching for a level
+shifter.
 
 ## Files & downloads
 

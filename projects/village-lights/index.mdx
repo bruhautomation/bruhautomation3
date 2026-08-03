@@ -1,19 +1,325 @@
 ---
 title: Village Lights
-description: Decorative village scene with controllable lighting.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed Christmas village with one addressable pixel under every roof — one string, one ESP, and every building its own light entity in Home Assistant.
+# The write-up is here; the models and the config aren't. Published, and marked
+# as pending on the page, in the sidebar and on the project list, until the STLs
+# and the ESPHome YAML land in the folder.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Decorative village scene with controllable lighting.
+A Christmas village is a shelf of little buildings with a bulb in each one, and
+the bulbs are on a switch or they are off. This one puts a single addressable
+pixel under every roof, on one string, on one ESP — so the village fades up at
+dusk instead of when somebody remembers, the church can sit warm and still while
+the toy shop cycles colour, and every building is its own light entity in Home
+Assistant.
 
-## Hardware
-- LED modules
-- Control circuitry
-- Decorative structures
+The buildings are printed, which is the other half of the point. A shop-bought
+village is whatever the shop sold; a printed one is your street, at your scale,
+with a 12 mm hole in the base of each building because that is exactly what the
+light wants.
+
+<ImagePlaceholder alt="A printed Christmas village on a mantel at night, each building lit from inside in a different colour">
+  Hero shot — the whole village lit in a dark room, shot low and level with the
+  rooftops so the windows read as windows. Two or three buildings on different
+  colours makes the per-house control obvious in one frame.
+</ImagePlaceholder>
+
+:::note
+The models aren't posted yet, and neither is the ESPHome config. What follows is
+the lighting, the print settings a building lit from inside wants, the wiring and
+the config to write — the STLs will land in the download section at the bottom.
+:::
+
+## One pixel per house
+
+The part that makes this easy is the 12 mm WS2811 bullet pixel: a diffused round
+node on a 12 V string, potted, with a controllable RGB LED inside it. Press one
+up into a 12 mm hole in the base of each building and the string *is* the wiring.
+No board per house, no supply per house, nothing to solder once the string is
+made up.
+
+Node order is pixel order. The first house the data reaches is pixel 0, and that
+number is what Home Assistant will end up calling it, so the order you thread the
+string is a decision, not an accident.
+
+**The string is tighter than your village.** A 10 m string of 100 nodes is
+roughly 100 mm of wire between one node and the next, and buildings on a mantel
+sit further apart than that. Plan for it: cut the string where two houses are too
+far apart and put a pair of JST-SM pigtails in the gap. That buys you 30 cm and,
+better, the village comes apart at those points in January instead of going into
+the box as one 3 m tangle.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [12 V WS2811 12 mm bullet pixels, 100 nodes / 10 m](https://www.amazon.com/dp/B0922DZ4CC?tag=brau01-20)
+  — the light, the wiring and the connectors in one part. IP68, so a node
+  survives being glued into a base and prised back out. The
+  [50-node BTF-LIGHTING string](https://www.amazon.com/dp/B077PRS371?tag=brau01-20)
+  is the same thing at half the length if the village is a shelf rather than a
+  mantel and a windowsill.
+- [ESP32 dev board, 38-pin, 2-pack](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20)
+  — the board every recent BRUH build uses. Its RMT peripheral clocks pixel data
+  without leaning on the CPU, which matters not at all for twelve pixels and
+  matters when the village grows. A
+  [Wemos D1 mini](https://www.amazon.com/dp/B01N3P763C?tag=brau01-20) does the same
+  job in a box a third the size.
+- [12 V 10 A supply with an 8-way splitter](https://www.amazon.com/dp/B018G3ABWY?tag=brau01-20)
+  — the splitter is the reason to buy this one. One leg feeds the string, one
+  feeds the controller box, and a third goes to the far end of the string when the
+  village gets long enough to need it.
+- [MP1495 adjustable buck module, 5-pack](https://www.amazon.com/dp/B0CDWTQG9B?tag=brau01-20)
+  — set to 5 V, this is what runs the ESP off the same 12 V brick so there is one
+  cord going to the shelf and not two.
+- [5.5 × 2.1 mm panel jacks and pigtails, 20-pack](https://www.amazon.com/dp/B08LQ3SB3F?tag=brau01-20)
+  — matches the brick's splitter, so the controller box gets a socket instead of a
+  captive lead.
+- [JST-SM 3-pin pigtail pairs, 20 pairs](https://www.amazon.com/dp/B0CGPV3FMG?tag=brau01-20)
+  — 15 cm a side. Every one you fit is a place the village separates for storage.
+- [24 AWG silicone wire, 10 colours](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20)
+  for lengthening a run between two nodes and for the short data hop, and
+  [18 AWG red/black silicone](https://www.amazon.com/dp/B07FMRDP87?tag=brau01-20)
+  for the 12 V feed and any injection tap.
+- [Lever-nut connectors, 26-pack](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20)
+  — where the supply splits to the string and the buck. Solderless, and they come
+  apart when the layout changes next December.
+- [IP65 project box with cable glands](https://www.amazon.com/dp/B07RPNWD47?tag=brau01-20)
+  — holds the barrel jack, the buck and the ESP. It lives behind the village or
+  under the shelf; nothing about this build wants to be looked at.
+- [A 470 Ω resistor](https://www.amazon.com/dp/B072BL2VX1?tag=brau01-20)
+  in series with the data line and
+  [a 1000 µF electrolytic capacitor](https://www.amazon.com/dp/B06WGPNM19?tag=brau01-20)
+  across 12 V at the first node. Two-cent parts, left out of every build until the
+  first pixel starts misbehaving.
+
+And the filament, which on this project is most of the design.
+
+- [Matte light brown PLA](https://www.amazon.com/dp/B08HVP2Q1C?tag=brau01-20) and
+  [matte chocolate PLA](https://www.amazon.com/dp/B08MT3RJ1L?tag=brau01-20) —
+  walls. Matte kills the layer sheen that makes a printed building read as
+  plastic, and brown is a house colour in a way that white is not.
+- [Matte white PLA](https://www.amazon.com/dp/B089S1HB8K?tag=brau01-20) — snow,
+  church walls, and anything you *do* want to glow through.
+- [Clear PLA](https://www.amazon.com/dp/B07ZNG4L9P?tag=brau01-20) — window panes,
+  printed one or two layers thick and glued in behind the openings.
+- [PLA+ in black](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — roofs and
+  bases, 4 kg of it. A roof is the part that must not leak light.
+- [6 × 2 mm neodymium magnets, 120-pack](https://www.amazon.com/dp/B075RZ82HP?tag=brau01-20)
+  — four per building, so the roof lifts off to get at the node instead of being
+  glued down over it.
+- [CA glue with activator](https://www.amazon.com/dp/B0849YVVSL?tag=brau01-20) for
+  the window panes,
+  [hot glue](https://www.amazon.com/dp/B071HH42WW?tag=brau01-20) for a node that
+  ended up loose in its hole, and a
+  [needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) for one
+  that ended up tight.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls | 3 on the shell, 1 on the window panes |
+| Infill | 0% |
+| Supports | None, if the roof is a separate part |
+| Material | PLA — matte for walls, PLA+ for roofs and bases |
+| Orientation | Building upright, roof separate and flat on the bed |
+
+**Print the walls opaque and let the windows do the work.** A thin white shell
+lit from inside glows evenly all over, which is the right answer for [an
+ornament](/projects/christmas-ornaments/) and the wrong one for a house — it
+reads as a paper lantern. Three walls of matte brown and a black roof stop the
+light dead, so the only place it escapes is the openings you cut, and a point
+source behind a window is exactly what a lit window looks like from across a
+room.
+
+The roof is a separate part for three reasons: it prints flat with no overhang
+and no supports, it can be a different colour from the walls without a filament
+change, and it lifts off. Set four magnets in the eaves and four in the wall tops
+and you can get at a dead node in December without a heat gun. **Check the
+polarity of all eight before the glue goes off** — one magnet in backwards and the
+roof slides itself off the house.
+
+A 12 mm hole prints slightly undersized on almost every machine, and the first
+layer's elephant's foot makes the base of it tighter still. Open it with a round
+needle file until the node pushes in and stays, rather than reprinting the
+building. Leave enough height inside that the node is not pressed flat against
+the back of a window — a pixel touching the pane is a bright dot, and a pixel
+sitting 15 or 20 mm behind it is a lit room.
+
+:::caution
+**PLA and a working fireplace do not mix.** A Christmas village lives on a mantel
+more often than not, and the shelf above a fire that gets lit runs hot enough to
+soften PLA — it goes at around 60 °C, and a warped village is a village you print
+again. If the fire below yours is more than decorative, print the buildings in
+[PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) and accept the shinier
+finish.
+:::
+
+## Wiring
+
+There is no firmware in this folder yet, so no pin is fixed. What is fixed is
+which wire goes where, and the three-conductor string makes that short.
+
+| Signal | Goes to | Notes |
+|---|---|---|
+| String data in | An ESP GPIO, through the 470 Ω | Whichever pin you name in the config. Keep the lead under about 20 cm |
+| String +12 V | The supply, directly | Never off the board — see below |
+| String ground | Supply ground | |
+| ESP 5 V in | The buck's output | Set to 5 V with a meter *before* it is connected to anything |
+| ESP ground | Supply ground | Common with the string's ground, always |
+
+The string is fed from the supply, not through the ESP. A board regulator exists
+to run the board; a couple of dozen pixels at full white is many times what it can
+give, and the failure is a board that reboots the instant the light turns on.
+
+Ground is the connection people skip and it is the one that must be there. The
+data signal is measured against ground, so a board and a string on separate legs
+of the splitter with no ground tied between them means the first node is reading
+noise.
+
+<ImagePlaceholder alt="The controller box open, showing the barrel jack, buck module, ESP32 and the three-wire lead out to the pixel string">
+  Wiring shot — the project box laid open with the barrel jack, the buck module,
+  the ESP and the 470 Ω on the data line all visible and labelled.
+</ImagePlaceholder>
+
+## Assembly
+
+<Steps>
+
+1. **Lay the village out before you buy or cut anything.** Put the buildings —
+   or boxes standing in for them — where they will actually sit, and measure gap
+   to gap. Every gap wider than about 100 mm is a place a JST pair goes.
+
+2. **Print one building and dry-fit a node** in its 12 mm hole. The fit of the
+   pixel in the base is the only thing on this print that can be wrong, and it is
+   much cheaper to find out on the first one than on the twelfth.
+
+3. **Thread the string in the order you want the pixels numbered**, and check the
+   arrows on the string as you go — data enters at the end the arrows point away
+   from, and a string fed backwards is completely dark with no other symptom.
+
+4. **Write the pixel number under every base** as you fit its node. Masking tape
+   and a marker. Six months later, "which house is pixel 7" is a question you will
+   otherwise answer by turning them on one at a time.
+
+5. **Build the controller in the box.** Barrel jack through a gland, buck module
+   metered to 5 V with nothing attached to its output, ESP, 470 Ω in series on the
+   data line, three-wire lead out the other gland. These buck modules arrive set
+   to wherever the last person on the line left the trimmer.
+
+6. **Flash it and walk the pixels** — turn each one on alone and confirm it is the
+   house you think it is — *before* you dress the wire and glue the roofs down.
+
+7. **Hide the run.** Cotton batting, fake snow or a printed snowbank over the wire
+   between buildings. The string is grey plastic and the eye finds it immediately.
+
+</Steps>
+
+## Configuration
+
+There is no config in this folder yet. The whole of it is one string and a
+handful of segments — this is where to start:
+
+```yaml
+light:
+  - platform: neopixelbus
+    id: village
+    variant: WS2811
+    type: GRB
+    pin: GPIO13
+    num_leds: 12
+    name: "Village"
+    internal: true
+```
+
+`num_leds` is the number of houses, and it has to be right: set it low and the
+far end of the street never lights, set it high and the extra pixels are thrown
+away silently.
+
+`type` is the order the three colour dies are wired inside the package and it
+varies by string. Start at `GRB`. If you send red and get blue, this is the line
+and it is the only line — the 12 V WS2811 run behind the
+[Neopixel Strip](/projects/neopixel-strip/) project came out `BRG`.
+
+Then give each building its own entity with a partition light, one per house:
+
+```yaml
+  - platform: partition
+    name: "Village Church"
+    segments:
+      - id: village
+        from: 3
+        to: 3
+```
+
+`from` and `to` are the pixel numbers you wrote under the bases. With the base
+light marked `internal: true`, Home Assistant never sees the strip at all — it
+sees a church, a bakery and a toy shop, which is what you want in a scene and on
+a dashboard. Group them into one HA light group for the "village on" automation.
+
+Set the default colour warm and the brightness low. Full white through a printed
+wall looks like a printed wall; something around a candle's colour at a third
+brightness looks like a window with a fire behind it, and it is still the
+brightest thing on the shelf in a dark room.
+
+## If you don't want a controller
+
+Two routes that need no ESP and no config at all, and both are honest answers for
+a village that comes out for four weeks a year.
+
+[Flameless LED tea lights](https://www.amazon.com/dp/B0BQJ5QZ8J?tag=brau01-20) —
+24 in a pack, warm white, already flickering — drop into a building through the
+same hole in the base if you size it for a tea light instead of a 12 mm node.
+Nothing to wire, nothing to hide, and no cord to the shelf.
+
+A [100-LED warm white fairy string](https://www.amazon.com/dp/B091SVMFV4?tag=brau01-20)
+threaded through the whole village puts one or two mini LEDs in every building
+off one battery box. Put it on a
+[Sonoff S31](https://www.amazon.com/dp/B07BTLHWFM?tag=brau01-20) run from mains
+instead — see the [Sonoff S31](/projects/sonoff-s31/) page — and the village is
+back in Home Assistant as a switch, which covers the "on at dusk, off at
+bedtime" automation that is most of what anybody actually wants from it.
+
+## Troubleshooting
+
+**Nothing lights at all.** Nine times in ten the data is on the wrong end of the
+string. Check the arrows, then check that the ESP's ground and the supply's
+ground are genuinely joined.
+
+**The first pixel is the wrong colour, or flickers.** A 3.3 V data pin driving a
+12 V string's input, which is the most common problem with this build by a
+distance. Fit the 470 Ω in series at the board end, keep the lead from board to
+first node short, and put the 1000 µF capacitor across 12 V at that first node. If
+it still misbehaves, buffer the data through a
+[74AHCT125](https://www.amazon.com/dp/B00XW2L39K?tag=brau01-20)
+— a plain one-way buffer, not a bidirectional auto-direction shifter, which is
+the wrong shape for an 800 kHz line that only ever goes one way.
+
+**One house is dark and so is everything after it.** WS2811 has no backup data
+line, so a node whose IC has died takes the rest of the street with it. The dark
+one is the culprit, not the first one still lit. Cut it out and splice the three
+conductors straight through, or drop a spare node in — and remember the pixel
+numbering downstream does not change if you splice through, but drops by one if
+you delete the node from the string.
+
+**Red comes out blue.** Change `type:` in the config.
+
+**The far houses are dim and orange.** Voltage drop down a long string. Feed the
+far end from a second leg of the splitter — same supply, same ground.
+
+**The board reboots every time the village turns on.** The string is being fed
+through the ESP. Take it off the board and give it its own leg.
+
+**The buildings glow all over instead of at the windows.** The walls are too thin
+or too pale. Three perimeters of an opaque colour, and a black roof.
 
 ## Files & downloads
 

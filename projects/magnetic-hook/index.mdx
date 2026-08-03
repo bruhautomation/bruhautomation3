@@ -1,18 +1,186 @@
 ---
 title: Magnetic Hook
-description: Wall-mounted magnetic hook.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed hook that screws straight onto a 40 lb stud magnet — captive M6 nut, no glue, no screws, and a returning arm that stops 27 mm short so nothing slides off it.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Wall-mounted magnetic hook.
+A hook you can move. It threads onto the M6 stud of a rubber-coated neodymium
+magnet, so it sticks to anything ferrous — a steel garage door, the side of a
+tool chest, a rack upright, the underside of a shelf — and comes off again
+without leaving a hole or a patch of adhesive residue. There are two parts to
+buy and one to print.
 
-## Hardware
-- Strong neodymium magnet
-- 3D-printed base
+The shape is the reason to build this one rather than buy a hook: it is a
+**closed** hook. The arm goes out, arches over, and comes back to within 27 mm of
+the mounting face. Whatever you hang on it can be knocked, swung and driven over
+a speed bump, and it stays on.
+
+<ImagePlaceholder alt="The printed magnetic hook screwed onto a rubber-coated magnet and stuck to a steel garage door, with an extension cord hanging in it">
+  Hero shot — the hook stuck to a steel surface with something actually hanging
+  in it. Shoot it side-on so the arch and the gap between the returning arm and
+  the wall both read clearly.
+</ImagePlaceholder>
+
+## The shape
+
+Every number here is measured off `bruh_mag_hook_v2.step` in this folder.
+
+| Feature | Dimension |
+|---|---|
+| Overall | 57.5 × 15 × 60 mm |
+| Stands off the mounting face | 60 mm |
+| Mounting pad | 15 × 15 mm |
+| Arm section | 15 × 15 mm square |
+| Stud bore | 6.0 mm dia, 16 mm deep, blind |
+| Nut pocket | 10.0 mm across flats, 6 mm deep, side entry |
+| Throat, clear | 32.5 mm across × 50 mm deep |
+| Mouth | 27 mm |
+| Arch radius | 15.5 mm outside, 5 mm on every inside corner |
+| Model volume | 21.1 cm³ |
+
+The load-bearing arm is the one with the magnet on the end of it: a 15 mm square
+bar that stands straight out of the mounting face for 45 mm. Everything else —
+the arch and the short returning leg — exists to stop things leaving.
+
+**Mount it with the magnet at the bottom and the arch above.** Then the square
+arm is a 45 mm ledge with the wall as its back stop, the returning leg is a roof
+over it, and the only way out is up 32.5 mm and back through the 27 mm mouth.
+Flip it over and everything you hang dangles off the far end of a 60 mm
+cantilever, which is the worst possible way to load a magnet. On a horizontal
+surface overhead it works the obvious way round: the arm hangs down, the arch is
+the bottom of the hook, and the return leg keeps the load from swinging out.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [M6 stud magnet base, 40 lb, rubber-coated](https://www.amazon.com/dp/B07JLKXRV6?tag=brau01-20) — the part the whole thing is drawn around. The rubber matters twice over: it won't mark a painted door, and friction is what gives a magnet any useful grip in shear. Four in a pack, so print four hooks
+- [M6 hex nut](https://www.amazon.com/s?k=M6+hex+nut+DIN+934+stainless&tag=brau01-20) — one per hook, 10 mm across flats, plain or nyloc. The pocket is 6 mm deep, so a 5 mm standard nut has a millimetre of slop in it and a 6 mm nyloc fills it exactly
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — the default, and about 20 g a hook, so a spool is fifty of them
+- [PETG filament, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — use this instead in a garage, a shed or a car. A loaded hook is a permanent load, and PLA creeps under one, faster when it's warm
+- [Blue threadlocker](https://www.amazon.com/dp/B000I1RSNS?tag=brau01-20) — one drop on the stud. Anything that gets bumped daily unscrews itself eventually
+- [Twist drill set](https://www.amazon.com/dp/B07DH55YRX?tag=brau01-20) — the bore wants reaming, see below
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) and a [needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) — for the bore mouth and the nut pocket
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — measure your nut across the flats before you print four hooks it doesn't fit
+
+## Before you slice it
+
+:::caution
+The STL carries a stray block. There is a solid 10 × 5.4 × 5 mm slab sitting on
+the side face directly over the mouth of the nut slot — the tool body that cut
+the slot, left in the export. Print the file as it stands and the slot is walled
+off, and the nut has nowhere to go.
+:::
+
+It is attached only around the rim of the slot opening, so there are two ways
+past it and both are quick. In the slicer, drop a **negative volume** over that
+corner of the part and it disappears from the sliced output. Or open
+`bruh_mag_hook_v2.f3d` or the STEP, delete the body called `Body3`, and export a
+clean mesh. Cutting it off after printing works too, but the block sits exactly
+where the part has to meet the bed, so you would be dressing a face you then have
+to print on top of — delete it first.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 5 |
+| Infill | 40% |
+| Supports | None |
+| Material | PLA+ indoors, PETG anywhere warm |
+| Orientation | On the face the nut slot opens through, 15 mm tall |
+
+**Lay it down on the slotted face.** The part is then 15 mm tall, the whole
+outline becomes a straight extrusion, and there is not a single overhang in it —
+no supports, anywhere. It was drawn to print this way: the nut pocket comes out
+as an open-bottomed 10 mm slot with a 30° peak on top, which steps in about a
+third of a millimetre per layer and needs no bridge. Stand the part on its base
+instead and the returning leg starts in mid-air, 27 mm up.
+
+The other reason is strength. Flat on that face, the layers stack across the
+15 mm width and every extrusion runs the length of the arch, so a load on the
+ledge pulls along them. Printed upright, the same load is trying to peel apart
+layer joints at the root of the arm — which is also where the nut pocket has
+already taken a 10 × 6 mm bite out of a 15 × 15 mm section. That is the
+highest-stress spot on the part and it is not where you want a glue line.
+
+Walls do the work, not infill. Five perimeters on a 0.4 mm nozzle puts nearly
+4 mm of solid shell across a 15 mm section; the 40% is mostly there to hold the
+bore round.
+
+## Assembly
+
+<Steps>
+
+1. **Ream the bore.** It is drawn at exactly 6.0 mm and an M6 stud is exactly
+   6.0 mm, so there is no clearance in the model at all — and printed on its side
+   the top of the hole always comes out a little flat. Run a 1/4 in (6.35 mm) bit
+   through it by hand. A drill on a trigger will grab and spiral the plastic out.
+
+2. **Check the nut goes in.** The pocket is 10.0 mm across flats and so is the
+   nut. If it will not push in under thumb pressure, two strokes of a flat needle
+   file on each pocket wall gets you there. Do not force it — those two walls are
+   the only thing stopping the nut spinning.
+
+3. **Slide the nut in** from the slot side until it sits up under the peak.
+   Nothing retains it sideways, so if the hook is going somewhere it will be
+   handled a lot, one drop of CA in the slot once the nut is seated settles that
+   permanently.
+
+4. **A drop of threadlocker on the magnet's stud**, then thread the hook down
+   onto it and nip it up by hand. Hand tight is the whole spec: the nut is steel
+   and the pocket is plastic, and you are only holding a hook.
+
+5. **Aim it after it is tight.** The hook stops wherever the thread runs out,
+   which will not be where you wanted it pointing. Do not fight it — stick the
+   magnet to the steel and twist the whole assembly on the surface until the hook
+   faces the right way. Rotating the magnet on the steel costs nothing.
+
+</Steps>
+
+<ImagePlaceholder alt="The printed hook, an M6 nut and a rubber-coated stud magnet laid out before assembly, with the nut slot in the base of the hook visible">
+  Exploded shot — hook, nut and magnet side by side on the bench, angled so the
+  hex slot in the underside of the hook is readable.
+</ImagePlaceholder>
+
+## What it will actually hold
+
+The 40 lb on the magnet is **straight pull**, measured square to a thick, clean,
+flat steel plate. Nothing about that describes this hook.
+
+On a vertical surface the load is shear, and a magnet in shear is holding on by
+friction rather than by magnetism — which is exactly why this one is
+rubber-coated, and why what you get is a fraction of the rated pull. Then the
+ledge puts the load up to 45 mm out from the face, and that leverage tries to
+peel one edge of the magnet off the steel, which is the direction it is weakest
+in. Thin sheet, paint, powder coat, a curved surface or a patch of rust each take
+another bite.
+
+Load it and find out where it lets go, somewhere the thing falling does not
+matter. Cords, bags, headphones, a broom, a hi-vis vest: fine. Anything you would
+be upset to hear hit the floor: use two, or use a screw.
+
+## Two things that will bite you
+
+**Both fits are drawn at nominal.** The bore is 6.0 mm for a 6.0 mm stud and the
+pocket is 10.0 mm for a 10.0 mm nut. In CAD that is correct; out of a printer it
+is interference on both counts, because a printed hole always finishes under
+size. Ream and file rather than reprinting at 101% — scaling the part moves the
+arch and the mouth with it.
+
+**The stud has to be long enough to reach the nut.** The nut sits 5 mm above the
+pad face, so the first 5 mm of any stud is doing nothing but passing through a
+clearance hole. There is room for 16 mm of stud in the bore, and the more of it
+that ends up inside the nut the better this holds. If yours is short, pack the
+nut down onto the floor of the pocket with a thin washer under it.
 
 ## Files & downloads
 

@@ -1,19 +1,310 @@
 ---
 title: Sourdough Monitor
-description: Fermentation-tracking smart jar for sourdough starter.
+description: A knurled printed lid for a 40 oz starter jar with a 3.5in touch screen on it — temperature, humidity and a rolling chart of the last few hours, pulled back from Home Assistant every time it reboots.
 # The files are here; the write-up isn't finished. Published, and marked as
 # pending on the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Fermentation-tracking smart jar for sourdough starter.
+A sourdough starter tells you when it is ready by how far it has risen and how
+fast, and both of those depend almost entirely on how warm the kitchen is. This
+is a printed lid that sits over a 40 oz starter jar with a 3.5in colour touch
+screen on top: temperature and humidity in big type, a chart of the last few
+hours under them, and a Home Assistant device behind it so the same numbers end
+up on a dashboard and in automations.
 
-## Hardware
-- Temperature/humidity sensor
-- WiFi connectivity
-- Smart jar lid
+The interesting part is what happens at boot. The ESP32 keeps 48 samples in RAM
+and nothing on flash, so two seconds after the API connects it fires an event at
+Home Assistant asking for its own history back. The recorder is the storage; the
+jar is just the display.
+
+:::caution
+**Read [The lid](#the-lid) and [Firmware](#firmware) before you order anything.**
+The two STLs in this folder are byte-identical, the merged mesh is a sealed box
+that cannot be printed in one piece, and the ESPHome config in `esphome/` stops
+partway through — it has no `i2c:`, no `sensor:` and no `display:` block. This
+page is honest about all three. It is a parts list and a set of measurements,
+not a config you can flash tonight.
+:::
+
+<ImagePlaceholder alt="The printed sourdough monitor lid sitting on a glass starter jar, screen showing temperature, humidity and a rise chart">
+  Hero shot — the lid on the jar on a kitchen counter, screen lit, starter
+  visibly risen up the marked feeding band behind it.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [3.5in 320×480 touch screen with an ESP32 on the back](https://www.amazon.com/dp/B0D93MBWC2?tag=brau01-20)
+  — screen, touch panel and radio on one board, which is the only reason this
+  fits under a 121 mm lid. **This is a substitute, and you need to know how.**
+  The shipped config declares `board: esp32-s3-devkitc-1` with octal PSRAM; this
+  Hosyond board is the classic dual-core ESP32-WROOM version of the same ST7796U
+  panel, with no PSRAM. Build on it and you change the `esp32:` block to a plain
+  ESP32 board key, delete the `psram:` block, and check the backlight pin against
+  your board before you trust the `GPIO14` in the config. If you want the config's
+  platform block to be true as written, buy an
+  [ESP32-S3 3.5in 320×480 display board](https://www.amazon.com/dp/B0F3WS2W5R?tag=brau01-20)
+  instead.
+- [SHT31-D temperature and humidity module, 3-pack](https://www.amazon.com/dp/B0CN32WXJY?tag=brau01-20)
+  — I²C, ±0.2 °C and ±2% RH, and it does not mind living in the damp air over a
+  jar. This is the sensor to use for anything where the number drives a decision;
+  a DHT22 reads to a whole degree at these temperatures and a starter's whole
+  behaviour sits inside a five-degree band.
+- [VL53L0X time-of-flight laser module, 3-pack](https://www.amazon.com/dp/B0D7LWDBVX?tag=brau01-20)
+  — this is what measures rise. It looks straight down through the lid's port at
+  the surface of the starter and reports millimetres, with nothing touching the
+  dough and nothing to clean. Also I²C, at `0x29`, so it shares two wires with
+  the SHT31-D at `0x44` and needs no multiplexer.
+- [40 oz sourdough starter jar](https://www.amazon.com/dp/B0CZY387TL?tag=brau01-20)
+  — straight-sided, wide mouth, and it comes with the marked feeding band that
+  makes the screen's chart checkable by eye. The lid's skirt is bored 114.8 mm;
+  measure the mouth of whatever jar you own before you print, because there is no
+  thread here and the fit is friction.
+- [JST 1.25 mm connectors with pre-crimped leads](https://www.amazon.com/dp/B0CZ6V3K66?tag=brau01-20)
+  — two sensors, four wires each, inside a 31 mm cavity. Plugs let you lift the
+  screen out without desoldering anything. [Dupont jumpers](https://www.amazon.com/dp/B077X99KX1?tag=brau01-20)
+  work if you would rather not crimp, and
+  [24 AWG silicone wire](https://www.amazon.com/dp/B0881H2LR5?tag=brau01-20) is
+  the flexible stuff for the tail that has to bend inside the lid.
+- [5 V 2.5 A USB supply](https://www.amazon.com/dp/B00MARDJZ4?tag=brau01-20) and a
+  [right-angle 1 ft cable](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) —
+  the board runs off its own USB socket. The lid's cable window is 12 mm wide and
+  7.5 mm tall, so a right-angle plug is the one that goes in and does not lever
+  the lid off the jar.
+- [PETG](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) for the cup and
+  [PLA+](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) for the cover — see
+  [Print settings](#print-settings) for why the two halves get different plastic.
+
+There are no screws in this build. The CAD has no bosses, no threaded-insert
+holes and no fasteners of any kind — the only round hole anywhere in it is the
+12 mm port through the floor.
+
+:::note
+**If you want the barometric pressure the config's header comment mentions**, a
+[BME280 module](https://www.amazon.com/dp/B07KR24P6P?tag=brau01-20) gives you
+temperature, humidity and pressure on the same two wires and replaces the
+SHT31-D outright. The globals in the shipped config only ever track temperature
+and humidity, so pressure is a line in a comment and nothing more — but it is a
+two-dollar upgrade if you want to log it.
+:::
+
+## The lid
+
+Everything below is measured off `cad/smart_jar_lid_v3.step`, which is the
+authority. Two things about the files first, because they will both cost you a
+print if nobody tells you.
+
+**There is one lid design in this folder, not two.**
+`smart_jar_lid_v3.stl` and `smart_jar_touch_lid_v1.stl` are byte-identical, and
+the two STEP files carry the same geometry under different product names. Open
+either one.
+
+**The STL is two solids merged, and it is not printable as it stands.** The STEP
+carries two bodies — a cup and a cover — and the exported mesh is their union: a
+sealed 31 mm chamber with a closed floor under it and a closed disc over it. Slice
+that and you get supports trapped in a box you cannot open. Load the STEP or the
+`.f3d` in Fusion, separate the two bodies, and export them as two parts.
+
+### The shape
+
+The body is a fluted cylinder, 121.2 mm across the ribs and 119.6 mm across the
+flutes, 45.8 mm tall. The grip runs the whole height, which is what lets you
+twist it off a jar with one flour-covered hand.
+
+| Feature | Measurement |
+|---|---|
+| Outside diameter | 121.2 mm over the ribs, 119.6 mm over the flutes |
+| Overall height | 45.8 mm |
+| Wall thickness | 3.2 mm |
+| Skirt bore | 114.8 mm for the first 5 mm, then a chamfer out to a 118 mm counterbore for the next 6 mm |
+| Internal floor | 1.6 mm thick, 11 mm up from the bottom rim |
+| Electronics cavity | 114.8 mm across, 31 mm deep |
+| Cable window | 12 × 7.5 mm through the side wall, 4 mm above the floor |
+| Cover | 114.8 mm disc, 1.2 mm thick, dropping into a 1 mm rebate at the top |
+
+That 118 mm counterbore above the 114.8 mm bore is a groove, not a mistake. It is
+where a gasket or an O-ring goes if you want the lid to seal rather than sit.
+
+Two openings go through or into the floor, and they are not the same kind of
+feature. A **12 mm round port**, 24 mm off the axis, goes all the way through —
+it is the only hole between the cavity and the jar, so it is the window the
+distance sensor looks down and the vent the humidity sensor reads through. On the
+axis there is a **24 mm square well, 5 mm deep with a closed bottom**: a locating
+pocket for a small breakout, not a through-hole. Don't drill it out expecting a
+second port.
+
+:::caution
+**A starter jar has to vent.** A fed starter makes real volumes of CO₂, and a lid
+that seals over one will either pop off at 3 a.m. or bulge the jar. The 12 mm port
+is the only path out of the cavity apart from the cable window, and both are small.
+Leave the gasket groove empty unless you have added a vent of your own.
+:::
+
+### Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Infill | 20% |
+| Supports | Cup only, inside the bore |
+| Material | PETG for the cup, PLA+ for the cover |
+| Orientation | Cup skirt-down; cover flat |
+
+Print the cup with its open skirt end on the bed. The internal floor then lands
+11 mm up and needs support across the bore — but that support is 11 mm tall and
+pulls straight out of the open bottom when the print comes off. Any other
+orientation buries it. The cable window starts 16.6 mm up and bridges 12 mm,
+which prints clean with no help.
+
+The cover is a flat disc. Print it face down, no supports, and give it four or
+five perimeters — at 1.2 mm thick and 115 mm across it is mostly perimeter
+anyway, and a couple of extra walls is what stops it bowing.
+
+**PETG for the cup.** It spends its life over a jar of warm, wet, actively
+fermenting flour, and it sits under a screen that makes its own heat. PLA creeps
+under exactly those conditions and a lid that has crept no longer grips the jar.
+The cover is a flat disc in open air and PLA+ is fine for it.
+
+Nothing printed touches the starter. The lid sits over the mouth of a glass jar
+and the plastic never meets the food, which is the only reason a printed part
+belongs anywhere near this.
+
+## Wiring
+
+The shipped config names exactly one pin: **GPIO14**, an LEDC output at 1000 Hz
+driving `backlight_pwm`, wrapped in a `monochromatic` light called *Display
+Backlight* with `restore_mode: RESTORE_DEFAULT_ON`. That is the whole pin map in
+the file.
+
+The screen's own bus, the touch controller and the two sensors are not in it. On
+an all-in-one display board the panel pins are fixed by the PCB and you take them
+from the board's own documentation, not from here — and the two I²C sensors go on
+whichever pair of pins the board brings out to a header. Write those four lines
+yourself and write them down, because a confident wrong pin number is worse than
+no pin number.
+
+## Firmware
+
+`esphome/bruh-sourdough-monitor.yaml` is in the download section below. Here is
+what is actually in it.
+
+The node is `smart-jar-2`, friendly name *Sourdough Monitor*, on `esp-idf` with
+`psram: mode: octal` at 80 MHz. WiFi, OTA and the API key all come from
+`secrets.yaml`; there is a captive-portal fallback AP called *Smart-Jar-2 Fallback
+Hotspot*.
+
+Three services are exposed to Home Assistant:
+
+| Service | Argument | What it does |
+|---|---|---|
+| `force_display_update` | — | Redraws the screen now |
+| `set_chart_hours` | `hours` (int) | Sets the chart window and asks HA for that much history |
+| `set_brightness` | `level` (float) | Writes the backlight PWM directly |
+
+The globals are the interesting half. `history_data` is a `float[48]`, so the
+chart is 48 points wide however long the window is — at the default eight hours
+that is one sample every ten minutes. `chart_hours` is the only global with
+`restore_value: yes`; everything else, including the history itself, is thrown
+away on reboot. `last_temp`, `last_humidity` and `last_display_value` are three
+separate values, so the charted quantity is not temperature and not humidity.
+That is the rise.
+
+The colour table names five temperature bands — cold, cool, ideal, warm, hot,
+running #2196F3 blue through #4CAF50 green to #F44336 red — and three humidity
+bands. The thresholds that pick between them live in the display lambda, which is
+not in this file.
+
+:::caution
+**The config is truncated.** It ends after the `color:` block. There is no `i2c:`,
+no `spi:`, no `sensor:` and no `display:` section, even though the API service and
+the debounce script both call `component.update: smart_jar_display`. ESPHome will
+refuse to compile it as it stands. What is here is the skeleton — the platform,
+the services, the globals, the fonts and the palette — and the sensor and drawing
+code is yours to write against your board.
+:::
+
+## Home Assistant
+
+The device has no long-term storage, so it asks for its history back. Two seconds
+after the API connects, and again every time `set_chart_hours` is called, it
+fires this:
+
+```yaml
+event: esphome.smart_jar_request_history
+data:
+  device: "smart_jar_2"
+  hours: 8
+```
+
+Something in Home Assistant has to hear that and answer it. **That automation is
+not in this folder** — it is the other half of the design and it does not ship
+here. It needs to read the recorder for the requested window, resample to 48
+points, and hand them back to the node.
+
+If you rename the device, change the `device:` field in both `homeassistant.event`
+blocks as well. The node's own name and the string in that payload are set
+separately, and a responder matching on `smart_jar_2` will silently ignore a jar
+that calls itself anything else.
+
+## Assembly
+
+<Steps>
+
+1. **Print the cup and the cover** from the two separated bodies and dry-fit the
+   screen board in the cavity before you wire anything. There is room across
+   114.8 mm of bore, but the cable window has to line up with the board's USB
+   socket, so check that first and rotate the board until it does.
+
+2. **Wire the two sensors on flying leads** long enough to reach the floor with
+   the screen lifted out. Both are I²C and both live on the same pair of wires;
+   run one four-way plug up to the board and split it at the sensor end.
+
+3. **Mount the VL53L0X over the 12 mm port** so it looks straight down the jar,
+   and keep it square — a tilted time-of-flight sensor ranges to the jar wall
+   instead of the starter and reads a constant.
+
+4. **Put the SHT31-D near the port too, but not in it.** It wants the jar's air,
+   not a bead of condensate. Anywhere on the underside of the floor within reach
+   of the vent is right.
+
+5. **Flash and bring it up on the bench with the jar empty.** Confirm the entities
+   arrive in Home Assistant and that the distance reading changes when you put
+   your hand under the port, before you close it up over live starter.
+
+</Steps>
+
+## Troubleshooting
+
+**The chart is empty after every reboot.** That is the design working and the
+Home Assistant side not answering. `history_data` has `restore_value: no`, so the
+node comes up with nothing and waits for the event responder. Check the automation
+first, then check that the `device:` string still matches.
+
+**The distance reading is constant.** Either the sensor is tilted and ranging on
+the glass, or its window has fogged. Condensation on a ToF lens inside a jar of
+fermenting starter is the failure mode of this whole build — it is warm, wet air
+against a cold plastic lid, and it will happen every time the kitchen cools
+overnight.
+
+**Humidity pegs at 100%.** Same cause, one component over. A starter jar's
+headspace really does saturate; if you want a number that means something, read
+the room rather than the jar, or accept that this reading is a condensation alarm
+and not a measurement.
+
+**It compiles with an error about an unknown ID.** `smart_jar_display` is
+referenced by the API service and by the debounce script but never defined. See
+the caution under [Firmware](#firmware).
+
+**The screen is dark but the node is online.** The backlight is a light entity,
+not a fixed output — something turned *Display Backlight* off, or `set_brightness`
+was called with `0`. It restores to on at boot, so a power cycle proves it.
 
 ## Files & downloads
 

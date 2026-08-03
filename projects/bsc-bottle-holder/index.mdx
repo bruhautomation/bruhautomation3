@@ -1,15 +1,150 @@
 ---
 title: BSC Bottle Holder
-description: A 3D printed bottle holder for organizing reagents inside a biosafety cabinet.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed rack that stands media bottles up inside a biosafety cabinet without putting a solid wall across the airflow the cabinet depends on.
+# The write-up is here; the model isn't. Published, and marked as pending on the
+# page, in the sidebar and on the project list, until the STLs land in the folder.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-A bottle holder designed to fit inside a biosafety cabinet for organizing reagents while maintaining airflow.
+A biosafety cabinet has less usable deck than it looks like it has. Bottles of
+media, PBS and trypsin drift to the back where you can't reach them past your
+own hands, or sit in the middle where they are in the way of everything. This is
+a printed rack that stands them up in a fixed order along one side, off the part
+of the deck you actually work on, and does it without blocking the grilles.
+
+:::caution
+**The grilles are what make the cabinet a cabinet.** A Class II BSC protects you
+and your culture by pulling air down through the front and rear grilles — that
+downflow is the containment. A rack sitting on a grille, overhanging one, or
+spanning the deck as a solid block changes where that air goes. Keep the
+footprint small, keep it well behind the front grille, and keep it clear of the
+rear one. If your cabinet is shared or certified annually, ask whoever certifies
+it before you make anything in there a permanent fixture.
+:::
+
+<ImagePlaceholder alt="A 3D printed bottle holder inside a biosafety cabinet, holding media bottles upright along one side of the deck">
+  Hero shot — the printed rack in the cabinet, loaded with media bottles, shot
+  from the operator's seat so the clear deck and the uncovered front grille are
+  both visible.
+</ImagePlaceholder>
+
+## Parts
+
+<AffiliateDisclosure />
+
+Print it in PETG. That is the whole material decision and it is worth getting
+right: this thing gets wiped with alcohol every time the cabinet is used, and in
+a lot of labs it sits under a germicidal UV lamp all night. PLA goes chalky and
+brittle under UV-C and crazes with repeated alcohol contact. PETG shrugs off
+both for years.
+
+- [eSUN PETG filament, 1.75 mm, solid white](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — one 1 kg spool is plenty. **White on purpose**: a spill or a dried ring of media shows up on white and hides on black.
+- [SUNLU PLA+ 1.75 mm, black, 4 × 1 kg](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — for the test print only. Print one bottle well in PLA+ to check the fit, then print the real thing in PETG.
+- [Overture TPU, 1.75 mm, white](https://www.amazon.com/dp/B08BC7X8HQ?tag=brau01-20) — for printed feet. A rack on a stainless deck skates when you pull a bottle out one-handed, and TPU feet stop it with nothing adhesive in the cabinet.
+- [Self-adhesive clear rubber bumpers, 200 pcs](https://www.amazon.com/dp/B088HGQSZT?tag=brau01-20) — the no-second-filament version of the same fix. Four under the corners. Expect to replace them: alcohol creeps under the adhesive eventually, which is why the TPU feet are the better answer if you can print them.
+- [Solimo 99% isopropyl alcohol, 16 oz × 12](https://www.amazon.com/dp/B07J62C1K5?tag=brau01-20) — dilute it to 70% before you wipe anything with it, roughly seven parts alcohol to three parts water. Neat 99% evaporates off the plastic before it has done anything useful.
+- [Neiko digital caliper, 0–8 in](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — you need your own bottle diameters before you print. See below.
+- [AFA deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) — an elephant's-foot lip or a stringy bore is a place liquid sits. Ten seconds per opening.
+
+Optional, and only if you split the model to fit your bed:
+
+- [ruthex M3 brass heat-set inserts, 100 pcs](https://www.amazon.com/dp/B08BCRZZS3?tag=brau01-20)
+- [VIGRUE M2/M3/M4 stainless screws and nuts, 1080 pcs](https://www.amazon.com/dp/B071KBVZVV?tag=brau01-20) — **stainless, not the black alloy kits.** Black-oxide and black-zinc screws bloom rust after a few months of daily alcohol, and rust streaks down a white rack look exactly as bad as they sound.
+
+If you label the positions, use a laminated-tape labeller — a
+[Brother P-touch](https://www.amazon.com/dp/B071RSC7ZH?tag=brau01-20) with
+[TZe laminated tape](https://www.amazon.com/dp/B06XCQ79ZM?tag=brau01-20). Thermal
+paper labels last about a week of alcohol wipes before they lift at a corner and
+go grey.
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 4 |
+| Infill | 30% |
+| Supports | None |
+| Material | PETG |
+| Nozzle and bed | Whatever your slicer's PETG profile uses |
+
+Four perimeters rather than the usual two, because the rack gets lifted out of
+the cabinet fully loaded and a 1 L bottle of media is a kilo on its own.
+
+Orient it so the bottle wells open upward and print with no supports. Support
+material inside a well leaves a scarred, stepped surface, and the inside of a
+well is precisely where a drip ends up — that surface wants to be the smoothest
+the printer can give you, not the roughest.
+
+If it is wider than your bed, split it between wells rather than through one,
+melt M3 inserts into one half and bolt the two together with stainless. A joint
+across a well is a crevice with liquid in it.
+
+## Sizing it to your bottles
+
+Lab bottles are not a standard. A 500 mL bottle and a 1 L bottle do not share a
+diameter, and two brands of 500 mL bottle often don't either. Measure the widest
+point of the body of the bottles you actually use, with calipers, before you
+slice anything.
+
+Then add about a millimetre to the diameter of the well. A well cut to the exact
+measured size will accept the bottle on the bench and refuse it in the cabinet,
+because in the cabinet you are gloved, working at arm's length, and not looking
+straight down at it.
+
+Measure the cabinet too. The height that matters is not the internal height — it
+is the clear height at the sash's working position, because that is the gap the
+rack has to come back out through at the end of the day. A rack you have to
+raise the sash to remove is a rack that stays in there dirty.
+
+## Before it goes in the cabinet
+
+<Steps>
+
+1. **Deburr every opening.** Run the deburring tool around the top edge of each
+   well, and knock the elephant's foot off the base.
+
+2. **Wash it** in warm soapy water and rinse it properly. A fresh print carries
+   release agent, finger oil and loose plastic dust, and none of that belongs on
+   a cabinet deck.
+
+3. **Dry it completely**, then fit the feet — TPU pressed in, or four bumpers
+   under the corners on a surface you have just wiped with alcohol so the
+   adhesive gets a clean start.
+
+4. **Wipe it down with 70%** on the way in, the same as everything else that
+   enters the cabinet, and load it before you start work rather than during.
+
+</Steps>
+
+## What it is not
+
+:::danger
+**Do not autoclave it.** PETG softens around 80 °C. An autoclave cycle runs at
+121 °C. It will come out as a puddle with your bottles' shapes in it.
+:::
+
+It is also not sterile and cannot be made sterile. An FDM part is porous by
+construction — the layer lines are a surface no wipe reaches into. Treat it as
+furniture: it holds closed bottles, it never touches anything sterile, it does
+not go near an open bottle mouth, and it comes out and gets cleaned on the same
+schedule as the cabinet.
+
+If your cabinet runs its UV lamp overnight, take the rack out. PETG survives
+UV-C far better than PLA does, but "better" is not "indefinitely", and a rack
+that lives in the beam will chalk and go brittle at the thin sections eventually.
 
 ## Files & downloads
+
+:::note
+The model isn't posted yet — that is the missing piece here, and it is why this
+page is still flagged as unfinished. Everything above holds for any bottle rack
+going into a cabinet in the meantime.
+:::
 
 <ProjectFiles slug="bsc-bottle-holder" />

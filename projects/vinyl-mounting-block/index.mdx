@@ -1,17 +1,275 @@
 ---
 title: Vinyl Mounting Block
-description: Mounting block for fixing hardware to vinyl siding.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A printed pad that gives a light, a camera or an outlet one flat plumb face on vinyl siding — stepped on the back for a 5 in exposure with a 1/2 in lap, and drilled to a 4 in round box's screw pattern.
+# The CAD is here and every number below is measured off it. There is no
+# photograph of one on a wall. Published, and marked as pending on the page, in
+# the sidebar and on the project list, until there is.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Mounting block for fixing hardware to vinyl siding.
+Vinyl siding is a wall made of overlapping curves. There is no flat on it and
+no plumb on it, which you find out the first time you try to hang something: a
+floodlight screwed straight to a panel rocks on two high points, its gasket
+seals against air, and the screws pin a panel that is supposed to slide as the
+sun moves across it. A mounting block is the fix. It takes the siding profile
+on its back and gives you one flat vertical face on the front, and everything
+after that is ordinary.
 
-## Hardware
-- 3D-printed mounting block
+They are sold, in three sizes, in white. Printing one gets you the size and the
+screw pattern you actually want, in about 450 cm³ of plastic — but only if your
+siding is the profile this one is drawn for, and that is the first thing to
+check rather than the last.
+
+<ImagePlaceholder alt="The printed mounting block installed on vinyl siding with a floodlight on it, seen from below so the stepped back edge against the siding is visible">
+  Hero shot — the block on a wall with a fixture on it. Shoot it from below and
+  to one side so the two ledges sitting under the siding butts read, and take a
+  second frame of the bare block held against the siding before it goes up.
+</ImagePlaceholder>
+
+## What is in the file
+
+`siding_block_v3.stl` is a Fusion assembly exported whole, not a print plate.
+There are three separate solids in it and **one of them is the part**.
+
+| Solid | What it is | Print it? |
+|---|---|---|
+| The block | 200 × 190 mm pad, stepped back, Ø55 mm bore, six screw holes | Yes |
+| A 4 in round weatherproof box | Ø101.6 mm barrel, five 3/4 in NPT hubs, two mounting lugs — a manufacturer's model dropped into the design to check the screw pattern against | **No** |
+| Two Ø4.83 × 12.5 mm cylinders | thread bodies belonging to two of that box's tapped holes, shaken loose in the tessellation | **No** |
+
+Splitting the STL to objects will not get the box off, and that is worth
+knowing before you spend ten minutes trying. The block's six clearance holes
+and the box's six tapped holes are drawn on the same six circles on the same
+plane, so the two meshes are stitched together there — to a slicer it is one
+connected body. The two loose thread cylinders sit inside two of the six holes
+and plug them.
+
+Open `siding_block_v3.step` or `siding_block_v3.f3d`, delete the box, export
+the block on its own. It takes a minute and it is the only clean route.
+
+## The numbers that matter
+
+Measured off the STEP file, not off a drawing.
+
+| Feature | Dimension |
+|---|---|
+| Overall | 200 mm tall × 190 mm wide |
+| Front face | 190 × 180 mm, inside a 5 mm 45° bevel |
+| Corners | 30 × 30 mm off at 45°, so the outline is an octagon |
+| Thickness | 20 mm just below a course line, 7.3 mm just above it |
+| Back | three flat ramps, 1 in 10 |
+| Course pitch | 127.0 mm (5 in) |
+| Step at each course line | 12.7 mm (1/2 in) |
+| Centre bore | Ø55.0 mm, straight through |
+| Fixture holes | six, Ø5.2 mm, through |
+| Solid volume | about 450 cm³ |
+
+### The back is the whole design
+
+The front is a flat plate and takes ten seconds to describe. The back is three
+flat ramps separated by two 12.7 mm steps, and the steps are 127 mm apart.
+
+That is one course of vinyl siding. Within a course the panel face leans out as
+it comes down to its butt, so the block has to lose thickness on the way down
+to stay in contact — 12.7 mm of it over 127 mm, a slope of 1 in 10. At the butt
+line the next panel below starts tight to the wall again, and the block steps
+back to meet it. Two of those steps land on the part, 127 mm apart, and they
+face **upward**: each one tucks under the rolled butt edge of a panel. Push the
+block up the wall and it stops itself in exactly one place. That is the only
+alignment feature it has and it is enough.
+
+**5 in exposure with a 1/2 in lap is D5 — "double 5" — and it is not the only
+kind of vinyl on the market.** D4, D4.5, D6 and D7 all exist, and none of them
+fit this. Hold a tape on your own wall before you slice anything: butt line to
+butt line is the exposure, and how far a butt stands proud of the panel above
+it is the lap. If they are not 5 in and 1/2 in, the STEP file is the one to
+open — those two numbers are the entire back of this part.
+
+### The hole pattern is a 4 in round box
+
+Six Ø5.2 mm holes, all centred on the middle of the pad: a pair 88.9 mm
+(3-1/2 in) apart vertically, a second pair 88.9 mm apart horizontally, and a
+third pair 69.85 mm (2-3/4 in) apart horizontally. Those are the fixture and
+cover screw spacings of a 4 in round or octagon box. Six holes for a fixture
+that uses two, so whichever pair your strap or cover lands on is already there.
+
+The Ø55 mm bore through the middle is the wire pass-through, and it is worth
+being clear about what it is not: it is smaller than the Ø96.5 mm mouth of the
+box behind it, so you cannot push a device through the block into the box. This
+pad suits anything that screws to the box's ears with its leads passing through
+— a lamp holder, a flood bracket, a camera plate, a receptacle already made up
+on a 4 in round cover. It does not suit a device you were planning to set into
+the box afterwards.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- **ASA filament, 1.75 mm** — [search](https://www.amazon.com/s?k=ASA+filament+1.75mm+white&tag=brau01-20). Nothing in the workshop is ASA, so this is the one line on the page with no part number behind it. It is still the right answer: ASA is the only common filament that holds its colour and its impact strength in years of direct sun, which is the exact duty this part signed up for
+- [ABS, 1.75 mm](https://www.amazon.com/dp/B00J0H6NNM?tag=brau01-20) — the nearest thing actually on the shelf, and a substitute rather than a match. Same heat resistance, same need for an enclosure, but ABS chalks and yellows under UV where ASA does not. On a north wall it will be fine for years; on a south wall it is a two-season part
+- [PETG, 1.75 mm](https://www.amazon.com/dp/B00ZAUR6M0?tag=brau01-20) — solid white, which is the colour most siding wants anyway, and the honest choice if your printer is open-framed. It will embrittle and go dull outdoors; plan on reprinting rather than pretending otherwise
+- [PLA+, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — for the test fit only. A PLA block on a sunlit wall will sag out of shape before it fades, and it is holding a light fitting up
+- Printed on a [Bambu Lab A1](https://www.amazon.com/dp/B0D17V4SKM?tag=brau01-20). The 256 mm bed swallows the 200 × 190 mm footprint with room to spare; the open frame is what makes ASA a fight
+- **4 in round weatherproof box** — [Hubbell-Bell 5361-7](https://www.amazon.com/dp/B00004WZ2X?tag=brau01-20) is the one to buy. The part the block is drawn around, and the part that does the containing. **Note the hubs: the 5361-7 has 1/2 in, and the box modelled in the STL has 3/4 in.** Every 4 in round box readily available is 1/2 in hub, and 1/2 in is what most fixtures and the liquid-tight kit below actually want — so the mismatch is in the model, not the shopping list. The six-hole pattern is identical either way, which is the part that matters to the block
+- **Stainless machine screws, 10-24 × 2 in** — [search](https://www.amazon.com/s?k=10-24+x+2+inch+stainless+machine+screws&tag=brau01-20). The block adds up to 20 mm between fixture and box, so whatever screws came in the fixture's bag are now too short
+- [Arlington 8141DBL siding mounting kit](https://www.amazon.com/dp/B0069KVZZ4?tag=brau01-20) — the bought version, box built in, sold for "1/2 inch lap double siding", which is the profile this model is cut to. Buy one if you want to hold the geometry in your hand before you commit a 450 cm³ print to it
+- [Siding removal tool](https://www.amazon.com/dp/B00004SUQW?tag=brau01-20) — the zip tool. Six dollars, and without it you unlock a course by breaking it
+- [Folding utility knife](https://www.amazon.com/dp/B08X6X8132?tag=brau01-20) and [blades](https://www.amazon.com/dp/B015W3AKDQ?tag=brau01-20) — vinyl scores and snaps far more neatly than it cuts
+- [Jigsaw blades, T-shank](https://www.amazon.com/dp/B001ED1UIS?tag=brau01-20) — for the box opening through siding and sheathing. A fine metal-cutting blade and a slow speed; a coarse wood blade tears vinyl and melts it back together behind itself
+- [Twist drill set](https://www.amazon.com/dp/B07DH55YRX?tag=brau01-20) and a [countersink and step-drill set](https://www.amazon.com/dp/B0CP4VSXNZ?tag=brau01-20) — for opening the six screw holes back up after printing
+- [Butyl sealing rope, 5/16 in × 20 ft](https://www.amazon.com/dp/B01IRM64UW?tag=brau01-20) — sold for septic tank risers, and it is the same butyl that comes on a roll as flashing tape. A bead of it behind the top edge of the block is a better seal than any caulk, because it never skins over and never cracks
+- **Exterior polyurethane sealant** — [search](https://www.amazon.com/s?k=exterior+polyurethane+sealant+siding+NP1&tag=brau01-20), plus a [caulk gun](https://www.amazon.com/dp/B08LYKSGL1?tag=brau01-20) and a [finishing tool](https://www.amazon.com/dp/B07YCN8LKK?tag=brau01-20). Read the caution below before you point that gun at anything
+- [Non-contact voltage tester](https://www.amazon.com/dp/B01N99D3MS?tag=brau01-20) — the breaker labelled "outside lights" is not always the breaker feeding the outside lights
+- [12/2 UF direct-burial cable](https://www.amazon.com/dp/B000BPCWTG?tag=brau01-20) if you are running a new circuit out to the wall, and [lever-nut connectors](https://www.amazon.com/dp/B098QZ5277?tag=brau01-20) or [solder-seal butt splices](https://www.amazon.com/dp/B0BZ88G8JJ?tag=brau01-20) inside the box
+- [Liquid-tight conduit and fittings](https://www.amazon.com/dp/B0C9PDSF3L?tag=brau01-20) — a substitute worth naming: this kit is 1/2 in and the box's hubs are 3/4 in, so it wants a reducing bushing at each end
+- [Electrical tape](https://www.amazon.com/dp/B07YDRY8ZS?tag=brau01-20), a [digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20), a [deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20), a [needle file set](https://www.amazon.com/dp/B094FFQ8QT?tag=brau01-20) and [wet/dry sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20)
+
+:::note
+Things that mount straight to the pad, all of them already on the shelf here:
+a [twin-par flood light holder](https://www.amazon.com/dp/B001QGIUDG?tag=brau01-20),
+which screws to a 4 in round box on the 3-1/2 in pair; a
+[10 in wet-rated LED wall sconce](https://www.amazon.com/dp/B07P85ZLPN?tag=brau01-20);
+or a [duplex receptacle already made up on a 4 in round cover](https://www.amazon.com/dp/B000HEHCAU?tag=brau01-20),
+which is what the 2-3/4 in pair of holes is for. Put a
+[weather-resistant GFCI](https://www.amazon.com/dp/B013OVCQGM?tag=brau01-20)
+in it rather than a plain receptacle. The
+[in-use cover](https://www.amazon.com/dp/B008KNR4LW?tag=brau01-20) in the
+workshop is a 1-gang rectangular one and will not land on this pattern — a
+round box wants a round in-use cover.
+
+If all you want to hang is a battery camera, skip the whole exercise. A set of
+[no-drill vinyl siding hooks](https://www.amazon.com/dp/B07XG17SPY?tag=brau01-20)
+clips into the butt seam and puts no hole in anything.
+:::
+
+## Print settings
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Walls / perimeters | 4 |
+| Infill | 15% gyroid |
+| Supports | None |
+| Material | ASA, or PETG on an open printer |
+| Orientation | Front face flat on the plate |
+| Bed needed | 200 × 190 mm |
+| Roughly | 175 g, and an overnight print |
+
+**Front face down, and there is no second option worth arguing about.** The
+flat plumb pad is the only surface anybody ever looks at, and printed against
+the plate it comes out as good as the plate is. Everything else follows: the
+back ramps become a 5.7° upward slope, the two course steps become plain
+vertical walls, the Ø55 bore and the six screw holes run straight up, and the
+5 mm perimeter bevel flares off the first layer at 45°. There is not a single
+overhang in the part and not one support anywhere.
+
+That first layer is 33,700 mm² of it, which is the catch. In PETG it is a
+non-event. In ASA or ABS it is a 200 mm flat slab on a heated bed with corners
+that would very much like to lift, so run a brim, run a draft shield, and if
+your printer is open-framed put a box over it. This is the part that punishes
+choosing the right material and printing it the wrong way.
+
+The six holes come out of a printer undersize, as printed holes always do. They
+are Ø5.2 mm nominal — clearance for a 10-24 screw and not a millimetre more —
+so run a drill through each by hand before you are up a ladder holding a light
+fitting in one hand.
+
+:::caution
+**Seal the top and the two sides. Never seal the bottom.**
+
+Vinyl siding is not a seal and was never meant to be one. It is a rain screen:
+water gets behind it on every wall in every storm, runs down the housewrap, and
+leaves at the bottom of each course. Run a bead of caulk along the bottom edge
+of this block and you have built a cup in the middle of that drainage path,
+with a 55 mm hole through your sheathing at the back of it.
+
+Butyl behind the top edge and the two sides, nothing along the bottom, and the
+hole for the box flashed properly behind the siding rather than caulked in
+front of it. If that hole is not lapped over by the housewrap and the course
+above, no amount of sealant on the outside will fix it — it will just take
+longer to find out.
+:::
+
+## Installation
+
+<Steps>
+
+1. **Measure the wall first.** Butt line to butt line, and how far a butt stands
+   off the panel above it. You want 5 in and 1/2 in. If you get 4 in, or 4-1/2,
+   stop and edit the STEP — the print is four hours and the disappointment is
+   permanent.
+
+2. **Kill the breaker and prove it dead** at the wires you are about to touch,
+   not at the panel.
+
+3. **Pick the height so the block straddles a course.** Its two ledges are
+   127 mm apart and each wants a butt line. Mark the centre of the pad; that is
+   where the box goes.
+
+4. **Unzip the course above** with the siding removal tool, and lift it clear so
+   you can reach the back of the panel you are cutting.
+
+5. **Cut the opening and mount the box.** Fine blade, slow speed, and cut vinyl
+   cold — a fast blade welds the kerf back together behind itself. Fish the
+   cable, flash the hole behind the siding, and fix the box to the sheathing or
+   a stud through its two lugs. Plug the hubs you are not using.
+
+6. **Bed the block.** Butyl rope behind the top edge and down both sides, and
+   nothing at all along the bottom.
+
+7. **Push it up until both ledges bite.** They land under the two butt edges and
+   the block stops. That is the position; there is nothing to measure and
+   nothing to level, because the siding is already level and the ledges are
+   parallel to it.
+
+8. **Screw the fixture through the block into the box.** Longer machine screws
+   than the ones in the fixture's bag — the pad is up to 20 mm of extra stack.
+   Snug, then stop. You are clamping a fixture to a steel box through a plastic
+   pad that is resting on a panel which has to be free to move all summer, and
+   the one thing you must not do is pin that panel.
+
+9. **Relock the course above**, dress the sealant on the top and sides, leave the
+   bottom edge open, and put the power back on.
+
+</Steps>
+
+<ImagePlaceholder alt="Close-up of the back of the printed block held next to a length of vinyl siding, showing the two stepped ledges lining up with the siding butts">
+  Detail shot — the block turned over beside a scrap of the actual siding, close
+  enough to see the two 12.7 mm steps and the shallow ramp between them, then a
+  second frame with the block pushed up onto the siding so the ledges are seated.
+</ImagePlaceholder>
+
+## What will bite you
+
+**Your siding is probably not the profile this is cut for.** D5 is common and it
+is not universal, and a block drawn for 5 in exposure sitting on 4 in siding
+touches in two places and rocks in between. This is the failure that costs a
+whole print, and the tape measure that prevents it takes thirty seconds.
+
+**It is trim, not an enclosure.** The printed pad carries no connections, holds
+no splices and is not listed for anything. The box does that job, and the box
+is a bought part for the same reason a breaker is. Nothing on this page is an
+argument for printing an electrical enclosure.
+
+**The screws hold the block on, and there are no others.** There is no separate
+mounting hole in this part — the six holes are the fixture's, and the fixture
+clamps the pad to the box behind it. Fit the fixture and the block as one
+assembly. Take the light off later and the block is loose in your hand.
+
+**PLA will not survive a summer on that wall.** Dark vinyl in direct sun runs
+past 60 °C, which is PLA's glass transition, and the block is a load-bearing
+plate under a fixture the whole time. It sags, the fixture tilts, and the seal
+opens. PETG is the floor for anything on an outside wall and ASA is the answer.
+
+**The bottom edge is supposed to look unfinished.** Every instinct says finish
+the job with a bead of caulk all the way round, and every instinct is wrong.
+The gap along the bottom is the drain, and a wall that cannot drain rots from
+the inside where nobody sees it for six years.
 
 ## Files & downloads
 

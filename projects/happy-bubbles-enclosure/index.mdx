@@ -1,18 +1,208 @@
 ---
 title: Happy Bubbles Enclosure
-description: Enclosure for Happy Bubbles BLE presence beacons.
-# The files are here; the write-up isn't finished. Published, and marked as
-# pending on the page, in the sidebar and on the project list.
+description: A two-piece printed puck for the Happy Bubbles Bluetooth presence detector — and the measurements you need to put an ESP32 BLE node in it instead.
+# No photo of the finished build yet, so the write-up is marked as pending on
+# the page, in the sidebar and on the project list.
 pending: true
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
+import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
 
-Enclosure for Happy Bubbles BLE presence beacons.
+The Happy Bubbles Bluetooth Presence Detector shipped as a bare board. One per
+room, each publishing what it heard to MQTT, and Home Assistant finally knew
+which room a key fob was in — but a naked PCB sitting on a bookshelf looks like
+a naked PCB sitting on a bookshelf. This is the case that fixed it: a flat oval
+puck in two parts, no screws, a window for the status LED and a notch at one end
+for the USB cable.
 
-## Hardware
-- Happy Bubbles BLE beacon
-- 3D-printed case
+Happy Bubbles the company is gone and the board has not been buyable for years.
+The case is still worth printing, because the thing that replaced it — an ESP32
+running ESPHome as a [BLE Hub](/projects/ble-hub/) — is also a bare board on a
+shelf, and there is room for it in here. Every measurement you need to check
+that is below.
+
+<ImagePlaceholder alt="The printed oval enclosure closed, sitting on a bookshelf with the status LED showing through the lid">
+  Hero shot — the closed puck on a shelf at eye level, USB cable leaving the
+  notch at one end, LED lit through the slot in the lid.
+</ImagePlaceholder>
+
+## The measurements
+
+There is one STL and it holds both halves, already laid out side by side on the
+plate. Everything here is measured off that model.
+
+| | |
+|---|---|
+| Assembled | 71 × 64 mm, 12.9 mm tall |
+| Base (the taller half) | 71.2 × 64.4 × 10.3 mm |
+| Lid | 71.3 × 64.4 × 7.2 mm |
+| Interior | 65.6 × 57.6 mm, 10.9 mm deep |
+| Wall | 2.8 mm, stepping to a 1.06 mm lip above the seam |
+| Floor and lid plate | ~1.05 mm |
+| Port notch | 12.4 mm wide × 7.2 mm tall, lower edge 3.2 mm above the interior floor |
+| LED window | 3.0 × 5.2 mm rectangle through the lid |
+
+Two things follow from that table and they are most of what you need to know
+about this print.
+
+The board only goes in one way. The port notch is at one end of the oval, split
+across the seam so half of it is in each part, and the LED window is offset
+toward that same end — the orientation is decided for you.
+
+And there is nothing inside to hold the board. No posts, no standoffs, no screw
+bosses anywhere in either half. The lid pressing down is the retention, which is
+fine for a board that weighs nothing and never moves, and is why you want a pad
+of foam under it.
+
+## Parts
+
+<AffiliateDisclosure />
+
+- [PLA+ filament, 1.75 mm](https://www.amazon.com/dp/B0CJ2LB5FZ?tag=brau01-20) — a 4 kg pack of black. One spool is dozens of these
+- [Matte PLA, 1.75 mm](https://www.amazon.com/dp/B0DR7XN26N?tag=brau01-20) — the better call for a case that lives in a room at eye level. Matte hides layer lines, and the logo debossed into the lid reads properly instead of disappearing into the gloss
+
+The board that goes inside:
+
+- **A Happy Bubbles Bluetooth Presence Detector**, if you still have one. It was sold direct by Happy Bubbles, never through Amazon, and the company shut down — there is no honest link to give you
+- [ESP32 dev board, 38-pin DevKit](https://www.amazon.com/dp/B07QCP2451?tag=brau01-20) — a 2-pack, and what to build today. **This is a substitute, not the original board.** It is roughly 52 × 26 mm so it drops inside easily, but it does not share the Happy Bubbles layout: its LED will not land under the window and its USB socket sits lower than the port notch. Read the ESP32 section below before you print a lid
+
+Power and mounting:
+
+- [Right-angle micro-USB cable, 1 ft](https://www.amazon.com/dp/B07K4HTBSM?tag=brau01-20) — a 3-pack. The right-angle head keeps the lead flat against the shelf instead of standing the puck off it. The plug moulding has to clear 12.4 × 7.2 mm, so measure yours
+- [Dual-port 2.4 A USB wall charger](https://www.amazon.com/dp/B07KY8D3R7?tag=brau01-20) — a 3-pack of cubes, two nodes per cube
+- [16 ft flat micro-USB extension](https://www.amazon.com/dp/B07WTTMDNR?tag=brau01-20) — for the node that wants to be above a doorway, where the socket isn't
+- [Industrial hook-and-loop, 2 in × 15 ft](https://www.amazon.com/dp/B00006RSP1?tag=brau01-20) — the right way to hang this on a wall, because you will want it back down again to reflash it
+- [3M VHB tape, 1/2 in × 15 ft](https://www.amazon.com/dp/B01BT0A6MG?tag=brau01-20) — if it is never coming down again
+
+Worth having on the bench for this one in particular:
+
+- [Deburring tool](https://www.amazon.com/dp/B09ND84SXF?tag=brau01-20) and [assorted wet/dry sandpaper](https://www.amazon.com/dp/B07R64PZ8N?tag=brau01-20) — the lip fit is tight enough that you will use both
+- [Digital caliper](https://www.amazon.com/dp/B000NEA0P8?tag=brau01-20) — for checking a board's USB socket against a 3.2 mm number before you commit to a print
+
+## Print settings
+
+Both halves are already sitting flat on the plate in the orientation they want —
+base opening-up, lid face-down. Print it as exported and there is not a single
+overhang in either part.
+
+| Setting | Value |
+|---|---|
+| Layer height | 0.2 mm |
+| Perimeters | 3 |
+| Infill | 20% |
+| Supports | None |
+| Material | PLA or PLA+ |
+| Orientation | As exported — do not rotate |
+
+PLA is right here. This is an indoor part that never gets warm, and PLA holds the
+1.06 mm lip more accurately than PETG will. Save the PETG for the sensor that
+lives in the garage.
+
+The lid's outer face is the one against the bed, and the logo is debossed into it
+0.23 mm — one layer. Print it on a smooth sheet and it comes out crisp. Print it
+on a textured one and the deboss competes with the texture and loses.
+
+:::caution
+**The lip is a press fit with almost nothing in hand.** The base's lip measures
+67.7 mm across, the lid's cavity 67.9 mm — 0.08 mm of clearance per side, which
+is less than one printer's worth of variation. Expect to run the deburring tool
+round the top edge of the lip and the inside edge of the lid rim, and to knock
+the elephant's foot off the base's first layer, before the two go together. That
+is normal for this model, not a sign you printed it wrong. Take material off the
+lip, never off the inside of the lid, or you lose the seam.
+:::
+
+## Assembly
+
+<Steps>
+
+1. **Deburr both mating edges** before you try anything else — the outside top
+   edge of the base's lip, and the inside edge of the lid's rim. One pass with
+   the deburring tool is usually all it takes.
+
+2. **Dry-fit the empty halves.** They should go together with firm thumb pressure
+   and stay together. If you have to press hard enough to flex the walls, sand
+   the lip: 400 grit, a few strokes, check again. Do this now rather than with a
+   board inside.
+
+3. **Check your board against the port notch.** The opening starts 3.2 mm above
+   the interior floor and is 12.4 × 7.2 mm. Sit the board on the floor of the
+   base and look at where its USB socket lands. If the socket sits low, pack the
+   board up on foam tape until the plug goes in straight — a plug levering
+   against the edge of a printed notch is how a micro-USB socket gets torn off a
+   PCB.
+
+4. **Line the LED up with the window**, note which way round that puts the board,
+   and stick it down. Foam tape underneath does two jobs: it sets the height, and
+   it stops the board rattling, since nothing else in there is holding it.
+
+5. **Power it up and confirm it is on your network before you close it**, because
+   opening this case again is a fingernails-and-a-guitar-pick job.
+
+6. **Press the lid on** with both hands, thumbs at the two ends of the oval,
+   straight down. Rocking it on one end first is what splits a 1.06 mm lip.
+
+</Steps>
+
+## Putting an ESP32 in it
+
+The honest version: this case was drawn around a board that no longer exists, and
+the inside is a plain 65.6 × 57.6 × 10.9 mm cavity with no features in it at all.
+That makes it a generous, indifferent home for almost any small ESP node — a
+DevKit uses about half the floor — and it makes the port notch the only thing you
+have to get right.
+
+Flash the ESP32 with the config from the [BLE Hub](/projects/ble-hub/) project.
+That is the direct descendant of what the Happy Bubbles board did: it hands Home
+Assistant a Bluetooth radio in that room, and tracks iBeacons by UUID on top of
+it. One per area, same as before. It must be an ESP32 and not an ESP8266 — the
+ESP8266 has no Bluetooth radio at all.
+
+Two things do not carry over. The LED window is a 3 × 5 mm hole in a fixed place,
+and a DevKit's power LED will not be under it — either accept a case with a hole
+in it, or drop a 3 mm light pipe in and run it to wherever the board's LED
+actually is. And the port notch sits 3.2 mm up, so a DevKit lying flat on the
+floor of the case puts its socket below the opening and needs shimming.
+
+:::tip
+Print the base on its own first and try your board and your cable in it before
+you print six lids. Ten minutes of print time answers the only question that
+matters about a case you did not draw.
+:::
+
+## What it is listening for
+
+A presence detector is half a system. The other half is a small radio that talks
+constantly, never needs charging, and is attached to whatever you want located.
+
+- [Tile (Gen 2) Bluetooth tracker](https://www.amazon.com/dp/B011HT9AL2?tag=brau01-20) — the era-correct one, and what was on the keyring when these detectors first went up. Current Tiles rotate their Bluetooth address for privacy, which is exactly the behaviour that breaks address-based room tracking, so treat this as the historical answer
+- [BlueCharm iBeacon](https://www.amazon.com/dp/B08PCHJ1KS?tag=brau01-20) — a plain iBeacon with a fixed UUID is the reliable modern answer, and it is what the BLE Hub config is written around. These come from BlueCharm rather than a generic seller, so a search is the honest link
+- [Xiaomi Mi Band](https://www.amazon.com/dp/B07TFKHCMP?tag=brau01-20) — a beacon you were going to wear anyway. This is a Band 4; the newer ones are the same idea
+
+## Troubleshooting
+
+**The lid will not go on.** Almost always elephant's foot on the base's first
+layer rather than the lip itself — the widest part of the base is the bit that
+touched the bed. Chamfer that edge with a knife and try again before you sand
+anything.
+
+**The lid goes on and will not come off.** There is no fingernail relief anywhere
+in this model. Slide a guitar pick or a spudger into the seam at one of the
+narrow ends and lever gently. If you expect to open it often, put a tape tab
+under the board so you can lift the board out without fighting the case.
+
+**Range is worse in the case than out of it.** The plastic costs you very little.
+Where you put the puck costs you a lot — flat against the back of a steel
+appliance, inside a cabinet or behind a mirror is a node with half its Bluetooth
+range gone. Height helps more than anything else; above a door beats ankle height
+in the same room every time.
+
+**A beacon reads as present from two rooms away.** Not a case problem, and not
+fixable by moving the node. RSSI reads like a distance and is not one. Use it to
+answer *which node hears this loudest*, never *how far away is it*.
 
 ## Files & downloads
 
