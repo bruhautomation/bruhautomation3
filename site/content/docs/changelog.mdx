@@ -10,7 +10,18 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.19.0" date="August 3, 2026" latest>
+<Release version="1.19.1" date="August 3, 2026" latest>
+
+Page views are counted again — on every page this time.
+
+<Changes type="added">
+
+- **Vercel Web Analytics**, as the one `defer`red script Vercel serves at the edge. It is on all 88 pages, including the landing page and the Minecraft command builder, which are outside Starlight's layout and are exactly the two that a "put it in the docs layout" answer misses. No npm dependency: on a static site with no client router, the `@vercel/analytics` package exists to load this one file. Nothing about the page changes for a reader, and nothing is served anywhere but Vercel.
+
+</Changes>
+</Release>
+
+<Release version="1.19.0" date="August 3, 2026">
 
 Thirteen projects gone, and the rough pages now say what's rough about them.
 
