@@ -76,6 +76,11 @@ const cards = [...groups, APPS].map((group) => ({
 		    square, because iOS rounds it again on the way in. */}
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+		{/* Vercel Web Analytics. This page is outside Starlight's layout, so the
+		    copy in astro.config.mjs's `head` never reaches it — a landing page
+		    missing from the numbers is the one page you would notice. */}
+		<script src="/_vercel/insights/script.js" defer></script>
+
 		{/* Block render until theme is set — prevents flash */}
 		<script is:inline>
 			(function () {

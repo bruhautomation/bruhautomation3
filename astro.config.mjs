@@ -247,6 +247,20 @@ export default defineConfig({
 						"try{if(localStorage.getItem('bruh:show-pending')==='true')" +
 						"document.documentElement.classList.add('show-pending')}catch(e){}",
 				},
+				// Vercel Web Analytics. This is the same script the
+				// `@vercel/analytics` package loads at runtime and nothing else —
+				// on a static multi-page site there is no client router to hook,
+				// so the package buys a dependency and a build step to arrive at
+				// this one tag. Served by Vercel itself at the edge, so it 404s
+				// harmlessly in local dev and on any other host.
+				//
+				// The package's own Astro component was tried first and does not
+				// work here: it renders a `<vercel-analytics>` custom element
+				// whose client `<script>` never made it into the bundle, so the
+				// element shipped on every page with nothing to define it. That
+				// failure is silent — no error, no request — which is the whole
+				// reason to prefer a tag you can see in `view-source`.
+				{ tag: 'script', attrs: { src: '/_vercel/insights/script.js', defer: true } },
 				// Amazon OneLink. Product links are written once, tagged for the US
 				// store (`brau01-20`); this rewrites them per reader to whichever
 				// Amazon marketplace actually ships to them. Without it a reader in
