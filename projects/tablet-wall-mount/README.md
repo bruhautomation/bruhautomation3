@@ -17,7 +17,6 @@ same plate leans the tablet out at 0°, 10°, 15° or 20°.
 
 - `models/` — print-ready STL files (these are what the site previews)
 - `cad/` — STEP exports for both plates, the jack insert and both bezels
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 - `images/` — photos
 
 ### The parts

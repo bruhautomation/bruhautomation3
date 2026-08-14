@@ -22,12 +22,12 @@
 
 
 /************ WIFI and MQTT INFORMATION (CHANGE THESE FOR YOUR SETUP) ******************/
-#define wifi_ssid "deathstar" //enter your WIFI SSID
-#define wifi_password "(BRUHstarwars$687)" //enter your WIFI Password
-#define mqtt_server "192.168.86.106" //I use my DuckDNS adddress (yourname.duckdns.org) in this field
+#define wifi_ssid "YourSSID" //enter your WIFI SSID
+#define wifi_password "YourWIFIpassword" //enter your WIFI Password
+#define mqtt_server "your.mqtt.server.ip" //I use my DuckDNS adddress (yourname.duckdns.org) in this field
 #define mqtt_port 1883
-#define mqtt_user "bruh" //enter your username
-#define mqtt_password "automate!" //enter your password
+#define mqtt_user "yourMQTTusername" //enter your username
+#define mqtt_password "yourMQTTpassword" //enter your password
 
 
 
@@ -43,7 +43,7 @@ const char* off_cmd = "OFF";
 
 /**************************** FOR OTA **************************************************/
 #define SENSORNAME "sensornode1"
-#define OTApassword "bruh"
+#define OTApassword "yourOTApassword"
 int OTAport = 8266;
 
 

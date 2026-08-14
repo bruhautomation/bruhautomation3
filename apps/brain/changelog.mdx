@@ -681,6 +681,15 @@ import Changes from '../../site/components/changelog/Changes.astro';
 </Changes>
 </Release>
 
+<Release version="1.5.1" date="July 29, 2026">
+
+<Changes type="fixed">
+
+- **The header wrapped onto a second row on a phone.** A `flex-wrap: wrap` rule left over from the old two-bar chrome spilled the auth and usage chips out of the fixed-height bar, and the icon-only breakpoint sat at 780px when the full bar needs 995px — leaving tablets and half-width windows overflowing by up to 212px. The bar now sheds text in three measured steps (chip sentences below 1024px, tab labels and the wordmark below 780px, tighter padding below 400px), verified at 24 widths from 320px to 1440px, and nothing in the bar is allowed to shrink.
+
+</Changes>
+</Release>
+
 <Release version="1.5.0" date="July 29, 2026">
 
 **No default cards — it learns your home first.**
@@ -836,6 +845,8 @@ First release. brAIn replaces **[BRUH Terminal](/brain/archive/bruh-terminal-cha
 </Release>
 
 </Changelog>
+
+The complete, unabridged history — including the full detail behind every entry above — lives in the [`CHANGELOG.md`](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/brain/CHANGELOG.md) in the add-on repository.
 
 ## Before brAIn
 

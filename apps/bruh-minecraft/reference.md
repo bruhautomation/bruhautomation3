@@ -24,11 +24,12 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 
 ### Gameplay — per world, not add-on options
 
-Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Each world owns its own `server.properties` — gamemode, force-gamemode, difficulty, PVP, hardcore, whitelist, max players, view/sim distance, world-gen (level name/seed/type, structures, mobs), online-mode, resource pack, command blocks, op level, connection throttle, idle timeout, MOTD, and everything else — edited from the panel's **Server Properties** tab (or set up front by the new-world wizard). Settings are seeded with sensible defaults the first time a world boots, then they're yours forever; switching worlds loads each world's own settings.
+Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Each world owns its own `server.properties` — gamemode, force-gamemode, difficulty, PVP, hardcore, whitelist, max players, view/sim distance, world-gen (level name/seed/type, structures, mobs, feature packs), online-mode, resource pack, command blocks, op level, connection throttle, idle timeout, MOTD, and everything else — edited from the panel's **Server Properties** tab (or set up front by the new-world wizard). Settings are seeded with sensible defaults the first time a world boots, then they're yours forever; switching worlds loads each world's own settings.
 
 - **OP a player:** join once, then click **op** next to their name on the panel's **Players** tab. Ops persist per-world in `ops.json`.
 - **Offline / LAN mode:** set a world's `online-mode: false` in **Server Properties** — the add-on silently forces `enforce-secure-profile: false`, switches Geyser to offline auth, uninstalls Floodgate, and disables Bedrock login validation. See [Family mode](/bruh-minecraft/quickstart/#family-mode-no-xbox-required).
 - **Command blocks / op level:** `enable-command-block` and `op-permission-level` are ordinary per-world properties on the same tab.
+- **Experiments:** Mojang gates experimental content behind named *feature packs* — add them to `initial-enabled-packs` (comma-separated, keep `vanilla`; recent 1.21.x examples: `minecart_improvements`, `redstone_experiments`, `trade_rebalance`). Experiments are baked in at world **creation**, so this only affects newly generated worlds — create a fresh world from the **Worlds** tab with the pack enabled.
 
 ### Performance
 
@@ -132,6 +133,16 @@ GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is name
 | `enable_ha_integration` | `true` | Deploys the `bruh_minecraft` integration and starts the IPC bridge. |
 | `announce_ha_events` | `true` | Announce HA-triggered events in chat with `/say`. |
 | `log_level` | `info` | `trace`–`fatal`. |
+
+## Ports
+
+| Port | What | Needed? |
+|------|------|---------|
+| 25565/tcp + udp | Minecraft Java Edition. | Yes, for anyone joining from Java. |
+| 19132/udp | Minecraft Bedrock, via Geyser. | Only with `enable_geyser` on — phones, consoles and Windows Bedrock discover the server through it. |
+| 24454/udp | Simple Voice Chat. | Only with the voice-chat plugin installed. |
+
+The add-on runs with host networking (Bedrock LAN discovery needs it), so these answer on the host's own address. The management panel itself is ingress-only — it rides Home Assistant's login, and its API refuses anything from the LAN that isn't the Supervisor or loopback.
 
 ## Recommended presets
 

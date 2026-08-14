@@ -59,13 +59,13 @@
 //Gyro SDA must go on D2 and Gyro SCL on D3.
 
 /************ Set your WIFI and MQTT Information ******************/
-#define wifi_ssid "deathstar" //enter your WIFI SSID
-#define wifi_password "(BRUHstarwars$687)" //enter your WIFI Password
+#define wifi_ssid "YourSSID" //enter your WIFI SSID
+#define wifi_password "YourWIFIpassword" //enter your WIFI Password
 
-#define mqtt_server "10.0.0.33" //
+#define mqtt_server "your.mqtt.server.ip" //
 int mqtt_port = 1883;
-#define mqtt_user "bruh" //enter your username
-#define mqtt_password "automate!" //enter your password
+#define mqtt_user "yourMQTTusername" //enter your username
+#define mqtt_password "yourMQTTpassword" //enter your password
 #define mqtt_client_name "blinds2"
 
 
@@ -81,7 +81,7 @@ int mqtt_port = 1883;
 
 /**************************** FOR OTA **************************************************/
 #define SENSORNAME "blinds2"
-#define OTApassword "bruh" // change this to whatever password you want to use when you upload OTA
+#define OTApassword "yourOTApassword" // change this to whatever password you want to use when you upload OTA
 int OTAport = 8266;
 
 

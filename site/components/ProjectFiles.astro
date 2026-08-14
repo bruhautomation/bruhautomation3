@@ -114,7 +114,11 @@ const models = filesIn('models', ['.stl']);
 // that only ships CAD can still be looked at, but they are never offered as a
 // download: the tessellation is approximate where the STEP is exact, and
 // handing someone a mesh labelled like an export is how a bad print happens.
-const previews = filesIn('preview', ['.stl']);
+// A preview whose stem also exists in models/ is skipped — the script promotes
+// a printable-tolerance preview into models/, and listing both put the same
+// mesh in the picker twice, once mislabelled *from CAD*.
+const modelNames = new Set(models.map((model) => model.name));
+const previews = filesIn('preview', ['.stl']).filter((preview) => !modelNames.has(preview.name));
 
 const configs = filesIn('esphome', ['.yaml', '.yml']).map((entry) => {
 	const code = readFileSync(join(projectDir, entry.path), 'utf8').replace(/\s+$/, '');

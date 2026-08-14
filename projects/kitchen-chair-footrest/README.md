@@ -20,7 +20,6 @@ leg in two places rather than along a sloppy sleeve.
 
 - `models/` — the printable STL
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 
 ## Hardware
 

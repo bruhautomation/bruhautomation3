@@ -19,8 +19,6 @@ counterbored or tapped.
   - `honda_cup_holder_holder_v2.stl` — the bracket. 130 × 138.5 × 21.5 mm
   - `honda_cup_holder_rail_v1.stl` — the rail key. 18 × 12.9 × 16 mm
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports, for editing the design
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D
-  viewer loads these)
 
 ## Dimensions
 

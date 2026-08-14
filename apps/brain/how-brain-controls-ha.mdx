@@ -5,6 +5,8 @@ description: The three access layers — the brain and ha CLIs, MCP tools, and P
 
 brAIn gives itself three ways to touch Home Assistant, and at first glance they look like three overlapping control panels. They're not — they're **one brain with one set of hands, plus a toolbox anyone in the house can reach**. This page explains what each layer is for, how they interact, and exactly where the (small, deliberate) overlap is.
 
+![brAIn architecture: the Home Assistant core on the left, the add-on container with the ingress panel, Claude Code, the MCP server, listeners and background services on the right, over shared file IPC and persistent storage](./images/architecture-overview.svg)
+
 ## The three layers in one table
 
 | | **CLI tools** (`brain`, `ha`) | **MCP tools** | **Power Tools** (`brain.*` services) |

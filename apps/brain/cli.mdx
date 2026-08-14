@@ -16,7 +16,7 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 
 | Command | What it does |
 |---------|--------------|
-| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses`, `confirm`, `reject`, `log`, `undo`, `consolidate`, `clear`, `export`, `import` |
+| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses` (alias `guesses`), `confirm`, `reject`, `log` (`--show <n>` prints one entry in full), `undo`, `consolidate`, `clear`, `export`, `import` |
 | `brain findings <action>` | The [findings](/brain/findings/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
 | `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
 | `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
@@ -47,8 +47,8 @@ against its own view.
 | Command | What it does |
 |---------|--------------|
 | `ha log [core\|supervisor\|host\|addon <name>\|errors\|all]` | Tail HA logs. `-f` to follow, `-n N` for line count |
-| `ha reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, `core`, `all` |
-| `ha check [path]` | Validate YAML before reloading |
+| `ha reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, every helper domain (`input_booleans`, `input_numbers`, `input_selects`, `input_texts`, `input_datetimes`, `timers`, `counters`), `core`, `all` — or `check` to validate without reloading. Singular forms work too |
+| `ha check [path]` | Validate YAML before reloading (alias: `ha yaml`) |
 | `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session (failed every time until 1.26.0 — the dispatcher ignored the script's shebang) |
 | `ha entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
 | `ha service call <domain>.<service>` | Call any HA service from the shell |

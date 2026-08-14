@@ -153,7 +153,10 @@ the BRUH configs use.
 This is a 2019-era config, so on current ESPHome you also need to move the board
 key: delete `platform: ESP32` and `board: nodemcu-32s` from under `esphome:` and
 put a top-level `esp32:` block with `board: nodemcu-32s` in their place. ESPHome
-tells you this the first time you compile. Leave the `lib_deps` pin on
+tells you this the first time you compile. Current ESPHome has also removed the
+plaintext `api: password:` this config uses — replace it with
+`api:` → `encryption:` → `key: !secret api_key` and let Home Assistant re-adopt
+the device. Leave the `lib_deps` pin on
 `NeoPixelBus@2.6.0` alone unless the compiler complains.
 
 ### Setting the two setpoints

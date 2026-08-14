@@ -39,16 +39,27 @@ list.
 				))}
 			</CardGrid>
 		)}
-		{group.projects.some((p) => p.guide && p.pending) && (
+		{group.projects.some((p) => p.guide && p.pending && p.files) && (
 			<p>
 				<strong>Drafted write-ups:</strong>{' '}
-				{group.projects.filter((p) => p.guide && p.pending).map((p, i, all) => (
+				{group.projects.filter((p) => p.guide && p.pending && p.files).map((p, i, all) => (
 					<>
 						<a href={`/projects/${p.slug}/`}>{p.title}</a>
 						{i < all.length - 1 ? ', ' : '.'}
 					</>
 				))}
 				{' '}Files are ready; the guide is still being written.
+			</p>
+		)}
+		{group.projects.some((p) => p.guide && p.pending && !p.files) && (
+			<p>
+				<strong>Drafted, files still to come:</strong>{' '}
+				{group.projects.filter((p) => p.guide && p.pending && !p.files).map((p, i, all) => (
+					<>
+						<a href={`/projects/${p.slug}/`}>{p.title}</a>
+						{i < all.length - 1 ? ', ' : '.'}
+					</>
+				))}
 			</p>
 		)}
 		{group.projects.some((p) => !p.guide) && (

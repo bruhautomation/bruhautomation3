@@ -17,8 +17,8 @@ what the tolerance controls is how finely curves are approximated, which is why
 a part that comes out too heavy to load in a browser is re-tessellated coarser
 rather than dropped.
 
-A preview that landed at a printable tolerance is copied into `models/` as well,
-so a project that only ever shipped CAD still has something to slice. That is
+A preview that landed at a printable tolerance is moved into `models/`, so a
+project that only ever shipped CAD still has something to slice. That is
 the whole point of the tolerance ladder: a mesh fine enough to print is a
 different artefact from one coarsened to fit a preview budget, and only the
 first gets offered as a part. The STEP stays the source of record either way.
@@ -170,13 +170,14 @@ def main():
         # but a part tessellated coarse to fit the preview budget is, and that
         # one stays preview-only rather than shipping as something to slice.
         if tolerance <= PRINTABLE_TOLERANCE:
+            # Moved, not copied: the viewer loads models/ too, and a copy left
+            # in preview/ put the same mesh in the picker twice — once
+            # mislabelled as CAD-only.
             os.makedirs(f'projects/{slug}/models', exist_ok=True)
-            with open(f'projects/{slug}/preview/{stem}.stl', 'rb') as source:
-                data = source.read()
-            with open(f'projects/{slug}/models/{stem}.stl', 'wb') as target:
-                target.write(data)
+            os.replace(f'projects/{slug}/preview/{stem}.stl',
+                       f'projects/{slug}/models/{stem}.stl')
             printable += 1
-            print('  also exported to models/ — fine enough to print')
+            print('  moved to models/ — fine enough to print')
         else:
             # The preview had to be coarsened to stay loadable over a phone
             # connection. That budget is the viewer's problem and not the
