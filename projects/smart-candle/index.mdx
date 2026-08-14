@@ -10,7 +10,7 @@ import { Steps } from '@astrojs/starlight/components';
 import AffiliateDisclosure from '../../site/components/AffiliateDisclosure.astro';
 import ImagePlaceholder from '../../site/components/ImagePlaceholder.astro';
 import ProjectFiles from '../../site/components/ProjectFiles.astro';
-import candleIgnition from './images/candle-arc-ignition.gif';
+import candleIgnition from './images/candle-arc-ignition.webm';
 import candleConcept from './images/smart-candlet-concept.png';
 
 An oil candle that lights itself when Home Assistant says so and blows itself
@@ -144,10 +144,14 @@ which puts heat into the wick instead of blowing it apart.
 across a few millimetres of air, and it has an internal cell and a USB charger,
 so it needs nothing from the ESP32 except a relay across its own button.
 
-<img
-  src={candleIgnition.src}
-  alt="Arc jumping between two copper tube tips above the wick of a glass oil candle, lighting it"
+<video
+  src={candleIgnition}
+  autoplay
+  loop
+  muted
+  playsinline
   style="max-width: 400px; border-radius: 8px;"
+  aria-label="Arc jumping between two copper tube tips above the wick of a glass oil candle, lighting it"
 />
 
 :::note
