@@ -14,7 +14,6 @@ ESPHome native API — no MQTT, no polling.
 
 - `models/` — print-ready STL files (these are what the site previews)
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 - `esphome/` — ESPHome configuration
 
 `esp32_7seg_body.stl` and `esp32_7seg_back.stl` are the two parts you print.
@@ -38,9 +37,11 @@ ESPHome native API — no MQTT, no polling.
 
 ## Case
 
-The body is 87 × 28 × 22 mm with a 66 × 16 mm window leaning back at 43°. The only
-opening is a 22 × 25.5 mm hatch at one end of the base, closed by the 2 mm plug-fit
-lid — everything is installed through it, lengthwise, into an 85 mm cavity. There
-is no cable hole in the model; notch the lid for the USB lead.
+The body is 87 × 28 × 22 mm with a 63 × 16 mm window leaning back at 43°. A
+20 × 22 mm hatch at one end of the base is how everything goes in, lengthwise,
+into an 85 mm cavity; it closes with a 22 × 25.5 mm plug-fit lid 2 mm thick. A
+10 × 4 mm slot in the far end wall is where the USB lead comes out. Mind that
+the hatch as modelled will not pass a 38-pin ESP32 — see the write-up before
+you print.
 
 Full write-up: `index.mdx`.

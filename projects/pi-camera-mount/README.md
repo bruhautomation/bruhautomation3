@@ -15,8 +15,6 @@ onto a 15 mm pipe, with a long ribbon running back to the Pi.
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports. `cam_pipe_clamp_v2` is
   the clamp; `bruh_pi_2_camera_mount_v2` is the camera bracket, which is held in
   Fusion as a mesh body and so exports an empty STEP and no STL
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D
-  viewer loads these)
 
 ## The clamp, measured
 

@@ -3,8 +3,10 @@
 Clean, production-ready ESPHome configuration files for all BRUH Automation devices.
 
 Each config lives in its own project folder alongside that project's CAD files and
-notes, rather than in one flat directory. Every file is self-contained — there are
-no `!include` dependencies between them, so a config can be copied out on its own.
+notes, rather than in one flat directory. No config `!include`s another, so each
+can be copied out on its own — the one companion file is `bruh-desk.yaml`'s
+custom sensor header, `table_height_sensor.h`, which lives beside it and moves
+with it.
 
 ## Device Configurations
 

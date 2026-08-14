@@ -19,8 +19,6 @@ replaces, so the router is not flexing its own base through the cut.
 - `models/` — the printable base plate (STL)
 - `cad/` — Fusion 360 source (`.f3d`) and a STEP export, if you would rather cut
   the plate from 1/4 in polycarbonate than print it
-- `preview/` — preview mesh tessellated from the CAD (generated; the site's 3D
-  viewer loads it)
 
 The file name carries an old Fusion design name. There is one part in it and it
 is the base plate.

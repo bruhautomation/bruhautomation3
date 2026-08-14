@@ -21,8 +21,6 @@ temperature and TDS, and metered fertiliser injection.
   `garden_sketch_v6` are layout sketches, not parts
 - `models/` — printable STLs: the air-injector drill guide and the timer
   indicator disk
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D
-  viewer loads these)
 
 ## Hardware
 

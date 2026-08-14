@@ -17,7 +17,6 @@ send its own history back.
 
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
 - `models/` — STL exports
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 - `esphome/` — ESPHome configuration
 
 ## Known gaps in these files

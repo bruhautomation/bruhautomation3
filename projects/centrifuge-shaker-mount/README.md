@@ -17,8 +17,6 @@ with one M6 cap screw per half.
 - `models/` — print-ready STL (both halves, in their assembled positions — run
   *split to objects* in the slicer before arranging)
 - `cad/` — Fusion 360 source (`.f3d`) and STEP export
-- `preview/` — preview mesh tessellated from the CAD (generated; the site's 3D
-  viewer loads these)
 
 ## The part
 

@@ -15,7 +15,6 @@ with a 20 mm sleeve on it, fixed with two screws.
 
 - `cad/` — Fusion 360 sources (`.f3d`) and STEP exports
 - `models/` — the printable STL
-- `preview/` — preview meshes tessellated from the CAD (generated; the site's 3D viewer loads these)
 
 ## The part
 

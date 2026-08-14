@@ -56,9 +56,10 @@ A part that already has a hand-exported STL in `models/` is skipped; that file i
 the author's and it wins.
 
 When a preview lands at a tolerance fine enough to print from — 0.15 mm chord
-deviation or better, which is finer than a 0.4 mm nozzle resolves — it is copied
-into `models/` as well, so a project that only ever shipped CAD still has
-something you can slice. A part that had to be tessellated coarser to fit the
+deviation or better, which is finer than a 0.4 mm nozzle resolves — it is moved
+into `models/`, so a project that only ever shipped CAD still has something you
+can slice (the viewer loads it from there, so nothing is kept in `preview/`
+twice). A part that had to be tessellated coarser to fit the
 preview budget stays preview-only, because at that point the mesh *is* what
 limits the print. The STEP remains the source of record either way, and the
 pages link it.
