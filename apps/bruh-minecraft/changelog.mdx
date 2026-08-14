@@ -10,7 +10,90 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.14.3" date="July 20, 2026" latest>
+<Release version="1.15.3" date="August 3, 2026" latest>
+<Changes type="changed">
+
+- **The add-on installs from a prebuilt image instead of building on your machine.** `config.yaml` now carries an `image:` key pointing at `ghcr.io/bruhautomation/{arch}-bruh-minecraft-server`, published for both architectures by CI. Installs and updates become a download rather than a container build — on a Raspberry Pi, the difference between minutes of SD-card writes and a pull. No action needed.
+
+</Changes>
+</Release>
+
+<Release version="1.15.2" date="August 3, 2026">
+<Changes type="security">
+
+- **The LAN-refusal log line took a percent-decoded request path.** aiohttp hands `request.path` over already decoded, so `%0a` in a URL arrived as a real newline and anything on the LAN could write its own lines into the add-on log — under a message about being refused. The method, path and peer are flattened to one line and capped before they are formatted in.
+- **Path containment is now proved where the path is built.** World names, pack names and backup refs were already behind anchored allowlists that cannot express a separator, so nothing was reachable. `_under()` makes containment a property of the path being used rather than of a pattern four hundred lines away — worth having in a panel that runs with `host_network: true` and hands out world delete, restore and upload.
+- **The restore-ref pattern is bounded.** `world-[\w-]+\.tar\.gz` on a URL segment a caller picks is an unbounded run of word characters in front of a literal suffix, which is what makes a failed match cost more than the string is long. No archive this writes comes near 64 characters.
+
+</Changes>
+<Changes type="changed">
+
+- Every deliberately silent exception handler now says what is lost when the exception is ignored.
+
+</Changes>
+</Release>
+
+<Release version="1.15.1" date="August 2, 2026">
+<Changes type="fixed">
+
+- **The integration page showed no logo.** Home Assistant had no artwork for the `bruh_minecraft` domain and fell back to printing the raw domain beside the name. The artwork was staged for a home-assistant/brands submission that can no longer be made — since Home Assistant 2026.3.0 that repository closes any pull request adding a new custom integration automatically. The integration now ships a `brand/` folder beside its manifest, which Home Assistant serves itself and prefers over the CDN — the icon and wide lockup appear with nothing to submit and nobody to wait for.
+
+</Changes>
+</Release>
+
+<Release version="1.15.0" date="August 2, 2026">
+
+The management panel answered your whole network — this release closes it off and turns AppArmor on, taking the add-on to a 6/6 security rating in the store.
+
+<Changes type="security">
+
+- **The panel now refuses any request that did not arrive through the Supervisor.** This add-on sets `host_network: true` so Bedrock clients can discover the server on the LAN, and the panel binds `0.0.0.0:8099` — together that put the management API on your network with nothing in front of it. Ingress is a proxy, not a gate: it authenticates the people who arrive through Home Assistant and has no say over anyone who types the IP. So `http://homeassistant.local:8099` reached, without any login, `POST /api/command` (arbitrary RCON — `/op`, `/ban`, `/stop`), world delete, backup restore, plugin install and the server.properties editor — the exposure Home Assistant documented in [GHSA-gh5m-4m97-c95h](https://github.com/home-assistant/core/security/advisories/GHSA-gh5m-4m97-c95h). Requests are judged by the connection's own peer address — not by `X-Forwarded-For`, which a direct caller sets themselves. Two paths stay public because they have to be: `/pack/{name}`, which Minecraft clients fetch the resource pack from, and `/api/health`, which reports liveness and nothing else. Refusals are logged, so "the panel does nothing when I open it by IP" has an answer in the add-on log. **Nothing changes if you open the panel from Home Assistant**, which is how the sidebar, the Worlds tab and every button already work.
+- **AppArmor is on.** `apparmor: false` was set in `config.yaml`, which disabled the Supervisor's sandbox and cost a point of security rating. It matters more here than on most add-ons: this one loads third-party plugin jars that run with the server's full authority. The profile that replaced it lets the JVM do JVM things — fork and exec, executable memory for the JIT, the four game ports — and denies the host-escape set: mounting, kernel modules, raw sockets, kernel tunables, the Docker socket. **The add-on now rates 6/6 in the store.**
+
+</Changes>
+<Changes type="added">
+
+- **Every option has a name and an explanation in the UI.** All ~50 of them were documented in `config.yaml` comments and none of it reached the configuration page, which showed raw keys like `geyser_mtu` with no description. `translations/en.yaml` moves that writing to where it is read.
+- **A watchdog** on the new `/api/health`, so a hung panel restarts instead of sitting there reading as "started".
+- A minimum `homeassistant` version, declared rather than assumed.
+
+</Changes>
+<Changes type="changed">
+
+- The generated RCON password and the console log are excluded from Home Assistant backups. Your worlds and world backups are still included — those are the point of backing this add-on up.
+
+</Changes>
+</Release>
+
+<Release version="1.14.6" date="August 1, 2026">
+<Changes type="changed">
+
+- **The roof is blocky now too.** The mark had `MC` on a 16u block grid sitting under the parent's smooth gable — two drawings in one lockup. The roof is stepped onto the same grid, keeping the apex, the 45° slopes and the knockout window, so the whole mark is built to one rule. brAIn keeps the smooth roof; a test now fails if either app is caught wearing the other's.
+
+</Changes>
+</Release>
+
+<Release version="1.14.5" date="August 1, 2026">
+<Changes type="changed">
+
+- **A real BRUH mark, at last.** The add-on's icon, its panel favicon and its panel header were a gradient plate with an isometric cube on it — no `BR` ligature, no gable, not even the brand palette. It now carries the same lockup as brAIn and the parent logo, with `MC` set on a 16u block grid as the thing that tells the two apps apart. The header's pickaxe emoji on a green gradient square goes with it.
+- **The full set of store artwork.** `logo.png` is rendered at the right ratio instead of being a stretched leftover, and the home-assistant/brands submission gains the `icon@2x`, `logo` and `logo@2x` files it never had.
+
+</Changes>
+</Release>
+
+<Release version="1.14.4" date="July 31, 2026">
+<Changes type="fixed">
+
+- **Plugin auto-install is now version-aware.** The Modrinth resolver picked the newest Paper-family build regardless of the server's Minecraft version, so e.g. a 1.20.1 server got WorldEdit built for 1.21.4 — which Paper refuses to load ("Unsupported API version") on every boot. Resolution now filters by the installed server version (from `.server-meta.json`), prefers release-channel builds over alpha/beta, and skips with a clear warning when a plugin has no build for your server version instead of installing a jar that can't load.
+- **`install_essentialsx_chat` works again.** The resolver looked up the Modrinth slug `essentialsxchat`, which does not exist (HTTP 404 on every boot). The correct slug is `essentialsx-chat-module`.
+- **Plugins built for a newer Minecraft are quarantined.** The boot-time plugin cleanup now also moves jars whose `api-version` targets a newer MC than the server runs into `plugins/.quarantine/` — they can never load, and the quarantine manifest tells you to install a build for your server version (or upgrade the server) instead of Paper printing a stack trace every start. Restore by moving the jar back, as with duplicate quarantines. Disabled together with `auto_quarantine_duplicates: false`.
+- **Console log noise cut sharply.** The stats collector now polls with `minecraft:list` instead of `/list`, so Essentials no longer logs "Rcon issued server command" every 15 seconds into console.log; and the server brand (`/version`) is fetched once per server run instead of every poll — each `/version` made Paper re-run its update check, which now dumps a `FileNotFoundException` stack trace every few minutes for MC versions the retired `api.papermc.io` v2 API no longer serves.
+
+</Changes>
+</Release>
+
+<Release version="1.14.3" date="July 20, 2026">
 <Changes type="changed">
 
 - **Sidebar naming**: the ingress panel is now titled "BRUH Minecraft" (was "Minecraft") to match the BRUH family branding.

@@ -10,7 +10,444 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.14.0" date="July 31, 2026" latest>
+<Release version="1.27.0" date="August 14, 2026" latest>
+
+**Findings can reach you now** — a critical finding no longer waits for somebody to open the panel — and the learned home is portable, scriptable, and better at reporting on itself.
+
+<Changes type="added">
+
+- **Findings can reach you now.** A critical finding discovered by the 3am scheduler used to be completely silent until somebody opened the panel — the store lives in the add-on's `/data`, which Home Assistant cannot see. The add-on now publishes a mirror to `/config/.brain/findings_state.json` on every change, and the integration builds three things on it: an **Open findings** sensor (open count as state, severity split and the texts as attributes, so an automation can put what is broken on a lock screen), a **`brain_finding` event** per newly-filed finding, and an optional **push notification** — set `findings_notify_service` to any `notify.*` service and `findings_notify_min_severity` to what is allowed to ring your phone (default `serious`). The store dedupes across every status and the settled ledger, so the same problem can never ring twice.
+- **`brain findings` — the Findings tab, scriptable.** `list`, `fix`, `done`, `wrong`, `ack` and `snooze`, all through the panel's own API, so a CLI ending writes the same memory line, settled-ledger key and undo token the tab's buttons do. The chat's command palette picks the new subcommands up automatically.
+- **`brain memory export` / `import` — the learned home, portable.** One JSON file carrying the memory document, the findings work list, the settled answers and the facts ledger (also downloadable from the Memory tab's ⬇ Export button). Import is a migration, not a sync: ledgers merge with existing entries winning, the memory document replaces only an effectively-empty one unless you pass `--replace-memory`, and importing the same file twice changes nothing the second time.
+- **The scheduler reports itself.** Every category now carries `next_due`, rendered on the card foot ("next in 4 h"), so "why did my cards stop updating" has an answer on the card instead of one log line printed once. The active auto-refresh gate (paused / budget reached / not signed in) rides along, and the countdown hides while a gate holds rather than promising a run that will not come.
+- **`/api/health` calls the roll.** The liveness endpoint now reports which background daemons are actually running (worker pool, listeners, usage tracker, memory consolidator, study watcher, ttyd) plus when the last consolidation pass landed — informational only, so a dead sibling can never fail liveness and restart-loop the add-on. `brain doctor` reads it and compares against its own view.
+- **Energy insights lean on Home Assistant's long-term statistics.** The analyst is told explicitly that `get_statistics` reaches back months (day/week/month buckets, surviving recorder purges) and is the tool for "compared to last week/month" — and the energy category asks for a period-over-period anchor instead of extrapolating a month from a few days. brAIn deliberately keeps no statistics store of its own: Home Assistant already has the sums.
+
+</Changes>
+<Changes type="fixed">
+
+- **Picking a chat model updates the label under the composer immediately.** The label is the only confirmation a pick landed, but the event that refreshes it does not arrive until the next message — a restarted `--resume` process says nothing until spoken to — so the picker looked like it did nothing. The response now carries the server-made label and the meta line updates on the spot.
+- **The four Playwright layout measures now run in CI** instead of by documented human habit — the two bar shapes, the 44px target floor, the never-truncated card title, the painted chat meta line and the on-screen tooltips are enforced on every PR.
+- The facts ledger no longer ships a `remove_fact` function: nothing may be deleted from that ledger — deleting is how the analyst re-announces what you have already seen — and the one function that could sat there called by nothing.
+
+</Changes>
+</Release>
+
+<Release version="1.26.0" date="August 14, 2026">
+
+**A round of fixes for things that failed quietly** — sensors that went dark without a reason, options that did nothing, notifications that never arrived.
+
+<Changes type="fixed">
+
+- **Usage sensors that went unavailable during a 429 wall now say why — and a restart no longer makes the wall worse.** The tracker's backoff (1/2/4 hours) is deliberately longer than the two-hour window after which a reading is too old to trust, so during any streak of 429s the four usage sensors *will* go unavailable — that part is by design. What was broken: the reason was only written down on the poll *after* the reading went stale, which on a four-hour rung is hours later; in between, the `Usage tracker` diagnostic said `stale` and nothing else. A failed poll now records what failed and when it will ask again right beside the reading it deliberately left showing, so the moment the sensors blank, the diagnostic names the cause (`http_429`, with the note that this is the endpoint's limit, not your account's usage) and `next_attempt_at` says when it retries. And the backoff survives restarts: it lived only in memory, so restarting the add-on — the first thing anyone does when sensors go dark — polled immediately and retried straight back into the daily meter that caused the outage.
+- **A restricted voice assistant could sidestep its service restrictions.** Deny-listing `cover.open_cover` did not stop `homeassistant.turn_on {"entity_id": "cover.garage_door"}` — HA's meta-services forward to the target's own domain, and the deny check only matched the spelled name. Meta-calls are now checked against their targets and refuse anything touching a restricted domain (or targets the check cannot resolve, like whole areas). `fire_event` — which can trigger any automation, including one that does exactly what the deny-list forbids — is refused entirely on restricted channels. And the one-click deny options now include `brain.*`, so a restricted agent can be kept away from the 65 registry-admin power tools (including `brain.create_user`, which can mint an admin login).
+- **"Voice thinking limit" and "Voice tool access" did nothing in fast mode — which is the default.** The worker pool never saw either option: it read its environment directly and the values were only written where the classic listeners re-source them. Voice always ran at 5 turns (config ships 8) whatever the slider said. Same class of bug as 1.25.2's listener fix, in the one consumer that release didn't cover.
+- **Voice conversations no longer lose their memory to the pre-warmed worker.** A follow-up turn whose worker had been reaped could be handed the fresh spare process — which knows nothing — and the stored session id was then overwritten, severing the conversation's context for good. The spare now only serves conversations that genuinely start from nothing.
+- **Deleting a chat conversation could destroy it while the toast still offered Undo.** The trash judged expiry by file mtime, which is a conversation's last-activity time — routinely older than the 30-minute grace period — so a just-deleted conversation could arrive "already expired" and be unlinked by the very next delete. Trash entries are now stamped at deletion time, and restore puts the original timestamp back so the row keeps its place in the rail.
+- **`brain_learned` logbook events now actually fire.** The watcher that turns newly-learned facts into logbook entries (documented since it shipped) was never started.
+- **`ha context` always failed.** The dispatcher ran delegated scripts with `bash`, which ignores their `with-contenv bashio` shebang — so the one script that logs through bashio died with "command not found" on its first line, every time. Both dispatchers now exec the script itself.
+- **Automation task notifications never arrived.** The listener posted with an `entity_id` key the notify schema rejects, so a task with `notify: true` produced a silent 400. The requested `notify_entity` now picks the notify service, as documented.
+- **A failed study session no longer silently doubles its own cost.** The study runner misread every failure's exit code as success-shaped, so a session stopped by its own timeout triggered a full second session, and every failure reported the same unhelpful message with stderr thrown away. Failures now report the real reason — timeouts by name, anything else with the CLI's own last line.
+- Smaller fixes: two panel writers can no longer silently lose a findings update to each other; the run-sources prune no longer hands the ledger to root; the MCP watchdog no longer rewrites arbitrary JSON files that merely mention `/api/mcp`; notebook edits are snapshotted before Claude changes them so `brain undo` covers them; a malformed terminal handoff no longer kills the terminal session at open; a malformed JSON body to the findings endpoints gets ignored instead of a 500; a chat stream that falls behind reconnects to a fresh snapshot instead of idling forever; `memory_max_kb`'s fallback agrees with the shipped default.
+
+</Changes>
+</Release>
+
+<Release version="1.25.2" date="August 12, 2026">
+
+<Changes type="fixed">
+
+- **"Automation thinking limit" and "Voice thinking limit" did nothing.** Whatever you set them to, automation ran at 10 turns and voice at 5 — the fallbacks. The settings were saved correctly and written where the listeners could find them; the listeners just read the number a moment before that file was loaded, so they kept the fallback and never looked again. This is why an agentic task — anything that searches the web, reads several entities, then writes something — would stop early and answer with whatever it had: ten turns is tight for that work, and `automation_max_turns` now genuinely ships at 30. Study sessions run from the terminal had the same fault, so `study_max_turns` and `study_timeout_minutes` were ignored on that path.
+- **The fallbacks disagreed with the documented defaults.** If the add-on ever can't read its saved environment, the listeners now fall back to the same numbers `config.yaml` ships (30 and 8) — one answer per setting instead of a second one that only appears when nothing is watching.
+
+</Changes>
+</Release>
+
+<Release version="1.25.1" date="August 8, 2026">
+
+<Changes type="fixed">
+
+- **The model picker looked like it did nothing.** Choosing a model always did change the model that answered you — what it didn't change was the name printed under the composer, the only place you can see which model is running. The panel worked that name out with a pattern that dropped the minor version, so Haiku 4.5 read as "Claude Haiku 4" and Sonnet 4.6 as "Claude Sonnet 4": any two models of one family printed the same thing, and swapping between them left the screen unchanged. (An older id like `claude-3-5-sonnet` fared worse — "Claude Sonnet 2", from the date stamp.) Names now come from the add-on itself, off the model Claude Code reports it resolved.
+- **The context percentage kept the old model's window after a switch.** The conversation carries across a model change, so the token count is still right — but the window belongs to the model. Switching to Haiku left the pill dividing by Sonnet's 1M and reporting 4% of a window it was 21% into. It's recalculated the moment the new session starts.
+- **The picker's "Default" row named the wrong model.** It read the global model once, when the Terminal tab opened — change it in ⚙ from the same tab and the row went on naming the model you had just replaced.
+- **The model popover jumped to the corner of the screen** if the window resized while it was open from ⋯ → Model. It closes instead.
+
+</Changes>
+</Release>
+
+<Release version="1.25.0" date="August 8, 2026">
+
+**When Claude has a question, the chat shows the question** — and the self-test learned to check the parts that have been failing quietly.
+
+<Changes type="added">
+
+- **Claude's mid-task questions render as questions.** Claude Code sometimes asks multiple-choice questions mid-task (`AskUserQuestion` — which zone did you mean, which approach do you prefer). Those arrived as a generic "may I use AskUserQuestion?" permission card, and allowing it sent the tool an empty answer sheet that broke the turn. The chat now renders the questions themselves — tap an option, pick several where allowed, or type your own — and the answers ride back on the CLI's own wire. **Don't answer** tells Claude to use its best judgement, and renders amber, not as a crash.
+- **Unknown control requests are answered, never dropped.** A `control_request` is a question the CLI is waiting on; one from a feature this panel has never heard of used to disappear into silence, which from the chat looked like Claude thinking forever. Anything unimplemented now gets an error response back so the CLI can fail that one feature and carry on with the turn.
+- **Delete several conversations in one pass.** A checklist button above the chats list turns on selection mode: checkboxes per row, **Select all**, and one **Delete** with a single Undo that puts the whole batch back. The open conversation is skipped and reported rather than failing the batch, and a batch is capped at what the trash can restore.
+- **The self-test covers the parts that failed quietly.** `brain doctor` now also checks: the panel and chat API are answering, the terminal's password gate is actually on (an unauthenticated 200 on :7681 is a FAIL, not a curiosity), the Claude CLI itself runs, the three background daemons are alive, the run-sources ledger is claude-owned (root-owned means background runs get filed as yours, silently), a crashed consolidation pass still holding the lock, disk space, and how stale the usage reading is.
+
+</Changes>
+<Changes type="fixed">
+
+- **The generated `/config/CLAUDE.md` stopped promising git backups.** It still told Claude edits were "auto-backed up via git" — a feature removed releases ago — so Claude repeated it to people as if it were true. It now teaches what actually exists: edits are snapshotted before Claude makes them, and `brain undo` reviews and reverts them.
+- **The self-test's "tracker polls every ~2 min" hint** predated the 30-minute poll and sent people waiting on a cadence that no longer exists.
+
+</Changes>
+</Release>
+
+<Release version="1.24.0" date="August 8, 2026">
+
+**The chat asks for permission instead of failing silently** — the main reason chat answers came up short of the terminal's.
+
+<Changes type="added">
+
+- **The chat asks for permission.** Headless Claude Code cannot put a prompt on a TTY, so a tool call outside the pre-approved set never ran and the answer was written around the gap. The same question now arrives as a card in the conversation (what tool, aimed at what, **Allow once** / **Don't allow**), carried over the CLI's own control channel — the wire the Agent SDK rides. Everything already allowed in `settings.local.json` still runs without asking; an unanswered card declines itself after ten minutes and says so; a CLI too old for the channel just gets the old behavior back.
+- **Thinking streams live.** The chat only rendered reasoning when the message closed, so a long think was minutes of dots followed by the reasoning delivered after its conclusion. Thinking deltas now stream in as they happen, exactly like answer text.
+- **A status line for the whole turn.** The three dots vanished on the first token, leaving a tool-heavy minute looking hung. The line now stays for the turn and says what Claude is doing — thinking, writing, which tool is running, waiting for your approval — with elapsed seconds, like the native CLI's bottom line.
+- **The docs say why chat sessions don't show in the Claude app.** "Connected" sessions ride Remote Control, which only supports interactive sessions — a Claude Code limitation, not a setting. The session popover and the guide say so, and point at the face switch, which moves the same conversation into a terminal session that can register.
+
+</Changes>
+<Changes type="fixed">
+
+- **The chat's model picker could apply nothing.** "Is a restart needed" was answered by comparing a pick against the panel's *intent*, which is refreshed from settings on every request — so after a ⚙ edit the picker said "already that model" about a live session still running the old one, and a long-lived session never respawns on its own. Every model question is now asked of the model the process was actually spawned with; a change made anywhere lands on the next message at the latest, and `--model` stays on the argv across `--resume`, because a resumed session otherwise keeps the model it remembers.
+- **Hitting the session turn limit no longer dead-ends the conversation.** The cap guards against runaway loops but spans the process, and the old answer — "start a new chat to carry on" — charged the person's conversation for it. The next message now restarts the CLI with `--resume`: the counter resets, the conversation carries on.
+- **A session error with a stderr tail could crash the refusal.** The message went into an HTTP reason line, which cannot carry newlines, so "the session died" surfaced as a 500 about carriage returns.
+
+</Changes>
+</Release>
+
+<Release version="1.23.0" date="August 7, 2026">
+
+**The chat picks its own model, and conversations can be deleted** — without either touching what the rest of the add-on costs or the CLI's own files.
+
+<Changes type="added">
+
+- **The chat picks its own model.** Press the model name under the composer — or ⋯ → Model — and choose from the same list ⚙ Settings offers. The choice is the chat's own (`chat_model`): it never touches the global model option, so insight runs and the listeners keep costing what the Configuration tab says. Applying it restarts the CLI with `--resume`, so the conversation carries straight across.
+- **Conversations can be deleted.** Every row in the Chats rail and the Conversations dialog grows a ✕, and the toast grows an Undo — the file is moved into a short-lived trash rather than unlinked, so a mis-tap puts back exactly what was taken. The open conversation is refused ("start a new chat first"), and nothing ever edits the CLI's own files: deleting a whole conversation is the one mutation, and it is a move.
+
+</Changes>
+<Changes type="fixed">
+
+- **Opening an old conversation could leave a chat that errored on every message.** Claude Code prunes old sessions from its store; resuming one it no longer holds spawned a CLI that died silently, and the kept resume id respawned the same failure forever. The spawn is watched until the CLI says its first word now: a refused resume drops the id, says so in the transcript (the replayed history stays on screen), and opens a fresh session — the panel tells you the context is gone rather than letting the next answer reveal it. A fresh session that dies on startup reports the CLI's own stderr instead of a shrug.
+- **The model and context line under the chat was clipped — at every width, and worst on a wide screen.** A leftover negative bottom margin shortened the page wrapper, whose `overflow: hidden` swallowed the bottom ~20px of the view: exactly where "Claude Sonnet 5 · 132k / 1000k context" lives. Fixed, and `tests/manual/measure-chatmeta.mjs` now measures the line with `elementFromPoint` — painted, not merely positioned — so it cannot quietly go under again.
+
+</Changes>
+</Release>
+
+<Release version="1.22.3" date="August 7, 2026">
+
+<Changes type="fixed">
+
+- **The usage sensors worked all night and died by mid-morning.** 1.22.2 cut the requests per poll from six to one and still the sensors hit a wall of 429s every day — recovering at roughly the same hour each night. That nightly recovery is the tell: a burst limit clears in minutes; a limit that comes back at a fixed hour is a **daily allowance**. The arithmetic matches exactly — nine working hours at a two-minute poll is about 270 requests, the reported window almost to the minute. Against a per-day cap the only lever is how many requests a day costs, so the poll is now every **30 minutes** — 48 requests a day instead of 288, or the ~4,300 the six-per-poll version could reach. What that costs is resolution nobody can see: the five-hour window moves about 1% every three minutes at a hard sprint, so a half-hourly reading is never more than a percent or two behind — and a sensor slightly behind all day beats one that is exact until 10am and unavailable after it. The 429 backoff moved from 15/30/60 minutes to **1/2/4 hours** to match: every step must exceed the poll interval, a rule with a test behind it, because lengthening the poll alone would have meant a *failing* tracker asking more often than a working one.
+
+</Changes>
+</Release>
+
+<Release version="1.22.2" date="August 4, 2026">
+
+<Changes type="fixed">
+
+- **The usage sensors reported a rate limit brAIn had caused itself.** They went unavailable with `http_429`, which reads as "you have used up your quota" and was nothing of the sort — the *usage endpoint* was refusing to answer, with plenty of quota to spare. brAIn was asking it six times per poll: the tracker offers a credential per *path*, and the paths are the same file — `CLAUDE_CONFIG_DIR` makes two of them identical strings and symlinks join the other two. One sign-in, four identical requests with no pause between them, then two more from the panel and `ha login` stores usually holding the same token — every two minutes, all day. That endpoint is undocumented and limited far harder than anything else brAIn touches, and a token hammered on it keeps answering 429 long after the window that supposedly caused it. Claude Code itself only ever calls it when you open its `/usage` screen, never on a timer. A credential is now offered once however many paths lead to it; a 429 is treated as the one failure retrying makes worse — waits of 15, then 30, then 60 minutes, and `Retry-After` can only ever make brAIn wait *longer*, because the endpoint sends `Retry-After: 0` while still refusing. A rate limit never blanks numbers that are still good — it says nothing about your sign-in, so the last reading ages out normally — and the **Usage tracker** sensor carries a `detail` explaining that `http_429` is the endpoint's limit and not your account's.
+
+</Changes>
+</Release>
+
+<Release version="1.22.1" date="August 4, 2026">
+
+<Changes type="fixed">
+
+- **Two things saving at once could lose one of them.** Every store in the panel wrote its file the same way — write `findings.tmp`, then rename it over `findings.json`. Safe against a *reader*, exactly wrong against a second *writer*: the scratch name is derived from the target, so every writer picks the same one, the first rename moves it, and the second's bytes went into a file the winner had already renamed away — **silently lost**. It was reachable: pressing **Fix it** writes the findings store from the web request while an insight run writes the same store from the background worker, and the same pattern was in all seventeen places the panel saves a file. Saving now uses a scratch name nobody else can pick. Two details a naive fix would have broken came along: the file keeps its **permissions** (several are written as root and read by the `claude` user) and its **owner** — the old rename silently took `/data/run-sources.jsonl` away from the `claude` user on every prune. Files are also flushed to disk before the rename, so a power cut can no longer leave a file that exists and is empty.
+
+</Changes>
+</Release>
+
+<Release version="1.22.0" date="August 4, 2026">
+
+**Every card now says what it cost, and fetches only what it needs.** The most expensive thing brAIn does is now readable on screen — and much smaller.
+
+<Changes type="added">
+
+- **Every card says what it cost.** Generating an insight is the most expensive thing brAIn does — typically 25k–45k tokens a card — and until now the only evidence was the usage pill moving, with nothing saying which card moved it. The figure is readable in four places, all reporting the same number: the spinner line while it runs (`500 entities · ~33k tokens sent`), the card's footer after (`41.2k tokens` beside the stopwatch, input/output split behind a hover — seconds and tokens are different readings), the usage pill's popover (*What brAIn spent, this session*, per card, biggest first), and one line per run in the add-on log. The itemization is scoped and says so: these are brAIn's own runs — when the percentage above it is your account's live figure it covers terminal, chat and voice too, and a breakdown read as exhaustive is how you conclude a terminal session is free.
+- **A card fetches what it needs instead of being handed the house.** ⚙ Settings → **How a card gets its data**, and Search is the new default. Claude gets a *map* of your home — how many entities of each kind, which areas, a few anchors — plus **read-only** Home Assistant tools, and looks up what the card actually needs: a question about the hallway costs the hallway. Measured on a real run: a 1,449-character prompt where the old path sent about 100,000. It is also the only mode that can afford **history on a question you type** — the one-shot path never could, so typed questions were always answered from a single instant. **Snapshot** is the old behaviour, kept as a setting *and* the automatic fallback so a card always appears; the fallback is logged, because a run that keeps taking it is worth knowing about.
+- **Insight runs can only read.** The analyst's tools are an explicit allow-list of the reading half of the HA MCP server, and every acting tool is explicitly denied as well — belt and braces, because `--allowedTools` governs what runs without a prompt and a headless run cannot be prompted, so an un-listed tool merely *fails* rather than being *forbidden*. Not the same guarantee with a real house on the other side. `tests/test_security.py` checks the deny list against the MCP server's own tool list, so adding an acting tool and forgetting this fails in CI rather than in somebody's home. The one path that changes anything is still **Fix it**, which a person presses.
+
+</Changes>
+<Changes type="changed">
+
+- **A card's data snapshot got 29% smaller, and lost nothing.** A question sends every entity in the home, so a character on one row is 500 characters on the prompt — and three fields were paying for something nobody read. `lc` is now **minutes since it last changed**, not a 19-character ISO timestamp (staleness is the only thing it was ever read for, and "6 minutes ago" and "an hour ago" are different facts that cost the same). `n` is dropped when it is just the entity_id prettified — HA's default name, a second copy of a string already on the row; a renamed entity keeps it. An unavailable entity keeps only its id, state and area. Measured on a 500-entity home: 72,943 → 52,086 characters, roughly 5k fewer input tokens on every card and every question.
+- **The docs now say what a card costs**, and which kind is expensive: a category card sends its slice of the home, a question typed into the ask bar sends *every* entity plus device context — which is why a few asked questions can cost what a dozen scheduled refreshes do. Settings & cost lists it as the first lever, above the scheduling ones.
+
+</Changes>
+</Release>
+
+<Release version="1.21.0" date="August 3, 2026">
+
+**Undo, in the toast** — because "I fixed it" and "Wrong" sit next to each other meaning opposite things, and a mis-tap had nothing to put itself back with.
+
+<Changes type="added">
+
+- **Undo, in the toast.** Every press that takes something off the Findings list — both endings, **Got it**, **Dismiss**, and either answer to a guess — now leaves an **Undo** button in the toast for a few seconds. It puts back all of it: the card, the suppression that would have stopped brAIn raising it again, and the line it queued for your memory document. Deliberately short-lived: this is "I pressed the wrong one", not a history — once a consolidation has run, the fact is in the document and editing the document is the honest answer, and Undo says so rather than pretending. **Fix it has no Undo**, because it has already sent Claude at your actual house and taking the card back would be a lie about what was undone. **Remind me later** has none either: it took nothing away, and it already has *Bring it back now*.
+- **"I fixed it" takes a note too.** The same box **Wrong** offers, for a different reason — nothing is being corrected, so what you type is simply more of the fact: "Replaced the CR2032 — it's a 3-monthly job on that one." "I fixed it" leaves brAIn knowing a problem is over; that sentence leaves it knowing your house. Optional, like the other one.
+
+</Changes>
+<Changes type="fixed">
+
+- **"9 things waiting" over four cards.** The Memory tab's filing queue counted one thing and listed another: the count read the memory inbox — every fact any writer has queued — while the list read the facts ledger, which only holds what insight runs discovered. So corrections, confirmed guesses, facts you typed in yourself, voice, study sessions and anything another add-on left in `/share` were all counted and never shown. Neither number was wrong; they were answers to different questions. The list is the inbox now — every row is a line the next pass will actually read, labelled with where it came from — and the count is the length of it, from the same read. **✕** on a row drops it from the queue and asks the consolidator for nothing, because a queued fact has never reached the document.
+- **Tooltips ran off the left of the screen.** They were anchored to each control's right edge and up to 240px wide, so anything in the first ~236px lost its text off the side — four of the six buttons under a finding on a phone, and still two on a desktop. They are measured and clamped to the window now, and open upward when there is no room below.
+- **The toast was squeezed into the right-hand half of the screen.** It was positioned from the centre, which on a phone left it about 195px to lay out in — text wrapped to four lines with the whole width to spare. Nobody noticed until the Undo button had to sit beside it.
+
+</Changes>
+</Release>
+
+<Release version="1.20.0" date="August 3, 2026">
+
+**One list of things waiting on you.** brAIn asks two kinds of question — *is this broken?* and *have I got this right?* — and the second was being asked in three places while the badge counted none of them.
+
+<Changes type="changed">
+
+- **Guesses now live on the Findings list, and the badge counts everything waiting on a decision.** They used to be answerable inline under every insight card *and* in the Memory tab's "Waiting on you" — so answering one left the same guess sitting elsewhere looking unanswered, and a Memory tab badged with work you didn't have to do is how you learn to stop reading the badge next to it, which counts work you do. Guesses keep their **✓ Yes** / **✕ No**, and the Memory tab is what it should have been all along: a queue that files itself and a document to read, with no badge, because nothing on it is waiting for you.
+
+</Changes>
+<Changes type="added">
+
+- **"Wrong" replaces "Ignore" on a finding, and it asks why.** The old button said what happened to the row; what people actually mean is usually *you've misread my house* — the sensor isn't stuck, it's a contact on a cupboard nobody opens — and it had nowhere to say so, so the next run made the same mistake in different words. **✕ Wrong** opens a box for one sentence, which goes into your memory document at the next consolidation and into what every future analysis is told about this home. **It is not treated as an instruction** — brAIn is handed what you said and works out what follows from it, usually a standing fact, sometimes nothing at all, so you don't have to phrase a correction carefully for it to be useful. The box is optional: press Send empty and it behaves exactly as Ignore did. The same box is offered when you turn down a guess and from the chat's action strip — telling Claude there reaches that one conversation, and the box reaches every future one.
+
+</Changes>
+</Release>
+
+<Release version="1.19.7" date="August 3, 2026">
+
+<Changes type="changed">
+
+- **The add-on installs from a prebuilt image instead of building on your machine.** `config.yaml` now carries an `image:` key pointing at `ghcr.io/bruhautomation/{arch}-brain`, published by CI for both architectures on every change. Installs and updates become a download rather than a container build — on a Raspberry Pi that's minutes of SD-card writes replaced by a pull, and one less thing that can fail halfway through on a flaky network. Everyone gets the identical image, and no action is needed: the next update simply arrives the fast way.
+
+</Changes>
+</Release>
+
+<Release version="1.19.6" date="August 3, 2026">
+
+<Changes type="security">
+
+- **The srcdoc height message had no origin check — and could not have had a useful one.** Every insight card renders in a sandboxed `srcdoc` iframe, and those all report their origin as the string `"null"`, so an origin comparison cannot tell one card's frame from another's. The handler checks window identity against the frame it is addressed to instead — the rule the terminal frame's keyboard message already followed.
+- **An insight id containing `</script>` would have escaped the snippet it was embedded in.** The height-reporting script interpolates the card id through `JSON.stringify`, which does not escape `<`. It does now.
+- **The terminal handoff file was world-writable.** `/data/terminal-handoff.json` was chmod `0o666` so the `claude` user could read and remove it; it is chowned to that user and `0o600` now. Removing a file was always governed by the directory, which that user already owns — the write bit bought nothing and granted it to everyone.
+- **Path containment is now proved where the path is built.** Insight ids, history stamps and card names were already behind anchored allowlists that cannot express a separator — but the guarantee lived in a regex somewhere up the call stack. `_under()` joins under a base directory and refuses anything that did not stay there. `_unmirror_card` had no allowlist at all, and its directory is under `/config/www`, which Home Assistant serves.
+
+</Changes>
+<Changes type="fixed">
+
+- **The bundle collector and the memory writer no longer put exception text in a response.** An `OSError`'s text is an errno and a path; both now log the detail and answer with the sentence the user can act on.
+- **A streaming conversation that ended without a result event had an unreachable error branch** — the fallback to file IPC was always the right answer, and the `RuntimeError` beside it could never run.
+
+</Changes>
+<Changes type="changed">
+
+- **Every deliberately silent exception handler now says what is lost when the exception is ignored** — 60-odd of them, from a failed cache write to a client that disconnected mid-stream. They were all intentional; none of them said so.
+
+</Changes>
+</Release>
+
+<Release version="1.19.5" date="August 3, 2026">
+
+<Changes type="fixed">
+
+- **`dangerously_skip_permissions: false` did nothing in the session picker.** `brain-menu.sh` read the flag as `${BRAIN_CLAUDE_PERMS_FLAG:-$PERMS_FLAG}` with the variable initialised to `--dangerously-skip-permissions` — and that failed open twice over. A missing `/data/.brain_env` meant "skip every prompt", and `:-` cannot tell empty from unset while `run.sh` writes exactly `export BRAIN_CLAUDE_PERMS_FLAG=""` when the option is OFF. So the dangerous fallback fired on the *normal* path: every session started from the picker ran with permission prompts disabled regardless of the option. Reachable whenever `auto_launch_claude` is off, which is what puts the picker in front of you; the default path was never affected. The flag now starts empty and is only ever set to what `run.sh` says. A security default may only fail closed.
+
+</Changes>
+<Changes type="changed">
+
+- **The chat says when a tool call was refused rather than broken.** Headless `-p` cannot prompt, so a call outside the permission set never runs — but it came back as a plain red Error, indistinguishable from a crash. It now renders amber, labelled "Not permitted", saying nothing is broken and that the terminal can approve a call the chat cannot. The match is on the CLI's own wording and deliberately narrow: a bare `Permission denied` is **not** treated as a refusal, because that is an ordinary EACCES from a permitted `Bash` call, and calling it a policy decision would send people to change a setting that was never in the way.
+
+</Changes>
+</Release>
+
+<Release version="1.19.4" date="August 3, 2026">
+
+**"The chat works but the terminal asks me to log in, and the usage sensors are dead."** One fault with three faces — and 1.19.3 fixed the wrong half of it.
+
+<Changes type="fixed">
+
+- **An expired CLI token won everywhere it mattered.** Two functions resolve the same credential in opposite order: the chat reads the panel's store first, the terminal reads Claude Code's own `.credentials.json` first — and decided it was usable with a prefix test, `startswith("sk-ant-")`, which says a token is *shaped* like a credential, not that it is one. So the terminal deferred to a dead token, exported nothing, and prompted for a login while a working panel credential sat unread; the usage tracker walked the same order into a 401; only the chat kept working. And it could not clear on its own: `run.sh` restores `.credentials.json` from a backup whenever it goes missing, so deleting the dead token brought it back on the next boot. Fixed by checking the expiry rather than the prefix in all four places that ask — `brain-auth-env.sh`, the usage tracker, `engine`'s status, and the backup restore, which now discards an expired backup instead of resurrecting it. A live CLI login still wins, because a `claude /login` done in the terminal is the most recent thing the person did there.
+- **A refused credential no longer speaks for the ones behind it.** The tracker tries each store in turn and falls through on a 401, so a stale token in one place cannot mask a working sign-in in another. Anything that isn't a 401 stops the search, because that is about the request rather than the credential.
+- **`ha selftest` names this failure directly** — it reports the CLI credential's expiry and, when it has passed, gives the two files to remove, including the backup, without which the next restart puts it straight back.
+
+</Changes>
+</Release>
+
+<Release version="1.19.3" date="August 3, 2026">
+
+<Changes type="fixed">
+
+- **Every usage-limit sensor was unavailable if you signed in through the panel.** The tracker looked for a credential in exactly one place — Claude Code's own `.credentials.json` — while brAIn keeps one in three: a panel login under `/data/secrets`, and the one `ha login` shares under `/config/.brain/secrets`. So the terminal, the voice listener and the fixer all ran happily off a login the tracker insisted did not exist, and four sensors said "not authenticated" about the one thing that wasn't wrong. It now resolves a credential the way everything else in the add-on does, and runs as root, because two of those three stores are root-owned `0700` directories — running it as the `claude` user is precisely what limited it to the one store it could read.
+- **A sign-in that cannot work now says which one it is.** An Anthropic API key bills per token and has no subscription window, so there is no utilization to report and never will be; that used to arrive as `no_oauth_token`, which sends people to redo a login that worked.
+- **Four sensors going unavailable with no stated reason.** A new `Usage tracker` diagnostic sensor never goes unavailable, because its whole job is to be readable at the moment the others are not: `ok`, or what stopped it — `no_oauth_token`, `api_key_has_no_usage_limits`, `http_401`, `network_error`, `stale`, `not_running`.
+- **Stale utilization was reported as live.** Readings now expire after two hours — the window the panel already applied to the same file — and a single failed poll no longer blanks four working sensors: a fresh reading is left alone to age out instead of being overwritten with an error.
+- **The chat's context pill claimed more tokens than the window it measured against.** Two mistakes, compounding. The count came from the `result` envelope, whose `usage` is every model call in the turn added up — and each call re-sends the conversation, so a ten-tool turn reported roughly ten conversations' worth. It now reads the per-call `usage` on the `assistant` event. And the denominator was a table where every Opus and Sonnet was 200K, which stopped being true at 4.6 when both went to 1M; the window is now read from the model's version, and a model whose version can't be read reports a token count and no percentage rather than a percentage of a guess.
+
+</Changes>
+</Release>
+
+<Release version="1.19.2" date="August 2, 2026">
+
+<Changes type="fixed">
+
+- **The integration page read "brain brAIn" instead of showing a logo.** The artwork existed and had been staged for over a year for a submission to home-assistant/brands that could not be made: since Home Assistant 2026.3.0 that repository closes any pull request adding a new custom integration automatically, before a human sees it. What replaced it is a `brand/` folder shipped beside the integration's own manifest, which Home Assistant serves itself and prefers over the CDN — the icon and wide lockup now appear with nothing to submit and nobody to wait for. The logos are 341×256 and 682×512 rather than the store's 512×384, because the brand spec caps a logo's *shortest* side at 256 — the staged assets would have failed the very validator that submission was aiming at.
+
+</Changes>
+</Release>
+
+<Release version="1.19.1" date="August 2, 2026">
+
+<Changes type="added">
+
+- **"Back up Home Assistant first" now says so where it matters.** brAIn edits your real configuration — automations, dashboards, helpers, entities. It snapshots every file before it changes it, and `brain undo` puts them back; none of that is a backup you can restore from, and the gap between "careful" and "recoverable" is the one worth naming out loud. The notice sits on the first-run screen, on screen before brAIn is allowed to change anything, and in the README and DOCS for anyone deciding whether to install. It is styled as a caution, not an error — red in this panel means "something went wrong just now", and a permanent notice wearing it teaches people to read past red.
+
+</Changes>
+</Release>
+
+<Release version="1.19.0" date="August 2, 2026">
+
+**The terminal port was a shell anyone on your network could open.** This release closes it, sandboxes the container, and keeps your Claude credential out of your backups. **brAIn now rates 6/6 in the add-on store.**
+
+<Changes type="security">
+
+- **The published ttyd port is gone.** `ports: 7681/tcp: 7681` published the terminal to the LAN on every install, with `--writable` and no `--credential` — anyone who could reach your Home Assistant box could open `http://homeassistant.local:7681` and get a root shell with `/config` read-write and a Claude Code signed in to your Anthropic account, with no Home Assistant login involved at any point. This is the exposure documented in [GHSA-gh5m-4m97-c95h](https://github.com/home-assistant/core/security/advisories/GHSA-gh5m-4m97-c95h). Ingress never needed the port — the panel reverse-proxies `/terminal/` to ttyd over loopback. If you were using the direct port for a wall tablet, assign it again under the add-on's Network settings.
+- **ttyd requires a password now, published or not.** `run.sh` generates one into `/data/terminal-credential` and the panel presents it upstream on every proxied request, so nothing changes for anyone coming in through Home Assistant. The proxy drops any `Authorization` header the browser sends before adding its own, so a cached credential for the ingress origin cannot be replayed at ttyd. `webui:` is gone with it — it pointed at the raw port, where nothing now listens.
+- **An AppArmor profile.** brAIn runs an agent that edits files and runs commands, so a profile enumerating permitted binaries would break the first time you asked for something new. This one constrains what brAIn can do to the **host** instead: no mounting, no kernel modules, no raw sockets, no writes to kernel tunables, no Docker socket, no ptracing out of the profile.
+- **The Claude credential no longer rides into your backups.** Home Assistant backups are unencrypted unless you opt in — then get copied to cloud storage, NAS shares and support tickets. `backup_exclude` now keeps the OAuth credential, the terminal password and the chat scrollback out of them. Restoring costs you one sign-in.
+
+</Changes>
+<Changes type="added">
+
+- **Every option has a name and an explanation in the UI.** `config.yaml` documented all 35 of them in comments nobody installing an add-on reads, while the configuration page showed `assist_max_turns` with a blank description. `translations/en.yaml` moves that writing to where it is read.
+- **A watchdog.** The panel is the ingress target and the foreground process, so a hung panel was a dead add-on that still read as "started". The Supervisor now polls `/api/health` and restarts it.
+- `stage`, `boot` and a minimum `homeassistant` version, declared rather than inherited from defaults.
+
+</Changes>
+</Release>
+
+<Release version="1.18.3" date="August 1, 2026">
+
+<Changes type="changed">
+
+- **The sidebar icon is a brain.** It was `mdi:home-analytics` — a house with a chart in it, which describes the Insights tab and none of the other four. Home Assistant only takes an MDI name in that slot, so the sidebar can never carry the mark itself; what it *can* do is say what the add-on is, and brAIn is the mind you gave the house. `mdi:brain` it is.
+
+</Changes>
+</Release>
+
+<Release version="1.18.2" date="August 1, 2026">
+
+<Changes type="changed">
+
+- **The icon says which add-on it is.** `icon.png`, the panel favicon and every square brAIn shipped were the gable on its own — the *family* mark. It says BRUH and nothing about which add-on you are looking at, so brAIn and BRUH Minecraft arrived in the same sidebar wearing the same roof. Every square now comes from the full lockup: the parent's `BR` ligature, the gable that doubles as the `A`, and `AIN` in smooth caps. Gable-only art is gone from the repo, and a test keeps it gone.
+
+</Changes>
+</Release>
+
+<Release version="1.18.1" date="August 1, 2026">
+
+<Changes type="fixed">
+
+- **"brAIn is filing memory now" that never stopped saying it.** The Memory tab could sit forever announcing a pass long after it had finished, and **File into memory now** did nothing visible. The lock: `with_lock` opened its file descriptor and never closed it, so the lock was held for the life of the *process* rather than the length of the *pass*. `--once` got away with that for years because exiting releases the lock for free — but the daemon calls it in a loop and outlives every pass, so its first consolidation held the lock until its next one, a day later. Consolidation itself kept working, which is why it hid; what broke was the reporting, because the lock is also the panel's only honest answer to "is a pass running right now" — so the tab announced a finished merge forever and the button answered every press with `{"started": false, "running": true}`. The lock is now released when the pass ends, in the contention path too.
+
+</Changes>
+<Changes type="changed">
+
+- **A pass says how long it has been going.** "This takes a few minutes" answered a question nobody was asking — what you want while watching is the difference between slow and stuck. The banner now counts up: *Filing these into the memory document now… (2m 10s)*, for the daemon's passes as well as the button's. Elapsed time is measured on the add-on's clock and sent as seconds, so a phone whose clock is minutes off still reads right.
+
+</Changes>
+</Release>
+
+<Release version="1.18.0" date="August 1, 2026">
+
+**A full memory document stopped filing anything, forever.** Once `memory.md` reached its size cap, every consolidation refused itself and nothing was ever filed again — a loop that got further from succeeding the longer it ran.
+
+<Changes type="fixed">
+
+- **The size guard changed nothing about the next attempt.** The pass asks Claude for the whole updated document and rejects an answer over the cap — but the daemon then ran the identical prompt every five minutes, got the identical over-size answer, and refused it again, while the queue grew behind it asking each attempt to fit *more* into a document already full. An overshoot is now measured and fed back — "your last answer was N bytes over, drop the oldest and lowest-value facts until it fits" — and only a second overshoot fails the pass, naming `memory_max_kb` instead of a byte count nobody can act on.
+- **Background passes can label themselves again.** The run-source ledger is written by the panel as root and by the consolidator and study watcher as the `claude` user. Root created it first, so every daemon claim failed with `Permission denied` and ran unlabelled — defeating the 1.17.0 change that keeps machine conversations out of your Chats rail. It is created claude-owned up front. The failure also printed a bash error on every pass despite the library being documented as silent: `>> file 2>/dev/null` silences the command, not the shell's own "cannot open" message.
+- **"File into memory now" logs where you were told to look.** A button-started pass had its output captured and discarded unless the script exited non-zero — while the failure it reported sent you to read those lines in the add-on log. They now stream there as the pass writes them, same as the daemon's.
+
+</Changes>
+<Changes type="changed">
+
+- **Memory got room to be memory.** `memory_max_kb` now defaults to **32 KB**, up from 8. Voice is unaffected — it reads the 2 KB `voice.md` distillate on every request and always did, so the small cap was never buying speed where speed is felt. The insight bundle was the other half of the mistake: learned memory and the house context shared one 4 KB budget with memory read first, so a document over 4 KB was truncated mid-fact *and* a full one starved the context entirely. Each gets its own budget now, sized so a full memory document arrives whole.
+
+</Changes>
+</Release>
+
+<Release version="1.17.0" date="August 1, 2026">
+
+**"File into memory now" actually files, and the Chats rail is your chats.**
+
+<Changes type="fixed">
+
+- **The consolidator gave Claude 120 seconds to rewrite the whole memory document plus the voice distillate.** On a document with anything in it that was a coin flip — and losing it looked identical to a broken login: `timeout` killed the CLI, the pass logged *"Claude invocation failed (not authenticated?)"*, the queue stayed put, and the daemon did it again five minutes later, forever, with the one explaining line sending you to redo a sign-in that was fine. A pass now gets 480 seconds — what an insight run gets, for the same reason — and says what actually went wrong: a timeout names the setting to raise, and any other failure carries Claude's own last line of stderr instead of a guess.
+- **The button stopped waiting for the pass it starts.** A consolidation takes minutes; the request carrying it timed out long before, which is why the button appeared to do nothing and then reported failure while the pass was still running. It returns straight away now, the tab reports progress off the consolidator's own lock, and pressing again joins the running pass instead of racing it.
+- **A terminal left open stays connected.** Nothing pinged the browser half of the terminal's websocket, so on an idle terminal the proxy in front — ingress, or Nabu Casa remote — closed it as idle after a minute or two, ttyd killed the session's process, and the client reconnected for as long as the tab was open. Both halves are pinged now.
+
+</Changes>
+<Changes type="changed">
+
+- **The Chats rail is your chats.** brAIn runs Claude Code in `/config` for voice, automation tasks and filing memory, and Claude Code files all of it where your own conversations go — so the rail filled with machine prompts, forty copies of the consolidator's opening line, with yours somewhere underneath. Worse, switching back from the classic terminal adopted *the most recent conversation*, which was routinely the consolidator's. Every background run now claims its session before it starts, so each row says whose it is: **Yours** is the default, Voice / Automation / Memory / Study are one press away with a count each, and switching back from the terminal only ever picks up a conversation of yours.
+- **A quieter log.** The panel logged a line per request, and an open panel polls: thousands of identical `200`s pushing the one line that explained a failure off the top of the page. Successful polls are silent now, failures log as warnings, and `log_level: debug` turns every request back on. ttyd's own notice-level chatter goes the same way.
+
+</Changes>
+</Release>
+
+<Release version="1.16.0" date="August 1, 2026">
+
+<Changes type="added">
+
+- **Your conversations, in a rail.** On a screen wide enough (1100px and up), the chat tab grows a column listing every conversation in `/config` — whichever face made it — with **＋** to start a new one and the current one marked rather than hidden. Below that width nothing changes: 248px of conversations is most of a phone, so **⋯ → Conversations** is still the way in. Nothing is reachable only from a screen you don't have.
+- **Which model, and how full.** Under the composer, quietly: the model that is actually answering, and how much of the context window the conversation occupies — `42k / 200k context · 21%`, turning amber past 80%. The token figure is the CLI's own report of what it sent on the last turn, and what it sent *is* the conversation so far — a measurement, not an estimate. Cache reads count, because a cached prompt still occupies the window; it is only cheaper. A model with no published window reports its count and no percentage.
+- **Dismiss, next to Ignore.** A finding can now be cleared off the list **without** teaching brAIn anything: **Ignore** settles it — a line into memory, and the analyst told never to raise it again — while **Dismiss** just deletes the row, so the next analysis is free to find it again. That is what `forget` in the store has always done, and it had no button.
+
+</Changes>
+<Changes type="changed">
+
+- **A new chat does not lose the old one.** "This one is cleared and Claude forgets its context" was overstating it — Claude Code keeps the conversation, it stays in the list, and you can reopen it. The prompt now says what is actually true.
+
+</Changes>
+<Changes type="fixed">
+
+- **The last line of an answer is no longer flush against the composer.** Scrolled fully down, the chat log left 8px, which reads as the message being cut off rather than as the end of it.
+- **The iPhone home indicator no longer overlaps the chat.** The safe-area inset was on the composer, which stopped being the bottom-most element when the model line was added below it. It is on the container now, which is always last.
+
+</Changes>
+</Release>
+
+<Release version="1.15.0" date="July 31, 2026">
+
+<Changes type="fixed">
+
+- **The full-screen terminal left the bar cut in half.** Going full-screen and coming back gave you a sliver of a top bar that stayed a sliver on every other tab, until a reload. `.topbar`'s height *is* `--bar-h`, and the panel writes `--bar-h` from the bar it just measured — stable at rest and wrong exactly once: the immersive terminal sets it to `0`, so on the way out the bar rendered clipped, the next measurement read the clipped height, and that became the new truth. Measured on a desktop viewport, the 56px bar came back as **1px**. Measuring now clears the override first, and a zero is never written — the CSS class already says zero, and an inline one would outlive the class that justified it.
+
+</Changes>
+<Changes type="changed">
+
+- **The findings buttons say what they do, in fewer words.** *"Not a problem here"* became **Ignore**, and *"I've fixed it"* became **I fixed it** — a row of four decisions is read at a glance or not at all. What each ending *teaches* brAIn is still there, in the tooltip, where an explanation belongs.
+- **The counts we advertise are now tested** (`tests/test_documented_counts.py`). "36 native tools" and "65 registry-management services" are derived from the registrations themselves, and every present-tense claim in the repo is checked against them. They had gone stale twice; the site said 56 for six releases after nine more shipped.
+- **The docs screenshots are reproducible** (`tests/manual/demo_panel.py`) — the real panel booted against a seeded demo home with Claude stubbed out, so the pictures stay the actual product.
+
+</Changes>
+<Changes type="removed">
+
+- **The Answered filter, because memory is the record.** Settling a finding writes a plain fact into `memory.md` and deletes the row; **Answered** then listed those answers again, which put a pile of dismissed cards next to a work list that is supposed to empty — and invited you to treat it as the record when memory already is. It and **Everything** are both gone; two chips remain, the work and what is waiting. The settled ledger is untouched and still stops the analyst re-raising next week what you answered today — it is simply not a view any more.
+
+</Changes>
+</Release>
+
+<Release version="1.14.1" date="July 31, 2026">
+
+<Changes type="changed">
+
+- **The guide opens with what brAIn is for.** The Docs tab opened by describing what brAIn is made of. It now opens the way the READMEs and bruhautomation.com do — *your house already has nerves, now give it a brAIn* — followed by what it actually does. Five surfaces describe this add-on and they had drifted apart; they now open with the same words. Text only: no behaviour, no options, nothing to reconfigure.
+
+</Changes>
+</Release>
+
+<Release version="1.14.0" date="July 31, 2026">
 
 **Switching to chat brought a fraction of the conversation** — and on a phone, an insight card gave its title away to its buttons. Both are the same mistake: something that doesn't matter crowding out something that does.
 

@@ -13,7 +13,7 @@ Everything lives under one **BRUH Minecraft** device:
 |--------|-------------------|
 | `sensor.…_players_online` | Player count, with the `players` name list in attributes |
 | `sensor.…_players_max` | Slots |
-| `sensor.…_tps_1m/5m/15m` | Server tick rate (Paper/Purpur) — the lag early-warning |
+| `sensor.…_tps_1m/5m/15m` | Server tick rate (Paper/Purpur/Folia) — the lag early-warning |
 | `sensor.…_latency_ms` | Status ping latency |
 | `sensor.…_uptime` / `version` / `server_type` / `motd` / `difficulty` / `gamemode` | Server facts |
 | `binary_sensor.…_reachable` | Status ping succeeds |
@@ -33,6 +33,8 @@ Everything lives under one **BRUH Minecraft** device:
 | `bruh_minecraft.restart_server` | — | Graceful save + restart |
 | `bruh_minecraft.stop_server` | — | Graceful save + stop (stays stopped) |
 | `bruh_minecraft.op_player` / `deop_player` / `kick_player` / `ban_player` / `whitelist_add` / `whitelist_remove` | `player` | Player management |
+
+There's also a **notify platform**: `notify.bruh_minecraft_broadcast` takes a `message` and broadcasts it in-game, so anything that can send a notification — doorbells, timers, dinner — can reach the players.
 
 ## Recipes
 

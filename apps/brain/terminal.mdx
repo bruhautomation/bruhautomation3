@@ -41,13 +41,19 @@ difference is entirely how you see it.
 
 **Chat** is the default. Claude Code's output rendered as a conversation: text that reflows
 to your screen, code blocks that scroll inside their own box, tool calls folded into one line
-each (tap one for its arguments and result), reasoning behind a *Thinking* line, and a real
-text box so dictation and autocorrect behave. **⏹** stops an answer in progress; **＋**
-starts a new chat. It survives a reload, a locked phone, and the add-on restarting.
+each (tap one for its arguments and result), reasoning behind a *Thinking* line that streams
+while it's being written, and a real text box so dictation and autocorrect behave. While
+Claude works, the three dots are a status line for the whole turn — thinking, writing, which
+tool is running, with elapsed seconds — so a tool-heavy minute never looks hung. **⏹** stops
+an answer in progress; **＋** starts a new chat. It survives a reload, a locked phone, and
+the add-on restarting.
 
 **Classic** is a true terminal — ttyd over tmux. Use it for anything that draws its own
 screen (a TUI, `htop`, an installer), for running shell commands yourself, or just because
-you prefer it.
+you prefer it. Its port (7681) is unpublished by default — a published port answers the LAN
+with no Home Assistant login in front of it, so assign one in the add-on's Network panel only
+if you want direct access — and ttyd always requires a generated password, which the panel
+presents upstream for you, so through ingress you never see a prompt.
 
 :::note[The switch carries the conversation, both ways]
 Going to Classic releases the chat's session and opens the terminal already inside it.
@@ -72,9 +78,24 @@ so rather than failing.
 
 ## On a wide screen, a rail of conversations
 
-From about **1100px** the chat grows a column down the left listing every conversation in
-`/config` — whichever face made it — with **＋** for a new one and the one you're in marked
-rather than hidden. Picking one resumes it.
+From about **1100px** the chat grows a column down the left listing **your** conversations,
+with **＋** for a new one and the one you're in marked rather than hidden. Picking one
+resumes it.
+
+Yours is the default because everything else that drives Claude Code from `/config` — voice,
+automation tasks, memory filing, study sessions — files its conversations in the same place,
+and a rail of forty consolidator prompts buried the chats you actually had. Every background
+run claims its session id before it starts, so an unclaimed conversation is yours by
+definition; **Voice / Automation / Memory / Study** chips are one press away, each with a
+count, and only for faces that have actually run in your house. Switching back from the
+Classic face only ever picks up a conversation of *yours*, never the consolidator's.
+
+**✕** on a row deletes a conversation — a move into a short-lived trash, not an unlink, and
+the toast grows an **Undo** that puts back exactly what was taken. The one you're in is
+refused ("start a new chat first"): deleting the ground the live session stands on would
+kill it or quietly fork it. A checklist button turns on selection mode — checkboxes per row,
+**Select all**, one **Delete**, one Undo for the whole batch — and the open conversation is
+skipped and reported rather than failing the batch.
 
 It's the same list and the same resume as the ⋯ menu, so nothing lives only in the rail.
 Below that width it isn't drawn at all: 248px of conversations is most of a phone, and
@@ -85,6 +106,12 @@ Claude Code keeps the conversation and it stays in the list. What a new chat cos
 the next thing you say belongs to a separate conversation — not that anything was forgotten.
 :::
 
+Two dead ends that aren't anymore: hitting the session's turn limit no longer ends the
+conversation — the next message restarts the CLI with `--resume` and carries on — and
+reopening a conversation Claude Code itself has pruned from its store says the context is
+gone, keeps the replayed transcript on screen, and opens fresh instead of erroring on every
+message forever.
+
 ## Which model, and how full
 
 Under the message box, quietly: the model that's actually answering, and how much of the
@@ -93,20 +120,38 @@ context window the conversation is using — `42k / 200k context · 21%`, turnin
 
 The number is the CLI's own report of what it sent on the last turn, and what it sent *is*
 the conversation so far, so it's measured rather than estimated. Cached parts count: a
-cached prompt still occupies the window, it's only cheaper to send. For a model with no
-published window, you get the token count and no percentage — a percentage of a guessed
-denominator is worse than none.
+cached prompt still occupies the window, it's only cheaper to send. The denominator comes
+from the model's **version**, not its family — Opus and Sonnet went to a 1M window at 4.6,
+Haiku stayed at 200K — and it's re-derived the moment the model changes, so switching
+mid-conversation moves the percentage immediately rather than on the next turn. For a model
+whose version can't be read, you get the token count and no percentage — the candidate
+windows are five times apart, and a percentage of a guessed denominator is worse than none.
+
+### Picking the model
+
+Press the model name under the composer, or **⋯ → Model**. The choice is the chat's own
+(`chat_model`) — it never touches the global `model` option, so insight runs and the
+listeners keep costing what the Configuration tab says. **Default** in this picker means
+"follow ⚙ Settings", and names the model that setting currently resolves to. Applying a
+pick restarts the CLI with `--resume` — the conversation carries straight across — and the
+label under the composer updates on the spot, which is your confirmation it landed. It's
+refused mid-answer, because restarting the process would lose the answer being written.
 
 ## The ⋯ menu
 
 - **New chat** — start again in a separate conversation.
-- **Conversations** — the same list as the rail: every conversation in `/config`, started in either face. Pick one and
-  it replays into the pane and carries on. Both faces stand in the same directory, which is
-  what lets each see the other's conversations at all: Claude Code files them per working
-  directory.
+- **Conversations** — the same list as the rail, with the same filter chips and the same
+  selection mode. Pick one and it replays into the pane and carries on. Both faces stand in
+  the same directory, which is what lets each see the other's conversations at all: Claude
+  Code files them per working directory.
 - **Session details** — the model, the project directory, how you're being billed, and this
   conversation's id. Copy the id to resume the same conversation from an SSH session or
-  another machine.
+  another machine. One thing a chat session can never do is appear as "connected" in the
+  Claude app: that rides Remote Control, which requires an interactive session — a Claude
+  Code limitation ([anthropics/claude-code#30447](https://github.com/anthropics/claude-code/issues/30447)),
+  not a setting. The popover says so and points at the face switch, which moves the same
+  conversation into a terminal session that *can* register.
+- **Model** — the same picker as the model name under the composer.
 - **Switch face** — the same switch as the corner button.
 
 :::tip[A per-message price only appears if an API key is paying]
@@ -133,7 +178,23 @@ to `/config/.claude/settings.local.json` at startup — MCP tools, Bash, Read, W
 WebFetch and WebSearch. Claude Code runs as a non-root user, and `secrets.yaml` is never
 snapshotted and never edited.
 
+**When Claude wants something outside that set, the chat asks.** Headless Claude Code has no
+TTY to prompt on, so a tool call outside the pre-approved set used to simply never run — the
+answer was written around the gap, which is the main reason chat answers came up short of
+the terminal's. The question now arrives as a card in the conversation — what tool, aimed at
+what, **Allow once** / **Don't allow** — carried over the CLI's own control channel.
+Everything already pre-approved still runs without asking; an unanswered card declines
+itself after ten minutes, because a chat tab — unlike a TTY — may have nobody in front of
+it; and a refusal renders amber as *"Not permitted"*, never as a crash, so your own "no" is
+never mistaken for something breaking. A CLI too old for the channel just gets the old
+behavior.
+
+**Claude's own questions get the same treatment.** When it asks a multiple-choice question
+mid-task — which zone did you mean, which approach do you prefer — the chat renders the
+questions themselves: tap an option, pick several where the question allows it, or type your
+own answer. **Don't answer** tells Claude to use its best judgement.
+
 If you'd rather not be asked at all, `dangerously_skip_permissions` in the add-on
-configuration turns the prompts off for the interactive terminal only. It's **off** by
-default and it's the one option worth thinking about before you change it. See
-[Reference](/brain/reference/).
+configuration turns the prompts off for the interactive terminal only — not the chat, not
+insights, not the listeners. It's **off** by default and it's the one option worth thinking
+about before you change it. See [Reference](/brain/reference/).

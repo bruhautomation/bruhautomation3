@@ -10,7 +10,26 @@ import Changes from '../../components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.19.1" date="August 3, 2026" latest>
+<Release version="1.20.0" date="August 14, 2026" latest>
+
+The app docs describe the apps that actually ship again.
+
+<Changes type="added">
+
+- **Thirty-six releases of missing release notes.** The [brAIn changelog](/brain/changelog/) had stopped at 1.14.0 while the add-on shipped 1.27.0 — twenty-nine releases, including the 6/6 security hardening, the chat's permission cards and model picker, per-card cost reporting, and findings that can ring a phone. The [BRUH Minecraft changelog](/bruh-minecraft/changelog/) was seven behind, including its own LAN-gate and AppArmor release. All ported, condensed from the add-ons' own changelogs.
+- **The features those releases added are documented where a reader would look for them.** Findings notifications, `brain findings`, memory export/import and the scheduler's *next in 4 h* on brAIn's pages; Featured worlds (Drehmal), world import, the Resource Packs tab and the panel's LAN gate on BRUH Minecraft's — with the two committed-but-unused panel screenshots finally put to work.
+
+</Changes>
+<Changes type="fixed">
+
+- **The docs no longer contradict the products.** Guesses are answered on the Findings tab, not Memory; **✕ Wrong** replaced Ignore, and endings have an Undo; insight runs hold read-only tools rather than none; `memory_max_kb` ships at 32 KB, not 8; the usage tracker polls every 30 minutes, not 2; installs are a prebuilt-image pull, not a local build; 14 Minecraft services, not 13; `auto_restart_schedule` takes cron, not a clock time. Dozens more of the same shape, each verified against the shipped add-on rather than the previous sentence.
+- **`/brain/reference/#undo` lands on the Undo explainer again** — two headings slugified to the same anchor, and the three pages linking it were sent to a one-row option table instead.
+- **`brain.reset_dashboard_config` is documented** — the site described 64 of the 65 Power Tools while claiming 65 in three places.
+
+</Changes>
+</Release>
+
+<Release version="1.19.1" date="August 3, 2026">
 
 Page views are counted again — on every page this time.
 

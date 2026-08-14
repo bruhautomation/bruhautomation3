@@ -22,10 +22,13 @@ automation:
             Check the Home Assistant error log for today. Summarize real
             problems (ignore benign warnings) and suggest fixes.
           notify: true
+          notify_entity: notify.mobile_app_phone
           timeout: 300
 ```
 
 Tasks run with a generous agentic budget (`automation_max_turns`, default 30 — nobody is waiting on a background job) and full MCP access — including [Power Tools](/brain/power-tools/), so a task can *fix* what it finds, not just report it. Responses are also returned as service response data for use in the same automation.
+
+`notify: true` sends a notification when the task completes, and `notify_entity` picks the notify service that gets it — omit it for a persistent notification in the HA UI. (Before 1.26.0, `notify: true` silently did nothing: the listener posted a key the notify schema rejects, so every completion notification was a silent 400.) A `model` field on both `brain.run_task` and `brain.send_prompt` overrides the model per call (`default`, `sonnet`, `opus`, `haiku`), so a nightly digest can run on Haiku while everything else follows the add-on setting.
 
 ## `brain.send_prompt` — one-shot Q&A
 
@@ -61,6 +64,16 @@ content: >-
 ```
 
 Jobs or [insight cards](/brain/insights/)? Jobs produce glanceable markdown on dashboards and TTS-able events; cards produce interactive visual analysis you click into. Both read the same memory, so most homes use jobs for tiles and briefings, and cards for deep dives.
+
+## Findings in automations
+
+The [findings](/brain/findings/) work list lives in the add-on's `/data`, which Home Assistant can't see — so the add-on mirrors it to `/config/.brain/findings_state.json` on every change, and the integration builds three automation surfaces on it:
+
+- **`sensor.brain_open_findings`** — state is the open count, ready for a numeric-state trigger, with the severity split and the finding texts as attributes — enough to put what's actually broken on a lock screen.
+- **The `brain_finding` event** fires once per newly-filed finding, visible in the logbook. Deduping happens in the store, across every status and the settled ledger, so the same problem can never fire twice.
+- **Zero YAML**: set the `findings_notify_service` option to any `notify.*` service and `findings_notify_min_severity` to the severity allowed to ring your phone (default `serious`), and new findings at or above it are pushed with no automation at all.
+
+**`brain_learned`** fires the same way when a fact is filed into [memory](/brain/memory/) — though only actually since 1.26.0: the watcher behind it was documented from the start but never started. The other direction is `brain.add_memory`, which queues a fact from an automation; its optional `source` field records where the fact came from, so the consolidator knows who's talking.
 
 ## Power Tools from automations
 

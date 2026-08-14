@@ -21,6 +21,7 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 | `get_automations` / `get_automation_trace` | Automations with status; stored execution traces for debugging |
 | `get_ha_config` / `get_services` / `get_supervisor_info` | Config details, service catalog, system info |
 | `get_device_registry` | Per-domain entity count summary |
+| `list_dashboards` / `get_dashboard` | Enumerate dashboards; read one's full config — the reading half of the fetch-modify-save flow behind [Power Tools](/brain/power-tools/)' `update_dashboard` |
 
 ## Acting on it
 
@@ -35,8 +36,9 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 
 ## Scoping & safety
 
-- Every control tool funnels through the `call_service` chokepoint, so **per-agent service deny-lists** (e.g. no `lock.unlock` for a bedroom satellite) cover all of them at once.
+- Every control tool funnels through the `call_service` chokepoint, so **per-agent service deny-lists** (e.g. no `lock.unlock` for a bedroom satellite) cover all of them at once. Since 1.26.0 the chokepoint also resolves `homeassistant.*` meta-calls to their targets' domains — `homeassistant.turn_on` aimed at a cover *is* a cover call — refuses targets it can't resolve (a whole area), and refuses `fire_event` outright on restricted channels.
 - Voice agents default to `mcp_only` tool access — HA tools yes, shell and file edits no.
+- Insight and study runs, which run unattended, are scoped from both ends: an explicit read-only **allow-list** of these tools *and* an explicit **deny-list** of every acting one. Both are needed because `--allowedTools` only governs what runs *without a prompt*, and a headless run can't be prompted — so an un-listed tool merely *fails* rather than being *forbidden*, which is not the same guarantee with a real house behind it. `fire_event` and `remember_fact` are why it's an explicit list and not a name prefix: both are shaped like reads, and neither is one. The deny list is checked against the server's own tool names in CI, so a newly added acting tool can't quietly reach an unattended run.
 - `brain.*` Power Tools add their own layer: admin gating and id validation inside the service, regardless of who calls.
 
 ## Generated context

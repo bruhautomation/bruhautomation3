@@ -41,12 +41,15 @@ data:
 
 `brain.update_dashboard`
 
-Replace a storage-mode dashboard's configuration. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. A YAML-mode dashboard is declined here and edited as a file instead.
+Replace a storage-mode dashboard's configuration — or, with `view_index`, a single view. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. A YAML-mode dashboard is declined here and edited as a file instead. Saving onto a never-saved (auto-generated) dashboard requires `take_control: true`, because that takes permanent manual control of it — `reset_dashboard_config` reverts it.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `config` | object | yes | The full dashboard configuration object, including the complete views list. |
-| `url_path` | text | no | The dashboard's URL path (e.g. lovelace-lights). Omit for the default dashboard. |
+| `config` | object | yes | The full dashboard configuration object including the complete views list — or, when `view_index` is set, a single view object. |
+| `url_path` | text | yes | The dashboard's URL path (e.g. lovelace-lights), or the literal `default` for the default dashboard. Required on purpose: the default dashboard can only be targeted deliberately, never by accidental omission. |
+| `take_control` | boolean | no | Confirm saving onto a never-saved (auto-generated) dashboard. |
+| `view_index` | number | no | Replace only this view (0-based); `config` must then be a single view object. |
+| `dry_run` | boolean | no | Only report the resolved target and a change summary — nothing is written. |
 
 ```yaml
 service: brain.update_dashboard
@@ -81,6 +84,25 @@ data:
 ```
 
 > 🗣️ *"That dashboard change was worse — put it back how it was."*
+
+## Reset dashboard config
+
+`brain.reset_dashboard_config`
+
+Delete a dashboard's **stored** configuration — after backing it up — reverting it to auto-generated. The dashboard itself stays registered and in the sidebar; only its saved config goes (`delete_dashboard` is what removes the registration). This is the sanctioned way to clear a dashboard config — the gap that used to push callers toward raw `lovelace/config` websocket commands, which are off-limits — and `restore_dashboard` brings the config back from the backup if you regret it.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url_path` | text | yes | The dashboard's URL path, or the literal `default` for the default dashboard. |
+| `dry_run` | boolean | no | Only report what would be reset (the stored config's view count) — nothing is changed. Default off. |
+
+```yaml
+service: brain.reset_dashboard_config
+data:
+  url_path: lovelace-guest
+```
+
+> 🗣️ *"Wipe the guest dashboard back to the auto-generated one."*
 
 ## Delete dashboard
 

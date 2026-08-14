@@ -65,7 +65,8 @@ subscription — or your own API key.
   </Card>
   <Card title="It remembers your house" icon="open-book">
     One plain-markdown document of durable facts — nicknames, rhythms, the devices
-    that are *meant* to behave oddly. Everything brAIn does reads it.
+    that are *meant* to behave oddly. Everything brAIn does reads it, and
+    `brain memory export` carries it to new hardware — no starting over.
     [Memory →](/brain/memory/)
   </Card>
   <Card title="It explains your house" icon="star">
@@ -78,8 +79,9 @@ subscription — or your own API key.
   </Card>
   <Card title="It has a terminal" icon="laptop">
     The real Claude Code CLI with your `/config` in front of it, as a chat or as a
-    true terminal — same session, one button between them.
-    [Terminal →](/brain/terminal/)
+    true terminal — same session, one button between them. Permission asks arrive
+    as cards in the chat, it picks its own model, and conversations delete with
+    an Undo. [Terminal →](/brain/terminal/)
   </Card>
   <Card title="It works from automations" icon="puzzle">
     `brain.run_task` for background jobs, scheduled insight reports rendered to
@@ -126,9 +128,16 @@ day it started — and the specific change that would resolve it.
 ![The brAIn Findings tab, headed "What brAIn thinks is broken", listing thirteen orphaned entities, two loft sensors that never rejoined after a Zigbee channel change, and a dead back-door battery sensor — each with Fix it, Discuss, I fixed it, Remind me later and Ignore](./images/panel-findings.webp)
 
 Press **Fix it** and Claude makes the change, verifies it, and reports what it touched.
-Press **Discuss** to talk it over first, changing nothing. **I fixed it** and **Ignore** are
+Press **Discuss** to talk it over first, changing nothing. **I fixed it** and **✕ Wrong** are
 endings: the answer becomes a fact in memory, and the row is gone for good rather than
-joining a pile of dismissed cards.
+joining a pile of dismissed cards. Both take an optional one-line note, and the note is the
+half that teaches — *"that sensor always reads on, it's not stuck"* becomes a standing fact
+about your house, so the next run doesn't make the same mistake in new words.
+
+Findings can also reach you without the panel open: `sensor.brain_open_findings` carries
+the open count with the texts as attributes, a `brain_finding` event fires for each new
+one, and setting **one option** (`findings_notify_service`) turns them into phone pushes —
+no automation needed.
 
 ## It learns, and everything reads what it learned
 
@@ -140,7 +149,10 @@ terminal all read it. Tell the voice assistant something and the cards know it.
 
 When brAIn believes something it can't confirm, it says so as a **guess** you answer with
 one tap — *"The garage fridge is meant to run 24/7 — right?"* Three open at a time, never
-more. **Yes** files it as a fact; **No** records a dead end that is never revisited.
+more. Guesses sit at the top of the **Findings** tab, because "is this broken?" and "have
+I got this right?" are the same job — a question only you can answer — and one list should
+hold everything waiting on you. **Yes** files it as a fact; **No** records a dead end that
+is never revisited.
 
 ## It works from the sofa
 
@@ -165,8 +177,11 @@ What makes this different from running Claude Code on a regular machine:
   sensors with reset times, plus a budget that pauses *scheduled* work before it eats
   your week. Manual presses are never blocked.
 - **Safe by default** — voice agents get HA tools but no shell, file or web access;
-  per-agent blocked-service lists; a non-root sandbox; `secrets.yaml` is never
-  snapshotted and never edited.
+  per-agent blocked-service lists; a non-root sandbox behind an AppArmor profile
+  (**6/6** on the add-on store's security rating); the terminal port ships
+  unpublished *and* password-protected; `backup_exclude` keeps the Claude
+  credential out of HA backups; `secrets.yaml` is never snapshotted and never
+  edited.
 - **Two CLI commands, not fourteen** — `brain` for its own faculties, `ha` for Home
   Assistant chores. [The CLI](/brain/cli/).
 
@@ -178,6 +193,14 @@ configuration — Home Assistant's own backups already do that. What it keeps is
 journal of the files *it* touched, so `brain undo` can put one back. The full scorecard:
 [what brAIn can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
 
-**[Quick Start →](/brain/quickstart/)** — add the repo, install, restart HA once, sign in,
-press **Start learning**. About five minutes, plus a few minutes of study in the
-background.
+:::caution[Back up Home Assistant first — somewhere that isn't this machine]
+brAIn edits your real configuration: automations, dashboards, helpers, entities. It is
+built to be careful, it snapshots files before it changes them, and `brain undo` puts them
+back — but none of that is a backup you can restore from if something goes wrong.
+**Settings → System → Backups**, then copy it off the device: a backup that only exists on
+the machine you are changing is the one you cannot use when that machine is the problem.
+:::
+
+**[Quick Start →](/brain/quickstart/)** — add the repo, install (a prebuilt-image pull,
+not a local build — a download, not minutes of compiling), restart HA once, sign in, press
+**Start learning**. About five minutes, plus a few minutes of study in the background.

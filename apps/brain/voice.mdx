@@ -37,8 +37,14 @@ You can run several at once, each with its own name, model, personality and deny
                 Blocked: lock.unlock, lock.open, alarm_control_panel.*, script.*
 ```
 
-The deny-list is enforced where every control tool funnels through, so it holds no matter
-how the request is phrased.
+The deny-list is enforced where every control tool funnels through, and it's checked
+against what a call *does*, not what it's called: Home Assistant's meta-services forward to
+the target's own domain, so `homeassistant.turn_on` aimed at `cover.garage_door` **is** a
+cover call, and the chokepoint resolves meta-calls to their targets and refuses any that
+touch a restricted domain — or whose targets it can't resolve at all, like a whole area.
+`fire_event`, which can trigger an automation that does exactly what the deny-list forbids,
+is refused entirely on restricted channels. (Before 1.26.0 the check matched only the
+spelled service name, so a meta-call could sidestep it.)
 
 Because voice reads the same [memory](/brain/memory/) as everything else, an agent already
 knows the house it's talking about:
@@ -51,7 +57,7 @@ knows the house it's talking about:
 
 ## Conversation memory
 
-While the same Assist chat or voice session stays open, Home Assistant keeps the same `conversation_id` — and the add-on **resumes the same Claude session** for each turn, so follow-ups genuinely remember the conversation. A new session starts a clean slate; `brain.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory.
+While the same Assist chat or voice session stays open, Home Assistant keeps the same `conversation_id` — and the add-on **resumes the same Claude session** for each turn, so follow-ups genuinely remember the conversation. A new session starts a clean slate; `brain.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory. (Before 1.26.0 a follow-up turn could be handed the pre-warmed spare worker — which knows nothing — and lose the conversation's context for good; the spare now only serves conversations that genuinely start from nothing.)
 
 Voice is also how the house [learns](/brain/memory/): say *"remember that we call the office lamp 'the beacon'"* and it's stored instantly.
 
@@ -59,7 +65,7 @@ Voice is also how the house [learns](/brain/memory/): say *"remember that we cal
 
 Voice can control everything but can't run shell commands or edit files — `assist_tool_access: mcp_only` is the default. Two more dials:
 
-- **`assist_max_turns`** caps agentic loops per request (default 8) so a misunderstood command can't spiral. It stays deliberately modest where the other channels are generous: latency *is* the product for voice, and a twenty-turn voice command is a failed interaction whatever it answers.
-- **Per-agent service deny-lists** (e.g. forbid `lock.unlock` for the kids' satellite): every control tool funnels through one chokepoint, so the deny-list covers all of them. See the [Reference](/brain/reference/) for the option syntax.
+- **`assist_max_turns`** caps agentic loops per request (default 8) so a misunderstood command can't spiral. It stays deliberately modest where the other channels are generous: latency *is* the product for voice, and a twenty-turn voice command is a failed interaction whatever it answers. Worth knowing on older versions: until 1.26.0, neither this nor `assist_tool_access` reached fast mode — the default — at all; the worker pool never saw them, so voice always ran at 5 turns whatever the option said.
+- **Per-agent service deny-lists** (e.g. forbid `lock.unlock` for the kids' satellite): every control tool funnels through one chokepoint, so the deny-list covers all of them — `homeassistant.*` meta-calls included, resolved against their targets as above. **`brain.*` is a one-click deny option** too: it keeps a restricted agent away from all 65 registry-admin [Power Tools](/brain/power-tools/), including `brain.create_user`, which can mint an admin login. See the [Reference](/brain/reference/) for the option syntax.
 
 With [Power Tools](/brain/power-tools/) installed, voice requests can also reorganize — *"create a zone for the gym"*, *"hide the child-lock switches"* — with the same validation and admin gating as everywhere else.

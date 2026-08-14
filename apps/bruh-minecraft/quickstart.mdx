@@ -9,8 +9,8 @@ Five minutes from zero to a running Minecraft server.
 
 ## Prerequisites
 
-- **Home Assistant OS** or **Supervised**
-- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java comes bundled in the add-on (Eclipse Temurin JRE 25) — you don't install it — but it needs 64-bit hardware, so older 32-bit ARM boards won't work.
+- **Home Assistant OS** or **Supervised**, version **2023.6.0** or newer
+- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java comes bundled in the add-on (Eclipse Temurin JRE 25) — you don't install it — but it needs 64-bit hardware (`aarch64` or `amd64`), so older 32-bit ARM boards won't work.
 - ~**2 GB free RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
 
 ## Install it
@@ -23,7 +23,7 @@ Five minutes from zero to a running Minecraft server.
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install the add-on.** Find **BRUH Minecraft** in the store and click **Install** (~600 MB image).
+2. **Install the add-on.** Find **BRUH Minecraft** in the store and click **Install**. Since 1.15.3 this downloads a prebuilt image (~600 MB) rather than building one on your machine — on a Raspberry Pi, that's minutes of SD-card writes replaced by a pull.
 
 3. **Accept the EULA.** Open the **Configuration** tab and set:
 
@@ -66,7 +66,7 @@ Forward these on your router to your HA host:
 | `25565/tcp` + `25565/udp` | Minecraft Java |
 | `19132/udp` | Minecraft Bedrock |
 
-**Don't forward `25575`** — RCON is loopback-only by design.
+**Don't forward `25575`** — RCON is loopback-only by design. **Don't forward `8099` either** — that's the management panel, which since 1.15.0 refuses any request that didn't arrive through Home Assistant.
 
 ## Common first-install hiccups
 
@@ -77,5 +77,7 @@ Forward these on your router to your HA host:
 | Bedrock not in Friends tab | Same subnet/VLAN as HA? Try `<HA host IPv4>:19132` manually. |
 | iOS hangs on "Connecting…" | Set `geyser_mtu: 1200`. |
 | Plugin install warning, server still starts | A bad URL in `plugins:`. Add-on logs which one — fix or remove it. |
+| One-click plugin didn't appear | No Modrinth build for your server's Minecraft version — the log names the plugin it skipped. |
+| Panel does nothing when opened by IP | By design — open it from the HA sidebar. The panel only answers requests that come through Home Assistant. |
 
 For more, see the [Reference](/bruh-minecraft/reference/#troubleshooting).

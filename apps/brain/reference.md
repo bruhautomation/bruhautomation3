@@ -40,9 +40,18 @@ One ingress panel serves everything; these turn either face off. The panel itsel
 |--------|---------|--------------|
 | `learning` | `true` | Master switch for **everything** brAIn learns: the end-of-conversation reflection pass, the consolidator, and study sessions. Turning it off leaves existing memory in place and still used. |
 | `memory_injection` | `true` | Splice learned memory into voice prompts. |
-| `memory_max_kb` | `8` (1–64) | Size cap for the memory document. |
+| `memory_max_kb` | `32` (1–64) | Size cap for the memory document. Not a latency setting — voice reads the ≤2 KB `voice.md` distillate on every request, never the full document, so shrinking this buys nothing where speed is felt. |
 | `study_max_turns` | `60` (0–500) | Turn cap for a study session. **`0` removes the cap.** |
 | `study_timeout_minutes` | `30` (2–120) | Wall-clock limit for a study session. |
+
+### Findings notifications
+
+The [Findings](/brain/findings/) tab, `sensor.brain_open_findings`, and the `brain_finding` event work with or without these — this pair only decides whether a new finding also rings your phone.
+
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `findings_notify_service` | *(empty)* | A `notify.*` service (e.g. `notify.mobile_app_your_phone`) that gets a push whenever brAIn files a **new** finding. Empty = no push. The store dedupes across every status and the settled ledger, so the same problem can never ring twice. |
+| `findings_notify_min_severity` | `serious` | Only findings at or above this severity (`info` → `warning` → `serious` → `critical`) are pushed. The default means dying batteries and sensors gone silent reach your phone, while naming nitpicks wait on the tab. |
 
 ### Turn budgets
 
@@ -73,11 +82,11 @@ These are also editable from the panel's **Settings** dialog, which writes chang
 
 Generation runs **one card at a time** through a queue, which keeps things friendly to subscription rate limits.
 
-### Undo
+### Edit journal
 
 | Option | Default | What it does |
 |--------|---------|--------------|
-| `edit_journal_days` | `14` (0–365) | How long to keep snapshots of files Claude edited. `0` disables the journal entirely. |
+| `edit_journal_days` | `14` (0–365) | How long to keep snapshots of files Claude edited. `0` disables the journal entirely. See [Undo](#undo). |
 
 ### Permissions & tool scoping
 
@@ -151,13 +160,14 @@ One ingress panel on port **8099**, with five tabs. Each has its own page:
 | Tab | What it is | |
 |-----|-----------|---|
 | **Insights** | Cards proposed for your home, and an ask bar with two verbs | [Insights](/brain/insights/) |
-| **Findings** | The work list: what brAIn thinks is broken, and the fix | [Findings](/brain/findings/) |
+| **Findings** | The work list: what brAIn thinks is broken, plus the guesses awaiting a yes/no | [Findings](/brain/findings/) |
 | **Terminal** | Claude Code as a chat or as a true terminal, one session | [Terminal](/brain/terminal/) |
-| **Memory** | The document, the guesses, and the queue behind them | [Memory & Learning](/brain/memory/) |
+| **Memory** | The document, and the queue that files itself into it | [Memory & Learning](/brain/memory/) |
 | **Docs** | The same guide, shipped inside the add-on and searchable offline | |
 
-A number on the **Findings** tab means something is waiting on your decision; a number on
-**Memory** means a guess is waiting on a yes/no.
+A number on the **Findings** tab means something is waiting on your decision — a broken
+thing to settle **or** a guess to confirm; both kinds of question live in that one list.
+The **Memory** tab has no badge, because nothing on it waits for you.
 
 ### Panel settings
 
@@ -172,6 +182,8 @@ name.
 | `budget_percent` | 5–100 (default 25) | How much of each 5-hour session window scheduled work may spend. |
 | `terminal_ui` | `chat`, `classic` | Which face the Terminal tab opens in. Default `chat`. |
 | `model` | preset or a custom model id | The model insight generation uses. |
+| `chat_model` | a model id, or unset | The chat terminal's own model, picked **from the chat** (the model name under the composer, or ⋯ → Model). Unset follows the global `model` — and deliberately never writes it, which would silently change what every insight run costs. |
+| `gather_mode` | `search`, `snapshot` | **How a card gets its data.** `search` (default) sends Claude a *map* of the home plus read-only HA tools, so it looks up only what the card needs — and it's the only mode that can afford history on a typed question. `snapshot` is the old send-everything path, kept as a setting and as the automatic fallback when a search run fails. |
 | `refresh_hours`, `history_days`, `history_keep_runs`, `history_keep_days`, `timeout_minutes` | | Same meaning as the add-on options below. |
 
 ### Token budget
@@ -211,6 +223,8 @@ action: brain.run_task
 data:
   prompt: "Check today's error log and summarise the issues"
   notify: true
+  notify_entity: notify.mobile_app_phone   # where the notification goes; omit for a persistent notification
+  model: haiku        # optional per-call override
   timeout: 300
 
 # Run one or all insight jobs now
@@ -228,6 +242,7 @@ action: brain.add_memory
 data:
   fact: "The garage fridge is meant to run 24/7"
   confidence: high         # high | medium | low
+  source: "spouse"         # optional — where the fact came from (default "service")
 
 # Answer one of brAIn's open questions — recorded, and queued as a fact
 action: brain.answer_question
@@ -252,11 +267,15 @@ Plus the **65 [Power Tools](/brain/power-tools/)** services for registry adminis
 | `sensor.brain_last_learned` | The most recent fact, with the text as an attribute |
 | `binary_sensor.brain_waiting_on_you` | On when a guess needs a yes/no, with the text in `pending` |
 
-A **`brain_learned`** logbook event fires for every new fact, so learning appears in your home's timeline next to lights and doors.
+A **`brain_learned`** logbook event fires for every new fact, so learning appears in your home's timeline next to lights and doors — see [Events](#events).
+
+### Findings sensor
+
+`sensor.brain_open_findings` exists to be *automatable* — the panel's badge answers the same question, but a badge cannot ring a phone at a sensible hour or sit on a dashboard. State is the open count; attributes carry the severity split (`critical` / `serious` / `warning` / `info`), the finding texts (first 20), and `newest`, because an automation that only knows "3" cannot put what is actually broken on a lock screen. It reads the mirror the add-on republishes to `/config/.brain/findings_state.json` on every findings change, and stays **unavailable until the add-on has written one** — which is what tells a fresh install apart from a clean bill of health.
 
 ### Usage-limit sensors
 
-Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every ~2 minutes; the sensors poll it every 30 seconds.
+Your real Anthropic account utilization — the same numbers as **claude.ai → Settings → Usage**, not estimates. A background tracker queries the Anthropic usage endpoint every **30 minutes** (the endpoint meters requests **per day**, so a chattier poll works all morning and then hits a wall of 429s until the small hours — 48 requests a day never does); the sensors poll the tracker's file every 30 seconds.
 
 | Sensor | Tracks | Key attributes |
 |--------|--------|----------------|
@@ -266,12 +285,26 @@ Your real Anthropic account utilization — the same numbers as **claude.ai → 
 | Weekly Usage Resets At | When the 7-day window resets | `utilization` |
 
 :::caution
-These need an **OAuth / subscription login**, **not** an `ANTHROPIC_API_KEY`. With an API key — or before you've signed in — they stay **unavailable** and explain why in their `error` attribute. `brain doctor` reports this.
+These need an **OAuth / subscription login**, **not** an `ANTHROPIC_API_KEY`. With an API key — or before you've signed in — they stay **unavailable**. And during a streak of 429s from the usage endpoint the four sensors **will go unavailable by design**: the tracker's backoff (1, then 2, then 4 hours) deliberately exceeds the two-hour window after which a reading is too old to trust, because retrying a daily-metered endpoint is what sustains the limit. Either way, the reason lives on the **Usage tracker** diagnostic sensor below — HA hides the attributes of an unavailable entity, which is exactly why the explanation lives somewhere that never goes unavailable. `brain doctor` reports this too.
 :::
+
+### Usage tracker diagnostic sensor
+
+The **Usage tracker** sensor's whole job is to be readable when the four above are not, so it **never goes unavailable**. Its state is `ok`, or the reason the others can't be: `no_oauth_token`, `api_key_has_no_usage_limits` (an API key bills per token and has no subscription window — that's a different situation, not a failed sign-in), `http_401`, `http_429` (with a `detail` attribute saying this is the *endpoint's* rate limit, not your account's usage), `network_error`, `stale`, or `not_running`. A failed poll records `last_error` and `next_attempt_at` *beside* the reading it deliberately left showing — so the moment the numbers blank, the diagnostic names the cause instead of saying `stale` and nothing else.
 
 ### Health sensor
 
 `binary_sensor.brain_system_assist_healthy` reports voice-assistant pool health, with worker count, the pre-warmed spare, and last-request latency as attributes.
+
+## Events
+
+| Event | Fires | Payload |
+|-------|-------|---------|
+| `brain_finding` | Once per **newly-filed** finding — never for a re-report, because the store dedupes across every status and the settled ledger | `finding`, `severity`, `entity_id`, `fixable`, `source`, `ts` |
+| `brain_learned` | Once per fact filed into memory (and once per forget) | `fact`, `source` |
+| `brain_insight_complete` | After every insight-job run | `name`, `entity_id`, `success`, `preview` |
+
+The first two also carry `name` and `message` fields phrased as sentences, so they read properly in the **logbook** — learning and findings appear in your home's timeline next to lights and doors. `brain_finding` is what to trigger on for anything fancier than the built-in push (`findings_notify_service` covers the simple case with no automation at all).
 
 ## MCP server tools
 
@@ -306,6 +339,8 @@ Snapshots are pruned after `edit_journal_days` and capped by total size. **`secr
 
 In fast mode the worker pool serves an internal HTTP API on **port 8098** (the panel owns 8099), token-authenticated via the shared `/config` volume. The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically. Nothing hardcodes the port; the integration reads it from the endpoint file the pool publishes.
 
+`/api/health` — the endpoint the Supervisor watchdog polls — also calls the roll: it reports which background daemons are actually running (worker pool, listeners, usage tracker, memory consolidator, study watcher, ttyd) and when the last consolidation pass landed. That part is **informational only**, on purpose: a dead sibling can never fail liveness, or the watchdog would restart-loop the whole add-on over one daemon. `brain doctor` reads it and compares it against its own view.
+
 ![File-based IPC fallback flow](./images/ipc-flow.svg)
 
 ## Permissions architecture
@@ -314,7 +349,12 @@ In fast mode the worker pool serves an internal HTTP API on **port 8098** (the p
 |---------|-----------|----------------|
 | Interactive terminal | Prompts (unless `dangerously_skip_permissions: true`) | Everything — you approve actions |
 | Voice / conversation agents | Pre-approved allowlist + `assist_tool_access` + per-agent deny-list | All HA MCP tools; **no** shell, file, or web |
-| Automation tasks, insight runs, study sessions | Pre-approved allowlist | All tools (MCP, shell, file edits, web) |
+| Automation tasks | Pre-approved allowlist | All tools (MCP, shell, file edits, web) |
+| Card rendering (snapshot mode) | `--disallowedTools "*"` | **No tools at all** — it renders what it was handed |
+| The analyst — insight runs, study sessions, typed questions | Explicit allow-list **and** explicit deny-list, checked from both ends in CI | **Read-only** HA tools; nothing that can change the house |
+| **Fix it** | Pre-approved allowlist — runs only because a person pressed the button, never on a schedule | Everything |
+
+The last three are the panel's three Claude paths, and only one can change the house. The analyst runs unattended, so its tool set is asserted from both ends rather than trusting one flag: `--allowedTools` only governs what runs *without a prompt*, and a headless run can't be prompted, so an un-listed tool merely **fails** rather than being **forbidden** — not the same guarantee with a real house behind it. The deny-list is checked against the MCP server's own tool names in CI, so a newly added acting tool fails the build instead of quietly reaching an unattended run.
 
 Background channels never use `--dangerously-skip-permissions` — they can't prompt, so the add-on writes `/config/.claude/settings.local.json` pre-approving the tools they need. Everything runs sandboxed as a non-root user (UID 1000), limited to `/config`, `/data`, and the enabled volume toggles.
 
@@ -323,8 +363,10 @@ Background channels never use `--dangerously-skip-permissions` — they can't pr
 | Port | What | Needed? |
 |------|------|---------|
 | 8099 | The ingress panel. Also reverse-proxies `/terminal/`. | Internal; ingress handles it. |
-| 7681 | ttyd, direct access. | Optional — handy for a kiosk or a bookmarked full-screen terminal. |
+| 7681 | ttyd, direct access. | **Unpublished by default** — declared as `null`, so nothing on your LAN can reach it until you assign a port in the add-on's **Network** panel (handy for a kiosk or a bookmarked full-screen terminal). |
 | 8098 | The assist worker pool's internal API. | Internal only. |
+
+A published terminal port answers the LAN with no Home Assistant login in front of it — the exposure HA documented in [GHSA-gh5m-4m97-c95h](https://github.com/home-assistant/core/security/advisories/GHSA-gh5m-4m97-c95h) — which is why 7681 ships off. ttyd also **always requires HTTP Basic auth** now, published or not: user `brain`, password generated into `/data/terminal-credential` and printed in the add-on log. The panel presents that credential upstream on every proxied request, so anyone coming in through ingress never sees a prompt.
 
 ## Where data lives
 
@@ -336,8 +378,14 @@ Background channels never use `--dangerously-skip-permissions` — they can't pr
 | `/config/.brain/memory/inbox/` | Candidate facts awaiting consolidation |
 | `/config/.brain/` | IPC bridge — request/response queues, sessions, logs |
 | `/config/.brain/usage_limits.json` | Cached account utilization for the sensors |
+| `/config/.brain/findings_state.json` | The findings mirror — derived, republished on every change; what the sensor, event, and push read (`/data` is invisible to HA, which is why it exists) |
 | `/config/.brain/logs/{assist,automation}-YYYYMMDD.log` | Per-request debug logs |
 | `/config/custom_components/brain/` | The HA integration |
+| `/data/findings.json` | The findings work list itself (the mirror above is derived from it, never read back) |
+| `/data/chat_transcript.json` | The chat tab's scrollback — capped, and only a scrollback: Claude Code owns the real conversation, so losing this file never costs context |
+| `/data/chat-trash/` | Deleted chat conversations, where the toast's Undo restores from (TTL'd and capped) |
+| `/data/terminal-credential` | ttyd's generated Basic-auth password |
+| `/data/run-sources.jsonl` | Which face (voice, consolidator, study, chat…) started each conversation — what keeps machine runs out of your Chats rail |
 | `/data/.brain/edits/` | The edit journal `brain undo` restores from |
 | `/data/` (add-on volume) | OAuth credentials, persistent packages |
 
@@ -359,7 +407,9 @@ Insight HTML is mirrored into `/config/www/brain/`, where Home Assistant itself 
 - Home data is sent to Anthropic's API only when you ask for something or a run you scheduled fires; nothing else leaves your machine.
 - Person **GPS coordinates are never included** in snapshots — only zone/state and areas.
 - Generated visualizations render in **sandboxed iframes** (`sandbox="allow-scripts"`) — they cannot touch your HA session, cookies, or the panel.
-- The panel is reachable only through **HA Ingress** (admin users).
+- The panel is reachable only through **HA Ingress** (admin users); the terminal port ships [unpublished and password-protected](#ports).
+- An **AppArmor profile** confines the container. It doesn't enumerate permitted binaries — brAIn runs an agent, and that list would break the first time you asked for something new — it denies the **host-escape set** instead: no mounting, no kernel modules, no raw sockets, no kernel tunables, no Docker socket, no ptracing out of the profile. brAIn rates **6/6** on the add-on store's security scale.
+- **The Claude credential never rides into your backups.** HA backups are unencrypted unless you opt in, then get copied to cloud storage, NAS shares and support tickets — so `backup_exclude` keeps the OAuth credential, the terminal password, and the chat scrollback out of them. Restoring a backup costs you one sign-in.
 - `secrets.yaml` is never snapshotted into the edit journal, and credentials are never read, written, or included in any snapshot.
 
 ## Mobile
@@ -411,7 +461,8 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 | A study session produced nothing | It probably hit `study_max_turns` or `study_timeout_minutes`; both are reported as such in the log. Raise them, or set `study_max_turns: 0`. |
 | Cards look thin | The card found few matching entities — check areas are assigned and the relevant sensors enabled in HA. |
 | Generation timed out | Raise `generation_timeout_minutes`, or set a faster `model`. |
-| Usage sensors *unavailable* | They need an OAuth/subscription login, not an API key (see above). |
+| Usage sensors *unavailable* | Read the **Usage tracker** sensor's *state* — HA hides an unavailable entity's attributes, which is exactly why the reason lives in a sensor that never goes unavailable. `no_oauth_token` means sign in (an API key isn't one, see above); `http_429` means the tracker is waiting out the endpoint's rate limit and `next_attempt_at` says until when. |
+| New findings never reach my phone | `findings_notify_service` is unset (it defaults to off), or the finding is below `findings_notify_min_severity` (default `serious`). The Findings tab and `brain_finding` event carry everything regardless. |
 | Anything else | **Settings → Add-ons → brAIn → Log**, with `log_level: debug`. |
 
 ### Per-request debug logs

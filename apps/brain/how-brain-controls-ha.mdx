@@ -26,7 +26,7 @@ brAIn gives itself three ways to touch Home Assistant, and at first glance they 
 
 **CLI tools are the workshop bench**, and they only exist inside the terminal. They cover the file-and-workflow side that live APIs don't: editing and reloading YAML, tailing logs, the memory document, the edit journal, persistent packages. brAIn uses them for config work; you use them when you're in the shell anyway.
 
-They are two commands, split by what they act on: **`brain`** for brAIn's own faculties (`memory`, `learn`, `ask`, `undo`, `doctor`) and **`ha`** for Home Assistant operations (`log`, `reload`, `entity`, `service`, `addon`, `notify`, `share`, `check`, `context`). See [the CLI](/brain/cli/).
+They are two commands, split by what they act on: **`brain`** for brAIn's own faculties (`memory`, `findings`, `learn`, `ask`, `undo`, `doctor`) and **`ha`** for Home Assistant operations (`log`, `reload`, `entity`, `service`, `addon`, `notify`, `share`, `check`, `context`). See [the CLI](/brain/cli/).
 
 So the flow for any request is:
 
@@ -60,7 +60,7 @@ A few verbs appear in two layers on purpose — `ha service call` and `call_serv
 
 The goal is an instance where Claude can do essentially everything — here's the honest scorecard:
 
-**Fully covered:** entity/device control for every major domain; cameras; history and statistics; automations, scripts, and scenes (YAML + reload); areas, floors, labels; entity naming, ids, aliases, icons, visibility; helpers (all 8 types); zones; persons; users; dashboards including custom-card resources; blueprints; statistics backfill; integration enable/disable/reload **and removal**; device and entity deletion, including orphan sweeps that dry-run by default; repairs; logs, traces, templates; and undo of any file it edited.
+**Fully covered:** entity/device control for every major domain; cameras; history and statistics; automations, scripts, and scenes (YAML + reload); areas, floors, labels; entity naming, ids, aliases, icons, visibility; helpers (all 8 types); zones; persons; users; dashboards including custom-card resources; blueprints; statistics backfill; integration enable/disable/reload **and removal**; device and entity deletion, including orphan sweeps that dry-run by default; repairs; logs, traces, templates; undo of any file it edited; and what *it* finds broken surfaces back into HA — an open-findings sensor, a `brain_finding` event, and an optional phone push.
 
 **Deliberately excluded:**
 - **Adding an integration** — config flows are interactive (OAuth, discovery, pairing buttons), so Claude walks you to the right screen and you click. *Removing* one it can do: `brain.delete_integration` drops the config entry and reports the entities and devices that went with it.

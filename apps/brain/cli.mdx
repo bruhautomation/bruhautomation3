@@ -16,7 +16,8 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 
 | Command | What it does |
 |---------|--------------|
-| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses`, `confirm`, `reject`, `log`, `undo`, `consolidate`, `clear` |
+| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses`, `confirm`, `reject`, `log`, `undo`, `consolidate`, `clear`, `export`, `import` |
+| `brain findings <action>` | The [findings](/brain/findings/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
 | `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
 | `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
 | `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
@@ -27,9 +28,19 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 brain memory add "We call the office lamp the beacon"
 brain memory hypotheses            # pending guesses awaiting a yes/no
 brain memory confirm "the garage fridge runs 24/7"
+brain findings done 2 "replaced the battery myself"
 brain learn energy
 brain undo --all-today             # revert everything Claude changed today
 ```
+
+`brain findings` goes through the panel's own API, never the store files — so a CLI ending
+writes the same memory line, settled key and undo token the tab's buttons write. `brain
+doctor`'s coverage roughly doubled across 1.25.0 and 1.27.0: it now also proves the panel
+and chat API are answering, the terminal's password gate is actually on, the Claude CLI
+itself runs, the three background daemons are alive, the run-sources ledger is
+claude-owned, no crashed consolidation pass is still holding its lock, disk space, and how
+stale the usage reading is — and it reads `/api/health`'s daemon roll-call and compares it
+against its own view.
 
 ## `ha` — Home Assistant operations
 
@@ -38,7 +49,7 @@ brain undo --all-today             # revert everything Claude changed today
 | `ha log [core\|supervisor\|host\|addon <name>\|errors\|all]` | Tail HA logs. `-f` to follow, `-n N` for line count |
 | `ha reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, `core`, `all` |
 | `ha check [path]` | Validate YAML before reloading |
-| `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session |
+| `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session (failed every time until 1.26.0 — the dispatcher ignored the script's shebang) |
 | `ha entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
 | `ha service call <domain>.<service>` | Call any HA service from the shell |
 | `ha addon <action> <slug>` | Manage add-ons: `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
@@ -59,9 +70,9 @@ If some other `ha` command is ever present on `PATH` inside the container, brAIn
 
 ## Undo
 
-Before Claude writes to any file under `/config`, the previous version is snapshotted. Only
-`/config` is journalled, and **`secrets.yaml` is never snapshotted**. Snapshots are kept for
-`edit_journal_days` (default 14).
+Before Claude writes to any file under `/config`, the previous version is snapshotted —
+notebook edits included, since 1.26.0. Only `/config` is journalled, and **`secrets.yaml` is
+never snapshotted**. Snapshots are kept for `edit_journal_days` (default 14).
 
 ```bash
 brain undo                    # list what Claude edited, newest first, in plain English
