@@ -41,7 +41,7 @@ const char* off_cmd = "OFF";
 
 /**************************** FOR OTA **************************************************/
 #define SENSORNAME "sensornode1"
-#define OTApassword "bruh"
+#define OTApassword "yourOTApassword"
 int OTAport = 8266;
 
 

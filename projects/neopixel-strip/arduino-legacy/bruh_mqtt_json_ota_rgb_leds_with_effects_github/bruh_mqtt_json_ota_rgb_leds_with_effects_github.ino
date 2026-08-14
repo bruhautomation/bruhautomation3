@@ -24,25 +24,25 @@
 
 
 /************ WIFI and MQTT Information (CHANGE THESE FOR YOUR SETUP) ******************/
-const char* ssid = "deathstar"; //type your WIFI information inside the quotes
-const char* password = "(BRUHstarwars$687)";
-const char* mqtt_server = "192.168.86.106";
-const char* mqtt_username = "bruh";
-const char* mqtt_password = "automate!";
+const char* ssid = "YourSSID"; //type your WIFI information inside the quotes
+const char* password = "YourWIFIpassword";
+const char* mqtt_server = "your.mqtt.server.ip";
+const char* mqtt_username = "yourMQTTusername";
+const char* mqtt_password = "yourMQTTpasswprd";
 const int mqtt_port = 1883;
 
 
 
 /*****************************FOR OTA*** ***********************************************/
-#define SENSORNAME "nightstand"
-#define OTApassword "bruh"
+#define SENSORNAME "porch"
+#define OTApassword "yourOTApassword"
 int OTAport = 8266;
 
 
 
 /************* MQTT TOPICS (change these topics as you wish)  **************************/
-const char* light_state_topic = "bruh/nightstand";
-const char* light_set_topic = "bruh/nightstand/set";
+const char* light_state_topic = "bruh/porch";
+const char* light_set_topic = "bruh/porch/set";
 
 const char* on_cmd = "ON";
 const char* off_cmd = "OFF";
@@ -169,7 +169,7 @@ CRGB leds[NUM_LEDS];
 /********************************** START SETUP*****************************************/
 void setup() {
   Serial.begin(115200);
-  //Serial.println("TESTING SERIAL MONITOR");
+  Serial.println("TESTING SERIAL MONITOR");
   FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
 
   setupStripedPalette( CRGB::Red, CRGB::Red, CRGB::White, CRGB::White); //for CANDY CANE
