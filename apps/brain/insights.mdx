@@ -67,15 +67,35 @@ against the same memory, printed as text instead of a card.
 
 For each card — and every asked question — brAIn:
 
-1. **Collects a slimmed snapshot** of your home through the Supervisor API: entity states
-   with areas and friendly names, recent history for the relevant sensors, long-term
-   statistics for energy, and the home memory document. GPS coordinates never leave the
-   house; only zone, state and areas are included.
-2. **Sends it to Claude** with a strict design system — a fixed categorical palette, one
-   y-axis per chart, reserved status colours, light and dark mode, hover interactivity.
-   The analysis pass has **no tools at all**; it is pure reading of that snapshot.
+1. **Fetches what the card needs** rather than being handed the house. By default
+   (⚙ Settings → **How a card gets its data**, set to *Search*) Claude gets a *map* of your
+   home — how many entities of each kind exist, which areas they're in, a few anchors like
+   people and thermostats — plus the home memory document and **read-only** Home Assistant
+   tools, and it looks up the rows the card actually needs: search by room or by name, read
+   the few entities that matter, pull their history. A question about the hallway costs the
+   hallway — measured on a real run, a 1,449-character prompt where the old path sent about
+   100,000. *Snapshot* is that old path, one slimmed snapshot of the whole slice and no
+   tools — kept as a setting *and* as the automatic fallback when a search run fails or runs
+   out of turns, so a card always appears (the fallback is logged). Either way, GPS
+   coordinates never leave the house; only zone, state and areas are included.
+2. **Renders it with a strict design system** — a fixed categorical palette, one y-axis per
+   chart, reserved status colours, light and dark mode, hover interactivity.
 3. **Stores and renders the result** — title, summary, highlight stats and a self-contained
    HTML visualisation, in a sandboxed iframe that cannot touch your HA session.
+
+Neither mode can change anything. An insight run holds reading tools only, behind an
+explicit allow-list *and* an explicit deny-list of every acting tool — belt and braces,
+because a headless run can't be prompted, and both lists are checked against the MCP
+server's own tools in CI. The one path that changes your house is still the Findings tab's
+**Fix it** button, which a person presses. Search is also the only mode that can afford
+**history on a typed question** — the one-shot path never had budget left after five hundred
+entities, so asked questions used to be answered from a single instant, with no trend behind
+them.
+
+Energy cards anchor on Home Assistant's **long-term statistics**: `get_statistics` reaches
+back months in day/week/month buckets and survives recorder purges, so "compared to last
+month" is a lookup rather than an extrapolation from a few days. brAIn keeps no statistics
+store of its own on purpose — Home Assistant already has the sums.
 
 Cards persist across restarts, refresh on their own schedules, and generation runs **one at
 a time** through a queue to stay friendly to subscription rate limits.
@@ -89,7 +109,7 @@ card on a phone, and the title was what got squeezed out to make room for them.
 | --- | --- |
 | **⤢ Expand** | The only one on the card itself, because it's the only one that acts on what's on screen rather than on the card's definition. |
 | **⋯ → Regenerate** | Run this card again now. |
-| **⋯ → Edit** | Name, icon, analysis focus and schedule. |
+| **⋯ → Edit** | Name, icon, analysis focus and schedule. On an ad-hoc Ask card it's **Rename** — name and icon only, because the question *is* the card. |
 | **⋯ → Give feedback** | Standing instructions for every future run. |
 | **⋯ → Add to dashboard** | YAML for a Webpage card on your own dashboard. |
 | **⋯ → Delete** | The card and its history. |
@@ -114,6 +134,10 @@ memory at the same time. **Send & regenerate** applies it immediately.
 - **Per-card schedules** — an interval, or fixed daily times (`07:00, 19:00`, up to six)
   which take precedence over the interval and spend nothing in between. `0` means manual
   only. Fixed times cost far less than a short interval.
+- **The next run, on the card** — every scheduled card's foot shows when it runs next
+  (*"next in 4 h"*), so "why did my cards stop updating" has an answer on the card instead
+  of a log line printed once. The countdown hides while a gate holds — paused, budget
+  reached, or not signed in — rather than promising a run that won't come.
 - **Run history** — every run is kept per `history_keep_runs` / `history_keep_days`, with a
   run selector, ‹ / › step buttons, and `prev: …` comparisons under each highlight.
 - **Tags** — the analyst tags each card by what it *found*, not by its category, so
@@ -125,10 +149,11 @@ memory at the same time. **Send & regenerate** applies it immediately.
 ## Guesses
 
 When a run believes something it can't confirm, it says so as a claim you answer with one
-tap — *"The garage fridge is meant to run 24/7 — right?"* — right on the card, or in the
-Memory tab. **✓** files it as a plain memory line; **✗** records a dead end that is never
-revisited. Three open at a time, 14-day expiry, never re-proposed in any wording. The full
-model: [Memory & Learning](/brain/memory/#guesses-not-questions).
+tap — *"The garage fridge is meant to run 24/7 — right?"* Open guesses sit at the top of the
+[Findings](/brain/findings/) tab, where everything waiting on your decision lives. **✓ Yes**
+files it as a plain memory line; **✕ No** records a dead end that is never revisited. Three
+open at a time, 14-day expiry, never re-proposed in any wording. The full model:
+[Memory & Learning](/brain/memory/#guesses-not-questions).
 
 ## Deep presence
 
@@ -172,6 +197,20 @@ attributes, and an event that fires on completion — good for glanceable tiles 
 briefings. Both read the same memory.
 
 ## What it costs
+
+Generating a card is the most expensive thing brAIn does — a bundle out, a whole rendered
+visualisation back, typically 25k–45k tokens — so every run reports its own bill. One
+figure, derived once server-side, readable in four places: the spinner while it runs
+(*"500 entities · ~33k tokens sent"* — the `~` marks the only estimate), the card's foot
+(*"41.2k tokens"* beside the stopwatch, with the input/output split behind a hover), the
+usage pill's popover (an itemisation per card, biggest first), and one log line per run.
+The itemisation is labelled as brAIn's own runs, because when the pill shows your account's
+live figure it also covers the terminal, the chat and voice — and a breakdown read as
+exhaustive is how you'd conclude a terminal session is free.
+
+**An asked question is the expensive kind.** A category card sends its slice of the home; a
+question typed into the ask bar sends every entity plus device context, because it could be
+about anything. A handful of asked questions costs what a dozen scheduled refreshes do.
 
 The panel's **⚙ Settings** dialog caps how much of each 5-hour session window brAIn may
 spend on *scheduled* work. Automatic runs pause at the budget; manual presses never do. The

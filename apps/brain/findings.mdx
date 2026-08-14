@@ -1,6 +1,6 @@
 ---
 title: Findings
-description: brAIn's work list — the things it thinks are broken in your home, each with the evidence, the fix it has in mind, and a button that sends it to make the change.
+description: brAIn's work list — the things it thinks are broken in your home, each with the evidence, the fix it has in mind, and a button that sends it to make the change. Plus the guesses waiting on a yes/no, because everything waiting on your decision lives here.
 ---
 
 A **finding** is something wrong with your house. A dead battery. A sensor that hasn't
@@ -26,6 +26,12 @@ somebody has to do something about it.
 
 Each one names the entity, the number and the day it started, because a work list item you
 can't check is just a worry.
+
+The stores stay separate, but the *deciding* happens in one place. The tab is headed
+**"What's waiting on you"** because open guesses ride at the top of the same list with
+**✓ Yes** / **✕ No** — a broken thing and a doubted belief are different knowledge, but
+answering either is the same job, and the tab badge counts both. Turning down a guess
+offers the same reason box as [calling a finding wrong](#the-two-endings).
 
 ## What findings actually look like
 
@@ -102,7 +108,9 @@ a problem *in your house*, and told to change nothing, because "explain this to 
 change my house" are different permissions.
 
 The decisions come with you: while you're talking it over, a strip above the message box keeps
-**Fix it**, **I fixed it**, **Later** and **Ignore** one press away.
+**Fix it**, **I fixed it**, **Later** and **Wrong** one press away. The strip's **✕ Wrong**
+opens the same reason box the card's does — explaining it to Claude in the chat reaches that
+one conversation; the note reaches every future one.
 
 ## The two endings
 
@@ -110,14 +118,24 @@ Ending a finding **removes it**. Which ending you pick matters, because each one
 something different:
 
 **✓ I fixed it** — it was a real problem and it's sorted now. Memory records
-*"Fixed by the homeowner: the back door sensor battery was replaced."*
+*"Fixed by the homeowner: the back door sensor battery was replaced."* It offers an optional
+note, and what you type is simply more of the fact — nothing is being corrected:
+*"Replaced the CR2032 — it's a 3-monthly job on that one."* "I fixed it" leaves brAIn knowing
+a problem is over; that sentence leaves it knowing your house.
 
-**✕ Ignore** — it was never a problem; it's normal in this house. If the garage freezer is
-*supposed* to sit at −30 °C, one press ends that conversation for good. Memory records
-*"Not a problem in this home: the garage freezer runs at −30 °C."*
+**✕ Wrong** — brAIn has misread your house. The sensor isn't stuck; it's a contact on a
+cupboard nobody opens. Pressing it opens a box for one sentence — *"That sensor always reads
+on. It's not stuck."* — and the sentence is the half that teaches. It goes two places: it's
+shown verbatim under this finding in every future analysis, and it's queued to memory as a
+correction. It is deliberately **not treated as an instruction** — brAIn is handed what you
+said and works out what standing fact follows from it, sometimes nothing at all — so you
+don't have to phrase a correction carefully for it to be useful.
 
-Both do the same three things: the answer goes into memory as a plain fact about your home,
-the wording is remembered so the problem is never reported at you again, and the row is
+Both boxes are optional. Send **Wrong** empty and it simply says "never raise this again";
+"not a problem here" needs no essay.
+
+Both endings do the same three things: the answer goes into memory as a plain fact about your
+home, the wording is remembered so the problem is never reported at you again, and the row is
 deleted. There is no pile of dismissed cards to scroll past — a list of things nobody has to
 look at again is not a work list.
 
@@ -127,11 +145,11 @@ look at again is not a work list.
 the next analysis is free to find the same thing again, and probably will if it's still
 there.
 
-That's the difference from Ignore, and it's why both exist:
+That's the difference from Wrong, and it's why both exist:
 
 | | What you're saying | What brAIn learns |
 | --- | --- | --- |
-| **✕ Ignore** | This is normal here | Never raise it again |
+| **✕ Wrong** | This is normal here — you've misread it | Never raise it again, and why |
 | **⌫ Dismiss** | Not now, and I'm not promising anything | Nothing |
 | **⏰ Remind me later** | Yes, but not yet | Nothing — it comes back on your date |
 
@@ -140,7 +158,8 @@ Use Dismiss when you're clearing the board rather than answering it.
 **⏰ Remind me later** is the answer for "yes, but not now" — an hour, tomorrow, next week,
 next month. It is not a decision and settles nothing: the finding stays exactly as open as it
 was and simply stops asking. Use it instead of dismissing something you actually intend to
-deal with, because dismissing is permanent. While it waits it sits under **Later**, showing
+deal with — a dismissed row only comes back if a later run happens to find the problem
+again; a snoozed one comes back on your date. While it waits it sits under **Later**, showing
 when it comes back, with a button to bring it back sooner.
 
 ## After brAIn fixes something
@@ -159,13 +178,55 @@ brAIn still remembers what you answered. A settled finding's wording is kept in 
 analyst consults before reporting anything, so the same problem is never raised at you twice,
 however it gets reworded. That ledger isn't a screen — it's the reason the list stays short.
 
-:::caution[Ignore is permanent]
-There is no undo and no archive to fish it back out of. Use **Remind me later** for anything
-you actually intend to deal with; **Ignore** is for things that were never problems.
-:::
+## A wrong press has an Undo
+
+Every press that takes a row off the list — both endings, **Got it**, **Dismiss**, and
+either answer to a guess — leaves an **Undo** in the toast for about five minutes. It puts
+back all three effects of an ending: the row, under its original timestamp; the suppression
+that would have stopped brAIn raising it again; and the line it queued for memory. It exists
+because "I fixed it" and "Wrong" sit next to each other meaning opposite things, so a
+mis-tap is not hypothetical — and it is deliberately "I pressed the wrong one", not a
+history. Once a consolidation pass has filed the fact into the document, Undo says so rather
+than pretending; editing the document is the honest answer by then.
+
+**Fix it** has no Undo, because it has already sent Claude at your actual house, and taking
+the card back would lie about what was undone. **Remind me later** has none either: it took
+nothing away, and it already has *Bring it back now*.
+
+## The tab, scriptable
+
+`brain findings` in the [terminal](/brain/cli/) is the same tab as text:
+
+```bash
+brain findings                     # list open findings (and guesses waiting)
+brain findings fix 1786715730      # send Claude to fix one
+brain findings done 1786715730 "replaced the CR2032"
+brain findings wrong 1786715730 "that sensor is meant to sit closed"
+brain findings ack 1786715730      # "Got it" after an automated fix
+brain findings snooze 1786715730 tomorrow    # hour | tomorrow | week | month | now
+```
+
+Everything goes through the panel's own API, never the store files — so a CLI ending writes
+the same memory line, the same settled-ledger key and the same Undo token the tab's buttons
+do. The chat's command palette picks the subcommands up automatically.
 
 ## Getting them to your phone
 
-Findings live in the panel, but the count is on the tab badge and the underlying state is
-available to automations through the [integration](/brain/automations/) — so a weekly
-*"brAIn has 3 things waiting"* notification is a few lines of YAML.
+Findings live in the add-on's private storage, which Home Assistant cannot see — so the
+add-on publishes a mirror to `/config/.brain/findings_state.json` on every change, and again
+at panel startup so a reboot never serves last week's list. The
+[integration](/brain/automations/) builds three things on it:
+
+- **`sensor.brain_open_findings`** — the open count, with the severity split and the finding
+  texts as attributes, so an automation can put what's actually broken on a lock screen.
+- **A `brain_finding` event** per newly-filed finding, for automations and the logbook. It's
+  primed at startup, so a restart never replays the open list as news.
+- **A push notification**, if you want one: set the `findings_notify_service` option to any
+  `notify.*` service, and `findings_notify_min_severity` to what may ring your phone
+  (`info` / `warning` / `serious` / `critical`; the default `serious` means batteries about
+  to die ring, while naming nitpicks wait on the tab).
+
+Notifications go to newly-created findings only, and the store dedupes across every status
+and the settled ledger — so the same problem can never ring twice, however it's reworded. A
+failed delivery is a log line, never a lost finding: the row is on the list before the
+mirror is touched.
