@@ -67,13 +67,16 @@ A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper
     Snapshots on a schedule, one-click restore from the panel, full commit history. Tar.gz archive mode for very large worlds.
   </Card>
   <Card title="Multi-world profiles" icon="random">
-    Run a creative sandbox *and* a hard-survival world side by side, each with its own world files, plugins, and ops list. Switch with one click.
+    Run a creative sandbox *and* a hard-survival world side by side, each with its own world files, plugins, and ops list. Switch with one click — or install a **Featured world** like [Drehmal: APOTHEOSIS](https://www.drehmal.net) server-side with one click, and import your own world from a `.zip`.
   </Card>
   <Card title="One-click + declarative plugins" icon="list-format">
-    Check off **EssentialsX, LuckPerms, WorldEdit, GriefPrevention, mcMMO, ChestSort** and more — installed via Modrinth on every boot. Or drop your own URLs in the `plugins:` list; bad URLs warn and skip.
+    Check off **EssentialsX, LuckPerms, WorldEdit, GriefPrevention, mcMMO, ChestSort** and more — resolved via Modrinth on every boot, version-aware so you never get a jar your server refuses to load. Or drop your own URLs in the `plugins:` list; bad URLs warn and skip.
   </Card>
   <Card title="Self-healing reliability" icon="approve-check">
-    Crash auto-restart (rate-limited), ghost-session auto-kick, connection throttling, optional idle-timeout kick, daily scheduled restart for memory creep.
+    Crash auto-restart (rate-limited), ghost-session auto-kick, connection throttling, optional idle-timeout kick — and a nightly restart is one HA automation away.
+  </Card>
+  <Card title="Locked down" icon="seti:lock">
+    Rated **6/6** in the add-on store: the management panel only answers through Home Assistant, AppArmor confines the container, and secrets stay out of your HA backups.
   </Card>
 </CardGrid>
 
@@ -89,13 +92,14 @@ A tab for everything you'd want to do without SSHing in — fully responsive, so
 - **Server Properties** — live editor with RCON apply
 - **Plugins** — install by URL, list with size/mtime, delete
 - **Backups** — git snapshots and archives, one-click restore
-- **Worlds** — switch between profiles
+- **Worlds** — switch between profiles, import a `.zip`, install Featured worlds
+- **Resource Packs** — upload once, served to players, applied per world
 
 Always-visible header buttons: **Backup** • **Update** • **Restart** (JVM-only, ~15s) • **Stop**.
 
 ## Home Assistant integration
 
-A companion integration is auto-discovered on first boot: 12 sensors (players, TPS, latency, uptime, …), 2 binary sensors, 4 buttons, 13 services, and a notify platform for in-game broadcasts. Pair with [brAIn](/brain/) and *"tell everyone dinner is ready"* works by voice. [Entities, services, and automation recipes →](/bruh-minecraft/home-assistant/)
+A companion integration is auto-discovered on first boot: 12 sensors (players, TPS, latency, uptime, …), 2 binary sensors, 4 buttons, 14 services, and a notify platform for in-game broadcasts. Pair with [brAIn](/brain/) and *"tell everyone dinner is ready"* works by voice. [Entities, services, and automation recipes →](/bruh-minecraft/home-assistant/)
 
 ## Example
 

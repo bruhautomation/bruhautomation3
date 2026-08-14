@@ -42,6 +42,8 @@ Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Eac
 
 ### Backups & uptime
 
+![The panel's Backups tab: a list of git snapshots with SHA, date, and subject, each with a one-click Restore button](./images/panel-backups.webp)
+
 | Option | Default | Notes |
 |--------|---------|-------|
 | `auto_backup` | `true` | Snapshot the world on a schedule. |
@@ -49,7 +51,7 @@ Since add-on **1.8.0**, gameplay settings are **not** global add-on options. Eac
 | `backup_keep_count` | `48` | 1–500. Older snapshots pruned. |
 | `backup_use_git` | `true` | `true` = git repo with deltas, `false` = tar.gz archives. |
 | `auto_restart_on_crash` | `true` | 5/5min rate limit. |
-| `auto_restart_schedule` | `""` | e.g. `"03:00"` for daily 3 AM. |
+| `auto_restart_schedule` | `""` | Cron format, e.g. `"0 4 * * *"` for daily 4 AM. For a scheduled restart today, use an HA automation on `bruh_minecraft.restart_server` — see [Automation recipes](#automation-recipes). |
 
 ### Connection handling
 
@@ -64,8 +66,8 @@ Connection throttle and player idle timeout are per-world `server.properties` ke
 | Option | Default | Notes |
 |--------|---------|-------|
 | `enable_bedrock_support` | `true` | Auto-installs Geyser + Floodgate. |
-| `geyser_auth_type` | `auto` | `auto` resolves to `offline` when the active world's `online-mode` is off, else `floodgate`. Also accepts `online`. |
-| `geyser_mtu` | `1400` | Drop to `1200` if iOS hangs on "Connecting…". |
+| `geyser_auth_type` | `auto` | `auto` resolves to `offline` when the active world's `online-mode` is off, else `floodgate`. Also accepts `online` and `offline` directly. |
+| `geyser_mtu` | `1400` | 576–1492. Drop to `1200` if iOS hangs on "Connecting…". |
 
 ### Plugins
 
@@ -73,7 +75,9 @@ Two ways to install plugins, mix and match freely.
 
 #### One-click popular plugins (1.4.0+)
 
-Tick a checkbox in the **Configuration** tab and the add-on resolves the latest Paper-compatible jar via the [Modrinth](https://modrinth.com) API on every boot. Bukkit-API only — Paper / Purpur / Folia.
+Tick a checkbox in the **Configuration** tab and the add-on resolves a Paper-compatible jar via the [Modrinth](https://modrinth.com) API on every boot. Bukkit-API only — Paper / Purpur / Folia. Since **1.14.4** resolution is version-aware: the add-on picks the newest build **for your server's Minecraft version** (preferring release builds over alpha/beta), and if a plugin has no build for your version it's skipped with a clear warning rather than installing a jar Paper refuses to load.
+
+Two of the twelve ship **on by default** — `install_viaversion` and `install_viabackwards` — so clients a version ahead of or behind the server can still join. Dependencies auto-enable: ticking `install_essentialsx_chat` pulls in `install_essentialsx`, and `install_viabackwards` pulls in `install_viaversion`.
 
 | Checkbox | Plugin | What it does |
 |----------|--------|--------------|
@@ -92,7 +96,7 @@ Tick a checkbox in the **Configuration** tab and the add-on resolves the latest 
 
 Toggling a checkbox **off** does NOT remove the jar — delete it from the panel's **Plugins** tab to remove.
 
-Duplicate plugin jars (which make Paper log "Ambiguous plugin name" and randomly disable one copy) are auto-quarantined to `plugins/.quarantine/` on boot — controlled by `auto_quarantine_duplicates` (default `true`); jars are moved, never deleted.
+Two kinds of jar are auto-quarantined to `plugins/.quarantine/` on boot: duplicates (which make Paper log "Ambiguous plugin name" and randomly disable one copy) and, since **1.14.4**, jars built for a **newer Minecraft than the server runs** — they can never load, and the quarantine manifest says to install a build for your version instead of Paper printing a stack trace every start. Both are controlled by `auto_quarantine_duplicates` (default `true`); jars are moved, never deleted — restore one by moving it back.
 
 #### Custom URL list
 
@@ -151,10 +155,9 @@ eula: true
 memory_mb: 6144
 auto_backup: true
 backup_keep_count: 96
-auto_restart_schedule: "04:00"
 ```
 
-Then in **Server Properties**: `online-mode=true`, `white-list=true`, `difficulty=hard`, `prevent-proxy-connections=true`.
+Then in **Server Properties**: `online-mode=true`, `white-list=true`, `difficulty=hard`, `prevent-proxy-connections=true`. Add a nightly-restart automation on `bruh_minecraft.restart_server` for long uptimes.
 
 ### Performance / plugin-heavy
 
@@ -162,7 +165,6 @@ Then in **Server Properties**: `online-mode=true`, `white-list=true`, `difficult
 eula: true
 server_type: paper
 memory_mb: 8192
-auto_restart_schedule: "03:00"
 ```
 
 Then in **Server Properties**: `view-distance=8`, `simulation-distance=6`, `network-compression-threshold=512`.
@@ -185,6 +187,16 @@ Each profile is a full server root at `/config/minecraft-worlds/<name>/` with it
 **Per-profile:** world files, `server.properties`, plugins folder, ops/whitelist/bans, backup history.
 **Shared across profiles:** the add-on's install/container options (server type, memory_mb, backups, Bedrock/Geyser, the `plugins:` URL list + toggles), RCON password. Gameplay settings — difficulty, gamemode, MOTD, and the rest of `server.properties` — are per-world.
 
+**Import (1.10.0+):** the Worlds tab accepts a Minecraft world `.zip` up to 2 GB. The add-on finds the directory containing `level.dat` wherever it sits in the zip and stages it as a new switchable profile — then *Switch* into it.
+
+### Featured worlds (1.14.0+)
+
+![The panel's Worlds tab: three world profiles with Switch/Download/Delete actions, and the Featured worlds section below offering Drehmal: APOTHEOSIS as a one-click install](./images/panel-worlds.webp)
+
+The Worlds tab has a **Featured worlds** section: curated community worlds installed with one click, hosted entirely **server-side** so players — including iPads and iPhones on Bedrock via Geyser — just join, with zero local installs. **Install** downloads the world and its bundled datapacks as a new switchable profile (your current world is untouched), writes its `server.properties` from the catalog recipe, and converts its resource pack to a Bedrock pack Geyser pushes on join. **Switch** then pins the server to the software + Minecraft version the world requires and restarts — switching back to your own world may need you to re-pick a version on the Configuration tab.
+
+The headline entry is [Drehmal: APOTHEOSIS](https://www.drehmal.net), a hand-built 12k × 12k adventure world (~1.5 GB download, Minecraft 1.20.1 on Paper). Bedrock players can explore the whole map; vanilla retextures come across in the auto-converted pack, but custom 3D models and animated textures don't — a Bedrock platform limit, and Drehmal's optional client-side Fabric mods aren't required to play.
+
 ## Offline mode
 
 Since 1.3.0, the server starts even when the HA host has no internet — provided it's been online at least once to cache the jars.
@@ -199,7 +211,7 @@ Since 1.3.0, the server starts even when the HA host has no internet — provide
 
 **What still happens offline:**
 
-- `server.properties` is re-rendered from add-on options.
+- `server.properties` is checked as usual — infrastructure keys (RCON, query, ports) are enforced, your gameplay edits are preserved.
 - Geyser config (auth-type, MTU, MOTD) is patched on every boot — those edits don't need network.
 - Ops / whitelist / bans, world / backup / panel / RCON, all HA integration plumbing — fully functional.
 
@@ -223,7 +235,8 @@ There's no config option for this — the behaviour kicks in automatically based
 | **Server Properties** | Per-world editor — your edits persist and travel with the world (see [What's set where](#whats-set-where)). |
 | **Plugins** | Install by URL, list with size/mtime, delete. |
 | **Backups** | Git snapshots and archives, one-click restore. Scoped to active profile. |
-| **Worlds** | List, switch, create, delete profiles. |
+| **Worlds** | List, switch, create, import (`.zip`, up to 2 GB), delete profiles — plus **Featured worlds**, curated community worlds installed with one click (see below). |
+| **Resource Packs** | Upload a pack `.zip` (≤ 250 MB); the add-on stores it under `/config/resource-packs/`, serves it on the LAN, and **Apply to active world** writes the URL + SHA-1 into that world's `server.properties`. |
 
 Header buttons (always visible): **Backup** • **Update** • **Restart** (JVM-only, ~15 s) • **Stop** (sets `no_restart`).
 
@@ -292,6 +305,11 @@ automation:
   - trigger: { platform: time, at: "04:00:00" }
     action: { service: bruh_minecraft.backup_now }
 
+# Nightly restart at 4:30 AM (helps long-uptime memory creep)
+automation:
+  - trigger: { platform: time, at: "04:30:00" }
+    action: { service: bruh_minecraft.restart_server }
+
 # Auto-stop when idle for 30 minutes
 automation:
   - trigger:
@@ -315,6 +333,15 @@ automation:
       - service: bruh_minecraft.stop_server
 ```
 
+## Security (1.15.0+)
+
+The add-on rates **6/6** in the add-on store:
+
+- **The management panel only answers requests that arrive through Home Assistant.** The add-on runs with host networking (Bedrock LAN discovery needs it), which puts the panel's port on your network — so since 1.15.0 it refuses any connection that isn't from the Supervisor or loopback, judged by the connection's own peer address. Opening `http://<HA-host>:8099` directly gets nothing, by design; refusals are logged. Two paths stay public because they must be: `/pack/<name>` (Minecraft clients fetch resource packs from it) and `/api/health` (liveness only).
+- **AppArmor is on.** The profile lets the JVM do JVM things and denies the host-escape set — it matters here because plugin jars run with the server's full authority.
+- **A watchdog** polls `/api/health` and restarts a hung panel.
+- **The generated RCON password and console log are excluded from HA backups.** Your worlds and world backups still go in — those are the point of backing this add-on up.
+
 ## Where data lives
 
 | Path | Contents |
@@ -322,6 +349,7 @@ automation:
 | `/config/minecraft/` | Symlink to the active profile |
 | `/config/minecraft-worlds/<profile>/` | Full server root per profile |
 | `/config/minecraft-backups/<profile>/` | Git snapshots or tar.gz archives |
+| `/config/resource-packs/` | Uploaded resource packs, served to players from the panel |
 | `/config/.bruh_minecraft/` | HA bridge — request/response queues, stats |
 | `/config/custom_components/bruh_minecraft/` | Companion integration |
 | `/data/server-cache/` | Cached jars (content-addressed) |
@@ -336,12 +364,14 @@ automation:
 | `EULA has NOT been accepted` | `eula: true`. |
 | `address already in use: 25565` | Stop the conflicting process or remap the port. |
 | Plugin install warning then continues | Bad URL — fix or remove from `plugins:`. |
+| One-click plugin didn't appear | No Modrinth build exists for your server's Minecraft version — the log says which plugin was skipped and why. |
 
 ### Connection issues
 
 | Symptom | Fix |
 |---------|-----|
-| Can't connect from internet | Forward `25565/tcp` + `25565/udp` (and `19132/udp` for Bedrock) to HA host. |
+| Can't connect from internet | Forward `25565/tcp` + `25565/udp` (and `19132/udp` for Bedrock) to HA host. Never forward `8099` — the panel refuses direct callers anyway. |
+| Panel does nothing when opened by IP (`<HA-host>:8099`) | By design since 1.15.0 — the panel only answers through Home Assistant. Open it from the sidebar; refusals show in the add-on log. |
 | "Please log into Xbox" | Set the world's `online-mode=false` (panel → **Server Properties**). |
 | iOS hangs on "Connecting…" | `geyser_mtu: 1200`. |
 | "You are already connected" | Auto-kicker should clear it; manual kick from Players tab. |
@@ -353,7 +383,7 @@ automation:
 |---------|-----|
 | TPS sensors null | TPS only reported by Paper / Purpur / Folia. |
 | OOM crashes | Bump `memory_mb`. |
-| Sagging TPS | Lower `view_distance` (8) and `simulation_distance` (6). Schedule a daily restart. |
+| Sagging TPS | Lower `view_distance` (8) and `simulation_distance` (6). A nightly-restart automation on `bruh_minecraft.restart_server` helps with memory creep. |
 
 ### Diagnostics
 
