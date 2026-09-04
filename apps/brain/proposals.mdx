@@ -4,8 +4,8 @@ description: brAIn watches what you do by hand, finds the patterns, and offers t
 ---
 
 :::note[Requires brAIn 1.42–1.43]
-This page documents releases that are on their way. Routine mining and one-off intents land
-in 1.43; the store, the tab and the replay behind them in 1.42.
+The Proposals tab, the replay and routine mining land in **1.42**. One-off intents and the
+missing-condition proposals derived from the override ledger are on their way in 1.43.
 :::
 
 People automate less than a tenth of what they do by hand. Not because the rest is hard —
@@ -68,20 +68,43 @@ because it sounded reasonable.
 
 ### Routines you already have
 
-> *"You turn the kitchen lights off by hand at 23:05 ± 12 minutes on 26 of the last 30
-> nights — always after the living-room TV goes off."*
+> *"You have turned the hall lamp on yourself on 10 of the last 10 weekday evenings, at
+> 18:40 give or take 4 minutes. Nothing in Home Assistant does it for you."*
 
-The miner finds the pattern **and its best trigger**, testing whether the time or the TV
-event predicts it better. brAIn writes the automation from whichever wins.
+brAIn keeps the changes **a person** caused — and only those. An automation moving a light
+says nothing about a habit, and a wall switch reaches Home Assistant with no record of who
+pressed it, which brAIn reports as *unattributed* rather than guessing at. Two months are
+kept, in the domains a timer can sensibly act on.
 
-The floors that keep this from being noise:
+What it writes is a plain **time trigger**, with a weekday or weekend condition when the
+habit has one — and never a condition it did not measure. The ledger knows *when* you did
+something; it does not know what else was true at the time, so a trigger inventing a
+condition would be brAIn guessing in the one place you cannot check it.
 
-- It has to have happened on **enough separate days**. Four presses in one evening is one
-  evening.
-- The times have to be **tight enough to mean something**. A press that happens anywhere
-  between 9pm and 1am has no time.
-- It has to be **still happening** — a habit you dropped two months ago has a beautiful
-  shape in the history and is not a proposal.
+The floors that keep this from being noise, each one tested against a house with no habit in
+it before it is tested against one that has:
+
+- **Six separate days**, not six presses. Twelve presses on one Monday is one Monday.
+- **A share of the days it could have happened on.** Six times in a fortnight is a habit;
+  six times in two months is a coincidence — and a count with no denominator reports both
+  identically. Weekdays and weekends are counted apart, so a weekday habit is graded against
+  weekdays rather than being marked down for the two days it was never going to happen on.
+- **A time, not a stretch of evening.** The times are averaged *around the clock* — half
+  past eleven and half past midnight are forty minutes apart, and a plain average of them is
+  noon — and anything looser than about three quarters of an hour is not a time of day.
+- **It has to be still happening.** A habit you dropped two months ago has a beautiful shape
+  in the history and is not a proposal.
+- **Nothing must already do it.** A second automation moving the same thing to the same
+  state is not a helpful duplicate; it is two rules that will disagree the first time their
+  triggers land in the wrong order.
+
+*Every day* has to be earned twice, once on each half of the week. A habit on ten weekdays
+and one Sunday clears the whole-window share comfortably, and calling it daily would build a
+trigger that fires on two mornings you are asleep — so a genuinely daily habit reads as
+*weekdays* for its first three weeks, until six weekend days have accrued. That is the
+cheaper mistake of the two.
+
+A pass offers at most three, strongest first. The rest are still in the ledger next time.
 
 ### Conditions an automation is missing
 
