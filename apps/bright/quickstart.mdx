@@ -1,0 +1,80 @@
+---
+title: BRight Quick Start
+description: From install to a room full of lights following a song — the five steps in order, and the two people skip.
+---
+
+## 1. Install
+
+Add the BRUH repository to Home Assistant, install **BRight**, and start it. The panel
+appears in your sidebar.
+
+BRight needs **host networking**, because LIFX discovery is a UDP broadcast whose replies
+come back to the sender's own address — a bridged container never sees them. That means its
+panel port is a real port on the host, so the add-on asks the Supervisor for a free one at
+startup rather than pinning a number that might already be taken.
+
+## 2. Map the lights
+
+The **Light Map** is a floor plan you drag lights onto. Each one gets:
+
+- **A position**, because effects travel through space — a chase crosses the room in the
+  order the lights actually sit in.
+- **A role** — `key`, `fill`, `accent`, `candle`, `strip`, `mover`. Roles are how a show
+  says "the candles" without naming four bulbs, and they are what keeps a show working when
+  you add a fifth.
+- **A zone**, optionally — a room name you can select by.
+
+Two ways to add them: **Import all** drops every unmapped bulb on the floor at once (right
+exactly once, at the start), and the picker adds them one at a time with a role and a zone
+chosen as you go. Six lamps in the middle of the floor named after their serials is not a
+map.
+
+## 3. Calibrate
+
+`media_player.play_media` returns when Home Assistant has *taken* the command — not when
+sound comes out. Between those two things, Core resolves the media, signs a path, puts a
+host in front of it and hands a URL to a speaker that then fetches it over the network.
+
+The **Calibrate** tab measures that gap for your speaker so the show's clock is anchored to
+the music rather than to the request. Skip it and the lights are early.
+
+## 4. Analyse the library
+
+The **Library** tab scans your music folders and analyses each track once. It is looking for
+beats and tempo, section boundaries and drops, the loudness envelope, chord changes, the
+melody line, and which drum each accent was — a kick and a snare can then be on different
+lights.
+
+This takes a while the first time and never again. Tracks are de-duplicated by content hash,
+so overlapping folders cost nothing.
+
+## 5. Compile a show, then play
+
+On the **Shows** tab, pick a track and compile. With a Claude login and `director_mode: auto`
+Claude writes it; without one the algorithmic choreographer does, and the file format is
+identical either way.
+
+Then the **Party** tab: tick the shows you want, press Play, skip with ⏮/⏭.
+
+## When nothing plays
+
+BRight walks the chain and stops at the first broken link, rather than reporting "started"
+and leaving you in a dark room:
+
+| Step | What it means |
+| --- | --- |
+| **file** | The track is not where the analysis says |
+| **media id** | Home Assistant will not resolve the media-source URI — often a custom `media_dirs` |
+| **host** | The speaker cannot reach the URL it was given |
+| **player** | The media player does not accept `play_media` |
+| **command** | The call was refused |
+| **playing** | Accepted, but the speaker never started |
+
+:::caution[The host step catches the commonest failure]
+Chromecast, Google and Nest speakers resolve names through Google's public DNS rather than
+your router's. So an `internal_url` of `http://homeassistant.local:8123` — which a great many
+installs have — is a name the speaker is told does not exist. Nothing plays and nothing
+errors.
+
+An *unset* internal URL is the good case: Core falls back to the machine's own IP.
+:::

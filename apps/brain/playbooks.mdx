@@ -1,0 +1,95 @@
+---
+title: Playbooks & Self-Healing
+description: Written from what your house actually has, accepted once, rehearsed on request — the capability that earns brAIn the right to act without asking. Plus overnight self-healing, and a scene designer that builds the looks your rooms are missing.
+---
+
+:::note[Requires brAIn 1.44]
+This page documents a release that is on its way. It is the last of the roadmap's ranked
+twelve, and the only part that lets brAIn act on your house unattended — read the diff
+before you enable it.
+:::
+
+Everything else brAIn does either reports or proposes. This is the part that **acts**, and
+it is deliberately last: the right to change something without asking has to be earned by
+everything above it working first.
+
+## Emergency playbooks
+
+A playbook is a short, written response to one bad thing, built from what **your** house
+actually has:
+
+| Event | What a playbook does |
+| --- | --- |
+| **Smoke** | Unlock the doors it is allowed to, turn every light to full, stop the HVAC so it stops feeding air, announce on every speaker, tell everyone |
+| **Leak** | Close the shut-off valve if there is one, name the sensor and the room, kill power to the machine if it is on a smart plug |
+| **Power cut** | Report what is still up, what is on battery, what will not survive the night |
+| **Freeze** | From [the thermal model](/brain/climate/) — which rooms reach the floor first, and what heat is available |
+
+brAIn writes it from your devices, you read it once and accept it, and you can **rehearse**
+it on demand — it walks the steps and reports what it *would* do, changing nothing.
+
+:::caution[A playbook you have not rehearsed is a document, not a plan]
+The rehearsal is the point. It is where you find that the "shut-off valve" is a switch that
+was renamed in March.
+:::
+
+### The rules it acts under
+
+Every action a playbook takes is:
+
+- **Bounded.** It does the steps it was accepted with, and nothing it thought of at the time.
+- **Reversible.** What it changed is recorded, and `brain undo` puts it back.
+- **Announced.** You are told what it did, not asked to notice.
+- **Refused for a protected entity.** Locks, alarms and anything in `protected_entities` are
+  enforced in the MCP server — the one chokepoint every path to your house crosses — and not
+  in a prompt that can be talked around.
+
+## Overnight self-healing
+
+A small set of remediations brAIn is allowed to attempt while you sleep, each with a
+rollback and a line in the morning saying what it did:
+
+- Reload an integration that has stopped answering.
+- Restart an add-on that is `boot: auto` and stopped.
+- Re-enable a helper that something disabled.
+- Re-interview a Z-Wave node that has gone dead.
+
+And a morning line: *"Overnight I reloaded the Hue integration, which had stopped answering
+at 02:14. Everything else was quiet."*
+
+The list is deliberately short and deliberately dull. Nothing here changes the *state of your
+house* — no lights, no locks, no climate. Every entry is an infrastructure action whose worst
+case is that it did not work, and each one is capped at a single attempt so a failing
+integration does not get restarted forty times before breakfast.
+
+:::note[It is off by default]
+Self-healing ships **off**. Turning it on is a decision about how much you trust everything
+above it, and that is not a decision an add-on should make on your behalf.
+:::
+
+## Scene designer
+
+brAIn knows your rooms, what is in them, and what you actually set them to — the Activity
+tab has been recording it. The scene designer proposes the scenes your house is missing:
+
+> *You put the living room into the same four-light arrangement most evenings after 8pm.
+> Here it is as a scene called **Evening**, with the trigger that usually precedes it.*
+
+It reads the light map the same way the automation miner reads the logbook: **sets of states
+you put the house into together, that recur**. Each proposal is a scene you can preview,
+rename, edit, or decline — it goes through the [Proposals](/brain/proposals/) lifecycle like
+everything else brAIn offers.
+
+What it will not do is invent a look. A scene is a thing you have already demonstrated a
+preference for; a scene brAIn imagined is a scene nobody uses.
+
+## Reading the diff
+
+This is the one release worth opening the pull request for rather than trusting green CI.
+The tests are written the other way round from usual — **the refusals are tested harder than
+the actions**, because a playbook that fails to fire costs you one incident report, and a
+playbook that fires wrong costs you a house you no longer trust.
+
+Every guard in it is verified against the failure it exists for: the test suite mutates the
+guard, watches the test fail, and restores it. A guard that passes whether or not it is there
+is not a guard.

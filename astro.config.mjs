@@ -383,8 +383,24 @@ export default defineConfig({
 									items: [
 										{ label: 'Insights', slug: 'brain/insights' },
 										{ label: 'Findings', slug: 'brain/findings' },
+										{ label: 'Proposals', slug: 'brain/proposals' },
+										{ label: 'Activity', slug: 'brain/activity' },
 										{ label: 'Terminal', slug: 'brain/terminal' },
 										{ label: 'Memory & Learning', slug: 'brain/memory' },
+									],
+								},
+								// What brAIn works out about this particular house, and
+								// the rules that read it. Deliberately its own group:
+								// these are not panel tabs, they are the measurements
+								// every tab above is expressed against.
+								{
+									label: 'What It Measures',
+									items: [
+										{ label: 'What brAIn Measures', slug: 'brain/measurements' },
+										{ label: 'House Checks', slug: 'brain/checks' },
+										{ label: 'Heating & Climate', slug: 'brain/climate' },
+										{ label: 'Shadow Runner & Replay', slug: 'brain/replay' },
+										{ label: 'Playbooks & Self-Healing', slug: 'brain/playbooks' },
 									],
 								},
 								{
@@ -430,6 +446,22 @@ export default defineConfig({
 										{ label: 'BRUH Insights changelog', slug: 'brain/archive/bruh-insights-changelog' },
 									],
 								},
+							],
+						},
+						{
+							label: 'BRight',
+							items: [
+								{ label: 'Overview', slug: 'bright' },
+								{ label: 'Quick Start', slug: 'bright/quickstart' },
+								{ label: 'How a Show Is Built', slug: 'bright/shows' },
+							],
+						},
+						{
+							label: 'BRUH Print',
+							items: [
+								{ label: 'Overview', slug: 'bruh-print' },
+								{ label: 'Quick Start', slug: 'bruh-print/quickstart' },
+								{ label: 'Labels, Stock & the Designer', slug: 'bruh-print/labels' },
 							],
 						},
 						{

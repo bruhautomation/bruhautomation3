@@ -1,0 +1,117 @@
+---
+title: How a Show Is Built
+description: What BRight hears in a song, how that becomes four layers of light on different bulbs, and the script file you can open and edit yourself.
+---
+
+## What it hears
+
+Beats and sections are a skeleton. A show built on those alone changes when the arrangement
+changes and sits still through everything in between — which is most of the record. So the
+analyser also extracts what the song is *playing*:
+
+| | What it finds | Why it is reported that way |
+| --- | --- | --- |
+| **Chords** | Triads per beat, reported as **changes only** | A show acts on the change; an ambiguous beat holds rather than flickering |
+| **Melody** | The tune as note events | With a sub-octave penalty — without it the tracker follows the bass up whenever the tune rests, and fills every silence with a phantom note |
+| **Phrases** | Notes grouped into breaths, with the direction of the line | The gap that ends one is measured in **beats**, because half a second is nothing at 90bpm and two beats at 160 |
+| **Repeats** | Where the chorus comes back | Deliberately coarse — that is the repetition a show should answer |
+| **Hits** | Each accent, ranked, and **which drum it was** | A kick and a snare can then be on different lights |
+
+Every extractor has a floor below which it says nothing. A confident answer where the audio
+holds none is the one failure that cannot be recovered downstream.
+
+## Four layers, on different lights
+
+A bulb runs **one** waveform at a time. That is physics, not taste — so two effects
+overlapping on one fixture means the later one cancels the earlier, and from a sofa that
+reads as an effect that mysteriously does nothing.
+
+So the automatic show claims whole **roles** for each layer:
+
+| Layer | What it does | Typically |
+| --- | --- | --- |
+| **Ground** | Harmony, seconds long — the only layer allowed to feel like fading | Candles, strip |
+| **Pulse** | The beat, as a strike | Fill |
+| **Hits** | Kick and snare, separately | Accent, mover |
+| **Voice** | The melody, placed by **pitch** | Key |
+
+A layer only splits a role by naming individual bulbs when it has nowhere else to go — which
+is what a designer does with six lamps and four ideas.
+
+## Swells and strikes
+
+Most lighting effects are swells: they travel smoothly up to a level and smoothly back.
+That is what "just a bunch of fading lights" describes, and for a long time it was every
+rhythmic effect BRight had.
+
+A **strike** is the other half — a jump to the peak with *no* fade, followed by a saw wave
+travelling down. A fade still in flight would start the decay from somewhere between the two
+and lose exactly the attack.
+
+:::note[The beat pulse used to peak on the off-beat]
+A LIFX waveform runs between the bulb's *current* colour and the packet's. A sine anchored on
+the beat is therefore at the existing level *there*, and brightest half a period later — so
+the one effect whose entire job was "the beat" was inverted in every show BRight ever
+compiled, from the first release. Every shape now declares where in its cycle it is
+brightest, and the wave starts far enough ahead to land the peak on the moment.
+:::
+
+## The script is the show
+
+Every compiled show mirrors its script to `/config/.bright/shows/`, because `/data` is
+invisible to Home Assistant and a file nobody can open is not editable.
+
+A script is scenes, each holding **effects**, plus `moments` that pin an effect to an
+instant. There are 22 effect types — wash, fade, build, pulse, strobe, chase, sweep, breathe,
+sparkle, colour_cycle, rainbow, theater, stab, blackout, melody, harmony, colour_drift,
+saturate, level, hit, accent, aux.
+
+An effect names a **selection** (ids, roles, zones, exclude) and **everything it does not
+name is untouched** — which is the whole reason a show is built from effects rather than
+scenes. Most of the room is usually meant to stay still.
+
+Parameters are **clamped, never rejected**. These files are typed by hand, and a show that
+refused to compile over `depth: 1.2` would be a worse tool than one that reads it as 1.
+
+:::caution[The mirror is a copy, and the copy is not the record]
+Editing the mirrored file changes nothing until you import it back. A half-typed JSON file
+being picked up by a party at 11pm is not a feature. A broken one is reported with the JSON
+parser's own line number — the single most useful sentence you can hand somebody who has
+just edited a thousand-line file.
+:::
+
+## The editor shows you what it compiled
+
+Not a description of it — the **compiler's own walk**. The same code that renders a show to
+packets renders it to preview frames, so the picture cannot disagree with the room.
+
+Three lanes ride on the waveform's own ruler: chords as labelled blocks, the melody as a
+contour against the track's own pitch range, and the drums with the kick low and the rest
+high. Underneath, one row per effect — built from the walk rather than the script, which is
+what tells "this effect produced nothing" apart from "this effect is fine".
+
+What is left below that is the **exceptions**: an effect that drives no lights, one whose
+analysis is too old, one whose waveform another cancels. When the show is fine, that block is
+empty.
+
+## Many shows, one that plays
+
+Every compile is a new **version**, and one of them is live. Asking the director to try again
+does not destroy the show you spent an evening editing — naming a version pins it, and the
+prune eats the oldest unnamed ones and never the live one.
+
+## Services
+
+| Service | What it does |
+| --- | --- |
+| `bright.party_mode` | Start a party — everything optional, merged over a saved party's settings |
+| `bright.start_party` | Start a **named** saved party. Requires the name, so a typo fails loudly rather than quietly playing the default folder |
+| `bright.start_show` | One track |
+| `bright.stop_show` | Stop, and put the room back |
+
+:::note["Back" is not always where it was]
+Restoring the pre-show snapshot is right when the show interrupted an evening, and wrong at
+1am — what people want then is a scene they already have. A party can name one, and it is
+called *instead of* restoring. A scene that fails to run falls back to the snapshot, so the
+room never keeps the party colours.
+:::

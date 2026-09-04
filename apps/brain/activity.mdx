@@ -1,0 +1,88 @@
+---
+title: Activity
+description: What happened in your house, and what caused it. Not a log — every change filed under whether a person, an automation, a script, a voice command or brAIn itself made it, because nothing in a state says who moved it.
+---
+
+Nothing in `light.kitchen` being *on* says whether a person pressed a switch, an automation
+fired, a voice command asked, or brAIn did it.
+
+That is the question behind most of what people actually want to ask their house — *why did
+the hallway light come on at 3am?* — and until the Activity tab it was unanswerable from
+every surface brAIn had.
+
+## The fourth kind of knowledge
+
+Memory is what is *true*. A finding is what is *broken*. A guess is what brAIn might have
+*wrong*. Activity is what **happened**.
+
+It is a record rather than a queue, so **it has no badge**. Nothing on it is waiting on you.
+
+## Where the cause comes from
+
+Home Assistant's logbook records a *context* for every state change — a chain saying what
+set it off. The Activity tab walks that chain and files each change under one of a closed
+set of causes:
+
+| Cause | What it means |
+| --- | --- |
+| **Person** | A named user did it, from the app or the UI |
+| **Automation** | A rule fired |
+| **Script** / **Scene** | Something ran |
+| **Voice** | An assistant command |
+| **brAIn** | brAIn changed it — see below |
+| **Unattributed** | Nothing in the record says |
+
+:::note[Unattributed is an answer, in as many words]
+A wall switch and a device's own integration reach Home Assistant identically. Naming either
+would be a guess, and a timeline that guesses is not evidence. So brAIn says *unattributed*
+rather than picking the likeliest.
+:::
+
+**Proximate and root cause are both recorded.** An automation somebody started from the UI
+carries an automation *and* a user. Reporting only the user turns every automation into "you
+did this"; reporting only the automation loses the one fact that explains an unexpected run.
+
+## How brAIn knows what brAIn did
+
+It wrote it down. The MCP server calls Home Assistant over REST with the Supervisor's token
+exactly like every other integration, so a light brAIn turned on is indistinguishable in the
+context chain from a light anything else turned on — there is no id to match.
+
+So every service call brAIn makes is appended to a ledger at the same chokepoint
+`protected_entities` is enforced at, and the reader joins the logbook against it. An area or
+device target is recorded and **deliberately not resolved**: resolving one needs the
+registries as they were at the time, and a wrong expansion would attribute somebody else's
+change to brAIn — the one mistake the ledger exists to prevent.
+
+## Overrides ride above the list
+
+An **override** is a person putting something back within a few minutes of an automation
+moving it. The automation ran, nothing errored, and the light is off — so no check that
+reads Home Assistant can see it, and it is the clearest signal a house gives that an
+automation is wrong for it.
+
+Three rules keep it honest:
+
+- **The state has to actually differ.** Pressing "on" after a rule turned it on is
+  agreement, and counting it would put the best-behaved automation in your house at the top
+  of the list.
+- **One automation move is undone once.** Nudging a dimmer three times is one disagreement.
+- **An automation undoing an automation is not an override.** That is a *conflict*, and a
+  different finding — two rules that disagree, where which one wins depends on the order two
+  triggers happened to fire in.
+
+Past three in a day, `auto.overridden` files it — with a **denominator**, because three
+undos of a rule that ran three times is a rule that is wrong for your house, and three undos
+of one that ran three hundred is an unusual Tuesday.
+
+## Nothing is cached
+
+The tab is fetched every visit. A timeline showing the house as it was when you last looked
+is the one thing a timeline may not do — and a cache of a stream is a second copy of the
+logbook to keep true.
+
+## Asking about it
+
+Claude can read this too. `explain_change` and `get_activity` are read-only tools on the
+analyst's list, so you can ask *"what turned the porch light on last night?"* in the chat or
+on the ask bar and get the chain rather than a guess.
