@@ -80,3 +80,12 @@ outcome, and the same edit journal behind it, so `brain undo` still puts it back
 
 That is the routing rule doing its job, not a gap in what brAIn can reach. The only thing
 you'll notice is which layer the work happened in.
+
+### One write happens without Claude
+
+Everything above is Claude with a model in the loop, on your instruction. There is exactly one
+exception, since 1.43.0: accepting a [proposal](/brain/proposals/#saying-yes-and-taking-it-back)
+appends one automation to `automations.yaml` from your press, with no Claude run behind it. It
+is the narrowest thing that can do that job — the file is snapshotted into the same edit
+journal first, the automation is only settled once Home Assistant is verifiably running it,
+the write is reverted if it is not, and both the toast and `brain undo` take it back.

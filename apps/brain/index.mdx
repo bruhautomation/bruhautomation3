@@ -89,8 +89,9 @@ subscription — or your own API key.
     [Automations →](/brain/automations/)
   </Card>
   <Card title="It can be undone" icon="seti:config">
-    Every file Claude writes to is snapshotted first. **`brain undo`** lists the
-    edits in plain English and puts one back. [The CLI →](/brain/cli/)
+    Every file brAIn writes to is snapshotted first — the automation an accepted
+    proposal adds included. **`brain undo`** lists the edits in plain English and puts
+    one back. [The CLI →](/brain/cli/)
   </Card>
 </CardGrid>
 
@@ -190,7 +191,8 @@ What makes this different from running Claude Code on a regular machine:
 brAIn can't *add* an integration (config flows are interactive, so it walks you to the right
 screen and you click — removing one it can do), never touches credentials, and doesn't back up your
 configuration — Home Assistant's own backups already do that. What it keeps is an edit
-journal of the files *it* touched, so `brain undo` can put one back. The full scorecard:
+journal of the files *it* touched — the automation an accepted
+[proposal](/brain/proposals/) writes included — so `brain undo` can put one back. The full scorecard:
 [what brAIn can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
 
 :::caution[Back up Home Assistant first — somewhere that isn't this machine]

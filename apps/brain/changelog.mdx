@@ -10,7 +10,29 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.27.0" date="August 14, 2026" latest>
+<Release version="1.43.0" date="September 4, 2026" latest>
+
+**The two steps that make a proposal mean anything.** 1.42.0 shipped the Proposals lifecycle — `proposed → trialling → accepted | declined` — and the last two did nothing: *Try it for a week* set a status and an end date, and nothing ever looked at the week; **Accept recorded a status and never created the automation**. A feature that does nothing is indistinguishable from one that is broken, and from the tab both of these read as the second.
+
+<Changes type="added">
+
+- **A trial is a replay of the week you lived through, graded against what you actually did.** Nothing subscribes to live events and nothing needs to: the recorder already holds when the proposed automation would have fired, and brAIn's own ledger of person-caused changes already holds what you did at those moments — so a trial is arithmetic over two things that exist. It is re-run on **every checks pass** rather than once at the end, because a replay costs one history fetch and *"three days in: it would have fired three times and you did the same twice"* is worth more than a card that says nothing until Sunday. Three verdicts, and the third is the one worth having: **agreed** (you did the same thing within a quarter of an hour), **nothing happened** (weak evidence either way, and named for it rather than counted against the change), and **you did the opposite** — you would have undone it, which folding into "nothing happened" would report as merely unproven. Each firing lands in exactly one bucket, decided by the nearest press, so a verdict cannot depend on the order the ledger is in. A refusal is carried rather than zeroed: *"it would never have fired"* and *"brAIn cannot replay this"* are different answers, and so is an action that is not one entity going to one state. When the week is up the row stays where it is with its report attached — ending a trial is your press.
+- **A yes becomes a real automation, and it can be taken back.** Accept appends one entry to `automations.yaml` with an `id` of `brain_<proposal id>`, the title as its alias and a description saying where it came from. Your file is not reformatted — everything above the new entry is byte-for-byte what you wrote, comments and all — and it is snapshotted into the same edit journal Claude's own edits go into **before** it is touched, so `brain undo` reverts this exactly as it reverts anything else.
+- **Written, reloaded, and *verified* — three claims that were being reported as one.** *The file was written* is one thing, *Home Assistant read it* is a reload, and *the automation exists* is a state in Core — and only the third is what you meant by pressing the button. A `mode:` Core does not recognise, a trigger from an integration that has not loaded, a read-only `/config`: each leaves a file on disk, a reload that returns fine, and no automation. Any of the three failing puts the file back, reloads again, and answers with the sentence — the proposal is exactly where it was, with no memory line and no settled entry.
+- **Undo reverses all three effects, or says which one it could not.** Five minutes on the toast: the automation removed, Home Assistant reloaded, the proposal back on the list under its own id, and the queued memory line dropped. A trial that was still running when you accepted it comes back as a *proposal* rather than as a trial whose week has since passed, because "try it for a week" is a promise about the next seven days. If the file cannot be put back it says so rather than claiming a success — the automation is still running.
+- **Four refusals, each a sentence rather than a guess.** An automation touching a **protected entity** (asked here as well as in the MCP server, because a YAML file the panel writes never passes through that chokepoint — and refused outright when it targets an area or a device, since expanding one needs registries this does not have). A `configuration.yaml` with no `automation: !include automations.yaml` line, where appending would be a change that silently does nothing — the refusal names the line it looked for. An `automations.yaml` that is not a list of automations. And a duplicate `id` or name.
+- **The change announces itself**, as a change you asked for rather than as a problem brAIn found, and sent rather than held for quiet hours — it answers a press made seconds ago. The settled entry keeps the automation's id and entity id, because "accepted" and "accepted, and here is what it became" are different claims and only the second can be checked six months later.
+- **Diagnostics report trials apart from their results.** "3 trialling, 0 with a result" is the exact shape of the failure this release fixes, and it is unreadable from a single count.
+
+</Changes>
+<Changes type="fixed">
+
+- **A protected entity is dropped at the miner as well as at the writer.** The writer has to refuse one, being the last gate before `/config` — but a card offering something brAIn will not do is a wasted no.
+
+</Changes>
+</Release>
+
+<Release version="1.27.0" date="August 14, 2026">
 
 **Findings can reach you now** — a critical finding no longer waits for somebody to open the panel — and the learned home is portable, scriptable, and better at reporting on itself.
 
