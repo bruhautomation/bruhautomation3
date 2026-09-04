@@ -140,6 +140,22 @@ the open count with the texts as attributes, a `brain_finding` event fires for e
 one, and setting **one option** (`findings_notify_service`) turns them into phone pushes —
 no automation needed.
 
+## It acts, twice, and only because you said so
+
+Everything above reports or proposes. Two things change the house, and both are decisions you
+make once, in advance:
+
+- **[Emergency playbooks](/brain/playbooks/)** — the automation you would want on a bad night:
+  smoke or CO, a water leak, a freeze with the heating stopped. brAIn writes it from your own
+  registries, lists every entity it would touch on the card, and **Home Assistant runs it, not
+  brAIn** — only once you have accepted it. Rehearse it to see what it would do, against the
+  house right now, changing nothing. No playbook ever unlocks a door or disarms an alarm.
+- **[Overnight self-healing](/brain/self-healing/)** — **off by default**. Switched on, it
+  does three dull things while you are asleep and nothing else: starts an add-on that was set
+  to run at boot, pings a dead Z-Wave node, reloads an integration that failed to set up. Once
+  a night, inside your quiet hours, three at most, never on a protected entity, and no Claude
+  run anywhere on that path. The morning brief says what it did and whether it stuck.
+
 ## It learns, and everything reads what it learned
 
 Memory is one markdown document you can open and edit. brAIn writes to it from

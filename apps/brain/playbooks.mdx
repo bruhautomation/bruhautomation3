@@ -1,95 +1,164 @@
 ---
-title: Playbooks & Self-Healing
-description: Written from what your house actually has, accepted once, rehearsed on request — the capability that earns brAIn the right to act without asking. Plus overnight self-healing, and a scene designer that builds the looks your rooms are missing.
+title: Emergency Playbooks
+description: The automation you would want on a bad night — smoke, a leak, a freeze with the heating gone — written from what your house actually has, listed entity by entity, and run by Home Assistant only if you accept it.
 ---
 
 :::note[Requires brAIn 1.45]
-This page documents a release that is on its way. It is the last of the roadmap's ranked
-twelve, and the only part that lets brAIn act on your house unattended — read the diff
-before you enable it.
+This page documents a release that is on its way. Everything below is built and tested; it
+is not in the current add-on yet.
 :::
 
-Everything else brAIn does either reports or proposes. This is the part that **acts**, and
-it is deliberately last: the right to change something without asking has to be earned by
-everything above it working first.
+Every house can already detect smoke, and almost no house has written down what should
+happen next. Not because the response is hard to think of — because writing it means listing
+every light, every thermostat and every blind by hand, and then never testing it.
 
-## Emergency playbooks
+brAIn writes that automation for you, from your own registries, and offers it on the
+[Proposals](/brain/proposals/) tab.
 
-A playbook is a short, written response to one bad thing, built from what **your** house
-actually has:
+## brAIn never runs a playbook
 
-| Event | What a playbook does |
-| --- | --- |
-| **Smoke** | Unlock the doors it is allowed to, turn every light to full, stop the HVAC so it stops feeding air, announce on every speaker, tell everyone |
-| **Leak** | Close the shut-off valve if there is one, name the sensor and the room, kill power to the machine if it is on a smart plug |
-| **Power cut** | Report what is still up, what is on battery, what will not survive the night |
-| **Freeze** | From [the thermal model](/brain/climate/) — which rooms reach the floor first, and what heat is available |
+It **writes** one. Home Assistant runs it, if — and only if — you accepted it. There is no
+mode in which brAIn fires a playbook itself, and there is no setting that turns one on.
 
-brAIn writes it from your devices, you read it once and accept it, and you can **rehearse**
-it on demand — it walks the steps and reports what it *would* do, changing nothing.
+Accepting goes down the same path as any other proposal:
+[written, reloaded, verified](/brain/proposals/#saying-yes-and-taking-it-back), with the
+same four refusals, the same edit-journal snapshot, and the same Undo on the toast. What you
+end up with is an ordinary automation in your `automations.yaml`, with an id that says what
+it is (`brain_playbook_smoke`) when you open that file in six months.
 
-:::caution[A playbook you have not rehearsed is a document, not a plan]
-The rehearsal is the point. It is where you find that the "shut-off valve" is a switch that
-was renamed in March.
+## The three, and exactly what each does
+
+A playbook is only offered when your house has the sensor for it. Most houses get none of
+them, which is the ordinary answer rather than a failure.
+
+| Playbook | It runs when | What it does |
+| --- | --- | --- |
+| **Smoke or CO** | Any `smoke`, `carbon_monoxide` or `gas` binary sensor goes off | Every light to full brightness, heating and cooling off, blinds and curtains open, then it tells you — naming the room the detector that fired is in |
+| **Water leak** | Any `moisture` sensor goes off | Water valves closed, water switches off, water heaters off, then it tells you, naming the room |
+| **Freeze with the heating stopped** | The coldest room brAIn has [measured](/brain/climate/) is below 5 °C **and** its thermostat has been doing nothing for 30 minutes | **It tells you. Nothing else.** |
+
+The room is looked up when the automation fires rather than written into it, because a
+playbook watches every detector in the house and which one goes off is not knowable when it
+is composed.
+
+A few details are choices rather than oversights:
+
+- **Blinds, shades and curtains open. Garage doors and windows do not.** One is an exit
+  nobody drives through in a fire; the other lets air in.
+- **Both halves of the freeze condition are triggers *and* conditions.** Either can move
+  first, so whichever fires re-asks the other — a cold-room trigger on its own fires in a
+  house whose heating is working perfectly.
+- **The freeze playbook turns no boiler on.** brAIn cannot know why the heating stopped, and
+  a playbook that fires one up unattended is a different and much larger promise.
+
+## No playbook unlocks anything, ever
+
+Not under smoke, not as a setting, not with a flag.
+
+`lock` and `alarm_control_panel` are refused across every playbook brAIn can generate, and
+the rule is checked over the **finished automation** rather than over the branch that would
+have written one — a rule enforced where the config is built is a rule that holds for the
+branches somebody remembered.
+
+:::caution[This contradicts what "smoke unlocks the doors" sounds like, on purpose]
+A lock is the canonical protected entity. A smoke detector is the sensor in a house most
+likely to go off over burnt toast. Unlocking the house on a false alarm at three in the
+morning is the worst outcome anything on this page could produce, and a locked front door
+has never been what stopped somebody leaving a burning building from the inside.
+
+The smoke card says so where you decide, not only here.
 :::
 
-### The rules it acts under
+## Written from your registries, not by a model
 
-Every action a playbook takes is:
+No Claude run picks which valve closes or which lights come on. Which detectors exist, which
+lights they would turn up, which thermostats go off, which valves close: all of it is read
+straight from the registries in the snapshot the [house checks](/brain/checks/) already
+collect.
 
-- **Bounded.** It does the steps it was accepted with, and nothing it thought of at the time.
-- **Reversible.** What it changed is recorded, and `brain undo` puts it back.
-- **Announced.** You are told what it did, not asked to notice.
-- **Refused for a protected entity.** Locks, alarms and anything in `protected_entities` are
-  enforced in the MCP server — the one chokepoint every path to your house crosses — and not
-  in a prompt that can be talked around.
+A model choosing that would be a guess wearing a config, and a guess nobody can check
+afterwards — the automation looks exactly the same either way.
 
-## Overnight self-healing
+Claude is used for **one optional thing**: the paragraph on the card explaining what this
+does in plain English. If that run fails, the card keeps the deterministic sentence brAIn
+composed from the list, and nothing else changes.
 
-A small set of remediations brAIn is allowed to attempt while you sleep, each with a
-rollback and a line in the morning saying what it did:
+### How a water shutoff is recognised
 
-- Reload an integration that has stopped answering.
-- Restart an add-on that is `boot: auto` and stopped.
-- Re-enable a helper that something disabled.
-- Re-interview a Z-Wave node that has gone dead.
+Anything in the `valve` domain qualifies, because that is what the domain is. A **switch** is
+named by a person, so the word has to be a whole word: **`water`**, **`valve`**,
+**`stopcock`**, **`mains`** or **`shutoff`**, in the entity id or the friendly name.
 
-And a morning line: *"Overnight I reloaded the Hue integration, which had stopped answering
-at 02:14. Everything else was quiet."*
+`main` on its own is deliberately not on that list — `switch.main_bedroom_lamp` matches it,
+and a leak playbook that turns the bedroom lamp off is a playbook you delete. A shutoff
+called only "Main" is missed, which costs you a line on a card you can read. The other way
+round costs trust.
 
-The list is deliberately short and deliberately dull. Nothing here changes the *state of your
-house* — no lights, no locks, no climate. Every entry is an infrastructure action whose worst
-case is that it did not work, and each one is capped at a single attempt so a failing
-integration does not get restarted forty times before breakfast.
+The leak card says as much, and asks you to read the list before you accept: brAIn matched
+those by name, and a switch it read wrong is one it would turn off in a leak.
 
-:::note[It is off by default]
-Self-healing ships **off**. Turning it on is a decision about how much you trust everything
-above it, and that is not a decision an add-on should make on your behalf.
+## Every entity is on the card, by name
+
+Grouped by what happens to it, with the count — *"Every light to full brightness (12)"* —
+and the list beneath. Past twelve names in a group the card says how many more there are
+rather than quietly showing you a subset. **The automation itself is never capped**: an
+emergency playbook that turns on sixty of your eighty lights is one that was guessed at.
+
+Anything on your `protected_entities` list is shown as **Skipped: protected**, not silently
+left out. Seeing that brAIn knows the valve is there and knows it may not touch it is the
+point of showing it.
+
+Protection is asked here as well as at the writer — a card offering something brAIn will
+refuse to write is a wasted no.
+
+:::note[A playbook with nothing left to do is not offered]
+If protection or absence removes every action, what is left is a notification, and brAIn
+already sends those. The exception is **freeze**, which is a notification playbook by
+design, and says so on its own card.
 :::
 
-## Scene designer
+## Rehearse it
 
-brAIn knows your rooms, what is in them, and what you actually set them to — the Activity
-tab has been recording it. The scene designer proposes the scenes your house is missing:
+**Rehearse it — show me what it would do** is a disclosure on the card. Open it and brAIn
+reads the house right now and renders every call the playbook would make against each
+target's current state:
 
-> *You put the living room into the same four-light arrangement most evenings after 8pm.
-> Here it is as a scene called **Evening**, with the trigger that usually precedes it.*
+> *12 → on (3 already on) — Kitchen ceiling — off, Hall lamp — on, …*
+>
+> *1 → closed (open now) — Mains water valve — open*
 
-It reads the light map the same way the automation miner reads the logbook: **sets of states
-you put the house into together, that recur**. Each proposal is a scene you can preview,
-rename, edit, or decline — it goes through the [Proposals](/brain/proposals/) lifecycle like
-everything else brAIn offers.
+It **executes nothing**. It is fetched when you open it rather than with the card, because
+it reads every state in the house and a tab of five playbooks would ask five times before
+anybody looked at one.
 
-What it will not do is invent a look. A scene is a thing you have already demonstrated a
-preference for; a scene brAIn imagined is a scene nobody uses.
+:::caution[It deliberately does not use `automation.trigger`]
+Home Assistant's own *Run actions* would run the actions. That is not a rehearsal, it is the
+emergency.
 
-## Reading the diff
+A real rehearsal is setting the detector off on purpose and reading the automation's trace
+afterwards. The rehearsal here answers the question before it: *is this list right?*
+:::
 
-This is the one release worth opening the pull request for rather than trusting green CI.
-The tests are written the other way round from usual — **the refusals are tested harder than
-the actions**, because a playbook that fails to fire costs you one incident report, and a
-playbook that fires wrong costs you a house you no longer trust.
+## There is no trial button on a playbook
 
-Every guard in it is verified against the failure it exists for: the test suite mutates the
-guard, watches the test fail, and restores it. A guard that passes whether or not it is there
-is not a guard.
+Everything else on the Proposals tab offers [a week's trial](/brain/proposals/#the-lifecycle)
+graded against what you actually did. A playbook gets a sentence where that button would be:
+
+> *There is no week to try this against: a trial replays the days you have already lived,
+> and those days had no emergency in them. Rehearse it instead, or set the detector off on
+> purpose and read the automation's trace afterwards.*
+
+A button that cannot answer the question is worse than a sentence saying why.
+
+## Declining one, and getting it back
+
+A declined playbook is remembered by the **change**, not the sentence. Fit another detector
+and the automation is genuinely different, so it comes back. Reword the card and it does
+not.
+
+## Where to see it
+
+- **The Proposals tab**, with a **Playbook** pill on the card.
+- `GET /api/proposals` — the offer, with its groups, its skipped rows and its note.
+- `GET /api/playbook/{ts}/rehearsal` — every call it would make, against the house right
+  now. It writes nothing.

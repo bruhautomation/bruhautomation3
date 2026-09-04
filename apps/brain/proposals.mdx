@@ -219,10 +219,39 @@ cheaper mistake of the two.
 
 A pass offers at most three, strongest first. The rest are still in the ledger next time.
 
+### Emergency playbooks
+
+The other thing brAIn offers here, since 1.45: the automation you would want on a bad night —
+smoke or CO, a water leak, a freeze with the heating stopped — written from your own
+registries. brAIn never runs one; Home Assistant does, once you have accepted it.
+[Emergency playbooks](/brain/playbooks/) covers what each one does and what none of them
+will ever do.
+
+The card is the same card with four differences, because the evidence for a playbook is not a
+replay:
+
+- **A `Playbook` pill** in the head, so it does not read as a habit brAIn spotted.
+- **The list of what it would act on**, grouped by what happens to each group and counted —
+  *"Every light to full brightness (12)"* — with anything on your `protected_entities` list
+  shown as **Skipped: protected** rather than quietly left out. Seeing that brAIn knows the
+  valve is there and knows it may not touch it is the point of showing it.
+- **Rehearse it**, a disclosure that reads the house right now and renders every call against
+  each target's current state, changing nothing. It fetches when you open it, not with the
+  card — it reads every state in the house, and a tab of five playbooks would ask five times
+  before anybody looked at one.
+- **No trial button**, and the reason where the button would have been. A trial replays the
+  week you have just lived, and that week had no emergency in it.
+
+The card also carries the sentence saying what this one will never do — on the smoke playbook,
+that it will not unlock any door and will not disarm the alarm, because that is where somebody
+decides.
+
+Accepting one goes down the path above, unchanged. There is no separate switch.
+
 ### Still ahead
 
-Habits are the only thing brAIn proposes today. The conditions an over-ridden automation is
-missing — the [override ledger](/brain/findings/) already notices when you put something back
+Habits and playbooks are what brAIn proposes today. The conditions an over-ridden automation
+is missing — the [override ledger](/brain/findings/) already notices when you put something back
 — and one-off intentions that expire once they have fired are both planned, and neither is
 shipped. When they arrive they will come down the same lifecycle: a replay, a trial, and a
 press.
