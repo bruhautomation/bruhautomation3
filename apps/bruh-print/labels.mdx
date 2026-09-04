@@ -1,0 +1,113 @@
+---
+title: Labels, Stock & the Designer
+description: How a label is drawn, why the margin is 2mm, what the designer will and will not do to a barcode, and how templates keep an automation from printing fifty labels with a hole in them.
+---
+
+## One rendering, two consumers
+
+There is exactly one route from a label to dots. The preview PNG and the raster sent to the
+printer are the **same bitmap** with different endings.
+
+A preview drawn a second way would look right while the label came out blank — which is the
+kind of bug you only find standing at a printer.
+
+Nothing is anti-aliased anywhere. A thermal head is one bit deep, so a 50% pixel is a black
+one, and an anti-aliased hairline comes out solid.
+
+## Text is fitted by its ink
+
+Not by the font's metrics. `textlength` is the *advance* width — where the next glyph starts,
+not where this one ends — and the font's line box reserves room for ascenders and descenders
+the word may not have (DejaVu's is about 1.29em against a cap height of 0.73em).
+
+Fitting to those is how a word comes out touching one edge *and* filling barely half its box
+at the same time. Measured on "Rice" in a 40 × 12mm box: **0.60 of the height before, 0.96
+after**.
+
+### The margin is 2mm
+
+A LabelWriter's registration wanders, and the 450's head is three dot columns short of a
+2.25″ label. At 1mm you get text at the die cut every other label.
+
+It is a **default** — a saved stock carries its own margin and keeps it, which is what lets
+the default move without undoing anybody's measurement.
+
+## Barcodes are never scaled down to fit
+
+This is the one thing that must not happen. A barcode's module width has to be a whole number
+of dots: at 1.4 dots per module each bar rounds independently, so five equal bars come out
+1, 1, 2, 1, 2 — and the scanner reads the wrong widths.
+
+So a symbol that cannot fit at one whole dot per module is **reported**, never drawn smaller.
+An unreadable barcode looks exactly like a readable one until somebody scans it.
+
+Same rule for QR.
+
+:::note[The 2.25″ note]
+The 450's head is 672 dots at 300dpi, which is 2.24″ — and the cryo stock is 2.25″. The three
+extra dot columns are **clipped**, not scaled away, and a note says so. Scaling everything
+down half a percent to hide it is what makes a module width fractional.
+:::
+
+## The designer
+
+Drag elements around a canvas with snapping (drawable edges and centres, then other boxes,
+then a 1mm grid), alignment tools and nudge. Elements that can rotate have a ⟳ in the
+properties pane — it acts on the selected element, which is why it lives there and not on the
+toolbar.
+
+Anything that will not print correctly gets a **red outline**, collected by watching the
+notes list grow per element, so a new drawer cannot forget to report.
+
+The font picker's rows are rendered by the same text drawer the label uses — a CSS
+`font-family` preview would show you the browser's idea of a monospace font beside a label
+that prints in DejaVu Sans Mono.
+
+:::note[The designer previews the canvas; everything else previews the sheet]
+A 90°-turned tube wrap is a tall strip with its words on their side once it reaches the
+sheet — the right picture on the Quick and Templates tabs, and the wrong one under a drag
+overlay whose coordinates are the canvas's.
+:::
+
+## Templates
+
+A template is a saved label with blanks in it.
+
+**Its fields come from the label, never from the request.** The placeholders in the document
+are the truth about what it needs; a declared field that no longer appears anywhere is a box
+on the form that fills nothing.
+
+Substitution is plain string replacement, with **no expression language**. A template that
+can evaluate is one that can be made to evaluate something else by whoever sends the
+automation payload, and the value of a label expression language is close to zero against
+that.
+
+An empty field **warns** in the panel and **refuses** through the API — deliberately
+different: the panel has somebody looking at the preview, and the API call is usually an
+automation about to print fifty labels with a hole in them.
+
+## The remaining count is a control, not a readout
+
+Nothing on a LabelWriter reports a real level, so the count is an estimate and says so
+everywhere it appears. It drifts the moment somebody prints from another machine.
+
+A number you can see and cannot correct is a number you stop reading — so **the bar is the
+button**. Press it to set it right.
+
+You can turn the whole thing off (`track_remaining`), and when you do the count stops moving
+as well as stops showing. A hidden count that kept counting would be worse than none: turning
+it back on would reveal a number that had been quietly wrong for a month.
+
+## Print quality
+
+Two settings on the Printer tab, both sent to the printer in the order the CUPS DYMO path has
+sent them for twenty years:
+
+- **Density** — how dark. On ordinary thermal stock the printer's own default reads as faint.
+- **Quality** — text speed, or the barcodes-and-graphics mode. Graphics mode is 300 × 600, so
+  the printer steps the paper twice as finely and every raster line is sent twice.
+
+There is also a `bare` mode that sends the minimum. It exists because whether a given
+firmware accepts every command in the preamble is not something an add-on in a container can
+find out, and a printer that takes a job and prints nothing is otherwise a guessing game
+played one release at a time.

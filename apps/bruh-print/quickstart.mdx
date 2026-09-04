@@ -1,0 +1,92 @@
+---
+title: BRUH Print Quick Start
+description: Plug in the printer, tell the add-on what is loaded, and print — plus the two things that go wrong first and what they actually mean.
+---
+
+## 1. Install and grant USB
+
+Add the BRUH repository, install **BRUH Print**, and start it.
+
+The add-on needs the host's USB device tree mapped in. That is a **manifest permission** the
+Supervisor grants when it creates the container — there is no switch on the Configuration
+tab, and there never was.
+
+:::caution[It only takes effect on a restart]
+This is the commonest "it cannot see my printer". If the printer was plugged in, or the
+permission granted, after the container started — restart the add-on.
+:::
+
+If it still cannot see it: check the power brick (a LabelWriter needs its own supply, not
+just USB), check the cable, and check nothing else is holding the device — a CUPS add-on
+will.
+
+## 2. Tell it what is loaded
+
+Open the **Printer** tab and say which stock is in which bay. A LabelWriter genuinely cannot
+report this, and it is the fact everything else depends on.
+
+If you have a **Twin Turbo**, there are two bays. You will never pick one again: naming the
+stock has already named the bay, so there is no roll picker on the Quick tab, in the
+designer, on a template, on the card, or in the print services. Two ways to say where a label
+goes is one way to contradict the other.
+
+## 3. Print something
+
+The **Quick** tab is three things: say, see, do. Type a word, look at the preview, press
+Print.
+
+The autofit is the product here. It does not just pick a size — it tries **every way of
+breaking the words across lines** and takes the arrangement whose glyphs come out biggest.
+`Buffer A` is biggest on two lines; `9912` is biggest on one. Trying a single arrangement is
+what makes an autofit label look like it did not try.
+
+## Measuring your stock
+
+Two numbers describe a label and they are **not** interchangeable:
+
+- **across** lies across the print head
+- **feed** travels past it
+
+Getting them the wrong way round is the single most common way a label comes out rotated with
+the text off the edge — and nothing can work it out for you, because the printer feeds to the
+next die-cut gap and has no idea what shape the label was.
+
+So press **Print test**. It prints a ruler with millimetre ticks on both axes. Measure, and
+if the two are swapped, the stock's Edit dialog has *These are the wrong way round* as one
+press.
+
+## If the alignment is off
+
+There is a **print offset** per stock, signed, in millimetres, on both axes. It corrects
+where *the machine* puts the paper — the label, the preview and the design canvas are
+untouched, because the offset is not a change to anybody's layout.
+
+Print the ruler, measure the margins, and enter the difference. A shift that would push real
+**ink** off the label prints anyway and comes back with a note saying how much and past which
+edge.
+
+## Text direction
+
+Which way text sits on a label belongs to the **stock**, not the job. A 0.56 × 3.44 cryo wrap
+reads along the roll and a 2.25 × 1.25 label reads across it — always. So it is asked once,
+on the Printer tab, and nowhere else.
+
+"Automatic" says what it decided in the closed picker (*Text direction: automatic — along the
+roll*), because a setting you cannot check without printing one is a setting people override
+blindly.
+
+## Two silences that mean different things
+
+**Ask the printer** prints nothing; it asks the device for its status. If it says nothing
+came back, that is one of two things and the panel says which:
+
+- **The printer did not answer** — about the printer.
+- **There is no channel to ask on** — about the connection. The USB printer class defines a
+  one-way protocol and a two-way one, and devices routinely expose both. On a one-way
+  interface there is simply no endpoint to read from, and the printer is fine.
+
+Neither is ever rendered as *ready*. And a one-way interface **prints perfectly well** — this
+is not a printing fault.
+
+If you are ever standing at a printer wondering what the add-on found, press **USB details**:
+the descriptors are readable even from a device that answers nothing.

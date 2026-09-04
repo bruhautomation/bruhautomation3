@@ -1,0 +1,72 @@
+---
+title: BRight
+description: A music-driven light show director for Home Assistant. It listens to your music once, choreographs your LIFX bulbs and switch-driven party lights against what it heard, and keeps the whole show in sync with the speaker.
+template: splash
+hero:
+  tagline: Point it at a folder of music and a speaker. It analyses each track once, writes a show, and runs it in sync with the room.
+  actions:
+    - text: Quick Start
+      link: /bright/quickstart/
+      icon: right-arrow
+    - text: How a Show Is Built
+      link: /bright/shows/
+      icon: open-book
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bright
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What it is
+
+A Home Assistant add-on that turns your lights into a lighting rig for music. It analyses
+each track **once** — beats, sections, drops, chords, the melody, which drum hit each accent
+was — and compiles a show: a timeline of packets sent straight to your LIFX bulbs over the
+LAN, plus switches for anything that only knows on and off.
+
+Then it plays the track through a Home Assistant media player and runs the show against it,
+calibrated to how long *your* speaker actually takes to start.
+
+<CardGrid>
+  <Card title="Analysed once, played many times">
+    A track's analysis and its compiled show are files. Play it again and nothing is
+    recomputed.
+  </Card>
+  <Card title="Bulb-side effects">
+    A pulse is one packet that tells the bulb to run a waveform for eight beats — not
+    hundreds of packets a second. The bulb keeps the envelope; the network stays quiet.
+  </Card>
+  <Card title="Editable, not a black box">
+    Every show is a JSON script of *effects* you can open, edit and recompile. The automatic
+    director writes the same file format you would.
+  </Card>
+  <Card title="It tells you when it can't">
+    A speaker that never started, a media path Home Assistant will not serve, a folder
+    outside `/media` — each is a named step in one check, not a silent dark room.
+  </Card>
+</CardGrid>
+
+## What you need
+
+- **LIFX bulbs** on the same LAN — BRight talks to them directly over UDP, not through the
+  cloud.
+- **A media player** Home Assistant can `play_media` on.
+- **Music files under `/media`**, which is not an arbitrary confinement: a show plays its
+  track by handing the player a media-source URI, and Home Assistant only serves those for
+  files under the media folder. A folder outside it analyses perfectly and never plays a
+  note.
+- Optionally, a **Claude login** — the director writes better shows than the built-in
+  algorithmic choreographer, and falls back to it automatically.
+
+## The order things want to happen in
+
+1. **Light Map** — tell BRight where the lights are and what each one is for.
+2. **Library** — point it at your music and let it analyse.
+3. **Calibrate** — measure how long your speaker takes to start playing.
+4. **Shows** — compile a show for a track, and watch it in the editor.
+5. **Party** — tick the tracks, press Play.
+
+Steps 1 and 3 are the ones people skip and then wonder why the lights are early.

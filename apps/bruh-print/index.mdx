@@ -1,0 +1,82 @@
+---
+title: BRUH Print
+description: A DYMO LabelWriter driver and label designer for Home Assistant — a full designer in the sidebar, fill-in-the-blank templates, one-word autofit, Twin Turbo roll selection, and a Lovelace card.
+template: splash
+hero:
+  tagline: Plug a DYMO LabelWriter into your Home Assistant box and print from the sidebar, from a template, from an automation, or from a card on your dashboard.
+  actions:
+    - text: Quick Start
+      link: /bruh-print/quickstart/
+      icon: right-arrow
+    - text: Labels & Stock
+      link: /bruh-print/labels/
+      icon: open-book
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bruh-print
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What it is
+
+A Home Assistant add-on that drives a USB DYMO LabelWriter directly — no CUPS, no spooler,
+no PPD, no filter chain. About 300 lines speaking the printer's own raster protocol over a
+bulk USB endpoint, which is the same shape the CUPS DYMO path has printed with for twenty
+years, minus four more places for a job to get stuck.
+
+<CardGrid>
+  <Card title="A real designer">
+    Text, barcodes, QR, images and shapes, dragged into place with snapping, alignment and
+    nudge — in the sidebar, not a separate app.
+  </Card>
+  <Card title="One word, biggest possible">
+    Type `Rice`, get `Rice` at the largest size that fits — chosen by trying every way of
+    breaking the words across lines, not just one.
+  </Card>
+  <Card title="Templates">
+    A saved label with blanks. Fill them in on the panel, or from an automation.
+  </Card>
+  <Card title="It knows what is loaded">
+    A LabelWriter cannot tell you what stock is in it. BRUH Print remembers — and refuses the
+    one print that ruins a roll.
+  </Card>
+</CardGrid>
+
+## What you need
+
+- A **DYMO LabelWriter** on USB. The 450 family is the reference; an unrecognised model is
+  **driven, not refused** — it gets the 450's geometry and its twin-roll flag is read from
+  the device's own product string.
+- Home Assistant on a machine you can plug it into.
+- The add-on's **USB permission**, which is a manifest permission the Supervisor grants when
+  it creates the container — not a switch on the Configuration tab. It takes effect on the
+  next **restart**.
+
+## The one thing it refuses
+
+Sending a 2.25″-wide raster to a 0.56″ roll prints across the liner — once per copy, with no
+error anywhere. A run of fifty ruins fifty labels.
+
+So a **stock/roll mismatch** is the single reason a print is refused. Everything else that
+could be wrong — a barcode that will not fit, an image that could not be read, a fixed font
+size that clips — comes back as a **note** beside a label that still prints.
+
+A refusal is always somebody unable to work.
+
+## Printing from Home Assistant
+
+| Service | What it does |
+| --- | --- |
+| `bruh_print.print_text` | One line (or a few words), autofitted |
+| `bruh_print.print_template` | A saved template with its blanks filled in |
+| `bruh_print.print_label` | A full label document |
+| `bruh_print.reprint` | The last thing, again |
+| `bruh_print.set_roll` | Record what you just loaded |
+| `bruh_print.print_test` | A ruler label, for measuring |
+
+Plus a **Lovelace card** for the dashboard, which reads the sensors and calls the services —
+never the panel. It runs in whoever's browser is looking, which may be a phone on mobile data
+through Nabu Casa; it has no route to the ingress port and no business having one.

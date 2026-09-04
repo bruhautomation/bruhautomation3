@@ -449,6 +449,22 @@ export default defineConfig({
 							],
 						},
 						{
+							label: 'BRight',
+							items: [
+								{ label: 'Overview', slug: 'bright' },
+								{ label: 'Quick Start', slug: 'bright/quickstart' },
+								{ label: 'How a Show Is Built', slug: 'bright/shows' },
+							],
+						},
+						{
+							label: 'BRUH Print',
+							items: [
+								{ label: 'Overview', slug: 'bruh-print' },
+								{ label: 'Quick Start', slug: 'bruh-print/quickstart' },
+								{ label: 'Labels, Stock & the Designer', slug: 'bruh-print/labels' },
+							],
+						},
+						{
 							label: 'BRUH Minecraft',
 							items: [
 								{ label: 'Overview', slug: 'bruh-minecraft' },
