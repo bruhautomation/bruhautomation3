@@ -1,11 +1,15 @@
 ---
 title: Proposals
-description: brAIn watches what you do by hand, finds the patterns, and offers the automation — with a replay against your own history and a week-long trial before anything is ever enabled. The tab where brAIn offers something rather than reports something.
+description: brAIn watches what you do by hand, finds the patterns, and offers the automation — with a replay against your own history, a week-long trial graded against what you actually did, and an accept that writes a real automation you can undo. The tab where brAIn offers something rather than reports something.
 ---
 
-:::note[Requires brAIn 1.42–1.43]
-The Proposals tab, the replay and routine mining land in **1.42**. One-off intents and the
-missing-condition proposals derived from the override ledger are on their way in 1.43.
+:::note[Requires brAIn 1.44]
+**1.42 shipped the tab and half the lifecycle.** The Proposals store, the
+[replay](/brain/replay/) and the routine miner all landed there — but pressing *Try it for a
+week* set a status and an end date and nothing ever looked at the week, and pressing *Enable
+it* recorded a status without creating an automation. Both are real in **1.44**: the trial is
+graded on every checks pass, and an accept writes the automation, reloads Home Assistant and
+checks it is running before the row leaves the list.
 :::
 
 People automate less than a tenth of what they do by hand. Not because the rest is hard —
@@ -43,26 +47,135 @@ proposed  →  trialling  →  accepted
 **Proposed.** brAIn has found a pattern and written the automation. Nothing is enabled.
 You see what it would do, and the [replay](/brain/replay/) against your own last month.
 
-**Trialling.** You press *Try it*. The automation runs **in shadow** for seven days — it
-evaluates against live events and logs what it *would* have done, calling nothing. At the
-end you get a report:
+**Trialling.** You press **Try it for a week**. Nothing is created, nothing is called and
+nothing subscribes to your events. The trial is a **replay of the week as you live it**:
+every checks pass, brAIn replays the proposed automation over the days since you started it
+and grades each firing against the ledger of changes *you* made by hand. The card fills in as
+the week goes on rather than staying blank until Sunday —
 
-> *It would have fired 6 times. On 5 of those you did the same thing by hand within 3
-> minutes. On 1 you did not.*
+> *It would have fired 6 times. On 5 of those you did the same thing by hand.*
 
 **Accepted.** It becomes a real automation in your `automations.yaml`, and it is yours —
-edit it, disable it, delete it, like any other.
+edit it, disable it, delete it, like any other. See
+[Saying yes, and taking it back](#saying-yes-and-taking-it-back).
 
 **Declined.** It goes away, and you can say **why** in a sentence. That sentence is the half
 that teaches, exactly as a finding's *Wrong* does: *"the hall light stays on because my
 partner works nights"* is a fact brAIn did not have, and it stops the same proposal coming
 back in different words next month.
 
-:::caution[Nothing brAIn writes is ever enabled without a trial]
-Not by default, and not silently. The trial is the whole point — an automation you accepted
-after watching it be right five times out of six is a different thing from one you accepted
-because it sounded reasonable.
+A declined proposal is remembered by the **change** it described, not by the sentence
+describing it — so a miner that rewords its own explanation is still offering something you
+have already answered, and it will not come back.
+
+:::caution[Nothing brAIn proposes is ever enabled on its own]
+The trial changes nothing and calls nothing, and the automation only exists once you press
+**Enable it** or **Keep it**. You *can* press it straight away without trialling — nothing
+stops you — but then it is a suggestion you liked rather than one you watched, and an
+automation you accepted after seeing it be right five times out of six is a different object
+from one you accepted because it sounded reasonable.
 :::
+
+### The three verdicts
+
+Every firing the replay finds lands in exactly one bucket, decided by the **nearest** press,
+so a verdict never depends on the order the ledger happens to be in:
+
+- **Agreed** — you put the same thing in the same state within a **quarter of an hour** of
+  the moment it would have fired.
+- **Nothing happened** — weak evidence either way, and it is named for what it is rather than
+  counted against the change.
+- **You did the opposite** — you put the entity to the opposite state inside that window. You
+  would have undone it, which is the one answer worth having, and it is deliberately not
+  folded into the second.
+
+A press that puts the entity somewhere else entirely is not evidence about a proposal to turn
+it *on*, so it leaves that firing unanswered rather than counting against it.
+
+When the week is up the row stays where it is with its report attached. Ending a trial is
+your press, not brAIn's — there is no seventh-day deadline that quietly decides for you.
+
+### What a trial cannot grade
+
+Two silences, and they are not the same one. *"It would never have fired"* is about the
+automation; *"brAIn cannot replay this"* is about brAIn, and the trial says which rather than
+reporting a confident zero. The [replay's own limits](/brain/replay/) are carried through
+verbatim.
+
+There is a third: an action that is not **one entity going to one state** — a scene, a
+script, three service calls in a row — has nothing single to grade your press against, and
+guessing which of them counts is how a confident wrong number gets made. Those trials report
+that instead of a score.
+
+## Saying yes, and taking it back
+
+**Accept writes a real automation.** It is appended to `automations.yaml` with an `id` of
+`brain_<proposal id>`, the proposal's title as its alias, and a description saying where it
+came from. Your file is not reformatted: the automation goes on the end and everything above
+it is left byte-for-byte as you wrote it, comments, ordering and quoting included.
+
+Then three things have to be true before the row leaves the list, and they are three
+different claims that were being reported as one:
+
+1. **The file was written.**
+2. **Home Assistant read it** — `automation.reload`.
+3. **The automation exists** — the new `automation.<name>` entity actually turns up.
+
+Only the third is what you meant by pressing the button. A `mode:` Core does not recognise, a
+trigger from a custom integration that has not loaded, a read-only `/config` — each of those
+leaves a file on disk and a reload that returns quite happily with no automation behind it.
+
+If any of the three fails, brAIn **puts the file back**, reloads again, and tells you what it
+tried in a sentence. A yes it could not honour is not a yes it records: the proposal is
+exactly where it was, with no memory line and no settled entry, ready to press again once the
+reason is fixed.
+
+When it works, the settled entry keeps the `automation_id` and the `entity_id` — *"accepted"*
+and *"accepted, and here is what it became"* are different claims, and only the second can be
+checked against the house six months later. You also get a notification about it, worded as a
+change you asked for rather than as a problem brAIn found, and it is **sent** rather than held
+for quiet hours: it answers a press you made seconds ago.
+
+### Undo
+
+**The toast carries an Undo for five minutes**, and it reverses all three effects or says
+which one it could not. The automation is removed, Home Assistant is reloaded, and the
+proposal comes back on the list under its own id — along with the memory line the accept had
+queued. A trial that was still running when you accepted it comes back as a **proposal**
+rather than as a trial whose week has since passed, because *try it for a week* is a promise
+about the next seven days.
+
+If the file cannot be put back it says so rather than claiming a success, because the
+automation is still running and an undo that lied about that would be worse than one that
+reported the failure.
+
+`automations.yaml` is snapshotted into the same edit journal that records Claude's own edits
+**before** it is touched, so **`brain undo`** in the terminal reverts an accepted proposal
+exactly as it reverts anything else brAIn changed — there is no second undo mechanism to keep
+true. See [the CLI](/brain/cli/#undo).
+
+### Four things stop an accept, each in a sentence
+
+- **A protected entity.** Anything in the add-on's `protected_entities` option — locks,
+  alarms, whatever you listed. That rule is enforced in the MCP server, at the chokepoint
+  every *Claude* path to your house goes through, and a YAML file the panel writes is not one
+  of its callers — so this path asks the same question the same way. An action naming an
+  **area or a device** rather than named entities is refused outright while the list is not
+  empty, because resolving one needs registries this does not have, and a protected entity
+  reached through its area is the bypass.
+- **No `automation: !include automations.yaml`.** With packages, a split config or
+  `automation manual:`, your automations live somewhere brAIn cannot find, and appending to a
+  file Home Assistant does not read is a change that silently does nothing. The refusal names
+  the line it looked for rather than guessing at another file.
+- **An `automations.yaml` that is not a list of automations.** That is your config in a shape
+  brAIn does not understand. (An empty or missing file it will create, exactly as Home
+  Assistant does.)
+- **A duplicate `id` or name.** Two automations with one id is a config Core refuses to load;
+  two with one alias is a house where nobody can tell which is which.
+
+The habit miner drops a protected entity too, one layer earlier — the writer has to refuse
+one, being the last gate before `/config`, but a card offering something brAIn will not do is
+a wasted no.
 
 ## What gets proposed
 
@@ -106,27 +219,13 @@ cheaper mistake of the two.
 
 A pass offers at most three, strongest first. The rest are still in the ledger next time.
 
-### Conditions an automation is missing
+### Still ahead
 
-The [override ledger](/brain/findings/) already notices when you put something back after an
-automation moved it. Past a certain rate, that is the automation being wrong about your
-house rather than you being inconsistent:
-
-> *`Evening lights` is overridden on 40% of weekday evenings — always when the office is
-> occupied.*
-
-The proposal is the missing condition, with a trial.
-
-### One-off intents
-
-The sentence people actually try to say to their house, which no automation model fits:
-
-> *"Turn the porch light off when the guests leave."*
-
-There is no trigger for *the guests leaving*. brAIn works out what that means in your
-house — the last phone that is not a household member's disconnecting from wifi, the front
-door closing after it — writes it, shows you, and **expires it** once it has fired. A
-one-off is not an automation; it is an intention with an end.
+Habits are the only thing brAIn proposes today. The conditions an over-ridden automation is
+missing — the [override ledger](/brain/findings/) already notices when you put something back
+— and one-off intentions that expire once they have fired are both planned, and neither is
+shipped. When they arrive they will come down the same lifecycle: a replay, a trial, and a
+press.
 
 ## Where to see it
 
@@ -134,9 +233,3 @@ one-off is not an automation; it is an intention with an end.
 - `GET /api/proposals` — the store as JSON.
 - Declines are recorded with their note, so the scorecard can show which producers earn
   their place. A proposal source that gets declined nine times out of ten stops proposing.
-
-## What brAIn will not propose
-
-It will not propose anything that touches a **protected entity** — locks, alarms, anything
-you have listed in the add-on's `protected_entities` option. That restriction is enforced in
-the MCP server, at the one chokepoint every path to your house goes through, not in a prompt.
