@@ -1,0 +1,79 @@
+---
+title: House Checks
+description: Deterministic checks that find what is broken in your house without spending a token — and clear themselves when it is fixed. Around thirty rules over your automations, devices, registry, dashboards and the machine underneath.
+---
+
+Every finding brAIn filed used to come out of a Claude run. Both the analyst and study
+sessions are told that an empty list is the honest answer, so most of those runs spent tens
+of thousands of tokens to report nothing — while the problems that are *deterministically*
+visible were found only when a model happened to look in the right place.
+
+A **house check** is a pure function from one snapshot of your house to a list of findings.
+It reads the same registries, states, statistics and traces the analyst reads, and it calls
+Claude **never**.
+
+## What that changes
+
+The model's job stops being *discovery* and becomes *judgement*: the checks hand it a
+ledger, and it answers "what do these miss, and which of them matter in this house?"
+
+## What gets checked
+
+| Family | Examples |
+| --- | --- |
+| **Automations** | A trigger watching an entity that no longer exists; one that can never fire; two rules that undo each other; a rule you keep overriding |
+| **Devices** | Unavailable for a day; a Z-Wave node gone dead; a Zigbee device that has stopped reporting; a reading that is physically impossible |
+| **Registry** | Entities with no area; a helper nothing uses; a device with no entities; a name that is still a hex string |
+| **System** | An add-on that was meant to be running and is stopped; a recorder database growing without limit; no backup in a fortnight; disk filling |
+| **Forecasts** | A battery with a date on it; a device whose behaviour is declining; storage that will be full |
+| **Baselines** | A reading far outside its own normal; a slow drift the band cannot see |
+| **Bedtime** | Something open that is usually shut at this hour |
+| **Chores** | The washing finished and is still in the machine |
+| **Climate** | [Five of them](/brain/climate/) |
+
+## Three rules that make them trustworthy
+
+**A check that fires on a healthy house is worse than no check.** It is the one people learn
+to ignore first, and after that they ignore the rest. Every rule has a floor or a window for
+this reason, and the producer scorecard on the Findings tab is what proves each one earns its
+place in *your* house.
+
+**"I could not look" and "it went away" are different claims.** A check whose data was
+unavailable — the recorder was busy, a WebSocket call timed out — reports nothing, which is
+indistinguishable from the problem being fixed. So brAIn records which checks actually
+**ran**, and only those are allowed to clear a row. ⚙ → Diagnostics names the ones that could
+not run, and why.
+
+**Finding text is stable across runs.** The store deduplicates by wording, so a number that
+changes — "9 days left", "unavailable for 27h" — lives in the detail rather than the title.
+Otherwise every hour would file the same problem as a new one.
+
+## Clearing
+
+A problem that goes away on its own is **not** a fact about your house. When a check that
+ran no longer reports a row, the row is removed — with no memory line and no ledger entry.
+If it comes back, the check files it again.
+
+That is different from *you* ending a finding, which writes a line into memory and remembers
+the wording so the same problem is never raised at you twice.
+
+## Running them
+
+- **Automatically**, every few hours (`checks_interval_hours`), plus one pass around your
+  house's measured bedtime so the bedtime check is ever awake to fire.
+- **`brain check`** from the terminal.
+- **`POST /api/checks/run`**.
+
+A whole pass costs no tokens and takes seconds.
+
+## When you hear about them
+
+Findings go through the notification router, which decides **whether**, **when** and **to
+whom** — urgency is declared per producer rather than per finding, because a `critical`
+battery forecast is three weeks out and a `warning` about a boiler that has stopped
+answering is now.
+
+Quiet hours **hold** rather than drop: anything raised overnight arrives as one message when
+the quiet ends, minus anything that resolved itself while it waited. Being told at seven
+about a problem that went away at four is exactly how these messages stop being about
+anything.

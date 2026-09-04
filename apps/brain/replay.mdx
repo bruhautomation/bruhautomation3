@@ -1,0 +1,107 @@
+---
+title: Shadow Runner & Replay
+description: Before any automation is enabled, brAIn runs it against the last month of your recorded history and tells you exactly when it would have fired and what it would have done — calling no service and touching nothing.
+---
+
+:::note[Requires brAIn 1.42]
+This page documents a release that is on its way. Everything below is built and tested; it
+is not in the current add-on yet.
+:::
+
+The difference between a suggestion and a decision is a number from history.
+
+Every proposal brAIn could make — *automate this*, *add this condition*, *this rule is wrong
+for your house* — is a guess until somebody enables it and lives with it for a week. That is
+exactly the commitment nobody wants to make on a guess, so the proposals never got made and
+the house went on being programmed by hand.
+
+The **shadow runner** is the other half. It takes an automation — one brAIn wrote, or one
+already in your house — and evaluates its triggers and conditions against the **recorded
+past**, reporting when it would have fired and what it would have done. It calls no service.
+It touches nothing.
+
+## What you get back
+
+> *Over the last 30 days this would have fired **26 times**. On 4 of those a condition
+> would have blocked it, so it would have run **22 times**. It would have called
+> `light.turn_off` on `light.kitchen`.*
+
+Answered in seconds, before anything is enabled.
+
+## Where to use it
+
+| Where | What it answers |
+| --- | --- |
+| **Proposals tab** | Every proposal shows its replay before you accept it |
+| **Any existing automation** | "What has this actually been doing?" — including ones you did not write |
+| `POST /api/replay` | The same answer, for an automation config you supply |
+
+## The four trigger kinds, and why the refusal is the feature
+
+Replay covers **`time`**, **`state`**, **`numeric_state`** and **`template`** triggers.
+Those are the four the recorder can reconstruct: a time trigger is arithmetic, and the other
+three are answered by state changes Home Assistant already keeps.
+
+A `webhook`, an `mqtt` message, an `event`, a `device` trigger — none of those is in the
+recorder in a form anything can replay.
+
+:::caution[A partial replay is worse than no replay]
+Reporting *"this would have fired twice"* about an automation whose webhook fires forty
+times a day is a confident wrong number that reads exactly like a right one — and it is the
+number somebody would decide on.
+
+So an automation carrying **any** unsupported trigger is refused **whole**, naming the kind.
+Never trimmed to the replayable subset.
+:::
+
+You will see the refusal in as many words:
+
+> *A `webhook` trigger cannot be replayed — the recorder does not keep what it fires on, so
+> brAIn would be guessing at how often it fired. Replay covers time, state, numeric_state
+> and template triggers.*
+
+## Templates are replayed against the world as it was
+
+A template trigger is a Jinja expression over the whole state machine, and a replay has a
+state machine only for the entities it fetched history for. So:
+
+- The template is parsed for the entities it names, and **every one of them has to be in the
+  timeline**. A template reading a sensor with no recorded history is refused, not rendered
+  against a blank — a blank reads as `unknown`, which reads as `false`, which is a confident
+  *no*.
+- Only a named set of Home Assistant's own helpers is allowed: `states`, `is_state`,
+  `state_attr`, `is_state_attr`, `has_value`, `now`, `as_timestamp`, `float`, `int`.
+  Anything else — a custom filter, `expand`, a bare `states` iteration — is refused **by
+  name**.
+
+## The details that decide whether a number is right
+
+**`for:` is a promise about a stretch of time**, not an instant. A state trigger with
+`for: 00:05:00` fires only where the entity then *stayed* that way for five minutes — a
+question about the next sample, not this one. A three-minute door blip does not count.
+
+**`numeric_state` is a crossing, never a level.** Home Assistant fires when a value moves
+*into* the range, not for every sample it spends inside one. A replay that reported the level
+would be reporting a reading rather than a trigger.
+
+**An area or device target is recorded and deliberately not resolved.** Expanding one needs
+the entity registry as it was at the time, and a wrong expansion would tell you a proposal
+touches lights it does not.
+
+## The bounds
+
+| Bound | Why |
+| --- | --- |
+| **30 days** maximum window | The recorder's default purge is ten days and most houses leave it there — past this the window quietly becomes a window over nothing |
+| **500 firings** maximum | More than that is a trigger watching something that changes constantly rather than an automation, and the number is the sampling. brAIn says so and suggests a `to:` or a `for:` |
+| A condition it cannot evaluate | Refused, not assumed — a guessed condition silently changes the count |
+
+## What it is not
+
+It is **not** a simulator of your house. It replays triggers and conditions against what was
+recorded; it does not model what would have happened *differently* had the automation been
+running. If the proposal would have turned a light off at 23:05, the replay says so — it
+does not then re-simulate the evening with that light off.
+
+That is the honest limit, and it is why a proposal still gets a **trial** before it is
+enabled for real.

@@ -1,0 +1,154 @@
+---
+title: What brAIn Measures
+description: "\"Unusual\" is a word until something measures it. Every night brAIn works out what your house normally does — per sensor, per hour of the week — so the alerts it raises are about your home rather than about a number somebody guessed."
+---
+
+Most smart-home alerts are a threshold somebody typed into a box. *Tell me if the freezer
+goes above −15.* *Tell me if power draw exceeds 2 kW.* They work in the house they were
+written for and nowhere else, and the first time one fires on an ordinary Tuesday you stop
+reading them.
+
+brAIn does the opposite. Once a night it measures what **your** house normally does, and
+every rule it raises is expressed against that measurement. Nothing here costs a Claude
+turn — it is arithmetic over history Home Assistant already keeps.
+
+## What gets measured
+
+| Engine | The question it answers | Needs |
+| --- | --- | --- |
+| **Baselines** | What does this sensor normally read *at this hour of this day of the week*, and how far does it normally stray? | Any sensor with a `state_class` |
+| **Closures** | How much of this hour is this door, window, lock or cover normally open? | Doors/windows/locks/covers |
+| **Appliances** | What does this machine's power look like when it is idle, running, and finished? | A power sensor (a smart plug is enough) |
+| **Rhythm** | When does this house actually get up, and when does it settle? | The action miner |
+| **Thermal** | How fast does each room lose heat, and how fast can anything put it back? | One outdoor thermometer + indoor ones in areas |
+
+The first pass runs overnight. Most engines want about a month of history before they will
+answer at all, and every one of them says *"not measured yet"* rather than guessing.
+
+## Why an hour of the week, and not just an hour
+
+A weekday 7am is not a Sunday 7am in anybody's house. Bucketing by hour alone smears the
+two together and produces a "normal" that is wrong on all seven days rather than on none.
+
+The buckets are in **your** timezone, not UTC — a baseline built in the wrong timezone is
+your evening filed as your morning, and from the outside it looks exactly like one that
+works.
+
+## Spread is a median, not an average
+
+The width of "normal" is a **median absolute deviation**, not a standard deviation. One
+meter that spiked when the oven came on sets a standard deviation wide enough that nothing
+can ever fall outside it — the band becomes a band that catches nothing, and the feature
+looks like it is working right up until you need it.
+
+:::note[A reading that never moves has no spread]
+Divide by it and every change is infinite. A sensor whose whole history is one value is
+reported as **flat** — no baseline — rather than as an exquisitely sensitive one.
+:::
+
+## What "unusual" has to clear
+
+`base.unusual` is the check most able to fire on a healthy house, so it carries the most
+floors:
+
+- **Six spreads.** A median absolute deviation is about ⅔ of a standard deviation, so the
+  bar is higher than the number sounds.
+- **Nine spreads** when the answer came from the sensor's whole history rather than from
+  this specific hour — a weaker measurement gets a higher bar.
+- **A minimum absolute move.** Six spreads of a band 0.02 wide is 0.12 °C, which is not
+  news.
+- **A cap.** More than a handful of rows at once means the *baseline* has stopped
+  describing the house — a heating season starting, a meter replaced — so it says nothing
+  at all rather than reporting the measurement.
+
+## A drift is invisible to the band
+
+This is the one worth understanding, because it is why there are two checks and not one.
+
+A freezer that has warmed 6 °C over a month has samples of 0, 2, 4 and 6 in its bucket. The
+median is 3 and the spread is 2, so today's 6 is one and a half spreads out — nowhere near
+the six it needs. **The band moves with the drift.** It is not badly tuned; it structurally
+cannot see this.
+
+So brAIn fits a line as well. On a real month-shaped drift, measured: **2.3 spreads to the
+band, 16 to the trend.** `forecast.decline` reports it, and `base.unusual` stands down for
+anything the trend already claims — one sensor, one card, one fix.
+
+A drift has to clear four floors before it is reported:
+
+- Both halves of the window agree on a direction — that is what tells a drift from a
+  season turning (a V) and from a meter being replaced (a step).
+- The move is bigger than its own noise.
+- **Five thermometers drifting together is the weather**, not a device, so the whole device
+  class stands down and what is left is the one room doing something the others are not.
+- Past a handful of rows, silence.
+
+## Doors are measured differently
+
+A door has no median. What a closure gets instead is **how much of each hour of the week it
+is open** — seconds open over seconds observed.
+
+Three rules keep it honest:
+
+- **Only closures.** A hall motion sensor is "on" every evening, and including it buries
+  the one row that matters.
+- **Time-weighted, never sampled.** A door open ten minutes and one open ten hours look
+  identical to something that catches each once, so the answer would be about the polling
+  rather than about the door.
+- **A bucket has to have been watched.** "Never open then" and "never looked then" are
+  different answers, and every rule that reads one branches on which it got.
+
+That is what makes `evening.left_open` possible: *something is open that is usually shut at
+this hour* — checked around the time your house actually settles, and silent about a door
+that is normally open then anyway.
+
+## Appliances have two humps, not a middle
+
+`> 10 W` is a running dishwasher in one house and a phone charger in the next. So each
+machine is measured from ten days of its own five-minute history, looking for the shape an
+appliance has: **hours near a floor, punctuated by runs well above it.** A sensor without
+that shape — a router, a fridge's standing draw — gets no profile rather than a guessed
+threshold.
+
+The part that matters is the waiting. A dishwasher's dry phase draws almost nothing for
+twenty minutes, so "done the moment the power drops" would say done three times a cycle.
+That quiet phase is measured too: the gaps between draws fall into two groups — lulls
+inside a cycle, idles between them — and **the jump between the groups is the machine's own
+answer** to how long its quiet phases last.
+
+:::caution[It cannot see that you emptied it]
+An empty machine and a full one draw exactly the same watts. So the chore ends the way any
+finding does — tick it off in the To-do app, press the notification button, or press it in
+the panel. It also clears itself if the machine runs again.
+:::
+
+## Rhythm: when this house gets up
+
+Everything brAIn does on a schedule used to happen at an hour somebody typed into a box, and
+07:00 is early on a Sunday and late on a Tuesday in the same house.
+
+The house already answers this. The action miner files every change under what caused it,
+and **the first change caused by a person is the house waking up** — not a motion sensor
+(it fires for the cat and for the heating), not a light (an automation does that at dawn),
+but somebody actually doing something.
+
+Weekdays and weekends are measured **apart**, because one number over both is wrong on all
+seven days. That costs time: a weekend accrues two days a week, so it takes about five
+weeks to exist. From the outside that looks like a bug; it is the floor doing its job.
+
+:::note[The median is circular]
+Settle times sit either side of midnight, and four of them within forty minutes of it have a
+straight median of **12:00** — not a small error, the opposite side of the day. Everything
+here is measured around the clock.
+:::
+
+## Where to see it
+
+- **⚙ → Diagnostics** shows what has been measured and when, for every engine — including
+  the ones that could not run, and why.
+- `GET /api/baselines` and `GET /api/appliances` return the measurements themselves.
+- `brain doctor` reports the same from the terminal.
+
+A measurement that has stopped is itself a finding: `base.stale` exists because every
+baseline check silently says nothing while the store is stale, and that is indistinguishable
+from a house with nothing odd in it.

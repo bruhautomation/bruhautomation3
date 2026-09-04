@@ -1,0 +1,147 @@
+---
+title: Heating & Climate
+description: brAIn measures how fast each room in your house loses heat and how fast anything can put it back, then uses those two numbers to tell you the heating starts too late, a window is open, or the pipes are at risk — none of which any single state in Home Assistant can say.
+---
+
+Every climate question people actually want answered is the same two numbers about a room:
+
+- *Start the heating so the bedroom is warm **when we get up**.*
+- *Is a window open, or is it just cold outside?*
+- *Will the pipes freeze by morning?*
+- *What would a 17 °C overnight setback actually cost?*
+
+Without those numbers each one is a threshold somebody guesses at — and a threshold that is
+right in one house is wrong in the next. A stone cottage and a new flat lose heat an order
+of magnitude apart, and so do two rooms of the same house.
+
+## The two numbers
+
+They are Newton's:
+
+| | What it is | What it means |
+| --- | --- | --- |
+| **`k`** | Loss coefficient, per hour | How fast the room falls towards outside. Its reciprocal is the **time constant** — "this room holds its heat for about eight hours" |
+| **`h`** | Gain, in degrees per hour | How fast anything puts the heat back |
+
+Both are measured per room from a month of hourly history, against **one** outdoor
+reference — and the reference brAIn picked is recorded where you can see it, because every
+`k` in the house is measured against that one choice.
+
+## What you need
+
+- **One outdoor temperature sensor.** Named something obvious ("Outside temperature") or
+  simply not assigned to an area — that is what a weather integration's own sensor usually
+  looks like.
+- **At least one indoor thermometer that is in an area**, so a finding can name a room.
+- Both reporting in the **same unit**. `k` is unit-free only while both halves of the
+  difference are in the same degrees; a Fahrenheit reference against a Celsius room is a
+  loss rate wrong by 1.8, with nothing downstream able to tell.
+- About a month of history, and some variation in the weather.
+
+With no outdoor sensor there is no model at all, and **⚙ → Diagnostics says so in words**.
+Every number here is a *difference* from outside, so without one there is nothing to measure
+a room against — and "no climate findings" and "no room could be measured" look identical
+from every other surface.
+
+## The measurement is taken at night, on purpose
+
+A south-facing room warms with the heating off. A fit that includes an afternoon reports a
+room that *gains* heat as it gets colder outside — confidently, and in every house with a
+window facing the sun.
+
+So `k` is measured only in the deep-night hours: no sun, and in most houses no schedule
+either. Measured on a simulated sunny room, the all-day fit is refused outright while the
+night fit lands on the physics.
+
+:::note[A freezer has a temperature device class too]
+So does a hot water tank and a barbecue probe, and each would fit beautifully. A *room* is a
+reading that spends the month inside a band people live in — anything else is a temperature
+that is not a room's.
+:::
+
+## The five findings
+
+| Check | What it catches |
+| --- | --- |
+| `climate.underheated` | A room asked for a temperature it never reaches |
+| `climate.heat_loss` | A room that empties much faster than the rest of the house |
+| `climate.preheat` | The heating starts too late — the room gets warm *after* everyone is up |
+| `climate.window` | A room losing heat faster than its own insulation allows |
+| `climate.freeze` | When this room reaches the temperature pipes are at risk at |
+
+### The heating never quite gets there
+
+`climate.underheated` is the one nothing errors about. The thermostat calls, the valve
+opens, the boiler runs, and the room sits two degrees under its setpoint all winter.
+
+It needs the arithmetic **and** the evidence: the room must never once have been seen at the
+temperature it is asked for, over a month of hours. That second half is load-bearing — a
+thermostat that switches off at its setpoint never lets a room show what it *could* have
+done, so a well-heated room's measured ceiling understates it, and a check reading the
+ceiling alone would fire on the healthiest houses first.
+
+It also says nothing at all if the month held no cold night. A January answer cannot be
+extrapolated out of an August.
+
+### The heating starts too late
+
+`climate.preheat` is what the model was built for. Your schedule warms the bedroom to its
+setpoint at 07:40 in a house that is up at 07:00 — every weekday, with nothing recording a
+fault.
+
+Three measurements have to agree before brAIn will say so:
+
+1. **When this house actually gets up** — from [rhythm](/brain/measurements/), not from an
+   hour in a box.
+2. **What the room reads at that hour** of an ordinary week, from its baseline.
+3. **How long the climb takes**, from the model.
+
+Then it names the time the call would have to come — *"the heating would need to start at
+about 05:15."*
+
+It reports **weekday mornings only** (that is where a schedule exists and where rhythm has
+the days behind it) and it says nothing until the wake time is *measured*. A preheat time
+pinned to a typed-in 07:00 is a guess wearing a number.
+
+:::note[It requires proof the heating does arrive]
+A room still short two hours later is `climate.underheated`'s finding, not this one — and
+"start earlier" is advice that cannot work on a room that never gets there at all.
+:::
+
+### Something is open
+
+`climate.window` fires on a room falling more than twice as fast as its own `k` allows —
+heat leaving by a route the walls do not have.
+
+This check is only *sayable* because the model exists. The same half-degree in ten minutes
+is a draught in one room and an ordinary evening in another, and no fixed threshold can tell
+them apart.
+
+### The pipes
+
+`climate.freeze` takes the current reading and the current outdoor temperature and asks when
+the room reaches **5 °C** — where water in an outside wall starts to be at risk, well before
+the room's own thermometer reads freezing.
+
+It only reports a room that is **already falling**, rather than assuming nothing is heating
+it: no state in Home Assistant says the heating is off, so the fall is the evidence.
+
+## Live checks read five-minute history
+
+`climate.window` and `climate.freeze` read five-minute statistics rather than hourly ones,
+because an hourly average cannot see a window opened forty minutes ago — it is still inside
+the hour that has not closed.
+
+## When you hear about them
+
+| Finding | Urgency | Why |
+| --- | --- | --- |
+| `climate.freeze`, `climate.window` | **now** — breaks quiet hours | A freeze warning at 3am is exactly when it is wanted, and an open window costs money for as long as it stays open |
+| The other three | **whenever** — quiet hours hold them | A room two degrees short all winter is not two degrees shorter at 3am, and a schedule that starts late will start late again tomorrow |
+
+## One room, one fix
+
+Checks that would name the same room stand down for each other — `underheated` over
+`heat_loss`, `freeze` over `window`. A draughty room that also never reaches its setpoint is
+**one card with one fix**, not two cards with two. Two rows about one room is how a work list
+stops being read.
