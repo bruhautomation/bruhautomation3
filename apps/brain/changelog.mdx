@@ -32,6 +32,449 @@ import Changes from '../../site/components/changelog/Changes.astro';
 </Changes>
 </Release>
 
+<Release version="1.43.1" date="September 4, 2026">
+
+<Changes type="fixed">
+
+- **The morning brief never saw the health verdict.** It awaited a plain function, so every call raised, the surrounding `try` logged it at *info* and carried on with an empty verdict — and the "brAIn itself is degraded" reason could never be the thing that made a brief worth sending.
+- **`every day` was granted at the weekday hour to a house that sleeps in at weekends.** The two halves of the week each held up on their own, but nothing asked whether they held up at the *same* time: fifteen weekday presses at 07:00 hid six weekend ones at 10:00 completely, and the answer came back as `every day at 07:00` with a spread of zero. The halves have to agree on the hour now, and when they do not the answer is the narrower true claim rather than nothing at all.
+- **Fix it had no Home Assistant.** Card and fix runs are deliberately run from the add-on's own home directory so their transcripts stay out of the Chats rail — and they inherited neither `.mcp.json` nor the project's permissions, so "Fix it" answered, accurately, that it had no working Home Assistant connection. The project is lent by flag now, and only the fixer gets the settings file, because the analyst's allow-list is asserted from both ends.
+- **A finding's title was sliced at 200 characters, mid-word.** The model wrote the whole argument into the title, the store kept the first 200 characters and threw the rest away, so the card read *"something you int"* and the sentence saying what to do was gone. An over-long title is now cut at its last sentence end and the remainder leads the detail.
+- **"Claude account connected 🎉" fired on every return to the tab.** The sign-in poll toasted whenever the server said `done`, which it does for as long as the credential lives. The toast is for *arriving* at done now, and a return to the tab no longer polls a finished sign-in at all.
+- **Discuss opens its own conversation** instead of appending the garage lights to a half-finished question about the heating.
+- **Switching the chat to the classic terminal froze the panel** for up to ten seconds — the handoff ran a blocking subprocess directly on the event loop, stalling every request, every stream and the terminal bridge. It runs on a thread.
+
+</Changes>
+</Release>
+
+<Release version="1.43.0" date="September 4, 2026">
+
+**Signing in, from the panel.** brAIn could sign you in **once** and after that had nothing to say about it: the sign-in screen was gated on a credential existing, and a credential exists long after it has stopped working — so the exact state that needed the screen was the one state with nothing to press. `/api/auth/logout` had existed since the first release and nothing in the UI ever called it.
+
+<Changes type="added">
+
+- **⚙ Settings → Claude account**, the first section of the dialog, because everything else in there is a preference and this is what decides whether the add-on works at all. It names the credential in use, **which of the three stores it came from**, when it was saved and the verdict of the last real check — then **Sign in again**, **Check it now** and **Sign out**.
+- **All three credential stores, always.** A surface that can see only its own file answers "signed in and shared" with "not signed in", which is exactly what `ha login --status` did to somebody who had signed in through the panel perfectly well.
+- **Sharing a login is a button now**, not something only `ha login` could do. It stays off unless you turn it on, and the dialog says why: `/config` rides in Home Assistant backups, which are unencrypted unless you opted in.
+- **`brain login`**, the same command as `ha login` — the split is brAIn's faculties versus Home Assistant operations, and a credential is neither, so both spellings are things people type. `ha login --share` publishes a login you already have, and `--status` reports all three stores with the CLI's expiry read.
+- **Check it now** re-earns the verdict on demand. It was otherwise only ever re-earned on a six-hour ageing — right for an unattended poll, useless to somebody who has just fixed their login in the terminal and is looking at a chip that still says it failed.
+
+</Changes>
+<Changes type="fixed">
+
+- **`ha login` with no terminal hung forever instead of refusing.** `claude setup-token` prints a link and then blocks reading a code from stdin; with nothing attached it simply sat there, and the last thing printed was "Starting the Claude OAuth token flow…", which is indistinguishable from working. It refuses immediately now, naming the routes that do work without a terminal.
+- **The auth chip is a control.** It renders only for trouble, and trouble is exactly when there is something to press — it was a `<span>` with no handler, unreachable from a keyboard.
+- **Signing out while a login was shared left you signed in**, because the shared file is read two branches below the panel's own. The dialog now says a shared copy exists and offers to take it with you.
+- **Three places told people to run `ha-share-login`**, which has never been a command — it is a filename; only `brain` and `ha` are on PATH.
+- **Claude Code's own session token is refused for sharing, in a sentence.** It is short-lived and refreshed in place, so a copy works for a few hours and then breaks every add-on reading it, silently — and it is the store most likely to be the only one present, which is exactly when somebody reaches for the button.
+
+</Changes>
+</Release>
+
+<Release version="1.42.0" date="September 4, 2026">
+
+**Trying a change without committing the house to it.** Everything ranked above the forecasts on brAIn's capability map stood on one thing it could not do.
+
+<Changes type="added">
+
+- **[The shadow runner](/brain/replay/) — what an automation *would* have done.** It evaluates triggers and conditions against the recorded past and reports when the automation would have fired and what it would have done, calling no service and touching nothing: *"over the last 30 days this would have fired 26 times; on 4 a condition would have blocked it."*
+- **The scope is four trigger kinds and the refusal is the feature.** Time, state, numeric-state and template are what the recorder can reconstruct; anything else is refused **whole**, naming the kind — never trimmed to the replayable part, because "this would have fired twice" about an automation whose webhook fires forty times a day is a confident wrong number that reads exactly like a right one.
+- **[Proposals](/brain/proposals/) — the fifth kind of knowledge, with its own store and its own tab.** A list of things you might want sitting beside a list of things that are broken makes both worse. The lifecycle is `proposed → trialling → accepted | declined`, and the key is the **change** rather than the sentence, so a miner that rewords its explanation is still offering what you declined.
+- **The habit miner — what you already do by hand.** Six separate *days* rather than six presses, a share of the days it could have happened on, a time rather than a stretch of evening, it has to still be happening, and nothing may already do it. `every day` has to be earned twice, once on each half of the week, because a habit on ten weekdays and one Sunday would otherwise build a trigger that fires on two mornings nobody wanted.
+- **Diagnostics carry the miner and the store.** A tab with nothing on it reads the same whether the miner found no habit or the ledger has been empty since March.
+
+</Changes>
+<Changes type="fixed">
+
+- **The image did not ship Jinja, and only a comment said it did.** The template branch carried a pragma claiming the image shipped `jinja2` and the Dockerfile installed no such package, so **every template trigger refused on every real install** while three tests passed on machines that happened to have it from somewhere else. A comment cannot fail.
+- **The history query was built by pasting entity ids into a URL, in three places**, past a docstring that already said not to and said why. On the replay path the ids arrive in an HTTP body, so an id carrying `&` becomes a second parameter — a partial SSRF; everywhere else the same character corrupts the call quietly, which is the failure nobody would ever have traced.
+- **A state that is not a *finite* number is not a number a replay can answer with.** `float("inf")` parsed happily and satisfied an `above:` threshold for ever, holding the trigger against every later crossing.
+- **The template allow-list moved onto the render path.** It ran in an earlier, separate pass, so the sandbox was reached safely only while every caller remembered to validate first — the same shape as asking about protected entities anywhere but the chokepoint.
+- **The seventh tab moved the top bar's breakpoint and broke its touch floor at 320px.** Seven 44px tabs plus their gaps need 320px exactly, leaving nothing for the bar's own padding, so every tab came out 42px on the narrowest phone. The strip wraps now: the row gives way, and the labels and the targets both survive.
+
+</Changes>
+</Release>
+
+<Release version="1.41.1" date="September 4, 2026">
+
+<Changes type="fixed">
+
+- A constant assigned and read nowhere, removed — CodeQL's finding on the 1.41.0 pull request, and a correct one. The number was written as documentation of a five-minute bucket, but the resolution is already stated in prose one line above it and in the query three lines below. Widening the test that would have caught it was measured and rejected: repo-wide the same rule reports names Home Assistant reads off a module *by name*, and a rule with exceptions no test can tell from real dead code needs a hand-maintained allow-list, which is a guard that rots.
+
+</Changes>
+</Release>
+
+<Release version="1.41.0" date="September 4, 2026">
+
+**Three [heating findings](/brain/climate/) the thermal model makes sayable.** 1.40.0 measured how each room holds its heat; this is what the measurement is *for* — each of these answers a question no single state in Home Assistant can.
+
+<Changes type="added">
+
+- **`climate.preheat` — the heating starts too late.** A schedule set to a fixed hour warms the bedroom to its setpoint at 07:40 in a house that is up at 07:00, every weekday, and nothing anywhere records a fault: the automation ran, the thermostat called, the room got warm. Three of brAIn's own measurements have to agree before it will say so, and it says nothing at all until the wake time is measured rather than guessed.
+- **The proof that the heating *does* arrive is required, not optional.** A room still short two hours later is `climate.underheated`'s finding, and "start earlier" is advice that cannot work on one.
+- **`climate.window` — a room losing heat faster than it can.** More than twice what its own loss rate allows is a route the walls do not have. This is only *sayable* because the model exists: the same half-degree in ten minutes is a draught in one room and an ordinary evening in another. The allowance is read where the fall started rather than where it ended, since a room's allowed loss shrinks as it cools.
+- **`climate.freeze` — the pipes.** When this room reaches 5 °C, where water in an outside wall starts to be at risk, well before the room's own thermometer reads freezing. It only reports a room **already falling**: no state anywhere says the heating is off, so the fall is the evidence.
+- **Both live checks read five-minute statistics**, because an hourly mean cannot see a window opened forty minutes ago — it is still inside the hour that has not closed. They ride at `now` urgency and may break quiet hours, and they stand down for each other's room, freeze first.
+
+</Changes>
+</Release>
+
+<Release version="1.40.0" date="September 4, 2026">
+
+**How this house holds its heat, measured.** Every climate capability people actually want — start the heating so the bedroom is warm *when we get up*, tell me a window is open rather than that it is cold, warn me the pipes will freeze by morning — is the same two numbers about a room, and brAIn held neither. Without them each of those is a threshold somebody guesses, and a threshold right in one house is wrong in the next: a stone cottage and a new flat lose heat an order of magnitude apart, and so do two rooms of one house.
+
+<Changes type="added">
+
+- **A [thermal model](/brain/climate/) per room.** How fast it falls towards outside (whose reciprocal is the time constant — "this room holds its heat for about eight hours") and how fast anything puts the heat back, measured nightly from a month of hourly statistics against one outdoor reference. The reference is recorded in the payload, because every loss rate in the house is measured against that one choice and a reference nobody can check is a reference nobody can correct.
+- **The sun is the confounder, and night is the gate.** A south-facing room warms with the heating off, so a fit that includes an afternoon reports a room that gains heat as it gets colder outside. The gate lives in the measurement rather than in the check that reads it.
+- **A fit is not a measurement until it is graded.** A month whose outdoor temperature barely moved has no leverage — every point sits at the same x and the line through them is whatever the noise says, which looks exactly like a real answer. Three more rules follow: a time constant outside physics is reported unmeasured rather than measured badly, a Fahrenheit reference against a Celsius room is refused outright, and a freezer carries `device_class: temperature` too.
+- **`climate.underheated` — a room asked for a temperature it never reaches.** Nothing errors: the thermostat calls, the valve opens, the boiler runs, and the room sits two degrees under its setpoint all winter. It requires the arithmetic **and** the evidence, because a thermostat that switches off at its setpoint never lets a room show what it could have done — a check reading the measured ceiling alone would fire on the healthiest houses first.
+- **`climate.heat_loss` — a room that empties much faster than the rest of the house.** Four measured rooms before one can be unusual against the others, and the room has to be fast in absolute terms too, because twice the loss rate of a very well insulated house is still a good room.
+- **With no outdoor sensor there is no model at all, and Diagnostics says so in a sentence.** "No climate findings" and "no room could be measured against anything" look identical from every other surface, and only one of them is a house that is fine.
+
+</Changes>
+</Release>
+
+<Release version="1.39.0" date="September 4, 2026">
+
+**When the washing finished, measured.** Nothing in Home Assistant says a cycle ended, and every rule anybody writes on top of a smart plug is a wattage typed into a box — `> 10 W` is a running dishwasher in one house and a phone charger in the next.
+
+<Changes type="added">
+
+- **A power shape per machine**, measured from its own ten days of five-minute statistics. A power reading is not a band with a middle and a spread; it is **bimodal**, and a sensor without that shape — a router, a fridge's standing draw — gets no profile rather than a guessed threshold.
+- **"Below the threshold" is not "finished".** A dishwasher's dry phase draws almost nothing for twenty minutes, so a machine that reports done the moment the draw drops reports done three times a cycle. The wait is measured too: the widest jump in the sorted gaps between draws is the appliance saying how long its own quiet phases last.
+- **The floor is a low percentile, never the minimum** — one zero during a power cut would otherwise set the idle level for good — and a blip is not a cycle, because every compressor, kettle and inrush clears a threshold for a moment.
+- **"Unloaded" cannot be seen from power at all**, and this does not pretend otherwise: an emptied machine and a full one draw exactly the same watts. Three states are measured, and the fourth is a person saying so.
+- **`chore.waiting` — the washing that finished and is still in the machine.** The measurement is universal; the chore is narrowed by *name* to a washer, a dryer and a dishwasher, which is the one guess here and is made in the direction where being wrong is cheap — a notification telling somebody to go and empty their television is how the whole feature gets turned off.
+
+</Changes>
+</Release>
+
+<Release version="1.38.0" date="September 4, 2026">
+
+**The work list where people already are.** The [Findings](/brain/findings/) tab is behind ingress, so a critical finding was a panel somebody had to open.
+
+<Changes type="added">
+
+- **brAIn's work list, in Home Assistant's own To-do app** (`todo.brain`). One list, two views — not a copy: every item is derived from the mirror the add-on already publishes, nothing about a finding is stored on the Home Assistant side, and the item's uid is the finding's own id.
+- **Three decisions there, each of them a refusal.** Adding an item is not offered, because one created there would have nothing behind it and would vanish on the next poll. Completing is "I've fixed it" and deleting is "not a problem here" — the tab's own two endings and no new vocabulary. And no due dates yet, because a forecast's date lives in the prose of its detail and a date parsed out of a sentence is a guess with a calendar entry attached to it.
+- **Findings on a phone arrive with buttons** — *I've fixed it*, *Not a problem*, *Later* — and pressing one ends the finding without opening anything. Only the companion app gets them, because every other notifier means something different by the same payload key, and only a message about exactly one finding, because a button on a digest would have to guess which problem it was about.
+- **One route back into the store, for both.** The panel owns the findings store and Home Assistant cannot reach it, so what crosses the gap is a **request**, not a write: a small JSON file picked up within seconds and applied through the same code the tab's own buttons use. A second implementation would be the same answer teaching brAIn two different things depending on where it was given.
+- **A request naming a finding that is gone is an ordinary race** — somebody's phone was out of date — so it is dropped and logged, never retried; applying twice is harmless by design, so there is no ledger of applied ids to keep true.
+
+</Changes>
+<Changes type="changed">
+
+- The findings mirror now carries the evidence and the suggested fix, cut harder than the store keeps them. A to-do item's description is read on a phone before deciding whether to get up.
+
+</Changes>
+</Release>
+
+<Release version="1.37.0" date="September 4, 2026">
+
+**The weekly report, and which meters to believe.**
+
+<Changes type="added">
+
+- **One message a week**, off by default and on the day you choose: what the house used against the week before, what was found and answered, what brAIn learned, and the one thing worth doing this week.
+- **It is not the morning brief with a longer timer.** The brief asks *is there anything* and its whole design is a refusal; a report asks *what happened*, and its failure mode is the opposite one — a report that lists everything is the dozen unread cards with the covers off. Every section is gathered deterministically and capped before any model runs, and the model's job is to say four things rather than to choose which four.
+- **"One thing to do this week" is chosen before the model, not by it.** Asked to pick, a model picks the row it can write the best sentence about, which is the one carrying the most detail rather than the most consequence.
+- **What the house used, week over week.** Summing "every sensor with `device_class: energy`" double-counts by construction — a whole-home clamp, the inverter and every smart plug behind them all carry that class — so the set is Home Assistant's own energy configuration, and a house with none gets a sentence rather than a plausible group picked here.
+- **Both windows are seven complete local days**, ending at midnight and never at `now`, because half of today against seven full days is a 45% fall that is nothing but the clock. A negative day is a meter reset and is dropped, which stands the comparison down rather than reporting a plausible fall.
+- **`brain weekly`**, and `brain weekly send` to write one now — which **moves** the week rather than adding to it, because two reports about overlapping weeks make the numbers in both meaningless.
+
+</Changes>
+<Changes type="fixed">
+
+- **A restart is not a new morning, and it was.** Both scheduled messages are guarded by a "once a day" / "once a week" stamp and both kept it in memory only, so restarting the add-on set it back to zero and the next window sent a second brief about the same morning. Restarting is the first thing anybody does after changing an option, which makes that the ordinary case rather than the unlucky one — and every way of failing to read the new on-disk stamp reads as "never sent", because a lost stamp costs one duplicate message where a stamp wrongly read as *sent* would silence a real report.
+
+</Changes>
+</Release>
+
+<Release version="1.36.0" date="September 4, 2026">
+
+**What is normally open here, and the bedtime check that reads it.**
+
+<Changes type="added">
+
+- **A [measurement](/brain/measurements/) for doors.** The baselines answer "is this reading unusual" and cannot answer it for a door, because they measure medians and spreads over numbers. What a binary entity has instead is **how much of each hour of the week it is open** — so a back door open at 23:40 is news in a house that has it shut then on 49 nights out of 50, and nothing in one where it stands open all summer.
+- **Time-weighted, never sampled.** A door open for ten minutes and one open for ten hours look identical to a sampler that catches each once. And a bucket has to have been *watched*: below an hour of observation it says nothing, which is a different answer from "never open then".
+- **Only closures** — doors, windows, locks, covers and garages. A hall motion sensor being on at midnight is not something anybody wants told about, and including it would bury the row that matters.
+- **`evening.left_open` — open at bedtime, and usually shut.** Every other check reads a state and knows whether it is wrong; a door being open is not wrong, and this is the first check whose entire answer is a measurement of this particular house. Four open doors are **one row**, because this is a single thing to do before bed and four rows to dismiss one at a time is a chore.
+- **A bedtime pass.** The scheduled checks run every few hours from whenever the add-on started, so on most houses they would simply never be awake in the evening window and the check would have been unreachable. Its urgency is `now`, and that is load-bearing: it fires *inside* quiet hours by construction, so anything else would hold it until morning — the one delivery that makes the check pointless.
+
+</Changes>
+</Release>
+
+<Release version="1.35.0" date="September 3, 2026">
+
+**The hour this house actually gets up.** Everything brAIn did on a schedule happened at a time somebody typed into a box, which is the definition of a timer rather than a rhythm: 07:00 is early on a Sunday and late on a Tuesday in the same house, and somebody who keeps correcting when a message arrives stops reading it.
+
+<Changes type="added">
+
+- **The house already answered this and nothing was asking.** The action miner files every change under a cause, and the first one caused by a **person** is the house waking up — not a motion sensor, which fires for a cat and for the heating, and not a light, which an automation turns on at dawn. Two numbers a day are kept; this is not a timeline.
+- **Weekdays and weekends are measured apart**, because one number over both is wrong on all seven days rather than on none. The cost is that a weekend answer takes about five weeks to exist, which looks like a bug from outside and is the floor doing its job.
+- **A spread wider than an hour and a half means there is no usual time**, and saying so beats a confident number over data that holds none.
+- **And the median is circular.** Settle times sit either side of midnight, and four of them inside forty minutes of it have a straight median of **12:00** — not a small error, the opposite side of the day.
+- **A morning brief**, off by default: one short message a day, at the hour this house actually starts moving. **The decision to send is made before any model is asked** — "all quiet" every morning is the message people mute, and it costs a Claude turn to produce, so an empty answer costs nothing at all and sends nothing. What the model is for is the sentence: under eighty words, no greeting and no markdown, because this is read on a lock screen.
+
+</Changes>
+<Changes type="changed">
+
+- Diagnostics report what the rhythm has measured and what the brief last did with it. A rhythm that never gathered enough days looks exactly like one that did and chose 07:00.
+
+</Changes>
+</Release>
+
+<Release version="1.34.0" date="September 3, 2026">
+
+**Three overrides of what, and the two rules fighting.**
+
+<Changes type="fixed">
+
+- **`auto.overridden` counted overrides with no denominator, and reported two opposite things identically.** Three undos of a rule that ran three times is a rule that does not fit this house; three undos of one that ran three hundred times is somebody having an unusual Tuesday. The check now counts what each automation actually did over the same window and fires on a *share* once there are enough runs for a share to mean anything — "3 of the 4 times it acted" rather than "3 times". Below that floor the count stands alone, because 3 of 3 is 100% and says nothing the count did not.
+
+</Changes>
+<Changes type="added">
+
+- **The slow override — the one that never reaches three in a day.** Somebody putting the same thing back once a day for a month is the clearest signal a house gives about a rule not fitting it, and a check that only looks at today is structurally unable to see it. An override ledger keeps overrides — and only overrides — so that sentence can be said at all; a deliberate exception to persisting nothing, and a much narrower claim than keeping the timeline.
+- **A pattern has to still be happening.** The ledger keeps two months so a shape has room to appear, but a rule somebody fixed goes on having a beautiful shape in that history, and a finding that cannot clear for eight weeks after the problem is gone is the list nobody reads.
+- **The finding names the condition the automation is missing** — *"almost always between 08:00 and 09:00 and only on weekdays"* — and reports the hours that are **occupied**, not the window that found them. The first cut searched four-hour windows and took whichever start it tried first, so fifteen overrides all at 08:10 came back as "between 05:00 and 09:00": not a slightly loose answer, but a condition somebody would write that stands the automation down for three hours nothing happens in.
+- **`auto.conflict` — two automations undoing each other.** Both ran, neither errored, and the entity is in whichever state the later trigger left it — so which one wins depends on the order two triggers happened to fire in, and the result is different from one day to the next. An automation cannot conflict with itself, and a pair is keyed unordered, or one disagreement is filed as two with each half under the floor.
+
+</Changes>
+</Release>
+
+<Release version="1.33.0" date="September 3, 2026">
+
+**The drift the band cannot see, and quiet hours.**
+
+<Changes type="added">
+
+- **The failure with no bad reading in it.** A freezer 6 °C warmer than it was a month ago has never once been outside its usual range, because the range is built from the same weeks the drift happened in and moved along with it. Measured on a real-shaped month, that freezer reads **2.3 spreads** to the unusual-reading check — which needs six — and **16** to the trend: it is not that the band is badly tuned, it is structurally incapable of seeing a drift however far the drift goes, and nobody notices until something spoils.
+- **A line fitted to what is left once the week's own pattern is taken out**, graded against the spread about that line — the one estimate a drift cannot inflate.
+- **Four floors answer "does this fire on a healthy house".** A window that turned around in the middle is not a drift and a step change is not weeks of drifting, so both halves have to agree on a direction; a move smaller than its own noise is not a move; **five thermometers drifting together is the weather rather than a device**, so the whole device class stands down and what is left is the one room doing something the others are not; and past a handful of rows it says nothing.
+- **Quiet hours, and urgency as its own axis.** Before this there was a sender and no router — five callers each handed new findings straight to one notify service — so a disk-space warning at 03:40 was a phone lighting a bedroom about something still true at breakfast, and the second time that happens the notification is gone for good.
+- **Urgency is not severity**, so it is declared per **producer** rather than per row: a `critical` battery forecast is three weeks out and a `warning` about a boiler that has stopped answering is now. And a quiet hour is a **hold, not a silence** — held rows queue on disk and leave together when the quiet ends, minus anything settled or cleared while they waited, because being told at seven about a problem that went away at four is how these messages stop meaning anything.
+
+</Changes>
+<Changes type="fixed">
+
+- **The unusual-reading check was quiet on energy meters by accident rather than on purpose.** A `total_increasing` total is higher than it has ever been every hour of its life; what kept the check quiet was that the band's own spread widened along with the ramp, which is not a guarantee — a meter that resets has no such protection. Both baseline checks now require `state_class: measurement`.
+- **A reading far outside its band on a sensor that has been drifting for a month is reported once, as the drift.** The two checks share one eligibility question so they cannot disagree about it.
+
+</Changes>
+<Changes type="changed">
+
+- One least-squares fit, shared with the battery runway forecast. Two implementations of "the slope of these points" is two answers to a question that has one, and nothing would ever have noticed them disagreeing.
+
+</Changes>
+</Release>
+
+<Release version="1.32.0" date="September 3, 2026">
+
+**"Unusual" is a word until something measures it.** It is behind most of what people want a smart home to notice — water running at night, a freezer drifting, a boiler on for twice as long as it usually is — and until there is a number behind it, every rule that uses it is a threshold somebody guessed.
+
+<Changes type="added">
+
+- **The [baseline engine](/brain/measurements/).** For every numeric sensor, what it normally reads at **this hour of this day of the week** and how far it normally strays, from a month of the house's own long-term statistics. It runs overnight, costs no Claude turn, and decides nothing by itself.
+- **The bucket is an hour of the week in the house's own timezone.** A weekday 7am is not a Sunday 7am, and UTC would smear every household's morning across two buckets and move it twice a year; a timezone that cannot be read falls back to UTC and says which.
+- **Spread is a median absolute deviation, not a standard deviation** — one meter that spiked when the oven came on would otherwise set a band nothing can ever fall outside. A reading that never moves has no spread, and dividing by it makes every change infinite, so an entity whose whole history is one value is reported as having no useful baseline rather than an exquisitely sensitive one.
+- **`base.unusual` — a reading well outside what this house normally does at this hour.** Six spreads, nine when the answer had to come from the whole history rather than this hour, and never for a move too small for a person to notice. It stands down for a reading the implausible-value check already claims, and it says nothing at all when it would say too much: more than a handful of rows means the *baseline* has stopped describing the house.
+- **`base.stale` — the measurement itself has stopped being taken.** Not a fact about the house but about brAIn, and it belongs on the list because every baseline check silently says nothing while it is true, which is indistinguishable from a house with nothing odd in it.
+- **A `get_baseline` tool, read-only.** It is what turns "that looks high" into "4.2 times its normal variation for a Tuesday morning" — without it, a model asked whether a reading is odd has to invent a threshold, and it invents the same one for a freezer and a water meter.
+
+</Changes>
+</Release>
+
+<Release version="1.31.0" date="September 3, 2026">
+
+**Who or what changed something.** A state carries no cause — nothing in `light.kitchen` being on says whether a person pressed a switch, an automation fired, a voice command asked, or brAIn did it, and that is the question behind most of what people actually ask their house.
+
+<Changes type="added">
+
+- **The action miner.** It reads Home Assistant's own logbook, walks each event's context chain, and files every state change under a cause. **Proximate and root cause are different and both are recorded**: reporting only the user turns every automation into "you did this", and reporting only the automation loses the one fact that explains an unexpected run.
+- **A change with no context is `unattributed` in as many words.** A wall switch and a device's own integration reach Home Assistant identically, so naming either is a guess, and a timeline that guesses is not evidence.
+- **brAIn's own actions are recorded rather than inferred.** The MCP server calls Home Assistant with the Supervisor's token exactly like every other add-on, so a change brAIn made is indistinguishable in the logbook from one any integration made — it writes them down instead.
+- **The [Activity](/brain/activity/) tab.** A day of the house with a cause on every row, an hour heading down the side, a filter per cause, and paging back a day at a time; tap a row for that entity's own recent history. Read straight from the logbook on every visit — no Claude run, nothing spent, and nothing cached, because a timeline showing the house as it was when you last looked is the one thing a timeline may not do.
+- **`auto.overridden` — an automation a person has undone three times in a day.** The automation ran, nothing errored, and the light is off, so it is invisible to every other check; it is also the clearest signal a house gives about a rule being wrong for it. Agreement is not a fight, and one automation move is undone once however many times somebody nudges the dimmer.
+- **`sensor.brain_health` — whether brAIn itself is working**, as `ok` / `degraded` / `failed`, with the reason and the thing to do about it. It never goes unavailable: Home Assistant hides the attributes of an unavailable entity, and this is the entity somebody looks at precisely when the others have gone. It is a state and a sentence, never a score — one number over a house hides its worst problem inside an average.
+
+</Changes>
+</Release>
+
+<Release version="1.30.0" date="September 2, 2026">
+
+**Ten more house checks, and Diagnostics under ⚙.** 1.29's checks read Home Assistant; these read the registry, the radios and the machine underneath.
+
+<Changes type="added">
+
+- **Registry housekeeping.** Entities still wearing the serial number their integration gave them (`0x00158d0001abcdef Temperature` is unfindable in a picker and unsayable to Assist), devices in no room, helpers nothing refers to, and device rows with nothing behind them.
+- **The radios.** A dead Z-Wave node read off the status sensor the controller publishes, and a Zigbee device that has not been *seen* — because a sleepy sensor is `available` between check-ins, so availability says nothing and silence says everything.
+- **The machine.** Nothing backed up or nothing in a week, an add-on set to start on boot and stopped, disk space, and the recorder database's size.
+- **`auto.trigger_unavailable` — the failure with no symptom at all.** The automation is switched on, nothing errors, no trace is written, and it can never fire again, because the entity in its trigger has been unavailable for days.
+- **A Diagnostics section under ⚙.** The run journal had counted every Claude run since 1.29 and nothing read it back — it existed only inside a bug report somebody else had to ask for. The dialog now renders versions, the sign-in verdict, a day of runs by outcome, and the last checks pass, including **which checks could not run and why**, since a skipped check is not a quiet one and is also the one that may not clear a row.
+
+</Changes>
+<Changes type="changed">
+
+- **The house snapshot carries the Supervisor and the recorder.** Each add-on row is folded together with its own info, because the list endpoint does not say whether an add-on was *meant* to be running and a manual start is somebody's decision rather than a fault; a database that is not a file under `/config` takes the whole key unavailable rather than reporting as small.
+- **A dead Z-Wave node is reported once**, because the same box under two different fixes is how a list stops being read.
+
+</Changes>
+</Release>
+
+<Release version="1.29.0" date="September 2, 2026">
+
+**[House checks](/brain/checks/): findings that cost nothing.** Every finding used to come out of a Claude run, and both producers are told an empty list is the honest answer — so most of those runs spent tens of thousands of tokens to report nothing, while the problems that are *deterministically* visible were found only when a model happened to look in the right place.
+
+<Changes type="added">
+
+- **A set of pure functions over one snapshot of the house** — states, registries, services, `automations.yaml` and friends, the traces Home Assistant keeps, a week of statistics, the dashboards — filing findings without calling Claude. Automations naming entities that do not exist or calling services that are not registered (the old phone's `notify.mobile_app_*`, with the replacement named), automations whose last run errored or that keep dropping triggers, devices unavailable for more than a day grouped per device, batteries low or *silent*, sensors frozen on one value for a week, entities left behind by a removed integration.
+- **They run on a timer, on the Findings tab's Run-checks button, and as `brain check`** — and what they find rides into the analyst's prompt block with everything else, so Claude's job on the automations card becomes judgement rather than discovery.
+- **The first forecast.** A line through sixty days of a battery's statistics files "… battery is running down" three weeks out, with the days left in the detail — a finding with a date on it, rather than a threshold that fires the day before it dies.
+- **A finding a check no longer reports leaves the list on its own** — removed, not settled, so it can come back if the problem does. Only checks that actually *ran* may clear anything: a check whose data could not be fetched said nothing, and nothing is not "the problem went away".
+- **A producer scorecard.** Every ending on the [Findings](/brain/findings/) tab is a label, and nothing added them up because the settled ledger recorded the ending and not who raised it. A line under the filters now says how right each producer has been, once it has enough endings to mean something.
+- **A run journal**, one line per Claude run of any kind and per checks pass, with a fixed outcome vocabulary — fallbacks included, because a fallback nobody counts is a fallback read as the real thing. Prompts and replies are never written.
+- **Diagnostics, three ways**: an endpoint, a mirror the integration reads so the standard **Download diagnostics** button produces something, and `brain report`, which writes it beside `brain doctor --json` and the log tail as one redacted archive — for a bug report that arrives with evidence rather than prose.
+- **`protected_entities`** — a list of entity ids or `domain.*` patterns brAIn may never act on, from any face. Enforced in the MCP server's one chokepoint, so it covers every control tool and every direct service call; a protected entity can still be looked at. A call aimed at an area or device that *contains* one is refused, and labels and floors are refused outright while the list is non-empty.
+
+</Changes>
+</Release>
+
+<Release version="1.28.10" date="September 1, 2026">
+
+<Changes type="fixed">
+
+- **A code-scanning sweep, in the two places it found something real.** Two silent `pass`es in exception handlers — the query is "an `except` that does nothing and has no comment", and in a codebase whose comments carry the reasoning, the missing comment *is* the finding. Each now says what is being ignored and why falling through is the answer. No behaviour changes.
+
+</Changes>
+</Release>
+
+<Release version="1.28.9" date="September 1, 2026">
+
+<Changes type="fixed">
+
+- **`brain doctor` warned about a consolidator lock that nothing was holding.** It stat-ed the lock file's mtime and warned past 15 minutes — but that file is an advisory flock target, not a lock-by-existence marker: releasing the flock leaves the file on disk permanently, so its presence means nothing at all and its mtime records when the last pass *started*. Any home that had not consolidated in the last quarter of an hour tripped it, which is nearly every run of the report, over a [memory system](/brain/memory/) that was working the whole time. The remedy it named could not clear it either, because the file lives under `/config` and survives a restart. It probes the flock the way the panel does now — shared, so asking can never be something a real pass blocks on — and it tells a lock nobody can take in this image from one somebody is holding.
+
+</Changes>
+<Changes type="added">
+
+- **`brain doctor` reports when a pass last landed, and warns when the *queue* is stuck.** Facts that have sat in the inbox for more than 26 hours with nothing filing them are a consolidator that is not working — the failure the lock warning was pretending to look for, asked of the queue rather than of a file nobody deletes.
+
+</Changes>
+</Release>
+
+<Release version="1.28.8" date="September 1, 2026">
+
+<Changes type="fixed">
+
+- **A passing Claude auth check was never re-earned.** The verification ran at panel startup, after a credential was saved, and after the guided sign-in — and never again. So a credential that died mid-week was reported by nothing: the panel served the startup verdict, the auth chip stayed hidden because a working login is not news, and the first real symptom was voice, automations and the consolidator failing off one credential store while the terminal carried on working off another. The verdict now ages out after six hours and is re-earned the next time somebody looks at the panel — lazily, because the check is a real Claude turn and an unattended timer would spend account tokens forever on a question nobody asked. A *failed* verdict ages out too, so fixing a login in the terminal no longer needs a restart for the panel to notice.
+- **The re-check is silent.** "Verifying Claude…" answers what a person just did; a six-hourly re-verification flashing a chip into the top bar — and shifting its layout — while you are reading a card is the same mistake with the timing changed.
+- **Two pollers could start two verifications for one question.** The in-flight guard read a state its own task had not set yet, because scheduling a task is not running it.
+- **The panel wrote `saved_at` in a format the contract does not describe.** Both credential files document an epoch int and the shell half has asserted it since it was written; the panel's own store wrote an ISO string. Latent, because each reader happens to read the file it wrote — which is exactly why it drifted.
+
+</Changes>
+</Release>
+
+<Release version="1.28.7" date="September 1, 2026">
+
+<Changes type="fixed">
+
+- **The usage sensors sent the wrong one of Claude Code's two User-Agents, so the 429 wall 1.28.0 was meant to end never ended.** The endpoint sorts callers into rate-limit buckets by User-Agent, and only Claude Code's own gets a bucket that answers a poll. The previous fix read that right and then read the bundle wrong: it took the UA the CLI's *Messages-API* client sends, while the helper that actually fetches utilization sends a different one. A genuine Claude Code UA sent to an endpoint that never sees it is still a stranger, so every poll went on landing in the hostile bucket — 429s within hours, an hours-long backoff, and four sensors ageing out into unavailable over and over with the fix already installed.
+- **A failing tracker looked like a working one showing 0%.** With no account numbers the panel falls back to estimating from brAIn's own insight runs, which on a home that mostly uses the terminal and the chat is 0% that never moves — and the one note about it told you to sign in with your Claude subscription, which is useless advice for somebody already signed in. The estimate now reads `~0%` with a warning dot, and the popover names the tracker's own reason and when brAIn will try again.
+- **A usage reading with no timestamp could never go stale**, because the freshness check was skipped whenever the stamp was missing rather than treating its absence as "this is not a reading".
+
+</Changes>
+</Release>
+
+<Release version="1.28.6" date="August 31, 2026">
+
+<Changes type="fixed">
+
+- **The terminal proxy dropped the client's `Authorization` header only if it was spelled one of two ways.** ttyd takes a generated Basic credential and the panel presents it upstream, so an ingress user never meets a prompt — and whatever the client sent was supposed to be dropped first, so a browser holding a credential for the ingress origin could not present it to ttyd instead. The drop was two case-sensitive removals over a dict keyed by the case the client actually sent, and HTTP considers every spelling of a header name identical: `AUTHORIZATION: Basic …` survived both and went upstream *beside* the real credential, leaving ttyd to pick between them.
+- **A terminal websocket that broke mid-frame closed silently.** An exception inside one of the two racing pumps never reached the code awaiting them, so the log carried no reason for the drop and Python printed a bare "Task exception was never retrieved" into the add-on log at some later collection, attributed to nothing. Both are settled properly now — and the losing pump's own parting error must not become the one reported, when the winner's is the reason for the shutdown.
+
+</Changes>
+</Release>
+
+<Release version="1.28.5" date="August 31, 2026">
+
+<Changes type="fixed">
+
+- **`brain.disable_device` no longer dies on a device that is its own `via_device`.** The service walks that chain up to the hub a device hangs off, so disabling the last live child disables the lonely parent too — and it walked it by recursion. Nothing in Home Assistant makes the chain acyclic, and `alexa_media` reports every device as its own `via_device`: the walk had no end, and the service raised `RecursionError` on each Echo, Wyze and Ecobee device it was given, *after* writing some of the disables. Both walks are iterative with a seen-set now, and nothing is lost by stopping where the chain would repeat, because every device on the cycle has been visited by the time it closes.
+
+</Changes>
+</Release>
+
+<Release version="1.28.4" date="August 19, 2026">
+
+<Changes type="changed">
+
+- **The Conversations dialog's intro is one line.** The paragraph had grown to five sentences and took more of the dialog than the list it was introducing.
+
+</Changes>
+</Release>
+
+<Release version="1.28.3" date="August 18, 2026">
+
+<Changes type="changed">
+
+- **"Your chats" is just "Chats".** Under a rail already headed CHATS, the possessive answered a question nobody asked.
+- **A finding discussion is titled "Discussing: &lt;the finding&gt;".** A conversation's title is its first message, and the discuss prompt opened with the same sentence every time — so a rail of three discussions was three copies of "I want to talk about something you flagged…" with the finding buried mid-message.
+
+</Changes>
+</Release>
+
+<Release version="1.28.2" date="August 18, 2026">
+
+<Changes type="fixed">
+
+- **"Your chats" is actually yours now.** Two of the worker pool's Claude runs never claimed their session ids — the pass that extracts facts from voice conversations, and the one-shot fallback that answers a voice request when a stream worker errors — and an unclaimed id is what "yours" means, so both piled into Your chats: a person's own conversations buried by the very plumbing meant to sort them. Both claim minted ids before running now, and a one-time startup pass labels the existing backlog by matching brAIn's own shipped prompt openers verbatim, so the list is honest immediately rather than in a fortnight. Genuine chats are never touched.
+
+</Changes>
+</Release>
+
+<Release version="1.28.1" date="August 18, 2026">
+
+<Changes type="added">
+
+- **Card and Fix runs are in the conversation list now, read-only.** Every insight run and every Fix-it run is a Claude conversation, and until now it was invisible: the engine runs them from the add-on's own home directory, so Claude Code filed their transcripts where the list never looked. Picking one opens a reader showing exactly what brAIn sent to Claude about your house, every tool call the run made, and what came back — read-only on purpose, because those turns ran under the analyst's read-only scoping and continuing one under the chat's permissions would change the conversation's rules mid-thread.
+
+</Changes>
+<Changes type="fixed">
+
+- **Jumping between conversations can no longer land your messages in the wrong one.** Two quick picks in the Chats rail raced each other: depending on the interleaving the chat either quietly opened a fresh, invisible session or stayed on the *first* conversation while the pane showed the second, so everything typed went into a conversation nobody was looking at. Switches are serialized now, and switching mid-answer is refused with "stop it first" rather than silently killing the answer.
+- **Browsing old conversations no longer shuffles the list.** Claude Code touches a session file the moment it is resumed, and the panel resumes a conversation just to show it — so merely looking at an old one shoved it to the top stamped "just now". A row's place and age now come from the newest entry in the transcript itself.
+- **The conversation you're in is listed again — marked, not hidden.** The server excluded it while the panel carried the code to mark it "where you are", so the row you had just opened vanished from the rail, which read as the conversation being lost.
+
+</Changes>
+<Changes type="changed">
+
+- **The chats filter says what it means.** "Yours" is now **Your chats**, and the machine chips follow alphabetically: *Automation*, *Cards*, *Fixes*, *Memory*, *Study*, *Voice*.
+
+</Changes>
+</Release>
+
+<Release version="1.28.0" date="August 18, 2026">
+
+<Changes type="fixed">
+
+- **The usage sensors update every 5 minutes again, and the 429 walls are gone with the User-Agent that caused them.** Anthropic's usage endpoint sorts callers into rate-limit buckets by User-Agent: the one Claude Code itself sends gets the bucket the whole statusline-tool ecosystem polls sustainably, and everything else gets the one that answers 429 after a few hours and keeps answering it. The tracker introduced itself as `brain/1.0` — which is what every "usage cap nobody hit" actually was, and what the 30-minute poll had been wrongly slowed down to accommodate. It now sends the installed CLI's own, and the session percentage tracks within a percent or two of live instead of up to half an hour behind. The hour-scale backoff stays as the safety net: in the right bucket a 429 is rare enough to mean something.
+
+</Changes>
+</Release>
+
+<Release version="1.27.1" date="August 14, 2026">
+
+<Changes type="fixed">
+
+- **`brain memory inbox` and `brain memory clear` are in `brain help` now.** Both subcommands existed and were documented on this site, but the dispatcher's usage text never listed them — and the chat's [command palette](/brain/cli/) is parsed from what `brain help` prints, so they could never appear in it.
+- A test's failure message pointed at five documentation paths that moved when this site was reorganised.
+
+</Changes>
+</Release>
+
 <Release version="1.27.0" date="August 14, 2026">
 
 **Findings can reach you now** — a critical finding no longer waits for somebody to open the panel — and the learned home is portable, scriptable, and better at reporting on itself.
