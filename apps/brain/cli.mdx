@@ -74,7 +74,7 @@ Before Claude writes to any file under `/config`, the previous version is snapsh
 notebook edits included, since 1.26.0. Only `/config` is journalled, and **`secrets.yaml` is
 never snapshotted**. Snapshots are kept for `edit_journal_days` (default 14).
 
-Since 1.43.0 the journal also covers the one write that happens without a Claude run at all:
+Since 1.44.0 the journal also covers the one write that happens without a Claude run at all:
 accepting a [proposal](/brain/proposals/#saying-yes-and-taking-it-back) appends an automation
 to `automations.yaml`, and it is snapshotted first, in the same line shape, so `brain undo`
 puts it back exactly as it puts back an edit.
