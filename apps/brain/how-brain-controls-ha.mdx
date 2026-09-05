@@ -81,11 +81,49 @@ outcome, and the same edit journal behind it, so `brain undo` still puts it back
 That is the routing rule doing its job, not a gap in what brAIn can reach. The only thing
 you'll notice is which layer the work happened in.
 
-### One write happens without Claude
+### Three things happen without Claude
 
-Everything above is Claude with a model in the loop, on your instruction. There is exactly one
-exception, since 1.44.0: accepting a [proposal](/brain/proposals/#saying-yes-and-taking-it-back)
-appends one automation to `automations.yaml` from your press, with no Claude run behind it. It
-is the narrowest thing that can do that job — the file is snapshotted into the same edit
-journal first, the automation is only settled once Home Assistant is verifiably running it,
-the write is reverted if it is not, and both the toast and `brain undo` take it back.
+Everything above is Claude with a model in the loop, on your instruction. There are exactly
+three exceptions, and each one is the narrowest thing that can do its job.
+
+**A press on the Proposals tab writes to `/config`** — [accepting a
+proposal](/brain/proposals/#saying-yes-and-taking-it-back), or removing a one-off that has
+fired — with no Claude run behind it (1.44.0). The file is snapshotted into
+the same edit journal first, the change is only settled once Home Assistant is verifiably
+running it, the write is reverted if it is not, and both the toast and `brain undo` take it
+back.
+
+Since 1.46 that write has three shapes, because what the producers need is three different
+things:
+
+- **Append** — the ordinary case. One automation on the end of `automations.yaml`, or four
+  [scenes](/brain/scenes/) on the end of `scenes.yaml`. Everything above them is byte-for-byte
+  what you wrote.
+- **Edit one entry** — a [condition proposal](/brain/proposals/#the-condition-it-is-missing)
+  changes an automation you already have. brAIn replaces exactly the bytes of that one entry
+  and **every byte outside it is identical afterwards**: your ordering, your comments, your
+  quoting and every other automation in the file. It refuses rather than guessing where the
+  entry ends — an id that appears twice, a file that is not a top-level list, an entry that
+  cannot be cut on a line boundary — because nearly-right bytes are your file with a hole in
+  it.
+- **Remove one entry** — the same splice with nothing written in its place, and it has exactly
+  one caller: the **Remove** button on a [one-off intent](/brain/intents/) that has fired.
+  Nothing in brAIn removes an automation on its own.
+
+`brain undo` covers all three, because all three snapshot the whole file into the same journal
+before touching it, in the same line shape a Claude edit writes. What comes back is the file
+as it was, not a reversal computed after the fact — so an undo of an edit puts your comments
+back too.
+
+**An accepted [emergency playbook](/brain/playbooks/)** is then run by **Home Assistant**, not
+by brAIn — it is an ordinary automation in your `automations.yaml` once you have accepted it,
+and brAIn has no path that fires one. It is composed deterministically from your registries
+rather than by a model, every entity it would act on is listed on the card before you accept,
+and no playbook ever unlocks a door or disarms an alarm.
+
+**[Overnight self-healing](/brain/self-healing/)** is the one thing brAIn does to your house
+with nobody's press behind it, and it is **off by default**. Switched on, it does three
+things and no more — starts an add-on that was set to run at boot, pings a dead Z-Wave node,
+reloads a config entry that failed to set up — once a night, inside your quiet hours, at most
+three a night, never on a protected entity and never on a finding you have already answered.
+There is no Claude run anywhere on that path.

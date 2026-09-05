@@ -400,7 +400,10 @@ export default defineConfig({
 										{ label: 'House Checks', slug: 'brain/checks' },
 										{ label: 'Heating & Climate', slug: 'brain/climate' },
 										{ label: 'Shadow Runner & Replay', slug: 'brain/replay' },
-										{ label: 'Playbooks & Self-Healing', slug: 'brain/playbooks' },
+										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
+										{ label: 'One-Off Intents', slug: 'brain/intents' },
+										{ label: 'Scene Designer', slug: 'brain/scenes' },
+										{ label: 'Overnight Self-Healing', slug: 'brain/self-healing' },
 									],
 								},
 								{

@@ -183,6 +183,7 @@ name.
 | `terminal_ui` | `chat`, `classic` | Which face the Terminal tab opens in. Default `chat`. |
 | `model` | preset or a custom model id | The model insight generation uses. |
 | `chat_model` | a model id, or unset | The chat terminal's own model, picked **from the chat** (the model name under the composer, or ⋯ → Model). Unset follows the global `model` — and deliberately never writes it, which would silently change what every insight run costs. |
+| `chat_max_sessions` | 1–8 (default 3) | How many chat conversations keep a live Claude Code process. It counts **processes, not conversations** — you may have as many of those as you like. Past it, the session untouched for longest is closed (never one mid-answer) and reopens where it left off. |
 | `gather_mode` | `search`, `snapshot` | **How a card gets its data.** `search` (default) sends Claude a *map* of the home plus read-only HA tools, so it looks up only what the card needs — and it's the only mode that can afford history on a typed question. `snapshot` is the old send-everything path, kept as a setting and as the automatic fallback when a search run fails. |
 | `refresh_hours`, `history_days`, `history_keep_runs`, `history_keep_days`, `timeout_minutes` | | Same meaning as the add-on options below. |
 
@@ -232,6 +233,11 @@ action: brain.run_insight
 data:
   name: "Daily Briefing"   # omit to run all
 
+# Do one thing next time. Returns immediately; the card lands on Proposals.
+action: brain.intent
+data:
+  sentence: "Turn the porch light off when the guests leave"
+
 # Study the home. Returns immediately; results arrive in memory.
 action: brain.study
 data:
@@ -254,6 +260,11 @@ data:
 action: brain.clear_conversation
 # data: { conversation_id: "..." }   # omit to clear all
 ```
+
+`brain.intent` needs **1.46**. It queues the sentence and returns straight away — Claude has
+to search the house for what it names — and what comes back is a card on the Proposals tab,
+including when brAIn will not arm it. Nothing is written until you accept it. See
+[one-off intents](/brain/intents/).
 
 Plus the **65 [Power Tools](/brain/power-tools/)** services for registry administration.
 

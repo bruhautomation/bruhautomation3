@@ -1,6 +1,6 @@
 ---
 title: Terminal
-description: The real Claude Code CLI in your browser with your /config in front of it — as a chat, or as a true terminal. Same session, same login, one button between them.
+description: The real Claude Code CLI in your browser with your /config in front of it — as a chat, or as a true terminal. Several conversations answering at once, one login, one button between the two faces.
 ---
 
 The Terminal tab is Claude Code itself, running inside the add-on with your Home Assistant
@@ -33,7 +33,7 @@ about my house*.
 Anything it writes to under `/config` is snapshotted first, so
 [`brain undo`](/brain/cli/#undo) puts a file back if you don't like the result.
 
-## Two faces, one session
+## Two faces, one login
 
 The button in the corner switches between them, and so does **⚙ Settings**. Both run the
 same Claude Code, on the same login, in the same `/config`, with the same permissions — the
@@ -62,8 +62,11 @@ have to finish a thought in the face you started it in.
 
 One honest limit: only one Claude Code process can own a conversation at a time, so this is a
 hand-off, not a mirror — the face you leave lets go, the face you arrive in takes over with
-the full history. Your shell in the classic terminal is never killed to make that work; if
-you had something running, it's still sitting there.
+the full history. That's a fact about the CLI rather than a limit on the chat, which holds
+[several conversations at once](#several-conversations-and-switching-stops-nothing); what
+nothing can do is hold the *same* conversation in two places. Your shell in the classic
+terminal is never killed to make that work; if you had something running, it's still sitting
+there.
 :::
 
 ## The command palette
@@ -76,11 +79,82 @@ print. Neither list is written down in the panel, so neither can go stale. ↑/�
 Enter or Tab to pick. A few Claude Code commands are REPL-only (`/help` among them) and say
 so rather than failing.
 
+## Several conversations, and switching stops nothing
+
+:::note[Requires brAIn 1.45]
+Before it, the chat held one Claude Code process. Switching conversations stopped the answer
+being written, and doing it mid-answer was refused with *"Claude is still responding"*.
+:::
+
+Every conversation you have open holds its own Claude Code process, the way a terminal tab
+does. Picking another one **attaches the view** to it, and that is all it does — nothing is
+stopped and nothing is thrown away.
+
+So ask a long question, leave it mid-answer, and go and deal with something else in another
+chat. The one you left carries on writing into its own transcript, and it is finished and
+waiting when you come back.
+
+### What the marks mean
+
+Every row in the list — in the rail, and in **⋯ → Conversations** — says what its own session
+is doing. Three states, and only two of them draw anything:
+
+| The mark | What it means |
+| --- | --- |
+| *nothing* | The ordinary case: nothing is running in that conversation, or brAIn isn't holding a process for it at all. Most rows, most of the time, and not news. |
+| **answering…** | A reply is being written in that conversation right now, in the background. |
+| **Needs your OK** | It is waiting on a [permission card](#permissions). |
+
+**Needs your OK** is the one that has to reach you, because the card behind it declines itself
+after ten minutes if nobody comes. So a background ask also raises a toast in the chat you
+*are* in, naming the conversation, with a button that opens it — a phone has no rail at all,
+and a badge on a list nobody can see is half an answer.
+
+The marks are pushed down the same stream the answers arrive on rather than polled: they only
+change when something already had an event to send.
+
+### How many stay open at once
+
+**⚙ Settings → Conversations kept open at once** — three by default, one to eight
+(`chat_max_sessions`).
+
+It counts **processes, not conversations.** You may have as many conversations as you like;
+Claude Code keeps every one of them, and one with no process is a transcript and an id, which
+costs nothing to hold. What the number governs is what runs on your box — so lower it on a
+small one, raise it if you keep several going at a time.
+
+Open one more than the cap and the session untouched for longest is closed to make room.
+Never one that is mid-answer: an answer surviving you looking somewhere else is the entire
+point of this, and an eviction that could take the busy one would break exactly the thing it
+exists to protect. What closes is the *process*. The conversation keeps its transcript, keeps
+its row, and gets a note in its own pane saying why its session went — so going back explains
+the gap instead of reading as a crash, and your next message there picks the conversation
+straight up again.
+
+**One refusal is left, and it is about the cap** rather than about an answer: every open chat
+still answering, and nothing idle to close. It says that, with the count and the setting that
+changes it — *"all 3 open chats are still answering — brAIn keeps 3 of them alive at once
+(`chat_max_sessions` in Settings). Stop one, or wait for it to finish."*
+
+:::tip[Try it once and it explains itself]
+Ask for something slow — *"read the last week of the error log and tell me what's failing"*.
+Then press **＋** for a new chat, or pick another conversation from the list, and ask
+something else there. The first row goes **answering…** and stays that way; when the mark
+clears, the whole answer is sitting there waiting for you.
+:::
+
+Each conversation's scrollback is now its own file (`/data/chat/`). A single file was the
+shape of a single session — two live ones writing it would each have ended up holding half a
+scrollback — and the old one is read across once on upgrade, so nothing you were part-way
+through reading is blanked. Losing one of these costs a scrollback and never context: Claude
+Code owns the conversation itself.
+
 ## On a wide screen, a rail of conversations
 
 From about **1100px** the chat grows a column down the left listing **your** conversations,
 with **＋** for a new one and the one you're in marked rather than hidden. Picking one
-resumes it.
+attaches the view to it — instantly when brAIn is already holding it open, and by resuming it
+from Claude Code's own store when it isn't.
 
 Yours is the default because everything else that drives Claude Code from `/config` — voice,
 automation tasks, memory filing, study sessions — files its conversations in the same place,
@@ -91,11 +165,14 @@ count, and only for faces that have actually run in your house. Switching back f
 Classic face only ever picks up a conversation of *yours*, never the consolidator's.
 
 **✕** on a row deletes a conversation — a move into a short-lived trash, not an unlink, and
-the toast grows an **Undo** that puts back exactly what was taken. The one you're in is
-refused ("start a new chat first"): deleting the ground the live session stands on would
-kill it or quietly fork it. A checklist button turns on selection mode — checkboxes per row,
-**Select all**, one **Delete**, one Undo for the whole batch — and the open conversation is
-skipped and reported rather than failing the batch.
+the toast grows an **Undo** that puts back exactly what was taken. Any conversation a live
+session is holding is refused — not only the one on screen, now that several may be open at
+once — because deleting the ground a live session stands on would kill it or quietly fork it.
+The ✕ offers the way out rather than leaving you with a no: close that session, then delete.
+It asks first, because closing one mid-answer loses what it was writing. A checklist button
+turns on selection mode — checkboxes per row, **Select all**, one **Delete**, one Undo for
+the whole batch — and a conversation something is holding open is skipped and reported rather
+than failing the batch.
 
 It's the same list and the same resume as the ⋯ menu, so nothing lives only in the rail.
 Below that width it isn't drawn at all: 248px of conversations is most of a phone, and
@@ -104,6 +181,8 @@ Below that width it isn't drawn at all: 248px of conversations is most of a phon
 :::note[A new chat doesn't lose the old one]
 Claude Code keeps the conversation and it stays in the list. What a new chat costs is that
 the next thing you say belongs to a separate conversation — not that anything was forgotten.
+If the old one was mid-answer it stays mid-answer: **＋** opens another process beside it
+rather than taking its place.
 :::
 
 Two dead ends that aren't anymore: hitting the session's turn limit no longer ends the
@@ -135,15 +214,20 @@ listeners keep costing what the Configuration tab says. **Default** in this pick
 "follow ⚙ Settings", and names the model that setting currently resolves to. Applying a
 pick restarts the CLI with `--resume` — the conversation carries straight across — and the
 label under the composer updates on the spot, which is your confirmation it landed. It's
-refused mid-answer, because restarting the process would lose the answer being written.
+refused while *that* conversation is being answered, because restarting the process would
+lose the reply being written — the one refusal holding several sessions doesn't remove, since
+it is about this conversation rather than about which one you are looking at. The sentence
+says so, and offers the thing that works: leave it writing, and pick the model in another
+chat.
 
 ## The ⋯ menu
 
 - **New chat** — start again in a separate conversation.
-- **Conversations** — the same list as the rail, with the same filter chips and the same
-  selection mode. Pick one and it replays into the pane and carries on. Both faces stand in
-  the same directory, which is what lets each see the other's conversations at all: Claude
-  Code files them per working directory.
+- **Conversations** — the same list as the rail, with the same filter chips, the same
+  selection mode and the same **answering…** / **Needs your OK** marks. Pick one and it
+  carries on where it was — this is the only surface a phone has, since the rail isn't drawn
+  below 1100px. Both faces stand in the same directory, which is what lets each see the
+  other's conversations at all: Claude Code files them per working directory.
 - **Session details** — the model, the project directory, how you're being billed, and this
   conversation's id. Copy the id to resume the same conversation from an SSH session or
   another machine. One thing a chat session can never do is appear as "connected" in the

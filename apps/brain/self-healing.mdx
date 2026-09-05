@@ -1,0 +1,131 @@
+---
+title: Overnight Self-Healing
+description: Three things brAIn may fix while you are asleep — an add-on that should be running, a dead Z-Wave node, an integration that failed to set up — off by default, capped at three a night, with no Claude run anywhere on the path.
+---
+
+:::note[Requires brAIn 1.45]
+This page documents a release that is on its way. Everything below is built and tested; it
+is not in the current add-on yet.
+:::
+
+Every other thing brAIn does to your house is a press you made on a specific card. This one
+is not: it runs while the house is asleep and nobody is looking, which is the whole point and
+also the reason it is the narrowest thing in the add-on.
+
+It is **off by default**. `self_healing` ships `false`, and a house does not start healing
+itself because it was updated.
+
+## The three, and nothing else
+
+Each one is keyed to a finding the [house checks](/brain/checks/) already file, and each is a
+call you would have made yourself:
+
+| The finding | What it does | Why it is safe to do unattended |
+| --- | --- | --- |
+| An add-on set to start at boot is not running | **Starts it**, through the Supervisor | It was meant to be running; this is what boot would have done |
+| A Z-Wave node the controller has marked dead | **Pings it** | A read with a side effect — the controller re-marks the node if it answers. Nothing in the house moves |
+| An integration that failed to set up | **Reloads that config entry** | A reload of something already broken cannot make it more broken |
+
+That is the complete list. A finding from any other producer is not something self-healing
+touches, and there is no way to add one.
+
+:::caution[What it will not do]
+- **No power-cycling of anything.** A plug switched off and on again has a freezer behind it.
+- **No restart of Home Assistant**, and no restart of brAIn.
+- **No Claude run anywhere on this path.** A model choosing what to restart in your house at
+  3am is a guess wearing a repair.
+- **An add-on in an error state is never started.** The Supervisor could not start it, or it
+  started and exited; asking again gets the same answer. That is a case for you and a log,
+  not for a loop at 3am.
+- **A `boot: manual` add-on is never touched.** You stopped it on purpose.
+:::
+
+## When it runs
+
+Once a night, and only inside a window you have already defined:
+
+1. **Your quiet hours**, if you have set them. They are the house saying when it is asleep,
+   and a second answer derived from anything else would disagree with them on the nights the
+   two drift apart.
+2. **An hour after this house settles**, if you have not. That is the settle time brAIn has
+   *measured* — see [rhythm](/brain/measurements/#rhythm-when-this-house-gets-up) — plus an
+   hour, because bedtime is when people are still moving about. The window stays open 45
+   minutes, so an add-on restarted at 04:00 does not heal at lunchtime.
+3. **With neither, it does not run at all** — and ⚙ **Diagnostics** says so, in as many
+   words. Running at an hour nobody set would be acting on a guess about when nobody is
+   looking, and a self-healer that has never run looks exactly like one that had nothing to
+   do.
+
+A night is keyed around local midnight rather than at it, so 23:40 and 03:10 are the same
+night. A key that changed at midnight would let a pass at 23:50 and a pass at 00:10 both
+run, twenty minutes apart.
+
+## The floors
+
+Every one of these is a refusal, and each is tested against the mutation that removes it.
+
+- **At most three repairs a night.** A house with nine broken things at once is not a house
+  to fix unattended; it is a house to look at. The plan is ordered oldest-first, so a night
+  that hits the cap takes the same three every time rather than whatever order the store
+  happened to be in.
+- **One attempt per problem per night**, written to disk after *every* attempt rather than at
+  the end — so the add-on restarting at three in the morning does not start the same add-on
+  twice. The unit is the **finding** rather than the target, because the finding is what
+  clears and the clearing is the verification: a house with three add-ons down gets one
+  started and keeps its row.
+- **Never something you have already answered.** Only `open` findings. If you pressed *Fix
+  it*, *Wrong* or *Remind me later* on that row, it is a conversation you are already having
+  with brAIn.
+- **Never a protected entity, area or device.** `protected_entities` is enforced at the MCP
+  server, the chokepoint every *Claude* path to your house crosses — and neither a Supervisor
+  request nor an unattended service call is one of its callers, so this path asks the same
+  question with the same patterns. A ping reaches the **box**, so every entity on that node's
+  device is checked, not only the sensor named on the finding.
+- **An unresolvable target is skipped, not guessed.** If brAIn cannot work out which entities
+  a repair would touch — an older Core carries no config-entry link on its registry rows —
+  and your protected list is not empty, it skips. *"I could not tell"* and *"nothing is
+  protected"* are different answers, and only one of them is safe to act on.
+- **Never off something it could not read.** If the Supervisor did not answer this pass, that
+  is not every add-on having come back. A snapshot brAIn could not fetch means *I could not
+  look*, which is a skip.
+
+A failed call is recorded and not retried the same night. That needs no machinery: the
+attempt is written down whatever happened to it, and the store is what the next pass reads.
+
+## It does not check its own work
+
+Nothing here reads back whether the call worked, deliberately. A `200` from the Supervisor is
+a request being **accepted**, which is a different claim from an add-on that is running.
+
+What proves a repair is the **next house-checks pass**: the finding clears, or it does not.
+And the morning brief is where you find out which:
+
+> *brAIn started the Mosquitto broker add-on at 03:10; it is working now.*
+
+> *brAIn pinged the Z-Wave node Back door sensor at 03:11; it has not cleared yet.*
+
+> *brAIn tried to fix something overnight and could not: it reloaded the Hue integration at
+> 03:10 — the call failed.*
+
+Something mended while the house was asleep is itself a reason to send that morning's brief,
+which is otherwise silent on the mornings there is nothing worth saying.
+
+## Where to see it
+
+- **⚙ Diagnostics** in the panel: whether it is on, when it would next run, what last night
+  attempted and skipped — and, when it did nothing, which of the three silences that was.
+- **The run journal**, which records every attempt as `healed`, `heal_failed` or
+  `heal_skipped`, with the skips and their reasons.
+- **`brain report`**, which bundles both for a bug report.
+
+There is no button that runs a healing pass on demand. The window is the point: the only
+moment this is allowed to act is the one you said nobody would be looking.
+
+## Turning it on
+
+`self_healing` in the add-on's configuration, described there as *Fix three things
+overnight*. Turning it on is a decision about how much you trust everything above it, and
+that is not a decision an add-on should make on your behalf.
+
+Set your quiet hours at the same time, unless you are happy for brAIn to wait until it has
+measured your house going quiet.
