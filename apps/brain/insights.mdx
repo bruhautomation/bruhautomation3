@@ -1,6 +1,6 @@
 ---
 title: Insights
-description: brAIn as your home's analyst — cards proposed for your house rather than shipped as defaults, an ask bar with two verbs, schedules, feedback, run history, and dashboard cards.
+description: brAIn as your home's analyst — cards proposed for your house rather than shipped as defaults, an ask bar with four verbs, schedules, feedback, run history, and dashboard cards.
 ---
 
 The **Insights** tab is brAIn acting as your home's analyst. It reads your Home Assistant
@@ -33,7 +33,7 @@ cards about a house it can't read would teach you to ignore the dashboard. Add m
 entities, let history accumulate, and run it again.
 :::
 
-## The ask bar has two verbs
+## The ask bar has four verbs
 
 **Ask a question and it becomes a card.** There's no separate "new insight" dialog —
 asking *is* the way in.
@@ -59,6 +59,17 @@ learn about my boiler
 study my energy use
 figure out how the upstairs heating actually behaves
 ```
+
+**Since 1.46 it has two more, and neither makes a card either.** A sentence that *opens* with
+a moment — *when…*, *once…*, *the next time…*, *tell me when…* — becomes a
+[one-off intent](/brain/intents/): one automation that runs once and switches itself off. And
+one that asks for scenes and names a room — *"design my evening for the living room"* —
+becomes [four moods](/brain/scenes/) for that room. Both land on the
+[Proposals](/brain/proposals/) tab, and neither is enabled until you accept it.
+
+The intent is matched on the word that *opens* the sentence, on purpose: *"tell me when the
+freezer is unusual"* is a one-off, and *"what happens when the freezer warms up"* is a
+question about your house.
 
 `brain ask "why is the garage cold"` in the [terminal](/brain/terminal/) is the same engine
 against the same memory, printed as text instead of a card.

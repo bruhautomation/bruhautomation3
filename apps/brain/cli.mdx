@@ -74,10 +74,17 @@ Before Claude writes to any file under `/config`, the previous version is snapsh
 notebook edits included, since 1.26.0. Only `/config` is journalled, and **`secrets.yaml` is
 never snapshotted**. Snapshots are kept for `edit_journal_days` (default 14).
 
-Since 1.44.0 the journal also covers the one write that happens without a Claude run at all:
+Since 1.44.0 the journal also covers the writes that happen without a Claude run at all:
 accepting a [proposal](/brain/proposals/#saying-yes-and-taking-it-back) appends an automation
 to `automations.yaml`, and it is snapshotted first, in the same line shape, so `brain undo`
 puts it back exactly as it puts back an edit.
+
+1.46.0 added two more shapes of that write and both are journalled the same way — four
+[scenes](/brain/scenes/) appended to `scenes.yaml`, and a **single entry changed or cut out of
+`automations.yaml`** in place, which is what a
+[condition proposal](/brain/proposals/#the-condition-it-is-missing) and a
+[one-off's](/brain/intents/) **Remove** do. The snapshot is the whole file either way, so
+`brain undo` restores the bytes you had rather than reversing an edit after the fact.
 
 ```bash
 brain undo                    # list what Claude edited, newest first, in plain English

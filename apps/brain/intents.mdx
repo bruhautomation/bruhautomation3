@@ -1,0 +1,157 @@
+---
+title: One-Off Intents
+description: Say one thing you want to happen next time, in a sentence. brAIn writes the automation, Home Assistant runs it once, and it switches itself off — then sits on the tab saying it fired until you press Remove.
+---
+
+:::note[Requires brAIn 1.46]
+One-off intents, the [scene designer](/brain/scenes/) and the condition proposal all landed
+in **1.46**, along with the byte-level edit of `automations.yaml` that two of them need.
+:::
+
+> *"Turn the porch light off when the guests leave."*
+>
+> *"Tell me when the tumble dryer finishes."*
+
+These are the sentences people already try to say to their house, and no automation fits
+them. An automation is a **standing rule**; this is a thing to do **next time**. Building one
+by hand means writing a rule, remembering it exists, and going back to delete it — which is
+why nobody does, and why the houses that try end up with a folder of automations nobody dares
+turn off.
+
+## Two ways to say one
+
+**The ask bar**, on the Insights tab. A question that *opens* with a moment goes here instead
+of becoming an insight card: *when…*, *whenever…*, *once…*, *as soon as…*, *the next time…*,
+*next time…*, *tell me when…*, *let me know when…*, *remind me when…*
+
+It is matched on the opening word for a reason. *"Tell me when the freezer is unusual"* is an
+intent; *"What happens when the freezer warms up"* is a question about your house, and the
+difference between them is which word the sentence starts with.
+
+**`brain.intent`**, the service, which is how a voice command or an automation reaches it:
+
+```yaml
+action: brain.intent
+data:
+  sentence: Turn the porch light off when the front door has been shut for ten minutes
+```
+
+Both write the same small request file on the shared volume, and the panel drains it every
+fifteen seconds — so the expensive half has one implementation and one place to be wrong.
+Neither waits for an answer: the sentence has to be searched against your house, which is far
+longer than a service call or a voice command should block.
+
+Anything past 300 characters is a specification rather than a sentence, and is cut there.
+
+## What happens to the sentence
+
+Claude reads your house with **reading tools only** — it can search for the entity your
+sentence names and it cannot act on it — and answers with one automation. What comes back is
+checked before it becomes anything, and then it lands on [Proposals](/brain/proposals/) as a
+card carrying three things: **your own sentence**, **what brAIn understood**, and a
+[replay](/brain/replay/) of how often that trigger would have fired over the last 30 days.
+
+Those first two are deliberately kept apart. Which half was misread is the only thing worth
+knowing when it is wrong, and one paragraph blending the two cannot say.
+
+:::note[The replay is a sanity check, not evidence that you want it]
+Everywhere else on the Proposals tab, a replay is the argument: *this is how often the thing
+brAIn is suggesting would have happened*. For a one-off it is not that. You already said you
+want it — the replay is the only check there is on a **trigger that has never fired**, and it
+is there so you can see brAIn read the right thing before it goes into your file.
+:::
+
+Nothing runs until you press **Enable it**.
+
+## What gets written
+
+An ordinary automation, in your `automations.yaml`, with `mode: single` and **one extra
+action nobody asked the model for**: `automation.turn_off` pointed at itself.
+
+So Home Assistant does the running. There is no listener inside the add-on to keep alive
+across a restart, no timer to survive an update, and nothing left *doing* anything once it has
+fired. The alias is your own sentence, because in six months that is the only thing in the
+file that says why the automation is there.
+
+The write goes down the same path as any other accept —
+[written, reloaded, verified, reverted if it did not take](/brain/proposals/#saying-yes-and-taking-it-back),
+snapshotted into the edit journal first, with an Undo on the toast.
+
+## Armed, fired, removed
+
+Once it is written the card moves off the proposals list and sits above it with a pill:
+
+| | What the card says |
+| --- | --- |
+| **Armed** | *Armed and waiting. It runs once, then switches itself off.* |
+| **It fired** | The time it fired, and that it is still in your automations. |
+| **Not armed** | A sentence brAIn will not arm, and why. The press is **Dismiss**. |
+
+brAIn learns that it fired from the automation's own **`last_triggered`**, checked on every
+[house-checks pass](/brain/checks/) — not from the automation being switched off, because you
+switching it off by hand is not it having fired. The stamp has to be *after* you accepted it,
+so an automation that happens to share a slug with one that ran last month does not read as
+done the moment it is armed. An entity Core has no state for is left exactly as it is: *I
+could not look* and *it has not happened* are different answers.
+
+### Nothing removes it for you
+
+Not when it fires, not after a fortnight, not ever. **Remove** is a press.
+
+An automation that vanished from your file while you were not looking is a file you cannot
+trust, and that is a much larger cost than a line on a tab. So a fired one-off stays in your
+automations, saying it fired, until you say otherwise.
+
+One that has been **armed a fortnight without firing** is *labelled*, not deleted — the card
+changes to *"it has been waiting a fortnight and has never fired. Remove it if what you were
+waiting for already happened."* That is almost always what a fortnight of silence means, and
+the answer to it is a sentence with a button on it rather than a file that changed while
+nobody was watching.
+
+Pressing **Remove** makes the same four claims the accept made, in reverse: the entry is cut
+out of `automations.yaml`, Home Assistant reloads, the entity is gone from Core, and only then
+does the row leave the list. Any of them failing puts the file back and tells you which.
+The toast carries an Undo that puts the automation, the reload and the row back together.
+
+:::note[Your file is not reformatted to take one out]
+Removing an entry is a **byte splice**, exactly as
+[editing one](/brain/how-brain-controls-ha/#three-things-happen-without-claude) is: the bytes
+of that one entry go, and every other byte in the file — your ordering, your comments, your
+quoting — is identical afterwards.
+:::
+
+## What brAIn will not arm, and why it tells you
+
+A refusal is a **card on the tab**, never a log line. Somebody typed a sentence and is waiting
+for an answer, and *"brAIn will not do this, and here is why"* is one. Each one is answered by
+**Dismiss**.
+
+- **It sounds like a standing rule.** *"Turn the porch light on at sunset"* is something that
+  should keep happening, and it is a good thing to want — it just belongs on the ordinary path,
+  where it gets a replay, a trial week and a report. The card shows what brAIn understood
+  alongside your sentence, so you can see which half it misread and correct it rather than
+  wonder.
+- **The trigger cannot be replayed.** Only `time`, `state`, `numeric_state` and `template`
+  triggers can be [replayed](/brain/replay/) against your recorded history. A `webhook` or a
+  `device` trigger would give you a card with no number on it and nothing to read but the
+  model's own restatement of itself.
+- **The sentence named nothing brAIn could act on.** An automation that names no entity does
+  nothing, and one that does nothing is indistinguishable from one that has not fired yet.
+- **It touches a protected entity.** Anything in the add-on's `protected_entities` option.
+  Asked here as well as at the writer, because a card offering something brAIn will refuse to
+  write is a wasted no.
+- **You already have six armed.** A list of things about to happen is only useful while it is
+  short. Remove one and ask again.
+- **brAIn could not work out an automation from the sentence at all**, or could not find what
+  it named — with what it looked for on the card.
+
+Only the five most recent refusals are kept, and they are pruned among *themselves* — a run of
+sentences brAIn cannot use never pushes the armed ones off the tab.
+
+## Where to see it
+
+- **The Proposals tab**, above the proposals — a one-off is waiting on the *house*, where a
+  proposal is waiting on you. That is also why the tab's badge never counts them.
+- **⚙ Diagnostics** carries how many are armed, fired, refused, overdue and still queued, plus
+  the cap and the fortnight. An empty tab reads the same whether nobody has asked for one or
+  every ask was refused.

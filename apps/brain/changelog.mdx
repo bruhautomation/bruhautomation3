@@ -10,7 +10,53 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.45.0" date="September 4, 2026" latest>
+<Release version="1.46.0" date="September 5, 2026" latest>
+
+**The last three things on the list, and the mechanism two of them needed.** brAIn's capability map ranked twelve changes by how much of a house each one would change; this release finishes the twelve. One-off intents were **#1** on it and had been unbuildable until the shadow runner existed; the scene designer was the half of **#11** the thermal model left; and the condition an over-ridden automation is missing is what **#9** named and deferred when the override ledger shipped. All three are new producers on the [Proposals](/brain/proposals/) tab, and two of them have to *edit* somebody's YAML rather than append to it — which is the new mechanism, and the part that had to be right first.
+
+| # | On the map | Shipped in |
+| --- | --- | --- |
+| 1 | One-off intents | **1.46.0** |
+| 2 | Routine mining with a trial before enable | 1.42.0, and its lifecycle in 1.44.0 |
+| 3 | Emergency playbooks | 1.45.0 |
+| 4 | Battery runway and device decline forecasts | 1.29.0 |
+| 5 | Anomaly alerts through a notification router | 1.32.0–1.33.0 |
+| 6 | Overnight self-healing | 1.45.0 |
+| 7 | The to-do list, actionable notifications and the chore engine | 1.38.0–1.39.0 |
+| 8 | History replay for any automation | 1.42.0 |
+| 9 | Override learning and automation report cards | 1.34.0, and the condition it deferred in **1.46.0** |
+| 10 | Morning brief, weekly report and the day timeline | 1.35.0 and 1.37.0 |
+| 11 | Scene designer and the thermal model | the thermal half in 1.40.0–1.41.0, the scenes in **1.46.0** |
+| 12 | Protected entities in the MCP server | 1.29.0 |
+
+Everything else on that map is still proposed.
+
+<Changes type="added">
+
+- **Changing one entry without touching a byte of the rest of the file.** 1.44.0's writer appends and never re-serialises, because `automations.yaml` is your file with your ordering, your comments and your quoting in it — and two of this release's producers have to change an entry that is already in it. Re-serialising the list to do that would hand back a diff nobody asked for on every press, so an edit is a **byte splice** instead: the YAML is composed into a node tree without constructing any of it, and every node carries offsets into the very text that was parsed. The load-bearing test is therefore not *"the file still parses"* — a round trip through the YAML library would pass that, keep every value and quietly delete every comment — but that **every byte outside the entry is identical** before and after.
+- **Three things make that span honest, and each of them is a refusal.** A block collection's end runs on to whatever token ended it, so the last entry in a file would swallow the comment after it and one followed by a blank line would swallow that; the leading `- ` is not part of the node and has to be walked back to, across a newline, because an item written with its keys on the next line is the same item. And anything that cannot be cut on a line boundary — two entries under one id, a document that is not a top-level list, an item sharing its last line — is refused rather than approximated. Nearly-right bytes are your file with a hole in it.
+- **[The condition an automation you keep undoing does not have](/brain/proposals/#the-condition-it-is-missing).** The override finding already reports the fight — *"you have put Evening lights back 11 times, on 8 separate weekday evenings"* — and then leaves you to open the automation editor and work out what to write. This is the change that answers it, with the ledger's own numbers on the card and the automation spliced in place rather than added beside.
+- **One condition, and it is negated.** The obvious shape is wrong in the direction that breaks a working house: a `time` condition is a **conjunction**, so an automation carrying one stands down every Saturday and Sunday as well, at every hour. What the evidence supports is far narrower, so what gets written is one `time` inside a `not`. The band comes from the override ledger and is **never re-derived** — every floor that makes a band mean something already lives there, and a second answer to *"is this a pattern"* is the one nobody can see.
+- **The case on the card is a pair of numbers**, because one alone is a fact about an automation rather than an argument for changing it: *"it ran 30 times; with this condition it would have run 22 — 8 fewer, in the hours you keep putting it back."* If the two come out the same the card says so rather than dressing it up.
+- **Four refusals, and none of them is a card.** An automation with no `id` (Home Assistant's own editor cannot change one either, so the reason names that rather than pretending brAIn is what is in the way), one that already stands down over those hours, one whose existing time condition names an entity instead of a clock — *"I could not tell"* may not be read as *"there is nothing there"* — and a protected target. Each is reported in **⚙ Diagnostics** with the automation it is about, because every card on the Proposals tab is something you can answer and these are not.
+- **[A sentence that happens once](/brain/intents/).** *"Turn the porch light off when the guests leave."* Type it into the ask bar — anything opening *when…*, *once…*, *the next time…*, *tell me when…* — or call the new **`brain.intent`** service, which is how a voice command reaches it. What gets written is an ordinary automation with `mode: single` and one extra action nobody asked the model for: `automation.turn_off` on itself. Home Assistant does the running, there is no listener in the add-on to keep alive across a restart, and nothing is left *doing* anything afterwards.
+- **Nothing removes it on its own.** What is left is a card saying it fired, with a **Remove** on it — because an automation that vanished from your file while you were not looking is a file you cannot trust. One that has waited a fortnight without firing is *labelled*, not deleted: that almost always means the thing already happened and nobody told the house, and the answer to it is a sentence with a button on it. brAIn learns that it fired from the automation's own `last_triggered`, stamped after the accept, rather than from it being switched off — you switching it off by hand is not it having fired.
+- **Claude writes the config once, with reading tools only, and everything it returns is checked.** The trigger has to be **replayable**, not because a one-off needs a shadow week but because the replay is the only sanity check there is on a trigger that has never fired. It has to act **once**, and a standing rule is a refusal **with the restatement shown** — *"every evening at sunset"* is a good thing to want and belongs on the path that gives it a trial. It has to name something. And it may not touch a protected entity. A refusal is a **row on the tab** rather than a log line: somebody typed a sentence and is waiting for an answer.
+- **[Four moods for a room](/brain/scenes/).** *"Design my evening for the living room"*, or a room picker at the top of the Proposals tab. Morning, day, evening and night, composed from the registries: a colour temperature where the bulb takes one, a colour where it cannot, brightness where there is neither, on and off where there is not even that — and a bulb whose modes cannot be read gets the last of those rather than being dropped. Night is the only mood that turns most of the room off, and which light stays on is matched on its name, because there is no attribute for *"this is the one I leave on"*.
+- **The evidence is the picture, because there is no replay and no week.** A swatch per light per mood, an off light drawn as an empty outline rather than a dark square, the bulbs named in text under the strip because a phone has no hover, and a protected light shown as **skipped**. Accepting writes them to `scenes.yaml` through the same snapshot-append-reload-verify-revert path, waiting for all four scenes to appear rather than the first. Claude is used for exactly one thing and it is the naming; a failed run leaves *Morning*, *Day*, *Evening* and *Night*, which work fine.
+- **The schedule is offered only once the four scenes really exist**, and read off `scenes.yaml` rather than off the proposals store — somebody who copied the card's YAML in by hand has earned it exactly as much as somebody who pressed the button. It is an ordinary automation, so unlike the scenes it can be tried for a week. Morning and night use the times brAIn has **measured** for when this house gets up and settles; midday and the early evening are not things a wake-time measurement can see, so they are fixed guesses and the card says which two.
+
+</Changes>
+<Changes type="fixed">
+
+- **The replay skipped everything inside a `choose`.** It walked past one along with the delays and the waits, so the check that reads what an automation would *do* — the one the protected-entity refusal stands on — saw nothing at all in a `choose` and passed it vacuously. It walks `choose`, `if`/`then`/`else`, `repeat`, `parallel` and `sequence` now, to a bounded depth.
+- **A `time` condition that wrapped midnight was replayed backwards.** Home Assistant reads `after` later than `before` as *"from tonight until tomorrow morning"*, and 22:00–01:00 is the commonest window anybody writes one for. Testing the two bounds separately answers *no* at every instant of such a window — so a `not`-wrapped one passed at every instant instead, which is exactly the shape this release's condition proposal writes.
+- **A YAML file holding nothing but a comment was read as unreadable** and refused. Home Assistant's own loader answers the same thing to an empty document and a broken one, so the distinction is drawn in the writer — and a `scenes.yaml` with one header line in it is the ordinary case on a house that has never saved a scene.
+
+</Changes>
+</Release>
+
+<Release version="1.45.0" date="September 4, 2026">
 
 **The house acts.** Everything brAIn had ever done to a house was a person's press on a specific card. These are the first two things that are not, and both are deliberately the narrowest shape that still does the job — every line of each is about what it will not do. It also carries the change the chat needed to work the way a terminal does: several conversations answering at once, and a switch between them that stops nothing.
 

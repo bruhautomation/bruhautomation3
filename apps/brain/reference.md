@@ -233,6 +233,11 @@ action: brain.run_insight
 data:
   name: "Daily Briefing"   # omit to run all
 
+# Do one thing next time. Returns immediately; the card lands on Proposals.
+action: brain.intent
+data:
+  sentence: "Turn the porch light off when the guests leave"
+
 # Study the home. Returns immediately; results arrive in memory.
 action: brain.study
 data:
@@ -255,6 +260,11 @@ data:
 action: brain.clear_conversation
 # data: { conversation_id: "..." }   # omit to clear all
 ```
+
+`brain.intent` needs **1.46**. It queues the sentence and returns straight away — Claude has
+to search the house for what it names — and what comes back is a card on the Proposals tab,
+including when brAIn will not arm it. Nothing is written until you accept it. See
+[one-off intents](/brain/intents/).
 
 Plus the **65 [Power Tools](/brain/power-tools/)** services for registry administration.
 
