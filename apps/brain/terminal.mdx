@@ -39,6 +39,16 @@ The button in the corner switches between them, and so does **⚙ Settings**. Bo
 same Claude Code, on the same login, in the same `/config`, with the same permissions — the
 difference is entirely how you see it.
 
+:::note[If you only ever sign in here — fixed in 1.47]
+A sign-in done in this terminal lands in the Claude CLI's own credential file, which is the
+**last** of the three stores brAIn consults. That file holds a short-lived token plus the
+thing the CLI renews it from, on its own, on its next run — and before 1.47 brAIn read the
+lapsed token as a dead credential. The panel put up the sign-in screen a few hours after
+every terminal login, and because every Claude run in the add-on is gated on the same
+answer, nothing ever ran the CLI, which was the one thing that would have renewed it. On an
+older version, running any `claude` command in this tab clears it.
+:::
+
 **Chat** is the default. Claude Code's output rendered as a conversation: text that reflows
 to your screen, code blocks that scroll inside their own box, tool calls folded into one line
 each (tap one for its arguments and result), reasoning behind a *Thinking* line that streams
