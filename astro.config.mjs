@@ -437,6 +437,12 @@ export default defineConfig({
 										{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
 										{ label: 'MCP Tools', slug: 'brain/mcp' },
 										{ label: 'The CLI', slug: 'brain/cli' },
+										// Checking brAIn itself, and the loop that says
+										// whether its prompts are any good. Under the Hood
+										// rather than What It Measures: neither of these
+										// measures the house, they measure the add-on.
+										{ label: 'Deep Check & Rehearsal', slug: 'brain/doctor' },
+										{ label: 'Capture & the Corpus', slug: 'brain/corpus' },
 									],
 								},
 								{ label: 'Reference', slug: 'brain/reference' },

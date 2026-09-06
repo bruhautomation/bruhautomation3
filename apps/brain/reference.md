@@ -155,13 +155,15 @@ learning: true
 
 ## The panel
 
-One ingress panel on port **8099**, with five tabs. Each has its own page:
+One ingress panel on port **8099**, with seven tabs. Each has its own page:
 
 | Tab | What it is | |
 |-----|-----------|---|
 | **Insights** | Cards proposed for your home, and an ask bar with two verbs | [Insights](/brain/insights/) |
 | **Findings** | The work list: what brAIn thinks is broken, plus the guesses awaiting a yes/no | [Findings](/brain/findings/) |
-| **Terminal** | Claude Code as a chat or as a true terminal, one session | [Terminal](/brain/terminal/) |
+| **Terminal** | Claude Code as a chat or as a true terminal, with as many live conversations as the cap allows | [Terminal](/brain/terminal/) |
+| **Activity** | What happened in the house and what caused it, plus the overrides above the list | [Activity](/brain/activity/) |
+| **Proposals** | What could be better, each with its evidence, and a trial before anything changes | [Proposals](/brain/proposals/) |
 | **Memory** | The document, and the queue that files itself into it | [Memory & Learning](/brain/memory/) |
 | **Docs** | The same guide, shipped inside the add-on and searchable offline | |
 
@@ -184,6 +186,7 @@ name.
 | `model` | preset or a custom model id | The model insight generation uses. |
 | `chat_model` | a model id, or unset | The chat terminal's own model, picked **from the chat** (the model name under the composer, or ⋯ → Model). Unset follows the global `model` — and deliberately never writes it, which would silently change what every insight run costs. |
 | `chat_max_sessions` | 1–8 (default 3) | How many chat conversations keep a live Claude Code process. It counts **processes, not conversations** — you may have as many of those as you like. Past it, the session untouched for longest is closed (never one mid-answer) and reopens where it left off. |
+| `capture` | on / off (default off) | **Records what the analyst was sent and what it answered**, one file per card run under `/data/capture`, plus the ending you later gave each finding it raised. Off by default because your entity and area names are a floor plan; nothing leaves the add-on until you press **Export**. [Capture & the Corpus](/brain/corpus/) |
 | `gather_mode` | `search`, `snapshot` | **How a card gets its data.** `search` (default) sends Claude a *map* of the home plus read-only HA tools, so it looks up only what the card needs — and it's the only mode that can afford history on a typed question. `snapshot` is the old send-everything path, kept as a setting and as the automatic fallback when a search run fails. |
 | `refresh_hours`, `history_days`, `history_keep_runs`, `history_keep_days`, `timeout_minutes` | | Same meaning as the add-on options below. |
 
@@ -332,6 +335,13 @@ brain memory list        brain learn energy      brain undo      brain doctor
 ha log                   ha reload automations   ha check        ha context
 ```
 
+`brain doctor` is free and never calls Claude. Two costed checks sit beside it and neither
+ever runs on a timer: **`brain doctor --deep`** walks every face of the add-on with one real
+round trip each (about five Claude turns), and **`brain doctor --rehearse`** plants a few
+`brain_test_*` defects in your house, scores the checks and the analyst against them, and
+removes everything — asking first, and naming exactly what it would create. Both are also
+buttons in **⚙ Settings → Diagnostics**. [Deep Check & Rehearsal](/brain/doctor/).
+
 ## Undo
 
 brAIn **does not back up your configuration.** Home Assistant's own backups are whole-system and restorable, and versioning `/config` inside `/config` only made those backups bigger.
@@ -351,6 +361,22 @@ Snapshots are pruned after `edit_journal_days` and capped by total size. **`secr
 In fast mode the worker pool serves an internal HTTP API on **port 8098** (the panel owns 8099), token-authenticated via the shared `/config` volume. The integration prefers it — no file polling, and replies stream so TTS starts at the first sentence. If the API is ever unreachable, both sides fall back to the original file protocol automatically. Nothing hardcodes the port; the integration reads it from the endpoint file the pool publishes.
 
 `/api/health` — the endpoint the Supervisor watchdog polls — also calls the roll: it reports which background daemons are actually running (worker pool, listeners, usage tracker, memory consolidator, study watcher, ttyd) and when the last consolidation pass landed. That part is **informational only**, on purpose: a dead sibling can never fail liveness, or the watchdog would restart-loop the whole add-on over one daemon. `brain doctor` reads it and compares it against its own view.
+
+### Diagnostics endpoints
+
+All on the ingress panel (8099), all reachable from the terminal over loopback.
+
+| Route | What it does |
+|-------|--------------|
+| `GET /api/diagnostics` | The whole bundle: versions, options, the run journal's last day, store counts, the health verdict, which checks could not run and why, the last deep check and rehearsal, the shadow-mode lines, and the capture counts. No prompts, no replies, no entity states. Same payload as the mirror at `/config/.brain/diagnostics.json` and as HA's own **Download diagnostics** button |
+| `POST /api/doctor/deep` | Start a deep check. A second caller gets the run that is already going rather than a collision |
+| `GET /api/doctor/deep` | The stages as they land, and the last run's verdict |
+| `POST /api/doctor/rehearse` | Start a rehearsal. **Without `{"consent": true}` it answers `428`** carrying the exact list of what it would create, and writes nothing |
+| `GET /api/doctor/rehearse` | The rehearsal's progress and last scores |
+| `GET /api/capture` | One row per captured run: when, what, how many findings, how many endings label them |
+| `GET /api/capture/{run id}` | One whole capture, exactly as it is on disk |
+| `POST /api/capture/{run id}/export` | Copy that one capture to `/share/brain/corpus/` |
+| `DELETE /api/capture/{run id}` | Remove it |
 
 ![File-based IPC fallback flow](./images/ipc-flow.svg)
 
@@ -395,6 +421,9 @@ A published terminal port answers the LAN with no Home Assistant login in front 
 | `/data/findings.json` | The findings work list itself (the mirror above is derived from it, never read back) |
 | `/data/chat_transcript.json` | The chat tab's scrollback — capped, and only a scrollback: Claude Code owns the real conversation, so losing this file never costs context |
 | `/data/chat-trash/` | Deleted chat conversations, where the toast's Undo restores from (TTL'd and capped) |
+| `/data/capture/` | Captured analyst runs, when `capture` is on — redacted as they are written, capped at the newest 50, and named in `backup_exclude` |
+| `/share/brain/corpus/` | Where **Export** copies one capture, so the file editor and Samba can reach it. The only route out of the add-on |
+| `/share/brain/reports/` | The redacted bundle `brain report` writes |
 | `/data/terminal-credential` | ttyd's generated Basic-auth password |
 | `/data/run-sources.jsonl` | Which face (voice, consolidator, study, chat…) started each conversation — what keeps machine runs out of your Chats rail |
 | `/data/.brain/edits/` | The edit journal `brain undo` restores from |
@@ -465,6 +494,7 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 |---------|-----|
 | Add-on won't start | Check the **Log** tab. Usually an architecture mismatch — the add-on builds for `amd64` and `aarch64` only. |
 | Integration not discovered | Restart HA after the first add-on start. Add manually via **Settings → Devices & Services** if needed. |
+| The panel says you are signed out, but the terminal works fine | Fixed in **1.47**. Before it, brAIn read the Claude CLI's short-lived access token as a dead credential a few hours after every terminal sign-in, put up the sign-in screen, and then never ran the CLI — which was the one thing that would have renewed it. **The workaround on an older version:** open the Terminal tab and run any `claude` command. That renews the token and clears the verdict. |
 | The terminal asks for a second login | One credential is shared with the CLI in both directions; if it doesn't take, `brain doctor`'s auth check names the file it found and the one it expected. |
 | It can't see entities | `enable_ha_mcp_server: true`? Run **`brain doctor`** — it reports any tool that errors. |
 | Voice replies cut off | Bump `assist_max_turns`. |

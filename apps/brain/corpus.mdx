@@ -1,0 +1,245 @@
+---
+title: Capture & the Corpus
+description: The prompts behind every insight card are the one part of brAIn no test can reach. Capture records what the analyst was sent and the ending you gave its findings; the corpus freezes houses with their labels; the replay scores this release against them; and shadow mode is where a new check runs before anybody sees it.
+---
+
+:::note[Requires brAIn 1.47]
+This page documents a release that is on its way. Everything below is built and tested; it
+is not in the current add-on yet.
+:::
+
+Everything under [Deep Check & Rehearsal](/brain/doctor/) tests brAIn's *plumbing*. The one
+part no test can reach is the **prompts** — the framing and the ten kilobytes of output rules
+behind every insight card — because nothing in the project runs them against a real house or
+a real model. A prompt edit ships on somebody's judgement, and is measured by nothing.
+
+Here is why that matters more than it sounds. BRUH's own light-show add-on had a function for
+finding the accents in a track that returned **zero** results on every real song for its
+entire life — with a green test suite behind it the whole time, because the only fixture it
+ever had was a synthetic thump loud enough to clear a threshold no real mix reaches. The
+feature did nothing, for months, and nothing could tell. brAIn's analyst prompts have exactly
+that exposure.
+
+This page is the machinery that changes it. **Every part of it is off, optional or invisible
+until you choose otherwise.**
+
+:::note[Two different things are called "replay" in these docs]
+The [shadow runner](/brain/replay/) replays an *automation* against your recorded history, to
+say when it would have fired. The **corpus replay** on this page replays *brAIn's own prompts
+and checks* against frozen houses, to say how well they did. They share a word and nothing
+else.
+:::
+
+## Capture
+
+**⚙ Settings → Diagnostics → Capture runs for the corpus.** Off by default.
+
+With it on, every card run writes one file under `/data/capture`:
+
+- **The data brAIn gave Claude** — the map of the home for a search run, the slimmed home for
+  a snapshot one.
+- **The card that came back** — its findings, what it learned, the fields you read. Never the
+  rendered chart.
+- **What it cost.**
+- And later, **the ending you gave each finding it raised**.
+
+That last part is the whole point.
+
+### An ending is already a label
+
+Every press that ends a row on the [Findings](/brain/findings/) tab is a judgement about
+whether the report was right:
+
+| The press | What it says about the report |
+| --- | --- |
+| **I've fixed it** | It was right |
+| **Got it**, after an automated fix | It was right |
+| **✕ Wrong** | It was not |
+
+Pair that with the prompt that produced it and a house becomes a **graded example**. A
+directory of graded examples is something a prompt change can be scored against *before* it
+ships, which is the thing that has never existed.
+
+The label is recorded where every ending goes through — not in the tab's buttons — so a tick
+in the [To-do app](/brain/findings/), a button on a notification and a press in the panel all
+land the same way. The label is a property of the **answer**, not of the surface you gave it
+on.
+
+### The four rules
+
+- **Off by default.** Your entity and area names are a floor plan. Nothing is recorded until
+  you switch it on, and the switch says exactly what it records.
+- **Redacted on the way in, not on the way out.** Anything credential-shaped is stripped as
+  the file is written — a redaction applied at export is one that never ran for the file
+  somebody found by another route. It is the same scrub `brain report` applies to every file
+  in a bundle, and the shell half and the Python half are driven against the same fixture
+  strings so the two cannot drift.
+- **Nothing leaves the add-on until you press Export.** `/data` is not visible from the file
+  editor, from Samba or from Home Assistant, and `backup_exclude` names the folder, so a
+  backup does not carry it either.
+- **The newest 50 runs are kept**, oldest deleted first. This is a sample, not an archive.
+
+### Review, export, delete
+
+The list under the switch gives you three buttons per run, and **View is the first one on
+purpose**:
+
+| Button | What it does |
+| --- | --- |
+| **View** | Shows the whole file, exactly as it is on disk. There is no unredacted copy for this to be hiding |
+| **Export** | Copies that one file to `/share/brain/corpus/<run id>.json`, where the file editor and Samba can reach it. This is the only route out |
+| **Delete** | Removes it |
+
+The list also tells you which runs have an **ending** on them, because a capture with no
+ending is a prompt and a reply with nothing to score them against.
+
+`/api/diagnostics` carries the numbers — whether capture is on, how many files there are, how
+many are labelled — and **never the captures themselves**, because a diagnostics bundle is
+what gets attached to a public issue.
+
+### One id joins everything
+
+The id on a capture is the session id the run already had. So a capture file, a line in the
+run journal, a transcript and a row in the Chats rail all name the **same run**, rather than
+being four ids nothing can join. A finding carries it too, which is what lets an ending find
+the capture that raised it.
+
+A house check carries none, and that is the honest answer: nothing was asked, so there is no
+prompt to grade.
+
+## The corpus
+
+`tests/corpus/` in the repository holds houses **and what was true of them**, frozen.
+
+Two entries ship with it, and neither is hand-written:
+
+| Entry | What it is | Where its labels come from |
+| --- | --- | --- |
+| The clean house | The test suite's own healthy fixture | None at all — *every check must be silent here*, which is the strongest claim in the directory |
+| The rehearsal house | That same house with the [rehearsal's](/brain/doctor/#brain-doctor---rehearse) own planted defects in it | The rehearsal's plan — the same defects it creates on a real install |
+
+Ground truth by construction in both cases, and the second one is why the corpus and the
+rehearsal can never disagree about what a planted defect is.
+
+**The entries are frozen deliberately, and nothing asserts they still match what the builder
+would produce today.** An entry whose expectations are regenerated from the current code
+cannot fail when the code changes, which is the one thing it exists to do. Every timestamp
+inside an entry is relative to the snapshot's own recorded *now*, so a replay next year grades
+exactly what a replay today does.
+
+### Contributing one from your own house
+
+Entirely optional, and it should be. Four steps, and **the third is the important one**:
+
+1. **Switch capture on.** ⚙ → Diagnostics → *Capture runs for the corpus*.
+2. **Use brAIn normally for a while, and answer its findings.** The endings are the labels.
+3. **Read one.** Press **View**. That is the whole file, exactly as it is on disk. If there
+   is anything in it you would not put in a public pull request, press **Delete** instead.
+4. **Export it** and open a pull request adding the file to `tests/corpus/entries/`, with a
+   title and a note saying what it is meant to catch.
+
+`tests/corpus/README.md` is the whole procedure, including the test that validates every
+entry before you open the pull request.
+
+## Replay
+
+`python tests/corpus/replay.py` scores this release's producers against the corpus, in two
+halves that cost very different things.
+
+### The free half
+
+Every [house check](/brain/checks/) against every entry, compared with what the entry says
+should be found. **No model, no tokens, no network.** It runs in ordinary CI on every pull
+request.
+
+This is what fails when somebody moves a threshold — and it names **the house** rather than a
+line number: a check that gains a condition stops finding a defect that was planted for it,
+and one that loses a condition starts firing on a house that is meant to be silent.
+
+### The costed half
+
+The analyst's prompt, **rebuilt with the current builder** — a stored prompt would grade the
+release that captured it, not this one — asked of a real model and scored against the endings
+people gave. A hit is a labelled finding reported, a miss is one that was not, and reporting
+something the homeowner already said was **wrong** is a false positive the report names
+separately, because that is the specific mistake worth catching.
+
+It is capped three ways, because a measurement that can quietly spend an account's window is
+one nobody runs twice: `--max-entries`, `--max-tokens` and `--model`, which says which model
+the number belongs to. The token cap is checked **before** each run rather than after — a cap
+that stops once it has been passed has already spent the run that passed it.
+
+**A capture from a *search* run is skipped there, and says why.** That run read the house with
+Home Assistant tools; replaying the prompt where those tools reach nothing would grade a model
+that cannot look anything up and report the result as the prompt's fault. Such a capture is
+still worth contributing — `replay.py --with-tools`, run from inside the add-on, is the switch
+for grading one against a real house.
+
+### The nightly job
+
+The costed half runs on a schedule in CI, and:
+
+- it is **never required for a pull request** — it costs money, and it can be red because a
+  model had a bad night, which is not a reason to block a change;
+- with **no `BRAIN_REPLAY_TOKEN` secret** it runs the free half and says so in the log rather
+  than failing. A scheduled job that goes red for want of a credential is a job people switch
+  off, and then the real failure is in the same stream nobody reads;
+- the report is uploaded as an artifact.
+
+One scorer serves the corpus, the rehearsal and both halves of it, because *"precision against
+labels"* having two answers is exactly the drift a shared prompt contract exists to avoid.
+Nothing over nothing answers **0.0**, never 1.0 — a number nobody should trust that looks like
+the best possible one.
+
+## Shadow mode
+
+A house check that is new goes into **shadow** first. It runs on every pass, files to a store
+of its own, and reaches nothing you look at:
+
+- not the [Findings](/brain/findings/) tab,
+- not the badge,
+- not a notification,
+- not the To-do list,
+- not the analyst's own prompt.
+
+Each of those is a separate test, because *"it is not rendered"* is five claims and a test of
+one is a test of one.
+
+:::caution[Why it is a separate store rather than a hidden status]
+The findings store deduplicates by wording across **every** status *and* the settled ledger —
+which is exactly what stops a re-reported problem ringing your phone twice. A hidden status
+would inherit that: a shadow row would **suppress a real report** of the same problem. A rule
+nobody has agreed to yet, silencing the analyst about something that is genuinely wrong. A
+separate file cannot do that.
+:::
+
+### The number is agreement, not precision
+
+Nothing in shadow has an ending on it — nobody can press **Wrong** on a row they cannot see.
+So what can be counted is whether something **else** reported the same thing: a matching row
+in the visible store, or in the settled ledger. That is weaker than a person's judgement, and
+it says so by its name.
+
+It reads the **settled ledger** as well as the open list, or a check would look worse the
+better your house is kept.
+
+**Days ride with the count**, because fourteen rows over one day is one evening and fourteen
+over nine days is a pattern. ⚙ → Diagnostics shows one line per trialled check:
+
+> *`dev.example`: 14 rows over 9 days, 11 agree with what was filed*
+
+A check being trialled is named there even when it has filed nothing, because *"this check is
+being trialled and has found nothing"* and *"no check is being trialled"* are different
+answers and only one of them is a rule that might be ready. `brain report` inherits the same
+lines.
+
+### Nothing is promoted automatically
+
+A check moves onto the visible list when somebody reads those numbers, and the corpus numbers
+beside them, and decides it has earned a place. That is a code change a person makes: a
+producer that promoted itself on a threshold would be a threshold nobody can see deciding what
+your house is told about.
+
+**No check is in shadow in this release.** Every one that ships has earned its place, and the
+set is empty on purpose — a set with something in it "for now" is how a trial becomes
+permanent.
