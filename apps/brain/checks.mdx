@@ -61,10 +61,34 @@ the wording so the same problem is never raised at you twice.
 
 - **Automatically**, every few hours (`checks_interval_hours`), plus one pass around your
   house's measured bedtime so the bedtime check is ever awake to fire.
-- **`brain check`** from the terminal.
+- **`brain check`** from the terminal — `brain check list` for the catalog and when each one
+  last ran.
 - **`POST /api/checks/run`**.
 
 A whole pass costs no tokens and takes seconds.
+
+## A new check runs where nobody can see it first
+
+Since 1.47 a rule that is new goes into **shadow** before it goes on the list. It runs on
+every pass, files to a store of its own, and reaches nothing you look at — not this list, not
+the badge, not a notification, not the To-do list, not the analyst's own prompt. ⚙ →
+Diagnostics shows what it has been finding and how often something else found the same thing,
+and **nothing is promoted automatically**: moving a check onto the visible list is a decision
+somebody makes reading those numbers. That is what stops a floor that is right in one house
+being tested against everybody else's with a week of **Wrong** presses.
+
+**No check is in shadow in this release** — every one that ships has earned its place. How it
+works, and what its numbers mean: [Capture & the Corpus](/brain/corpus/#shadow-mode).
+
+## Do these rules work on *your* house?
+
+The suite tests every check against fixture houses, which cannot see your Home Assistant
+version, your integrations or your data shapes. Two things answer that on the install you
+actually have: [`brain doctor --rehearse`](/brain/doctor/#brain-doctor---rehearse), which
+plants a couple of defects here and scores the checks and the analyst against them; and the
+[corpus replay](/brain/corpus/#replay), which runs every check against frozen houses with
+known labels on every pull request, and fails — naming the house — when somebody moves a
+floor.
 
 ## When you hear about them
 
