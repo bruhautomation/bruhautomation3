@@ -1,0 +1,233 @@
+---
+title: Deep Check & Rehearsal
+description: brain doctor asks whether the plumbing is connected. --deep asks whether each face of brAIn works right now, by doing the thing. --rehearse plants a few defects in your own house, scores the checks and the analyst against them, and takes everything back out.
+---
+
+:::note[Requires brAIn 1.47]
+This page documents a release that is on its way. Everything below is built and tested; it
+is not in the current add-on yet.
+:::
+
+A token is present. The MCP server completes a handshake. The panel answers. A daemon has a
+pid. Every one of those can be true while the thing you actually use is broken — a credential
+that stopped working on a Tuesday afternoon, a listener holding a folder open with nothing
+behind it, an allow-list that quietly stopped letting a read through.
+
+`brain doctor` answers the first question and is still the one to run first, because it costs
+nothing. These two answer the second, and they cost something, which is why neither of them
+ever runs on its own.
+
+## Three checks, three prices
+
+| | What it answers | What it spends |
+| --- | --- | --- |
+| **`brain doctor`** | Is the plumbing connected? | nothing — it never calls Claude |
+| **`brain doctor --deep`** | Does each face work end to end, right now? | about **five Claude turns** |
+| **`brain doctor --rehearse`** | Do the checks and the analyst find a defect planted in *this* house? | **one analyst run** |
+
+All three are also in the panel: **⚙ Settings → Diagnostics**, where the free report is
+already rendered and the two costed ones are buttons under it.
+
+## `brain doctor --deep`
+
+Eight stages, in order. Each is a real round trip with its own budget, and each has a sentence
+that names the switch or the log to look at when it breaks.
+
+| Stage | The round trip | What that proves |
+| --- | --- | --- |
+| **Claude, no tools** | Asks for a fixed JSON object and reads it back | The credential works for a plain run, and the JSON extractor can read a real reply — the step every insight card stands on, and the one whose failure reads as *"the card didn't generate"* |
+| **Analyst tools** | Asks for the area count **and** attempts a `call_service` | MCP reaches the model, the allow list lets a read through, and the deny list blocks an acting tool. A `call_service` that actually *ran* is the loudest failure on this page |
+| **Chat session** | Opens a session of its own, sends one message, closes it | The streaming session spawns, speaks and ends a turn |
+| **Automation listener** | Writes a task in the integration's own wire format | The listener is alive, it claims the task by renaming it inside the grace window, and a result comes back |
+| **Assist** | A `conversation/process` turn with brAIn's own agent id | The worker pool answers through Home Assistant's front door, not just its own health endpoint |
+| **Memory** | Queues a fact, consolidates, then takes it out again | A fact reaches `memory.md`, and can be removed |
+| **Findings and undo** | Files a finding, ends it, undoes it, ends it for good | The store, the settled ledger, the memory line and the undo token all round-trip |
+| **Fixer** | One real fix run renaming a `brain_test_` helper | The one path that can change your house can, and it puts it back |
+
+### How to read the report
+
+Every stage lands in one of three states, and **`skipped` is not a lesser `failed`**:
+
+- **`ok`** — the round trip completed and what came back was what it should be.
+- **`failed`** — it did not, and the line says what to look at.
+- **`skipped`** — brAIn did not look. A precondition failed, or the face is switched off.
+
+The run's own verdict is the worst state on the list, and the report names the first stage
+that failed. Non-zero exit on any failure, so it can be wired into something.
+
+**Every stage is reported, not just the first break.** *"The chat works and the automation
+listener does not"* is the answer, and stopping at the first break hides it.
+
+**A stage whose precondition failed is skipped with the reason** rather than run. Eight
+identical authentication failures is a report nobody reads past line one — so if the plain
+Claude run cannot authenticate, the stages that need it say so and stop there.
+
+**A switched-off face is skipped, not failed.** Assist with the Assist integration off, the
+automation task with the Automation integration off, and the fixer when
+`protected_entities` covers the helper it would rename are all skips, and each names the
+switch. A list doing its job is not a fault. The chat stage skips rather than closing
+somebody else's conversation to make room for itself.
+
+### What it creates, and takes back
+
+Everything: the synthetic fact, the synthetic finding, the helper. And **the cleanup is
+verified** — the fact is not in `memory.md` afterwards, the finding is in neither the store
+nor the settled ledger, the helper is gone. A leftover is reported as a **failure of the
+stage that left it**, not as a footnote.
+
+### What it costs, and when it runs
+
+About five Claude turns and a few minutes. Every one of those turns is journalled and
+counted: the runs claim their own `doctor` source before they start, so a probe never shows
+up in your Chats rail as a conversation somebody had, and the tokens go through the usage
+store, so the topbar pill moves and its popover attributes the movement.
+
+It rides the same generation queue a *Fix it* run does, because one Claude invocation in
+flight across the whole add-on is what keeps a subscription's rate limit intact. A second
+press while one is going watches the run that is already going rather than starting a
+second.
+
+:::caution[It never runs on its own]
+There is no option that schedules a deep check and no timer anywhere. It spends real turns,
+so it happens when you ask — the same rule, for the same reason, as the six-hourly
+credential re-check that only ever happens while somebody is looking at the panel.
+:::
+
+### Running one
+
+```bash
+brain doctor --deep           # each line as it lands
+brain doctor --deep --json    # the whole object, for a script
+```
+
+Or **⚙ Settings → Diagnostics → Run deep check**, which fills the stage list in as it goes.
+
+The last run's verdict — when, what it was, and which stage broke, never the transcript —
+rides in the diagnostics payload, so `brain report` and Home Assistant's own **Download
+diagnostics** button carry it without anybody having to ask for it.
+
+## `brain doctor --rehearse`
+
+Every [house check](/brain/checks/) has a test that asserts it silent on a clean fixture
+house before asserting it finds the planted row. What no fixture can see is **this** install
+— its Home Assistant version, its integrations, its data shapes — and that is where every
+late bug in this add-on has lived. A rule that is right against a hand-built dictionary and
+wrong against a real registry passes the suite for its entire life.
+
+So a rehearsal plants a small set of deliberately broken things in your house, runs the checks
+and the analyst against them, scores both, and removes everything.
+
+### It asks first, and the question names what it would create
+
+A rehearsal request without consent is answered with the **exact list** of what it would
+create — the ids, and what each one is for — and **nothing is written before you answer**.
+The CLI prints that list and waits; the panel's **Rehearse…** button shows the same list in a
+confirm dialog. `--yes` skips the question for scripted use.
+
+What it plants, today:
+
+| What | Why |
+| --- | --- |
+| `brain_test_dead_ref` — an automation whose action names a light that does not exist | Should be found by the *automation names a missing entity* check |
+| `brain_test_dead_service` — an automation calling a `notify` service that is not registered | Should be found by the *automation calls a missing service* check |
+| `brain_test_reading` — an ordinary `input_number` helper, set to a perfectly normal value | Should be found by **nothing**. A check that reports it is a false positive worth knowing about |
+
+Everything goes in through paths brAIn already owns — the automations through the same
+write-reload-verify path an accepted [proposal](/brain/proposals/) uses, so the rehearsal is
+also a real round trip of the writer and of the splice that takes an entry back out. A
+rehearsal that used a private back door would be rehearsing the back door.
+
+It refuses **before** asking for consent if `protected_entities` would match anything it
+would create. Your list said not to touch that, and the honest answer is to refuse rather
+than to ask and then fail.
+
+:::caution[The checks are run without filing anything]
+A rehearsal runs the check rules directly, never the scheduled pass. The scheduled pass
+files to the store, notifies, and clears — so it would ring somebody's phone about a defect
+brAIn planted, and let a planted row clear a real one.
+:::
+
+### The numbers, and how to read them
+
+```text
+  Checks:  2 of 2 planted defects found, 0 reported that were not planted
+    found           brain_test_dead_ref  (auto.dead_ref)
+    found           brain_test_dead_service  (auto.dead_service)
+    clean           brain_test_reading
+  Analyst: found 1 of 2 (recall 50%, precision 100%) on the default model
+  Cleanup: removed all 3 and checked they are gone
+```
+
+- **Checks** — of the defects planted, how many the deterministic rules found, and whether
+  anything *else* fired on a `brain_test_` row.
+- **Analyst** — the automations card's own prompt, run against the same house and scored for
+  **recall** (how many of the planted defects it reported) and **precision** (how much of
+  what it reported was really there). That number is the reason the rehearsal exists: *on
+  this house, this Home Assistant version, this model, the analyst found 3 of 4 and reported
+  1 thing that was not there* is what makes a prompt change measurable somewhere other than
+  the developer's own home.
+- **Cleanup** — what was removed, and loudly if anything could not be.
+
+**Both numbers are scoped to `brain_test_` rows.** A finding about your real house is not a
+false positive; folding one in would turn "precision" into a measurement of how tidy your
+house is.
+
+**Nothing over nothing is 0.0, never 1.0.** A score with nothing behind it is a number nobody
+should trust, and reporting it as the best possible one is how it gets trusted.
+
+### Checks a single pass structurally cannot rehearse
+
+Some floors are measured in days, and a pass that lasts a couple of minutes cannot produce
+them: an automation switched off for thirty days, a week of hourly statistics reading the
+same value, three stored traces of runs that all stopped at the same condition.
+
+Those are **named as not rehearsable, with the reason**, rather than counted as missed. A
+rehearsal that scored them would report a working check as broken on every single run — which
+is worse than not testing it, because it teaches you to ignore the number.
+
+### The cleanup, and the check on the cleanup
+
+Removal runs in a `finally`, so a rehearsal that fails halfway still cleans up, and it is
+**verified against a fresh snapshot** in all three places a leftover can survive: the
+automations file, the entity registry and the states.
+
+And the free `brain doctor` is what catches the one that could not:
+
+> *a rehearsal left something behind: /config/automations.yaml, input_number.brain_test_reading*
+>
+> *Fix: run `brain doctor --rehearse` again (its cleanup runs first), or delete the
+> `brain_test_*` entries from /config/automations.yaml and reload automations*
+
+It reads the files rather than Core where it can, because a doctor line that only works when
+everything else does is a line that is absent exactly when it matters. It is deliberately
+**not** a reason for `sensor.brain_health` to report `degraded`: a left-behind test helper is
+a tidy-up, not brAIn failing to work, and that sensor's whole value is that its three states
+mean something.
+
+### Running one
+
+```bash
+brain doctor --rehearse            # shows what it would create, then asks
+brain doctor --rehearse --yes      # skip the question
+brain doctor --rehearse --json     # the whole object
+```
+
+Or **⚙ Settings → Diagnostics → Rehearse…**.
+
+## Where the verdicts show up
+
+- **⚙ Settings → Diagnostics** — the free report, then the two buttons, each with the date
+  and verdict of its own last run.
+- **`/api/diagnostics`** — when the last deep run was, what it decided and which stage broke;
+  the last rehearsal's scores and cleanup line. Never a transcript, never a prompt.
+- **`brain report`** — bundles that payload, `brain doctor --json` and the tail of the add-on
+  log into one redacted archive under `/share/brain/reports/`.
+- **Home Assistant's own Download diagnostics button** on the brAIn integration, which is the
+  same payload.
+
+## What none of this measures
+
+The **prompts**. A deep check proves the analyst's tools reach the house; a rehearsal scores
+one prompt against two planted defects on one install. Neither can tell you whether an edit
+to the card contract made every card better or quietly worse across a hundred houses — that
+is what [capture and the corpus](/brain/corpus/) are for.

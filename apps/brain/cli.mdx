@@ -21,7 +21,13 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 | `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
 | `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
 | `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
-| `brain doctor` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool, memory) and prints PASS/FAIL with a fix hint per part |
+| `brain doctor` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool, memory) and prints PASS/FAIL with a fix hint per part. Free: it never calls Claude. `--json` gives the same verdict as one object |
+| `brain doctor --deep` | [Every face of brAIn, one real round trip each](/brain/doctor/#brain-doctor---deep) — a plain Claude run, the analyst's tools, a chat turn, an automation task, Assist, memory, findings and one real fix. Spends about five Claude turns; only ever runs when you ask |
+| `brain doctor --rehearse` | [Plant a few defects named `brain_test_*`](/brain/doctor/#brain-doctor---rehearse), run the checks and the analyst against them, score both, then remove everything. Asks first, and says exactly what it would create. `--yes` skips the question |
+| `brain check` | Run the [house checks](/brain/checks/) now, through the panel's API — `list` for the catalog and when each last ran. No Claude run, no tokens |
+| `brain weekly [send]` | The week's numbers and the last report sent; `send` writes and sends this week's now |
+| `brain report` | Write a redacted diagnostics bundle to `/share/brain/reports/` for a bug report (`--no-names` to hash entity ids) |
+| `brain login [--status\|--share]` | Sign in to Claude, and share that login with the other BRUH add-ons. The same command as `ha login` — the credential is brAIn's, and this is where people look for it |
 | `brain help` | The full list |
 
 ```bash
@@ -31,6 +37,9 @@ brain memory confirm "the garage fridge runs 24/7"
 brain findings done 2 "replaced the battery myself"
 brain learn energy
 brain undo --all-today             # revert everything Claude changed today
+brain doctor                       # free, and the one to run first
+brain doctor --deep                # every face, one real round trip each
+brain doctor --rehearse            # plant defects here, score, clean up
 ```
 
 `brain findings` goes through the panel's own API, never the store files — so a CLI ending
@@ -40,7 +49,19 @@ and chat API are answering, the terminal's password gate is actually on, the Cla
 itself runs, the three background daemons are alive, the run-sources ledger is
 claude-owned, no crashed consolidation pass is still holding its lock, disk space, and how
 stale the usage reading is — and it reads `/api/health`'s daemon roll-call and compares it
-against its own view.
+against its own view. Since 1.47 it also warns if a rehearsal left anything named
+`brain_test_*` behind, and names the command that removes it.
+
+**The three doctors cost three different amounts**, and only the first is free:
+
+| | What it answers | What it spends |
+| --- | --- | --- |
+| `brain doctor` | Is the plumbing connected? | nothing |
+| `brain doctor --deep` | Does each face work end to end, right now? | about five Claude turns |
+| `brain doctor --rehearse` | Do the checks and the analyst find a defect planted in *this* house? | one analyst run |
+
+Neither costed one ever runs on a timer, and both are also buttons in **⚙ Settings →
+Diagnostics**. The full walk-through: [Deep Check & Rehearsal](/brain/doctor/).
 
 ## `ha` — Home Assistant operations
 
