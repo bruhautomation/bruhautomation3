@@ -155,13 +155,15 @@ learning: true
 
 ## The panel
 
-One ingress panel on port **8099**, with five tabs. Each has its own page:
+One ingress panel on port **8099**, with seven tabs. Each has its own page:
 
 | Tab | What it is | |
 |-----|-----------|---|
 | **Insights** | Cards proposed for your home, and an ask bar with two verbs | [Insights](/brain/insights/) |
 | **Findings** | The work list: what brAIn thinks is broken, plus the guesses awaiting a yes/no | [Findings](/brain/findings/) |
-| **Terminal** | Claude Code as a chat or as a true terminal, one session | [Terminal](/brain/terminal/) |
+| **Terminal** | Claude Code as a chat or as a true terminal, with as many live conversations as the cap allows | [Terminal](/brain/terminal/) |
+| **Activity** | What happened in the house and what caused it, plus the overrides above the list | [Activity](/brain/activity/) |
+| **Proposals** | What could be better, each with its evidence, and a trial before anything changes | [Proposals](/brain/proposals/) |
 | **Memory** | The document, and the queue that files itself into it | [Memory & Learning](/brain/memory/) |
 | **Docs** | The same guide, shipped inside the add-on and searchable offline | |
 
