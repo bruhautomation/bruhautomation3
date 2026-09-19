@@ -322,7 +322,7 @@ The first two also carry `name` and `message` fields phrased as sentences, so th
 
 ## MCP server tools
 
-The built-in MCP server gives Claude **36 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users) and `call_service` with `return_response` for the [Power Tools](/brain/power-tools/) workflow. Verify them on your own system with **`brain doctor`**. Full tool-by-tool reference: [MCP Tools](/brain/mcp/).
+The built-in MCP server gives Claude **51 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users) and `call_service` with `return_response` for the [Power Tools](/brain/power-tools/) workflow. Verify them on your own system with **`brain doctor`**. Full tool-by-tool reference: [MCP Tools](/brain/mcp/).
 
 ![MCP server tools by category](./images/mcp-tools.svg)
 
