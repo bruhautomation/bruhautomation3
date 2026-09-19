@@ -22,6 +22,24 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 | `get_ha_config` / `get_services` / `get_supervisor_info` | Config details, service catalog, system info |
 | `get_device_registry` | Per-domain entity count summary |
 | `list_dashboards` / `get_dashboard` | Enumerate dashboards; read one's full config — the reading half of the fetch-modify-save flow behind [Power Tools](/brain/power-tools/)' `update_dashboard` |
+| `explain_change` / `get_activity` | What caused a change, and the house's recent activity as [episodes](/brain/activity/) — read off the panel over loopback, so attribution has one implementation |
+| `get_findings` / `get_health` | The Home feed as rows, and brAIn's own verdict on itself — so a card can ask whether the house already knows about a problem |
+
+## What brAIn has measured
+
+Since 2.2 every [measurement](/brain/measurements/) is a tool, read over the panel's own routes so each answer has one implementation. Each one says in a sentence when a store has not measured yet rather than answering with a number it does not have.
+
+| Tool | What it does |
+|------|--------------|
+| `get_house_model` | Every measurement's state in one call — ready, collecting, stale, not available — and one line per ready one |
+| `get_baseline` / `what_is_normal` | A numeric entity's own normal by hour of the week; `what_is_normal` places its reading now inside that band, in its own spreads |
+| `room_physics` | A room's heat-loss and gain rates, its time constant, and how long it takes to warm |
+| `appliance_status` | Whether a washer, dryer or dishwasher is idle, running or finished, by its own measured power shape |
+| `house_rhythm` | When the house gets up and settles, weekdays and weekends apart |
+| `door_habits` | How much of each hour of the week a door, window, lock or cover is usually open |
+| `habits` | What you do by hand with an entity often enough to be a habit, with the overrides and odd presses against it |
+| `simulate_automation` | Replay an automation config over the recorder's last weeks and grade it against what you actually did — calling nothing |
+| `recall` | Search the [facts store](/brain/memory/) by subject or by words: what brAIn knows, who taught it and when |
 
 ## Acting on it
 
@@ -32,7 +50,8 @@ The add-on ships a built-in **MCP server** that Claude Code launches automatical
 | `control_light` / `control_climate` / `control_media_player` / `control_cover` / `control_fan` / `control_switch` / `control_lock` / `control_alarm` / `control_vacuum` | Purpose-built device control for every major domain |
 | `activate_scene` / `run_script` / `send_notification` / `fire_event` / `reload_config` | Scenes, scripts (with variables), notifications, custom events, config reloads |
 | `render_template` | Render Jinja2 — test a template before it goes in an automation |
-| `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox |
+| `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox, tagged with the entity, room or person it is about |
+| `offer_resolutions` | Put the ways the finding under discussion could end on the person's screen as buttons — changes nothing itself; the press is the consent |
 
 ## Scoping & safety
 
