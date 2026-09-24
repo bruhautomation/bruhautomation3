@@ -1,12 +1,52 @@
 ---
-title: One-Off Intents
-description: Say one thing you want to happen next time, in a sentence. brAIn writes the automation, Home Assistant runs it once, and it switches itself off — then sits on the tab saying it fired until you press Remove.
+title: Rules & One-Offs, in a Sentence
+description: Say what you want your house to do, in a sentence. A standing rule is drafted, replayed over the last month and graded against what you did before it's offered; a one-off runs once and switches itself off.
 ---
 
-:::note[Requires brAIn 1.46]
-One-off intents, the [scene designer](/brain/scenes/) and the condition proposal all landed
-in **1.46**, along with the byte-level edit of `automations.yaml` that two of them need.
-:::
+Say what you want your house to do, in plain English — in the ask bar on **Home → Insights**,
+to a voice assistant, or with the `brain.intent` service. brAIn works out whether you mean
+**a rule** (every time) or **a one-off** (next time), writes the automation, and puts it on
+the **Proposals** tab. Nothing runs until you say yes.
+
+## A rule, in a sentence
+
+> *"Whenever the front door opens after dark, turn the hall light on."*
+>
+> *"Always turn the heating down when nobody is home."*
+
+Claude reads your house — searching only; it can't change anything — and drafts the
+automation. Then, **before you see it**, brAIn simulates it against your own history:
+
+1. **A replay of the last month** says how often the trigger would have fired.
+2. **The last fortnight of those firings is graded against what you did yourself** — did you
+   already do the same thing by hand, or the opposite?
+
+So the proposal arrives with its case in one sentence:
+
+```text title="A rule, on the Proposals tab"
+You said:    "Whenever the front door opens after dark, turn the hall light on."
+Understood:  When the front door opens between sunset and sunrise, turn on the
+             Hall light.
+
+Over the last 30 days it would have fired 9 times: 5 in the last 14 days,
+you had already done the same on 4, you did the opposite on 1.
+
+[ Make the change ]  [ Try it for a week ]  [ Dismiss ]  [ No thanks ]
+```
+
+- **Make the change** writes it into `automations.yaml`, reloads, and checks Home Assistant really
+  created it. `brain undo` puts the file back.
+- **Try it for a week** runs it in [shadow](/brain/replay/) first: nothing is switched on,
+  and the card reports how it would have behaved.
+
+The card shows **your sentence and what brAIn understood** side by side, because when a
+rule is wrong the useful thing to know is which half was misread.
+
+brAIn refuses — on the card, never silently — a sentence it can't do properly: a trigger it
+can't replay (a webhook, a device trigger), a sentence that names nothing it could act on,
+and anything that would touch a [protected entity](/brain/reference/).
+
+## One-offs
 
 > *"Turn the porch light off when the guests leave."*
 >

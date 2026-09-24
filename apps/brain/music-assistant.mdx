@@ -1,0 +1,68 @@
+---
+title: Music Assistant
+description: Run Music Assistant from brAIn — see every player and provider, control playback, clear out stale players Home Assistant can't delete, and ask Claude to do anything Music Assistant can.
+---
+
+**House → Music Assistant** is Music Assistant from brAIn's side: every player with what
+it's playing, every provider with the last error it reported, and the players worth clearing
+out. And you can ask Claude to do anything Music Assistant's own interface can.
+
+![The Music Assistant tab in dark mode: "Connected to Music Assistant 2.9.0 as Home Assistant Integration", a highlighted box "2 players worth clearing out" listing AirCast 0 and AirCast 1 with Remove buttons and a "Remove all stale players" button, and a Players list — Kitchen (Chromecast, playing "A Song With A Rather Long Title — Band", with Pause, Next, Vol −, Vol +, Turn off and More) and Living room (AirPlay, unavailable)](./images/panel-music.webp)
+
+## Clearing out stale players
+
+This is the part Home Assistant can't do on its own. A player Music Assistant remembers
+but hasn't seen since — every speaker a removed provider or an AirCast bridge left
+behind — comes back as a Home Assistant entity however many times you delete it, because
+its config lives in Music Assistant.
+
+brAIn lists them at the top, with why each one is stale:
+
+- **Remove** forgets one player for good.
+- **Remove all stale players** forgets every one of them, after showing you the list.
+
+Once Music Assistant forgets a player, Home Assistant drops its entity by itself. A player
+still held by a provider that can't remove players is reported as *held*, and can be
+**disabled** instead.
+
+## Controlling players and providers
+
+Each player has **play/pause, next, volume and power** on its row; **stop, clear the
+queue, rename and enable/disable** are under **More**. A provider showing an error can be
+**reloaded** from its row.
+
+## Or just ask
+
+From the chat or the terminal:
+
+```text
+Group the kitchen and the lounge and play my Discover Weekly.
+Why is the Sonos provider erroring?
+Remove every AirCast player.
+Turn on crossfade for the office.
+Make a playlist of what we played on Saturday.
+```
+
+Claude has an overview, a search, player and play tools, the clean-up (a dry run unless you
+tell it otherwise), and a tool that runs **any** command in Music Assistant's API — players,
+queues, groups, the library, playlists, providers and server settings.
+
+Scheduled runs may only read. **Voice** doesn't use these tools: it plays music through
+Home Assistant's own `music_assistant.play_media` on the media players you've
+[exposed to voice](/brain/voice/#what-voice-can-see).
+
+## Setup
+
+**There isn't any, usually.** brAIn connects where Home Assistant's Music Assistant
+integration connects, with the sign-in Music Assistant gave Home Assistant. That covers
+players and the library.
+
+Two options cover the rest:
+
+| Option | When you need it |
+| --- | --- |
+| `music_assistant_token` | Adding, changing or removing **providers**, or changing **server settings**, needs a Music Assistant admin. Create a long-lived token in Music Assistant → Settings → your profile → Tokens. Without it, brAIn says so when it's refused rather than just failing. |
+| `music_assistant_url` | A Music Assistant server Home Assistant isn't connected to, e.g. `http://192.168.1.20:8095`. Set a token with it. |
+
+**Protected entities apply**: a player that's a Home Assistant entity on your
+`protected_entities` list isn't played, changed or removed, and the refusal names it.

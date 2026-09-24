@@ -1,232 +1,206 @@
 ---
 title: Findings
-description: brAIn's work list — the things it thinks are broken in your home, each with the evidence, the fix it has in mind, and a button that sends it to make the change. Plus the guesses waiting on a yes/no, because everything waiting on your decision lives here.
+description: brAIn's list of decisions waiting on you — what it thinks is broken, the guesses it wants confirmed and the changes it suggests — each with the same row of answers, and a to-do list for the work you accept.
 ---
 
-A **finding** is something wrong with your house. A dead battery. A sensor that hasn't
-changed value in six days. A device stuck unavailable. An automation whose trigger entity
-was renamed, so it can never fire again.
+import { Steps } from '@astrojs/starlight/components';
 
-brAIn files them on its own, while it was looking at something else — findings come out of
-the same insight runs and study sessions that fill memory. You never ask for them.
+**Home → Findings** is the list of everything brAIn wants a decision about. Mostly that's
+something **broken** — a dead battery, a sensor that stopped reporting, an automation that
+can never fire — but a **guess** brAIn wants confirmed and a **change** it suggests land
+here too, because answering any of them is the same job.
 
-![The brAIn Findings tab, headed "What brAIn thinks is broken", with three findings: a back-door battery sensor that has reported nothing since 26 July, thirteen entities belonging to devices that no longer exist, and two loft sensors that never rejoined after a Zigbee channel change](./images/panel-findings.webp)
+![The Findings tab, headed "What's waiting on you". Two problem cards are visible: "Back door battery has reported nothing since 26 July" (Broken) and "Two loft sensors never rejoined after the Zigbee channel change" (Degraded), each with the evidence, a "How you'd fix it" box, and the buttons Add to list, Dismiss and Not a problem](./images/panel-findings.webp)
 
-## Three kinds of knowledge, and they don't mix
+You never have to ask for them. Findings come from brAIn's house checks (which cost no
+tokens), from insight runs and study sessions, and from the **Resident** — the loop that
+watches your house and decides what is worth your attention.
 
-|  | The question it answers | How it ends |
-| --- | --- | --- |
-| **Memory** | What is *true* of this home? | It's a document; it just gets better |
-| **Guesses** | What might brAIn have *wrong*? | Yes or No, once |
-| **Findings** | What is *broken* in this home? | Fixed, or dismissed |
+## What a finding looks like
 
-A finding is never just an observation. "The dryer used 3 kWh" is an insight. "The dryer's
-energy sensor has read exactly 3 kWh for six days" is a finding — something is wrong and
-somebody has to do something about it.
+These are the kinds of thing that turn up in a real house:
 
-Each one names the entity, the number and the day it started, because a work list item you
-can't check is just a worry.
+- **A sensor that died quietly.** *"Back door battery has reported nothing since 26 July.
+  Last reading 8% at 04:11. The door sensor still reports, so this is the battery entity
+  only — but your low-battery automation can no longer see it."*
+- **An automation that can never fire.** *"Morning lights triggers on a motion sensor that
+  was renamed three weeks ago. It has not run since."*
+- **A device that came back wrong.** *"Two loft sensors have been silent since 24 July at
+  14:30 — the same minute your Zigbee coordinator moved from channel 15 to 20."*
+- **Tidy-up.** *"13 entities belong to devices that no longer exist."*
 
-The stores stay separate, but the *deciding* happens in one place. The tab is headed
-**"What's waiting on you"** because open guesses ride at the top of the same list with
-**✓ Yes** / **✕ No** — a broken thing and a doubted belief are different knowledge, but
-answering either is the same job, and the tab badge counts both. Turning down a guess
-offers the same reason box as [calling a finding wrong](#the-two-endings).
-
-## What findings actually look like
-
-These are the kinds of thing that show up in a real house:
-
-- **A sensor that died quietly.** *"`sensor.back_door_battery` has reported nothing since
-  26 July. Last reading 8% at 04:11. The door sensor still reports state, so this is the
-  battery entity only — but your low-battery automation can no longer see it."*
-- **An automation that can never fire.** *"`automation.morning_lights` triggers on
-  `binary_sensor.hall_motion_old`, which was renamed three weeks ago. It has not run since."*
-- **A device that came back wrong.** *"Two Aqara loft sensors have been silent since 24 July
-  at 14:30 — the same minute your Zigbee coordinator moved from channel 15 to 20."*
-- **Something that contradicts itself.** *"`automation.away_lights` is gated on presence, but
-  the living-room motion sensor keeps the house 'occupied' all day. It has not fired this
-  month."*
-- **Tidy-up.** *"13 entities belong to devices that no longer exist. They show as unavailable
-  on three dashboards."*
+Every card names the thing by the name you know it by (the entity id is in a tooltip),
+says how bad it is, gives a sentence or three of why, and one line of what to do — headed
+**How you'd fix it** when it needs your hands, or **How brAIn would fix it** when software
+can make the change. **Why brAIn thinks so**, folded under the card, shows what it actually
+read, how sure it is, and what looked at the finding before you did.
 
 :::note[The same problem is never raised twice]
-Findings are deduplicated by meaning, not by wording. A problem reported in one run and
-described differently in the next is recognised and dropped, so the list stays a list of
-distinct things rather than a rolling feed.
+Findings are deduplicated by meaning, not wording, and everything you've answered is
+remembered — so a problem you've dealt with doesn't come back in new words.
 :::
 
-## Fix it
+## One row of answers
 
-**✦ Fix it** sends Claude to make the change, in your actual Home Assistant. It confirms the
-problem is still real, finds the cause rather than the symptom, makes the smallest change
-that resolves it, verifies the change took, and reports back with exactly what it touched.
+Every problem card offers the same answers, in the same order, so you can read the row
+without reading the words:
 
-A real one, end to end:
+| Button | What you're saying | What happens |
+| --- | --- | --- |
+| **Fix it** | *brAIn, sort this out.* | Only where software can make the change. brAIn works out the exact steps and **shows them first**; nothing changes until you press **Apply**. |
+| **Add to list** | *It's real and I'll get to it.* | The card moves to the **To-do** tab and brAIn stops raising it while it waits there. |
+| **Dismiss** | *Not now.* | Nothing is recorded. brAIn brings it back later if it's still true — sooner the more it matters — and tells you when. |
+| **Not a problem** | *You've got this wrong, or it's normal here.* | Settled for good. A box asks why (optional) — and that sentence is what brAIn learns from. |
+
+A flat battery never offers **Fix it**, because inventing a software substitute for a dead
+CR2032 is worse than saying so.
+
+The other kinds of card use the same shape with their own words:
+
+| Card | Its answers |
+| --- | --- |
+| **A guess** — *"The garage fridge is meant to run 24/7 — right?"* | **Yes · No · Dismiss** |
+| **A suggestion** — a change brAIn thinks would suit your house | **Make the change · Try it for a week · Dismiss · No thanks** |
+| **A plan waiting for you** | **Apply · Don't change it · Not a problem** |
+| **A change brAIn made** | **Got it**, and **Undo the fix** while it can be put back |
+
+The rarer presses live behind **⋯** on each card: *I've already fixed it*, *Check again*,
+*Talk about it*, *Stop raising these*, and a few more.
+
+## Fix it: a plan first, then your yes
+
+<Steps>
+
+1. **Press Fix it.** brAIn looks — read-only, it cannot change anything at this step — and
+   comes back with the exact steps: which file, which entity, what it becomes, and one
+   sentence on what could go wrong in *your* house.
+
+2. **Read the plan on the card.** If it's right, press **Apply**. If not, **Don't change
+   it** leaves the finding exactly as open as it was, and keeps the plan so reading it again
+   costs nothing.
+
+3. **brAIn makes the change** — exactly the steps you read. If the house has moved on or a
+   step turns out to be wrong, it stops and says so rather than improvising.
+
+4. **The card turns into a change for you to read**, with what was touched. **Got it**
+   clears it; **Undo the fix** puts back every file the run edited.
+
+</Steps>
 
 ```text title="A finding, fixed"
-FINDING   automation.morning_lights can never fire
+FINDING   Morning lights can never fire
           Its trigger references binary_sensor.hall_motion_old,
           renamed to binary_sensor.hall_motion on 8 July.
-          Last run: 23 days ago.
 
-✦ Fix it
+Fix it →  PLAN
+          1. In automations.yaml, change the trigger of "Morning lights"
+             to binary_sensor.hall_motion
+          2. Validate the config and reload automations
+          Risk: none — the new sensor reports the same states.
 
-          Read automations.yaml — trigger entity confirmed stale
-          Edited the trigger to binary_sensor.hall_motion
-          Validated automations.yaml — OK
-          Reloaded the automation domain
-          Re-read the config — trigger now resolves
+Apply →   Edited /config/automations.yaml
+          Validated — OK · Reloaded automations
+          Trigger now resolves
 
-FIXED     1 file changed: /config/automations.yaml
+          1 file changed · Undo the fix · Got it
 ```
 
-It is bounded on purpose:
+It's bounded on purpose: **one finding per run**, it **never deletes** anything it didn't
+create, **never restarts** Home Assistant, **never touches** secrets or anything on your
+[protected list](/brain/reference/), and **nothing runs until you press it**. Every file is
+snapshotted first, so [`brain undo`](/brain/cli/) can put it back too.
 
-- **One finding per run.** Anything else it notices along the way becomes its own finding
-  rather than an edit you didn't ask for.
-- **It never deletes** an entity, automation, dashboard or file it didn't create — it
-  disables or corrects instead.
-- **It never restarts Home Assistant.** Reloading one config domain is fine; a restart is
-  your call.
-- **It never touches secrets** or credentials.
-- **Nothing runs until you press it.** brAIn will not change your house on a schedule.
+## Not a problem: the answer that teaches
 
-Every file it writes is snapshotted first, so [`brain undo`](/brain/cli/) puts one back if a
-fix goes wrong.
+When a finding is wrong about your house, say so — and say why:
 
-Some things software can't fix — a flat CR2032, a device that needs re-pairing from the loft
-hatch. Those are marked **needs you** and offered without a Fix it button, because inventing a
-software substitute for a dead battery is worse than saying so.
+> *"That's a contact on a cupboard nobody opens. It's supposed to read closed."*
 
-## Discuss it first
+That sentence goes into [memory](/brain/memory/) as a correction and into every future
+analysis, and on a house-check's card it tells that **rule** to stop making the same
+mistake about that entity. The box is optional — "not a problem here" needs no essay — but
+the reason is what stops brAIn making the same mistake in new words.
 
-**💬 Discuss** opens the finding as a conversation in the [Terminal](/brain/terminal/) tab,
-with everything brAIn knows already in the question — the detail, the fix it had in mind, the
-entity, the severity. It is asked to look into the thing and say plainly whether it really is
-a problem *in your house*, and told to change nothing, because "explain this to me" and "go
-change my house" are different permissions.
+If a whole *kind* of finding is wrong for your house, **⋯ → Stop raising these** mutes that
+check entirely.
 
-The decisions come with you: while you're talking it over, a strip above the message box keeps
-**Fix it**, **I fixed it**, **Later** and **Wrong** one press away. The strip's **✕ Wrong**
-opens the same reason box the card's does — explaining it to Claude in the chat reaches that
-one conversation; the note reaches every future one.
+## Talk about it first
 
-## The two endings
+**⋯ → Talk about it** opens the finding as a conversation in **Ask**, with everything brAIn
+knows already in the question, and asks whether it really is a problem *here*. The
+conversation changes nothing. When Claude has finished looking, it offers the ways the
+finding could actually end as buttons under its answer — *"Replaced the CR2032"*, *"That
+cupboard is never opened"* — and pressing one settles the finding in those words.
 
-Ending a finding **removes it**. Which ending you pick matters, because each one teaches brAIn
-something different:
+## The to-do list
 
-**✓ I fixed it** — it was a real problem and it's sorted now. Memory records
-*"Fixed by the homeowner: the back door sensor battery was replaced."* It offers an optional
-note, and what you type is simply more of the fact — nothing is being corrected:
-*"Replaced the CR2032 — it's a 3-monthly job on that one."* "I fixed it" leaves brAIn knowing
-a problem is over; that sentence leaves it knowing your house.
+**Home → To-do** is the work you've accepted, plus anything you add yourself.
 
-**✕ Wrong** — brAIn has misread your house. The sensor isn't stuck; it's a contact on a
-cupboard nobody opens. Pressing it opens a box for one sentence — *"That sensor always reads
-on. It's not stuck."* — and the sentence is the half that teaches. It goes two places: it's
-shown verbatim under this finding in every future analysis, and it's queued to memory as a
-correction. It is deliberately **not treated as an instruction** — brAIn is handed what you
-said and works out what standing fact follows from it, sometimes nothing at all — so you
-don't have to phrase a correction carefully for it to be useful.
+![The To-do tab, headed "What you're going to do", with an "Add" box at the top and chores carried over from findings — each with its evidence, how to fix it, and Done and Off the list buttons](./images/panel-todo.webp)
 
-Both boxes are optional. Send **Wrong** empty and it simply says "never raise this again";
-"not a problem here" needs no essay.
+- **✓ Done** — it's sorted. brAIn writes it into memory now (*"Replaced the garage door
+  sensor battery"*), and the box asks what you did, optionally.
+- **⌫ Off the list** — you're not going to do it. A chore that came from a finding is then
+  free to be reported again if it's still true.
 
-Both endings do the same three things: the answer goes into memory as a plain fact about your
-home, the wording is remembered so the problem is never reported at you again, and the row is
-deleted. There is no pile of dismissed cards to scroll past — a list of things nobody has to
-look at again is not a work list.
+The same list appears in Home Assistant as **`todo.brain_system_brain`**, so ticking it off in the To-do
+app counts, and `brain.add_todo` adds to it from an automation.
 
-## Dismiss, which is neither
+## Answering from outside the panel
 
-**⌫ Dismiss** clears the row and teaches brAIn nothing. No memory line, no suppression — so
-the next analysis is free to find the same thing again, and probably will if it's still
-there.
+**Repairs.** Every finding that's waiting on you also appears under **Settings → System →
+Repairs**, with the same answers as its card. Answering there is answering on the tab.
 
-That's the difference from Wrong, and it's why both exist:
+**Notifications.** Set `findings_notify_service` to one of your `notify.*` services and
+findings reach your phone in three ways:
 
-| | What you're saying | What brAIn learns |
-| --- | --- | --- |
-| **✕ Wrong** | This is normal here — you've misread it | Never raise it again, and why |
-| **⌫ Dismiss** | Not now, and I'm not promising anything | Nothing |
-| **⏰ Remind me later** | Yes, but not yet | Nothing — it comes back on your date |
+| Kind | What you get |
+| --- | --- |
+| **Urgent and critical** — a leak, a freeze, a hub that stopped answering | Pushed at once, even in quiet hours, and **asked again** after an hour, four hours and twelve hours. Any answer stops it. |
+| **At or above `findings_notify_min_severity`** (default `critical`) | Pushed once, held through quiet hours unless it can't wait. |
+| **Everything else** | No message — it's on the tab, in `todo.brain_system_brain` and in Repairs. |
 
-Use Dismiss when you're clearing the board rather than answering it.
+On the companion app a notification about one finding carries its answer buttons, plus
+**Reply**: type a question and brAIn looks into it and answers in the next notification —
+*"Is the loft sensor definitely dead, or just asleep?"*
 
-**⏰ Remind me later** is the answer for "yes, but not now" — an hour, tomorrow, next week,
-next month. It is not a decision and settles nothing: the finding stays exactly as open as it
-was and simply stops asking. Use it instead of dismissing something you actually intend to
-deal with — a dismissed row only comes back if a later run happens to find the problem
-again; a snoozed one comes back on your date. While it waits it sits under **Later**, showing
-when it comes back, with a button to bring it back sooner.
-
-## After brAIn fixes something
-
-A fixed card **stays on the list** and turns green, with what changed and which files were
-touched. That's deliberate: brAIn altered something in your house, and news you haven't read
-is not settled. **✓ Got it** clears it once you have.
-
-## Where answered findings go
-
-Nowhere, and that's the design. Ending one writes the answer into
-[memory](/brain/memory/) and deletes the row — so memory is the record, and the tab has two
-filters rather than an archive: **Needs you**, and **Later** once something is waiting in it.
-
-brAIn still remembers what you answered. A settled finding's wording is kept in a ledger the
-analyst consults before reporting anything, so the same problem is never raised at you twice,
-however it gets reworded. That ledger isn't a screen — it's the reason the list stays short.
+**Automations.** `sensor.brain_findings_open_findings` holds the count, the severity split and the
+texts. Events fire as things change: `brain_case` when something new needs a decision,
+`brain_case_ended` when it's answered, and `brain_change` when brAIn changed something in
+your house.
 
 ## A wrong press has an Undo
 
-Every press that takes a row off the list — both endings, **Got it**, **Dismiss**, and
-either answer to a guess — leaves an **Undo** in the toast for about five minutes. It puts
-back all three effects of an ending: the row, under its original timestamp; the suppression
-that would have stopped brAIn raising it again; and the line it queued for memory. It exists
-because "I fixed it" and "Wrong" sit next to each other meaning opposite things, so a
-mis-tap is not hypothetical — and it is deliberately "I pressed the wrong one", not a
-history. Once a consolidation pass has filed the fact into the document, Undo says so rather
-than pretending; editing the document is the honest answer by then.
+Every press that takes a card off the list leaves an **Undo** in the toast for about five
+minutes, and it puts back everything the press did — the card, the "never raise this again",
+and the line queued for memory. After a fix, **Undo the fix** on the card is the durable
+version: it puts back every file brAIn edited, and lists (rather than reverses) any service
+calls it made, since "put that light back to how it was" is a guess.
 
-**Fix it** has no Undo, because it has already sent Claude at your actual house, and taking
-the card back would lie about what was undone. **Remind me later** has none either: it took
-nothing away, and it already has *Bring it back now*.
+## Filters
 
-## The tab, scriptable
+- **Needs you** — the default: everything waiting on a decision.
+- **Dismissed** — what you've put off, each showing when it comes back.
+- **Looked at** — what the Resident's first look decided wasn't worth your evening, with
+  its reason on every row and **Bring it to the front** to put one on the list.
+- **Answered** — what you've settled, with one button: *Let brAIn raise it again*.
 
-`brain findings` in the [terminal](/brain/cli/) is the same tab as text:
+Under the filters, a **scorecard** shows how right each source of findings has been in your
+house, once it has a few answers — *Device check: 9 of 10 confirmed*.
+
+## From the terminal
+
+`brain findings` in the [terminal](/brain/cli/) is the same list as text:
 
 ```bash
-brain findings                     # list open findings (and guesses waiting)
-brain findings fix 1786715730      # send Claude to fix one
+brain findings                         # list what's waiting
+brain findings fix 1786715730          # ask for a plan — changes nothing
+brain findings apply 1786715730        # carry out the plan
+brain findings undo 1786715730         # put back the files a fix changed
 brain findings done 1786715730 "replaced the CR2032"
 brain findings wrong 1786715730 "that sensor is meant to sit closed"
-brain findings ack 1786715730      # "Got it" after an automated fix
-brain findings snooze 1786715730 tomorrow    # hour | tomorrow | week | month | now
+brain findings snooze 1786715730 week  # hour | tomorrow | week | month | now
 ```
 
-Everything goes through the panel's own API, never the store files — so a CLI ending writes
-the same memory line, the same settled-ledger key and the same Undo token the tab's buttons
-do. The chat's command palette picks the subcommands up automatically.
-
-## Getting them to your phone
-
-Findings live in the add-on's private storage, which Home Assistant cannot see — so the
-add-on publishes a mirror to `/config/.brain/findings_state.json` on every change, and again
-at panel startup so a reboot never serves last week's list. The
-[integration](/brain/automations/) builds three things on it:
-
-- **`sensor.brain_open_findings`** — the open count, with the severity split and the finding
-  texts as attributes, so an automation can put what's actually broken on a lock screen.
-- **A `brain_finding` event** per newly-filed finding, for automations and the logbook. It's
-  primed at startup, so a restart never replays the open list as news.
-- **A push notification**, if you want one: set the `findings_notify_service` option to any
-  `notify.*` service, and `findings_notify_min_severity` to what may ring your phone
-  (`info` / `warning` / `serious` / `critical`; the default `serious` means batteries about
-  to die ring, while naming nitpicks wait on the tab).
-
-Notifications go to newly-created findings only, and the store dedupes across every status
-and the settled ledger — so the same problem can never ring twice, however it's reworded. A
-failed delivery is a log line, never a lost finding: the row is on the list before the
-mirror is touched.
+Everything goes through the panel's own API, so an answer from the terminal teaches brAIn
+exactly what the same button would.

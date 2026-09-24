@@ -50,18 +50,18 @@ house can ask for help before you notice anything's wrong.
 One install, one sidebar panel, one login. Runs on the Claude **Pro** or **Max**
 subscription — or your own API key.
 
-![The brAIn Insights tab: an ask bar across the top, tag filters, and four insight cards — one answering "Why did the hallway light come on at 3 am?" with a trace timeline, one showing a month of electricity by device as a bar chart](./images/panel-insights.webp)
+![The brAIn Insights tab: an ask bar across the top, tag filters, and two insight cards — "Why did the hallway light come on at 3 am?" with a trace timeline, and "Downstairs dries 15 min before it cools" with humidity and temperature charts](./images/panel-insights.webp)
 
 <CardGrid>
   <Card title="It runs Home Assistant" icon="setting">
     Not just "turn on a light" — **[65 admin services](/brain/power-tools/)** reach the
-    parts of HA that normally live behind the Settings UI, plus **51 native tools** and a
+    parts of HA that normally live behind the Settings UI, plus **71 native tools** and a
     real shell in `/config`. [What it can reach →](/brain/how-brain-controls-ha/)
   </Card>
   <Card title="It finds what's broken" icon="magnifier">
     A dying battery, a sensor that stopped reporting three weeks ago, an automation
-    whose trigger can never fire. Press **Fix it** and it makes the change.
-    [Findings →](/brain/findings/)
+    whose trigger can never fire. Press **Fix it**, read the plan, and it makes the
+    change. [Findings →](/brain/findings/)
   </Card>
   <Card title="It remembers your house" icon="open-book">
     One plain-markdown document of durable facts — nicknames, rhythms, the devices
@@ -70,8 +70,14 @@ subscription — or your own API key.
     [Memory →](/brain/memory/)
   </Card>
   <Card title="It explains your house" icon="star">
-    Insight cards with real interactive charts, proposed for **your** home rather
-    than shipped as defaults. Ask anything, get a card. [Insights →](/brain/insights/)
+    Ask anything and get a card: the answer, the numbers and a chart. **Refine** it
+    in a sentence, **Share** it as a picture or onto a dashboard.
+    [Insights →](/brain/insights/)
+  </Card>
+  <Card title="It runs your ESPHome and Music Assistant" icon="rocket">
+    Edit, validate and flash ESPHome devices, stream their logs, and clear out the
+    stale speakers Home Assistant can't delete — from the panel or by asking.
+    [ESPHome →](/brain/esphome/) · [Music Assistant →](/brain/music-assistant/)
   </Card>
   <Card title="It talks, in a voice you choose" icon="comment-alt">
     Pick brAIn in **Settings → Voice assistants**. Give it a personality, or run
@@ -125,32 +131,34 @@ and every attribute a `create_` service accepts has a service that changes it la
 
 A **finding** is something wrong with your house, filed by brAIn on its own while it was
 looking at something else. Each one carries the evidence — the entity, the number, the
-day it started — and the specific change that would resolve it.
+day it started — and what would resolve it.
 
-![The brAIn Findings tab, headed "What brAIn thinks is broken", listing thirteen orphaned entities, two loft sensors that never rejoined after a Zigbee channel change, and a dead back-door battery sensor — each with Fix it, Discuss, I fixed it, Remind me later and Ignore](./images/panel-findings.webp)
+![The Findings tab, headed "What's waiting on you", with a "Back door battery has reported nothing since 26 July" card and a "Two loft sensors never rejoined after the Zigbee channel change" card, each with the evidence, a "How you'd fix it" box, and the buttons Add to list, Dismiss and Not a problem](./images/panel-findings.webp)
 
-Press **Fix it** and Claude makes the change, verifies it, and reports what it touched.
-Press **Discuss** to talk it over first, changing nothing. **I fixed it** and **✕ Wrong** are
-endings: the answer becomes a fact in memory, and the row is gone for good rather than
-joining a pile of dismissed cards. Both take an optional one-line note, and the note is the
-half that teaches — *"that sensor always reads on, it's not stuck"* becomes a standing fact
-about your house, so the next run doesn't make the same mistake in new words.
+Every card takes the same row of answers: **Fix it** (where software can — brAIn shows you
+the plan first and changes nothing until you press **Apply**), **Add to list**, **Dismiss**
+for "not now", and **Not a problem** for "you've got this wrong" — with a box for why,
+which is the half that teaches. *"That sensor always reads on, it's not stuck"* becomes a
+standing fact about your house, so the next run doesn't make the same mistake in new words.
 
-Findings can also reach you without the panel open: `sensor.brain_open_findings` carries
-the open count with the texts as attributes, a `brain_finding` event fires for each new
-one, and setting **one option** (`findings_notify_service`) turns them into phone pushes —
-no automation needed.
+Findings reach you without the panel open too: in Home Assistant's **Repairs**, as the
+`todo.brain_system_brain` to-do list, as `sensor.brain_findings_open_findings`, and — with
+**one option** set (`findings_notify_service`) — as phone notifications with the same
+answer buttons and a **Reply**.
 
 ## It writes what you ask for, in a sentence
 
-Two of the things it offers on the [Proposals](/brain/proposals/) tab start with you rather
-than with a pattern it found:
+Some of the things on the [Proposals](/brain/proposals/) tab start with you rather than
+with a pattern it found:
 
-- **[One-off intents](/brain/intents/)** — *"turn the porch light off when the guests leave"*.
-  Type it into the ask bar, or call `brain.intent` from a voice command. brAIn writes an
-  ordinary automation that **runs once and switches itself off**, shows you a replay of the
-  trigger before you accept it, and then leaves it in your automations saying it fired until
-  you press Remove. Nothing removes an automation for you.
+- **[A rule in a sentence](/brain/intents/)** — *"whenever the front door opens after dark,
+  turn the hall light on"*. brAIn drafts the automation, **replays it over the last month**,
+  grades it against what you actually did, and offers it with the case in one line — *would
+  have fired 9 times; you'd already done the same yourself on 4*. **Try it for a week** first
+  if you like.
+- **[One-offs](/brain/intents/)** — *"turn the porch light off when the guests leave"*. An
+  ordinary automation that **runs once and switches itself off**, left in your automations
+  saying it fired until you press Remove.
 - **[Four scenes for a room](/brain/scenes/)** — morning, day, evening and night, composed
   from what each bulb in that room can actually be told, shown as swatches before you say yes.
   Accept them and brAIn offers the schedule that moves between them, using the times it has
@@ -178,7 +186,7 @@ Memory is one markdown document you can open and edit. brAIn writes to it from
 conversations, insight runs and background study sessions — and voice, insights and the
 terminal all read it. Tell the voice assistant something and the cards know it.
 
-![The brAIn Memory tab: two guesses awaiting a yes/no answer, three discoveries waiting to be filed, and the home memory document below with sections on the household, the house, and device quirks](./images/panel-memory.webp)
+![House → Knowledge: a "Teach it something" box and the memory document "What I know about this home", with sections on the household, the house, and devices and their quirks](./images/panel-memory.webp)
 
 When brAIn believes something it can't confirm, it says so as a **guess** you answer with
 one tap — *"The garage fridge is meant to run 24/7 — right?"* Three open at a time, never
@@ -189,11 +197,12 @@ is never revisited.
 
 ## It works from the sofa
 
-The panel is one ingress page with seven tabs, built for a phone as seriously as a
-desktop: every target is at least 44px, no width gets a row of bare glyphs, and the
-terminal folds the chrome away when the keyboard comes up.
+The panel is one ingress page with four tabs — **Home**, **Ask**, **House** and **Help** —
+built for a phone as seriously as a desktop: every target is at least 44px, cards
+rearrange themselves for a narrow screen, and the terminal folds the chrome away when the
+keyboard comes up.
 
-![The brAIn panel on a phone, showing the two-row top bar with the tabs named beneath the status row](./images/panel-phone.webp)
+![The brAIn panel on a phone in dark mode: the usage pill and settings on top, the four tabs named beneath their icons, the Home panes on a strip below, and an insight card whose title has a row of its own under its buttons](./images/panel-phone.webp)
 
 ## Built for Home Assistant
 
@@ -202,8 +211,9 @@ What makes this different from running Claude Code on a regular machine:
 - **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your
   usage; an API key works too. One login covers the panel, the terminal, voice,
   insights and memory.
-- **[36 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
-  history and statistics, registries, dashboards, traces, templates, logs, reloads.
+- **[71 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
+  history and statistics, registries, dashboards, traces, templates, logs, reloads, what
+  brAIn has measured about your house, ESPHome and Music Assistant.
 - **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of
   your install that Claude reads at the start of each session.
 - **Usage-limit sensors** — the same session and weekly utilisation as claude.ai, as HA

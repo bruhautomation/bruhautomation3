@@ -1,9 +1,9 @@
 ---
 title: MCP Tools
-description: Every tool the built-in MCP server gives Claude — live states, device control, cameras, history, registries, and service calls with response data.
+description: Every one of the 71 tools the built-in MCP server gives Claude — live states, device control, cameras, history, registries, measurements, ESPHome, Music Assistant, and service calls with response data.
 ---
 
-The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/brain/how-brain-controls-ha/)). Verify every tool on your install with `brain doctor`.
+The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it **71 tools** with live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/brain/how-brain-controls-ha/)). Verify every tool on your install with `brain doctor`.
 
 ## Reading your home
 
@@ -52,6 +52,39 @@ Since 2.2 every [measurement](/brain/measurements/) is a tool, read over the pan
 | `render_template` | Render Jinja2 — test a template before it goes in an automation |
 | `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox, tagged with the entity, room or person it is about |
 | `offer_resolutions` | Put the ways the finding under discussion could end on the person's screen as buttons — changes nothing itself; the press is the consent |
+
+## ESPHome
+
+Since 2.6. Editing files needs nothing; building, installing and logs go to the ESPHome
+dashboard. See [ESPHome](/brain/esphome/).
+
+| Tool | What it does |
+|------|--------------|
+| `esphome_list_devices` | Every device file: node and friendly name, chip and board, online, firmware versions, the Home Assistant device it is |
+| `esphome_get_config` / `esphome_write_config` | Read or save a device's YAML. A save is snapshotted for `brain undo` and refused if the file changed since it was read |
+| `esphome_create_device` | A new device file, the way the dashboard's wizard writes one — fresh encryption key, OTA password and fallback hotspot |
+| `esphome_delete_device` | Move a device file into `archive/` |
+| `esphome_validate` / `esphome_compile` / `esphome_install` / `esphome_clean` | Validate with ESPHome itself; compile; compile and flash over the air; clear build files |
+| `esphome_update_firmware` | Install the update Home Assistant says is waiting, through its own update entity |
+| `esphome_logs` / `esphome_job` | Read a device's live log for a few seconds; follow a build by its job id |
+| `esphome_set_secret` | Set one key in `secrets.yaml` without the value ever being read back |
+
+## Music Assistant
+
+Since 2.7. See [Music Assistant](/brain/music-assistant/).
+
+| Tool | What it does |
+|------|--------------|
+| `music_assistant_status` | Whether brAIn can reach the server and as whom, every player and provider, and the stale players |
+| `music_assistant_search` | Search the library and every music provider |
+| `music_assistant_player` / `music_assistant_play` | One action on a player (play, pause, volume, power…); play a search result or a name on a player |
+| `music_assistant_remove_players` | Forget stale players — a dry run unless told otherwise |
+| `music_assistant_query` | Any **read-only** Music Assistant API command |
+| `music_assistant_command` | **Any** Music Assistant API command: players, queues, groups, the library, playlists, providers and server settings |
+
+Unattended runs get the reading tools only — list, read, validate, logs, status, search and
+query. Anything that writes a file, flashes a device or changes Music Assistant is refused
+to them, and to voice.
 
 ## Scoping & safety
 

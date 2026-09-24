@@ -376,17 +376,21 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
-								// The panel's own tabs, in the order they sit in the
-								// panel — Insights opens first, so it leads here too.
+								// The panel's own panes, grouped the way the panel's
+								// four tabs group them (Home, Ask, House), in the
+								// order they sit there.
 								{
 									label: 'The Panel',
 									items: [
+										{ label: 'Findings & To-do', slug: 'brain/findings' },
 										{ label: 'Insights', slug: 'brain/insights' },
-										{ label: 'Findings', slug: 'brain/findings' },
+										{ label: 'Ideas', slug: 'brain/ideas' },
 										{ label: 'Proposals', slug: 'brain/proposals' },
-										{ label: 'Activity', slug: 'brain/activity' },
-										{ label: 'Terminal', slug: 'brain/terminal' },
+										{ label: 'Chat & Terminal', slug: 'brain/terminal' },
 										{ label: 'Memory & Learning', slug: 'brain/memory' },
+										{ label: 'Activity', slug: 'brain/activity' },
+										{ label: 'ESPHome', slug: 'brain/esphome' },
+										{ label: 'Music Assistant', slug: 'brain/music-assistant' },
 									],
 								},
 								// What brAIn works out about this particular house, and
@@ -401,7 +405,7 @@ export default defineConfig({
 										{ label: 'Heating & Climate', slug: 'brain/climate' },
 										{ label: 'Shadow Runner & Replay', slug: 'brain/replay' },
 										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
-										{ label: 'One-Off Intents', slug: 'brain/intents' },
+										{ label: 'Rules & One-Offs', slug: 'brain/intents' },
 										{ label: 'Scene Designer', slug: 'brain/scenes' },
 										{ label: 'Overnight Self-Healing', slug: 'brain/self-healing' },
 									],

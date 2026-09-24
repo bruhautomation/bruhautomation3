@@ -35,7 +35,7 @@ This is also the first thing the panel's own first-run screen tells you.
 
 3. **Restart Home Assistant** — required on first install so HA loads the brAIn integration: **Settings → System → Restart**. A persistent notification tells you whenever a restart is needed (first install and add-on version upgrades); add-on restarts within the same version don't need one.
 
-4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, the seven `brain.*` core services, and the 65 [Power Tools](/brain/power-tools/) admin services.
+4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, the eleven `brain.*` core services, and the 65 [Power Tools](/brain/power-tools/) admin services.
 
 5. **Sign in with Anthropic.** Open **brAIn** in the HA sidebar and complete the sign-in. This is the **only** login — the terminal, insight generation, voice, and memory consolidation all share it.
 
@@ -59,29 +59,42 @@ A fresh install has **no cards**, on purpose. A generic "Energy" or "Climate" ca
 
 ## Try it
 
-Switch to the **[Terminal](/brain/terminal/)** tab — it opens as a chat — and ask for
-something you'd otherwise have gone digging for:
+Open **Home → Insights** and ask something you'd otherwise have gone digging for. The
+answer comes back as a card:
 
-```text title="In the brAIn terminal"
-Why did the hallway light come on at 3am?
+```text title="In the Ask box on Insights"
+How quickly does the downstairs humidity drop when the AC turns on?
 Which of my devices have stopped reporting?
+What's my standby power, and what's causing it?
+```
+
+![An insight card titled "Downstairs dries 15 min before it cools", with the answer in bold, five number tiles and two charts](./images/insight-card.webp)
+
+Not quite what you wanted? Press **✎ Refine** and say what should change — *"compare it with
+upstairs"*, *"just the chart"*. Want it somewhere else? **↗ Share** copies it as a picture
+or adds it to a dashboard. [More about cards →](/brain/insights/)
+
+Or switch to **Ask** — Claude Code as a chat — for things that need doing rather than
+answering:
+
+```text title="In Ask"
+Why did the hallway light come on at 3am? Fix it.
 Write me an automation that turns the towel rail on when the shower humidity spikes
 Rename the switches in the garage to what they actually control
 ```
 
-Or ask from the **Insights** tab's *Ask* box and get a card back instead — same engine, same
-memory. Keep the ones you like as recurring cards, or drop any of them on a dashboard.
-
-Then look at the **[Findings](/brain/findings/)** tab. The number on it is what brAIn
-already thinks is broken in your house.
+Then look at **Home → Findings**. The number on the Home tab is what brAIn already thinks
+is broken in your house, each with a row of answers: **Fix it**, **Add to list**,
+**Dismiss**, **Not a problem**.
 
 ## Next steps
 
-- **Use brAIn as your voice assistant.** Go to **Settings → Voice Assistants → [your pipeline]** and pick **brAIn** as the conversation agent. Give the agent a name, a model, and (optionally) a personality. By default voice can control everything but can't run shell commands or read files.
+- **Use brAIn as your voice assistant.** Go to **Settings → Voice Assistants → [your pipeline]** and pick **brAIn** as the conversation agent. Give the agent a name, a model, and (optionally) a personality. Voice sees and controls what you've exposed to Assist (**Settings → Voice assistants → Expose**), and can't run shell commands or read files.
 - **Teach it something.** Say *"remember that we call the office lamp the beacon"* to a voice assistant, or run `brain memory add "…"` in the terminal. It lands in the same document every other surface reads.
-- **Answer its guesses.** When brAIn believes something it can't confirm, it says so at the top of the **Findings** tab as a yes/no — everything waiting on your decision in one list. Two taps settle it. `binary_sensor.brain_waiting_on_you` exists so you can push that to your phone — a guess sitting in a panel nobody has open just expires.
-- **Get findings on your phone.** Set `findings_notify_service` to your `notify.mobile_app_*` service in the add-on config — one option turns new findings into phone pushes, no automation needed (`findings_notify_min_severity` decides what's allowed to ring).
-- **Trigger it from automations.** Call `brain.run_task` with a prompt — it runs in the background and (optionally) notifies you when it's done.
+- **Answer its guesses.** When brAIn believes something it can't confirm, it asks on the **Findings** tab as a yes/no — everything waiting on your decision in one list. Two taps settle it. `binary_sensor.brain_memory_waiting_on_you` exists so you can push that to your phone — a guess sitting in a panel nobody has open just expires.
+- **Get findings on your phone.** Set `findings_notify_service` to your `notify.mobile_app_*` service in the add-on config — one option turns findings into phone pushes with answer buttons, no automation needed. By default only critical ones ring; `findings_notify_min_severity` changes that.
+- **Trigger it from automations.** `brain.ask` answers a question with data an automation can branch on; `brain.run_task` runs a job in the background. [Automations →](/brain/automations/)
+- **Let it manage your devices.** With the ESPHome or Music Assistant add-ons installed, **House → [ESPHome](/brain/esphome/)** and **House → [Music Assistant](/brain/music-assistant/)** work with no setup.
 - **Tune behaviour.** See the [Reference](/brain/reference/) for every config option and the full service / sensor / tool list.
 
 ## Common first-install hiccups
@@ -91,7 +104,7 @@ already thinks is broken in your house.
 | Add-on won't start | Check the **Log** tab. Almost always an architecture mismatch — prebuilt images exist for `amd64` and `aarch64` only. |
 | Integration not discovered | You probably skipped step 3. Restart HA, then check **Settings → Devices & Services** (or add **brAIn** manually). |
 | Sign-in fails | Verify the HA host can reach `console.anthropic.com`. After updates, you may need to re-authenticate. |
-| The panel says you are signed out, but the terminal works fine | Fixed in **1.47**. Before it, brAIn read the Claude CLI's short-lived access token as a dead credential a few hours after every terminal sign-in, put up the sign-in screen, and then never ran the CLI — which was the one thing that would have renewed it. **The workaround on an older version:** open the Terminal tab and run any `claude` command. That renews the token and clears the verdict. |
+| The panel says you are signed out, but the terminal works fine | Fixed in **1.47**. Before it, brAIn read the Claude CLI's short-lived access token as a dead credential a few hours after every terminal sign-in, put up the sign-in screen, and then never ran the CLI — which was the one thing that would have renewed it. **The workaround on an older version:** open **Ask**, switch to the classic terminal, and run any `claude` command. That renews the token and clears the verdict. |
 | The terminal asks for a second login | It shouldn't — one credential is shared with the CLI both ways. If it does, run `brain doctor`; the auth check names the file it found and the one it expected. |
 | "It can't see my entities" | Confirm `enable_ha_mcp_server: true`, then run **`brain doctor`** in the terminal — it drives the MCP server end-to-end and reports any tool that errors. |
 | Learning seems stuck | Study sessions are deliberately long-running (up to `study_timeout_minutes`, default 30). The progress list shows which topic is in flight; the add-on log shows the session. A session that actually fails names its real reason in the log — a timeout says timeout — rather than reporting a generic failure. |

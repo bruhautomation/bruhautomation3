@@ -7,7 +7,7 @@ brAIn keeps one small, human-readable document about your home at `/config/.brai
 
 The whole design answers one question: **what, exactly, has it learned?** If you can't point at a line and say "it knows that", it isn't memory.
 
-![The brAIn Memory tab: two guesses awaiting a yes/no, three discoveries waiting to be filed, a "Teach it something" box, and the home memory document below with sections on the household, the house, and device quirks](./images/panel-memory.webp)
+![House → Knowledge, scrolled to "What it remembers": a "Teach it something" box with Add, Edit markdown and Export buttons, and the memory document "What I know about this home" with sections on the household, the house, and devices and their quirks](./images/panel-memory.webp)
 
 ## What ends up in it
 
@@ -41,7 +41,7 @@ Only the queues are ever written to directly. **Nothing writes `memory.md` excep
 
 The cap is not a speed setting. Voice reads the 2 KB `voice.md` distillate on every request and never the document, so shrinking `memory.md` buys nothing where speed is felt — the cap only decides how much brAIn can know before filing something new means dropping something old.
 
-**⇪ File into memory now** on the Memory tab runs that same pass immediately — same script, same safety checks. The button *starts* the pass rather than waiting for it — a consolidation takes minutes, and a web request can't — so a banner counts the elapsed time and the tab reports the outcome when it lands. It empties **Waiting to be filed**, and what was in it is now in the document, which is the one place it's read and edited from. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
+**⇪ File into memory now** on **House → Knowledge** runs that same pass immediately — same script, same safety checks. The button *starts* the pass rather than waiting for it — a consolidation takes minutes, and a web request can't — so a banner counts the elapsed time and the tab reports the outcome when it lands. It empties **Waiting to be filed**, and what was in it is now in the document, which is the one place it's read and edited from. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
 
 **Waiting to be filed** is the inbox itself: every queued line, labelled with where it came from — an insight run, a voice conversation, a correction, something you typed — and the count is the length of that same list, so the two can never disagree. **✕** on a row drops it from the queue and asks the consolidator for nothing, because a queued fact has by definition never reached the document — there is nothing to forget.
 
@@ -74,7 +74,7 @@ Earlier versions asked open-ended questions, which piled up unanswered and left 
 
 Two taps settle it, on the [Findings](/brain/findings/) tab — open guesses ride at the top
 of the same list as findings, because both are questions only the person living there can
-answer, and one badge counts everything waiting on a decision. The Memory tab has no badge,
+answer, and one badge counts everything waiting on a decision. **House → Knowledge** has no badge,
 because nothing on it waits on you: the queue files itself, and the document is there to
 read.
 
@@ -89,17 +89,17 @@ The rules are enforced in code, not merely requested in a prompt — a model tha
 - **14-day expiry** — an unanswered guess retires itself.
 - **Never re-proposed**, confirmed or rejected, however it's reworded.
 
-`binary_sensor.brain_waiting_on_you` turns on when a guess needs an answer, with the text in its `pending` attribute. That exists to be automated: a guess sitting in a panel nobody has open expires unanswered, but pushed to a phone it costs one tap.
+`binary_sensor.brain_memory_waiting_on_you` turns on when a guess needs an answer, with the text in its `pending` attribute. That exists to be automated: a guess sitting in a panel nobody has open expires unanswered, but pushed to a phone it costs one tap.
 
 ## Learning you can see from outside the panel
 
 - **`brain_learned`** fires as a logbook event for every new fact, so *"brAIn learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
-- **`sensor.brain_facts_learned`** — how many things it knows.
-- **`sensor.brain_last_learned`** — the most recent one, with the text as an attribute.
-- **`sensor.brain_open_findings`** — how many findings are waiting on you, with the severity
+- **`sensor.brain_memory_facts_learned`** — how many things it knows.
+- **`sensor.brain_memory_last_learned`** — the most recent one, with the text as an attribute.
+- **`sensor.brain_findings_open_findings`** — how many findings are waiting on you, with the severity
   split and the texts as attributes.
 - **`brain_finding`** fires for every newly-filed finding — and can ring your phone; see
-  [getting them to your phone](/brain/findings/#getting-them-to-your-phone).
+  [getting them to your phone](/brain/findings/#answering-from-outside-the-panel).
 
 ## Viewing, editing, undoing
 
@@ -137,7 +137,7 @@ They're separate journals, and neither can touch the other's.
 
 `brain memory export` writes one JSON file carrying everything brAIn has learned: the memory
 document, the [findings](/brain/findings/) work list, the settled answers and the facts
-ledger. The Memory tab's **⬇ Export** button downloads the same file
+ledger. **House → Knowledge**'s **⬇ Export** button downloads the same file
 (`GET /api/memory/export`).
 
 Import is CLI-only, and it is a **migration, not a sync**: ledgers merge with your existing

@@ -1,9 +1,50 @@
 ---
 title: Automations & Insight Jobs
-description: Run Claude from automations with brain.run_task, get one-shot answers with send_prompt, and schedule recurring reports with insight jobs.
+description: Run Claude from automations — brain.ask for answers an automation can branch on, brain.run_task for background jobs, send_prompt for one-shot text, insight jobs for scheduled reports, and events for everything brAIn decides.
 ---
 
-Three ways to put Claude to work without opening the terminal.
+Ways to put Claude to work without opening the panel.
+
+## `brain.ask` — answers an automation can branch on
+
+A question in, and the answer back as **data** — not a sentence your automation has to
+parse. Hand it the shape you want as a JSON schema; Claude looks the answer up (read-only
+by default) and returns an object that has already been checked against that shape.
+
+```yaml
+automation:
+  - alias: "Warn when any room is cold at bedtime"
+    trigger:
+      - platform: time
+        at: "22:00:00"
+    action:
+      - action: brain.ask
+        data:
+          question: Which rooms are below 18 °C right now, and how far below?
+          schema:
+            type: object
+            properties:
+              rooms:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    degrees_below: { type: number }
+                  required: [name, degrees_below]
+            required: [rooms]
+        response_variable: cold
+      - if: "{{ cold.data.rooms | length > 0 }}"
+        then:
+          - action: notify.mobile_app_phone
+            data:
+              message: >-
+                Cold tonight: {{ cold.data.rooms | map(attribute='name') | join(', ') }}
+```
+
+`response` always holds the answer as text; `data` holds the object when you gave a
+`schema`. `tools` is `read_only` (the default — a question isn't a change), `house` (it may
+control devices) or `full` (shell and files too).
 
 ## `brain.run_task` — background jobs
 
@@ -26,7 +67,7 @@ automation:
           timeout: 300
 ```
 
-Tasks run with a generous agentic budget (`automation_max_turns`, default 30 — nobody is waiting on a background job) and full MCP access — including [Power Tools](/brain/power-tools/), so a task can *fix* what it finds, not just report it. Responses are also returned as service response data for use in the same automation.
+Tasks run with a generous budget (nobody is waiting on a background job, so they may take as many steps as they need, within `timeout`) and full MCP access — including [Power Tools](/brain/power-tools/), so a task can *fix* what it finds, not just report it. Responses are also returned as service response data for use in the same automation — and like `brain.ask`, `brain.run_task` takes a `schema` and returns `data`.
 
 `notify: true` sends a notification when the task completes, and `notify_entity` picks the notify service that gets it — omit it for a persistent notification in the HA UI. (Before 1.26.0, `notify: true` silently did nothing: the listener posted a key the notify schema rejects, so every completion notification was a silent 400.) A `model` field on both `brain.run_task` and `brain.send_prompt` overrides the model per call (`default`, `sonnet`, `opus`, `haiku`), so a nightly digest can run on Haiku while everything else follows the add-on setting.
 
@@ -65,15 +106,47 @@ content: >-
 
 Jobs or [insight cards](/brain/insights/)? Jobs produce glanceable markdown on dashboards and TTS-able events; cards produce interactive visual analysis you click into. Both read the same memory, so most homes use jobs for tiles and briefings, and cards for deep dives.
 
-## Findings in automations
+## Findings, cases and changes in automations
 
-The [findings](/brain/findings/) work list lives in the add-on's `/data`, which Home Assistant can't see — so the add-on mirrors it to `/config/.brain/findings_state.json` on every change, and the integration builds three automation surfaces on it:
+The [findings](/brain/findings/) list lives in the add-on's `/data`, which Home Assistant
+can't see — so the add-on mirrors it to `/config/.brain/findings_state.json` on every change,
+and the integration builds these on it:
 
-- **`sensor.brain_open_findings`** — state is the open count, ready for a numeric-state trigger, with the severity split and the finding texts as attributes — enough to put what's actually broken on a lock screen.
-- **The `brain_finding` event** fires once per newly-filed finding, visible in the logbook. Deduping happens in the store, across every status and the settled ledger, so the same problem can never fire twice.
-- **Zero YAML**: set the `findings_notify_service` option to any `notify.*` service and `findings_notify_min_severity` to the severity allowed to ring your phone (default `serious`), and new findings at or above it are pushed with no automation at all.
+| Entity or event | What it's for |
+| --- | --- |
+| **`sensor.brain_findings_open_findings`** | The open count, with the severity split and the texts as attributes — enough to put what's actually broken on a lock screen. |
+| **`todo.brain_system_brain`** | brAIn's to-do list, in Home Assistant's To-do app. `brain.add_todo` adds to it. |
+| **`brain_case`** event | Something new needs a decision — a problem, a guess or a suggestion. Carries the case, including its answer buttons. |
+| **`brain_case_ended`** event | A case left the list — answered, cleared by its check, or moved to the to-do list. |
+| **`brain_change`** event | brAIn changed something in your house (a fix you approved was applied). |
+| **`brain_finding`** event | The older per-finding event, still fired beside `brain_case`. |
+| **Repairs** | Every finding waiting on you, with its answers, under **Settings → System → Repairs**. |
 
-**`brain_learned`** fires the same way when a fact is filed into [memory](/brain/memory/) — though only actually since 1.26.0: the watcher behind it was documented from the start but never started. The other direction is `brain.add_memory`, which queues a fact from an automation; its optional `source` field records where the fact came from, so the consolidator knows who's talking.
+```yaml title="Tell the kitchen speaker when brAIn fixes something"
+automation:
+  - alias: "Announce brAIn fixes"
+    trigger:
+      - platform: event
+        event_type: brain_change
+    action:
+      - action: tts.speak
+        target: { entity_id: tts.home_assistant_cloud }
+        data:
+          media_player_entity_id: media_player.kitchen
+          message: "brAIn fixed something: {{ trigger.event.data.title }}"
+```
+
+**Zero YAML**: set the `findings_notify_service` option to any `notify.*` service and
+findings reach your phone with no automation at all — critical ones pushed at once and asked
+about again, others held through quiet hours, and each notification carrying its answer
+buttons plus **Reply**. `findings_notify_min_severity` (default `critical`) decides what may
+ring.
+
+`brain.check` runs the house checks now instead of waiting for the next scheduled pass.
+
+**`brain_learned`** fires when a fact is filed into [memory](/brain/memory/). The other
+direction is `brain.add_memory`, which queues a fact from an automation; its optional
+`source` field records where the fact came from.
 
 ## Power Tools from automations
 
