@@ -18,7 +18,7 @@ brAIn gives itself three ways to touch Home Assistant, and at first glance they 
 
 ## How they fit together
 
-**MCP is Claude's only pair of hands.** Everything Claude does to your live home — reading a sensor, turning on a light, looking at a camera, calling *any* service — goes through the MCP server's 51 tools. That single funnel is what makes safety enforceable: per-agent service deny-lists and voice tool-scoping are applied at that chokepoint, once, and cover everything.
+**MCP is Claude's only pair of hands.** Everything Claude does to your live home — reading a sensor, turning on a light, looking at a camera, calling *any* service — goes through the MCP server's 71 tools. That single funnel is what makes safety enforceable: per-agent service deny-lists and voice tool-scoping are applied at that chokepoint, once, and cover everything.
 
 **Power Tools are not a second pair of hands — they're verbs installed into HA itself.** Registering the 65 admin operations as real `brain.*` services (instead of private Claude abilities) is a deliberate choice with three payoffs:
 

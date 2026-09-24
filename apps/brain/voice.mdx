@@ -1,6 +1,6 @@
 ---
 title: Voice Assistant
-description: brAIn as a Home Assistant conversation agent — fast mode, personalities, conversation memory, and per-agent tool scoping.
+description: brAIn as a Home Assistant conversation agent — fast mode, personalities, conversation memory, what voice can see, and per-agent tool scoping.
 ---
 
 Pick **brAIn** as a conversation agent under **Settings → Voice Assistants** and every Assist pipeline — voice satellites, the chat dialog, the mobile app — routes through Claude with full knowledge of your home.
@@ -57,6 +57,24 @@ knows the house it's talking about:
 > compensation, not a boiler, so it raises the flow temperature instead of asking for a
 > target temperature that would do nothing.
 
+## What voice can see
+
+Voice sees what you've **exposed to Assist** — the same switch Home Assistant already has
+under **Settings → Voice assistants → Expose**. Un-expose the front door lock there and brAIn's
+voice agent can neither read it nor act on it, whether you name it directly or ask for
+*"everything in the hallway"*.
+
+- An entity nobody has ever set gets Home Assistant's own default — the same answer the
+  built-in Assist agent gives. **A lock is never exposed unless you expose it.**
+- Area, device and label targets are refused on voice, because a hidden entity reached
+  through its room would be the way around the switch.
+- If the exposure list can't be read, voice sees **nothing** rather than everything, and
+  says so.
+
+Want the old behaviour, where voice could reach the whole house? Set the `assist_exposure`
+option to `all`. (This only affects voice; the chat, the terminal and a finding's
+**Fix it** see the whole house, and are covered by `protected_entities` instead.)
+
 ## Conversation memory
 
 While the same Assist chat or voice session stays open, Home Assistant keeps the same `conversation_id` — and the add-on **resumes the same Claude session** for each turn, so follow-ups genuinely remember the conversation. A new session starts a clean slate; `brain.clear_conversation` resets one (or all) manually. If session resume isn't possible, the integration replays recent turns instead, so follow-ups still work with shorter memory. (Before 1.26.0 a follow-up turn could be handed the pre-warmed spare worker — which knows nothing — and lose the conversation's context for good; the spare now only serves conversations that genuinely start from nothing.)
@@ -65,9 +83,11 @@ Voice is also how the house [learns](/brain/memory/): say *"remember that we cal
 
 ## Safe by default: tool scoping
 
-Voice can control everything but can't run shell commands or edit files — `assist_tool_access: mcp_only` is the default. Two more dials:
+Voice can control what you've exposed but can't run shell commands or edit files — `assist_tool_access: mcp_only` is the default. Beyond that:
 
-- **`assist_max_turns`** caps agentic loops per request (default 8) so a misunderstood command can't spiral. It stays deliberately modest where the other channels are generous: latency *is* the product for voice, and a twenty-turn voice command is a failed interaction whatever it answers. Worth knowing on older versions: until 1.26.0, neither this nor `assist_tool_access` reached fast mode — the default — at all; the worker pool never saw them, so voice always ran at 5 turns whatever the option said.
+- **No turn counting to tune.** `assist_max_turns` was retired in 1.48.0. A voice run has a
+  generous guard far past any real command, and one that trips it is told to finish with
+  what it has rather than being cut off mid-thought.
 - **Per-agent service deny-lists** (e.g. forbid `lock.unlock` for the kids' satellite): every control tool funnels through one chokepoint, so the deny-list covers all of them — `homeassistant.*` meta-calls included, resolved against their targets as above. **`brain.*` is a one-click deny option** too: it keeps a restricted agent away from all 65 registry-admin [Power Tools](/brain/power-tools/), including `brain.create_user`, which can mint an admin login. See the [Reference](/brain/reference/) for the option syntax.
 
 With [Power Tools](/brain/power-tools/) installed, voice requests can also reorganize — *"create a zone for the gym"*, *"hide the child-lock switches"* — with the same validation and admin gating as everywhere else.
