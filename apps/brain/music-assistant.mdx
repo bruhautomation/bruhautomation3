@@ -1,13 +1,29 @@
 ---
 title: Music Assistant
-description: Run Music Assistant from brAIn — see every player and provider, control playback, clear out stale players Home Assistant can't delete, and ask Claude to do anything Music Assistant can.
+description: Ask brAIn to run Music Assistant — control and group players, search and play, manage providers and settings, and clear out stale players Home Assistant can't delete.
 ---
 
-**House → Music Assistant** is Music Assistant from brAIn's side: every player with what
-it's playing, every provider with the last error it reported, and the players worth clearing
-out. And you can ask Claude to do anything Music Assistant's own interface can.
+brAIn does anything Music Assistant's own interface can, and you ask for it in a sentence
+from the chat or the terminal. There is no Music Assistant screen in brAIn's panel — Music
+Assistant has one, and a second copy inside brAIn was clutter (the tab was removed in
+2.10). Everything it did is still there, as the tools Claude uses.
 
-![The Music Assistant tab in dark mode: "Connected to Music Assistant 2.9.0 as Home Assistant Integration", a highlighted box "2 players worth clearing out" listing AirCast 0 and AirCast 1 with Remove buttons and a "Remove all stale players" button, and a Players list — Kitchen (Chromecast, playing "A Song With A Rather Long Title — Band", with Pause, Next, Vol −, Vol +, Turn off and More) and Living room (AirPlay, unavailable)](./images/panel-music.webp)
+## What you can ask for
+
+```text
+Group the kitchen and the lounge and play my Discover Weekly.
+What's playing everywhere right now?
+Why is the Sonos provider erroring?
+Remove every AirCast player.
+Turn on crossfade for the office.
+Make a playlist of what we played on Saturday.
+```
+
+Claude has an overview (every player with what it's playing, every provider with the last
+error it reported), a search, a player tool (play/pause, next, volume, power, stop, clear the
+queue, rename, enable or disable), a play tool, the clean-up, and a tool that runs **any**
+command in Music Assistant's API — players, queues, groups, the library, playlists,
+providers and server settings.
 
 ## Clearing out stale players
 
@@ -16,52 +32,37 @@ but hasn't seen since — every speaker a removed provider or an AirCast bridge 
 behind — comes back as a Home Assistant entity however many times you delete it, because
 its config lives in Music Assistant.
 
-brAIn lists them at the top, with why each one is stale:
+Ask brAIn to clear them out ("remove the stale players") and it:
 
-- **Remove** forgets one player for good.
-- **Remove all stale players** forgets every one of them, after showing you the list.
+- **lists them first**, with why each one is stale — the clean-up is a dry run unless you
+  tell it to go ahead;
+- **has Music Assistant forget them** once you say so, after which Home Assistant drops the
+  entities by itself;
+- reports a player still held by a provider that can't remove players as **held**, and can
+  **disable** it instead.
 
-Once Music Assistant forgets a player, Home Assistant drops its entity by itself. A player
-still held by a provider that can't remove players is reported as *held*, and can be
-**disabled** instead.
+A working player is never swept up by "remove every player from that provider" — only the
+stale ones go.
 
-## Controlling players and providers
+## Who may use these tools
 
-Each player has **play/pause, next, volume and power** on its row; **stop, clear the
-queue, rename and enable/disable** are under **More**. A provider showing an error can be
-**reloaded** from its row.
-
-## Or just ask
-
-From the chat or the terminal:
-
-```text
-Group the kitchen and the lounge and play my Discover Weekly.
-Why is the Sonos provider erroring?
-Remove every AirCast player.
-Turn on crossfade for the office.
-Make a playlist of what we played on Saturday.
-```
-
-Claude has an overview, a search, player and play tools, the clean-up (a dry run unless you
-tell it otherwise), and a tool that runs **any** command in Music Assistant's API — players,
-queues, groups, the library, playlists, providers and server settings.
-
-Scheduled runs may only read. **Voice** doesn't use these tools: it plays music through
-Home Assistant's own `music_assistant.play_media` on the media players you've
-[exposed to voice](/brain/voice/#what-voice-can-see).
+| Who's asking | What they get |
+| --- | --- |
+| The chat and the terminal | Everything above. |
+| Scheduled, unattended runs (cards, the Resident) | The overview, the search and read-only queries. Nothing that changes a player, the library or a setting. |
+| Voice | None of these tools. Voice plays music through Home Assistant's own `music_assistant.play_media` on the media players you've [exposed to voice](/brain/voice/#what-a-voice-level-agent-sees), so the exposure check can see what it's playing on. |
 
 ## Setup
 
 **There isn't any, usually.** brAIn connects where Home Assistant's Music Assistant
-integration connects, with the sign-in Music Assistant gave Home Assistant. That covers
-players and the library.
+integration connects, with the sign-in Music Assistant gave Home Assistant. That sign-in can
+control, group, configure and remove players and edit the library.
 
 Two options cover the rest:
 
 | Option | When you need it |
 | --- | --- |
-| `music_assistant_token` | Adding, changing or removing **providers**, or changing **server settings**, needs a Music Assistant admin. Create a long-lived token in Music Assistant → Settings → your profile → Tokens. Without it, brAIn says so when it's refused rather than just failing. |
+| `music_assistant_token` | Adding, changing or removing **providers**, or changing **server settings**, needs a Music Assistant admin. Create a long-lived token in Music Assistant → Settings → your profile → Tokens. Without it, brAIn says so when it's refused rather than just failing. The token is in Home Assistant backups like every option, so use one you can revoke. |
 | `music_assistant_url` | A Music Assistant server Home Assistant isn't connected to, e.g. `http://192.168.1.20:8095`. Set a token with it. |
 
 **Protected entities apply**: a player that's a Home Assistant entity on your

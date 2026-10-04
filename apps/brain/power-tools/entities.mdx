@@ -1,11 +1,11 @@
 ---
 title: Entities
-description: Rename entities, fix entity IDs, enable, disable, hide, and clean up orphaned registry entries with brain services.
+description: Rename entities, fix entity IDs, enable, disable, hide, change what a device shows as, and clean up orphaned registry entries with brain services.
 sidebar:
   order: 4
 ---
 
-The entity registry is where friendly names, entity ids, and visibility live. These services let Claude fix the `light.shelly_1pm_9a4c2f` mess at scale: rename in bulk, assign sane entity ids, disable noisy diagnostics, hide what dashboards shouldn't show, and sweep out registry entries whose integration is long gone.
+The entity registry is where friendly names, entity ids, and visibility live. These services let Claude fix the `light.shelly_1pm_9a4c2f` mess at scale: rename in bulk, assign sane entity ids, disable noisy diagnostics, hide what dashboards shouldn't show, and sweep out registry entries whose integration is long gone. Since 2.11 they also change [what a device shows as](#what-a-device-shows-as) — a contact sensor as a door, a smart plug as a fan or a light, a sensor's decimals and unit.
 
 :::caution
 `change_entity_id` does **not** rewrite automations, scripts, or dashboards that reference the old id. Run [`find_orphaned_references`](/brain/power-tools/diagnostics-and-repairs/) afterwards to catch anything left pointing at the old name — Claude does this automatically when you ask it to rename things.
@@ -195,3 +195,142 @@ data:
 ```
 
 > 🗣️ *"Are there any dead entities left over from integrations I removed? Clean them up."*
+
+## What a device shows as
+
+New in brAIn 2.11. Every entity in Home Assistant has a *Show as* setting in its own settings dialog; these four services change it, so you can ask in the chat or the terminal — *"show the back door sensor as a door"*, *"show the fan plug as a fan"*, *"show the outdoor temperature in °F with one decimal"* — and an automation can call them too.
+
+| Service | What it changes | Undo |
+|---------|-----------------|------|
+| `brain.set_device_class` | The *Show as* type of a binary sensor, cover, switch, valve and a few more | `device_class` left empty |
+| `brain.show_switch_as` | A switch shown as a light, fan, lock, cover, siren or valve | `brain.stop_showing_switch_as` |
+| `brain.stop_showing_switch_as` | Removes that helper, so the switch is a switch again | — |
+| `brain.set_sensor_display` | A sensor's decimal places and, where it converts, its unit | the field set to `null` |
+
+The rules that hold for all four:
+
+- **Admin-only, and checked like any other change.** From the chat and the terminal they go through protected entities and the [action gate](/brain/safety/). A voice agent at the *Voice assistant* level cannot use them, and neither can scheduled cards or any other unattended run.
+- **Protected holds across a switch and its stand-in.** A switch shown as something else counts as protected if *either* the switch or the entity standing in for it is on your protected list — showing it as another type, or going back, is refused. While you have a protected list, brAIn also refuses when it cannot read which entity stands in for which.
+- **Checked against your Home Assistant.** A type or unit is checked against what your Home Assistant offers, and a wrong one is refused with the list of what it would take.
+- **A sensor's or a number's device class is never changed.** It decides the unit and the long-term statistics, and Home Assistant's own settings do not offer it either. Change its unit or precision with `set_sensor_display` instead.
+
+:::tip[A fan cannot become a light — but the plug it runs off can]
+Only a **switch** can be shown as another kind of device. A ceiling fan that arrives from an integration as a `fan` entity cannot be turned into a light, and brAIn says so. If the fan or lamp runs off a smart plug, show the plug's switch as what you want with `brain.show_switch_as` — that is Home Assistant's own *Change device type of a switch* helper.
+:::
+
+### Set device class
+
+`brain.set_device_class`
+
+Change what kind of device an entity is shown as — a binary sensor as a door, window, garage door, motion, moisture or smoke sensor; a cover as a garage door, blind, shutter, curtain or gate; a switch as an outlet. Returns, per entity, the device class now in effect, the override stored, and the integration's original.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity (list) | yes | Entities to change: `binary_sensor`, `button`, `cover`, `event`, `humidifier`, `media_player`, `switch`, `update` or `valve`. |
+| `device_class` | text | no | What to show it as, e.g. `door`, `window`, `moisture`, `garage`, `outlet`. Leave empty to give back the integration's own. |
+| `confirm_safety` | boolean | no | Needed to take a smoke, gas, carbon monoxide or leak sensor out of that class. Default off. |
+
+```yaml
+# A contact sensor on the back door, shown as a door
+service: brain.set_device_class
+data:
+  entity_id:
+    - binary_sensor.back_door_contact
+  device_class: door
+response_variable: result
+
+# Back to what the integration reports
+service: brain.set_device_class
+data:
+  entity_id:
+    - binary_sensor.back_door_contact
+```
+
+> 🗣️ *"The back door sensor shows as 'opening' — show it as a door."*
+
+**Smoke, gas, carbon monoxide and leak sensors keep their type unless you say yes.** brAIn's [safety lane](/brain/safety/) — a critical card sent straight away, through quiet hours — goes by that type, so showing a smoke detector as a door would quietly stop its alerts. brAIn asks you first, and the service refuses the change without `confirm_safety: true`. Making a sensor one of those types goes through, and the answer says that its alerts now go through quiet hours.
+
+**A template binary sensor made in Home Assistant's UI keeps the type set in its helper.** Change it in Settings → Devices & services → Helpers → the helper → Template options. brAIn will not add an override there, because Home Assistant hides that setting for those sensors and an override would mask every later change; it can still clear one that is already there. A template sensor written in YAML takes an override as usual.
+
+### Show switch as
+
+`brain.show_switch_as`
+
+Show a switch — a smart plug running a fan or a lamp — as a light, fan, lock, cover, siren or valve, through Home Assistant's own *Change device type of a switch* helper (`switch_as_x`). The new entity takes the switch's place in dashboards and voice; the original switch is hidden and keeps working. A switch already shown as something else is moved to the new type. Returns the new entity's id.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The switch to show as something else, or the entity it is already shown as. |
+| `target_domain` | select | yes | `cover`, `fan`, `light`, `lock`, `siren` or `valve` — checked against what your Home Assistant offers. |
+| `invert` | boolean | no | Invert the state (cover, lock and valve only; Home Assistant 2024.2 or newer). |
+
+```yaml
+# The plug the bedroom fan runs off, shown as a fan
+service: brain.show_switch_as
+data:
+  entity_id: switch.bedroom_fan_plug
+  target_domain: fan
+response_variable: shown   # shown.entity_id is the new fan entity
+
+# A plug running a floor lamp, shown as a light
+service: brain.show_switch_as
+data:
+  entity_id: switch.lounge_lamp_plug
+  target_domain: light
+```
+
+> 🗣️ *"The lounge lamp is on a smart plug — make it show up as a light."*
+
+### Stop showing switch as
+
+`brain.stop_showing_switch_as`
+
+Undo `show_switch_as`: remove the helper so the switch shows as a switch again and is no longer hidden. Takes the switch or the entity it is shown as. The answer lists the automations, scripts and scenes that used the entity going away — run it with `dry_run: true` first to see that list without changing anything.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity | yes | The switch, or the light/fan/lock/cover/siren/valve it is shown as. |
+| `dry_run` | boolean | no | When on, only report what would change. Default off. |
+
+```yaml
+# See what would break first
+service: brain.stop_showing_switch_as
+data:
+  entity_id: fan.bedroom_fan_plug
+  dry_run: true
+response_variable: preview
+```
+
+> 🗣️ *"Stop showing the bedroom plug as a fan — but tell me what uses it first."*
+
+### Set sensor display
+
+`brain.set_sensor_display`
+
+Change how a sensor is shown: its display precision (decimal places) and, where Home Assistant can convert it, its unit. Only the fields you name change; `null` puts back the integration's own. A unit is checked against the units Home Assistant can convert that sensor to — it converts only sensors whose device class has a converter (temperature, energy, power, pressure, …), and the refusal lists the units it can.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `entity_id` | entity (list) | yes | Sensors to change. |
+| `display_precision` | number | no | Decimal places to show, 0 to 6. |
+| `unit_of_measurement` | text | no | The unit to show it in, e.g. `°F` or `kWh`. |
+
+```yaml
+# Outdoor temperature in °F, one decimal
+service: brain.set_sensor_display
+data:
+  entity_id:
+    - sensor.outdoor_temperature
+  unit_of_measurement: "°F"
+  display_precision: 1
+
+# Solar power in kW instead of W
+service: brain.set_sensor_display
+data:
+  entity_id:
+    - sensor.solar_power
+  unit_of_measurement: kW
+```
+
+> 🗣️ *"Show the solar output in kilowatts with two decimals."*
+

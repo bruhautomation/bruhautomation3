@@ -7,10 +7,11 @@ Everything you might need to look up. Configure from **Settings → Add-ons → 
 
 ## Configuration options
 
-**Six of these are also editable from the panel's ⚙ Settings dialog**, which writes
+**Seven of these are also editable from the panel's ⚙ Settings dialog**, which writes
 them back through the Supervisor so both screens always show the same value:
 `auto_refresh_hours`, `history_days`, `history_keep_runs`, `history_keep_days`,
-`model` and `generation_timeout_minutes`. Everything else on this page is the
+`model`, `generation_timeout_minutes`, and **Let brAIn act without asking**
+(`dangerously_skip_permissions`, in ⚙ → Terminal & chat). Everything else on this page is the
 Configuration tab's alone.
 
 ⚙ Settings also holds things that are **not** add-on options at all, because they
@@ -32,7 +33,7 @@ the rest of your options.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `enable_terminal` | bool | `true` | Run the ttyd terminal and expose the Terminal tab. Turn off for a dashboard-only install with no shell. |
-| `enable_insights` | bool | `true` | Run the card scheduler and show the **Insights** and **Proposals** tabs. Off stops every scheduled Claude run; **Home stays**, because the house checks cost nothing and still file there. |
+| `enable_insights` | bool | `true` | Run the card scheduler and show the **Insights** pane. Off stops every scheduled Claude run; **Findings and Proposals stay**, because the house checks cost nothing and still file there. |
 
 ### Terminal
 
@@ -45,7 +46,18 @@ the Terminal tab itself), because it changes nothing about how the add-on runs.
 | `auto_generate_context` | bool | `true` | Regenerate `/config/CLAUDE.md` with your HA system context at startup. |
 | `enable_ha_mcp_server` | bool | `true` | Give Claude native HA access (states, services, history, statistics, registries, dashboards, logs, templates). |
 | `enable_mobile_ui` | bool | `true` | Splice the mobile toolbar and iOS dictation fix into ttyd's UI. |
-| `dangerously_skip_permissions` | bool | `false` | Skip Claude Code's tool-permission prompts in the interactive terminal. Background listeners never use this. |
+| `dangerously_skip_permissions` | bool | `false` | **Let brAIn act without asking.** Off, the terminal and the chat ask before Claude runs a command, edits a file or changes something in Home Assistant; on, they stop asking. Same switch as ⚙ → Terminal & chat. See [below](#let-brain-act-without-asking). |
+
+#### Let brAIn act without asking
+
+The option's key is still `dangerously_skip_permissions`, so an existing setting keeps its meaning; its label is **Let brAIn act without asking**, and the same switch sits in ⚙ → Terminal & chat — flip either and the other follows.
+
+- **Off (the default):** the terminal and the chat ask before Claude runs a command, edits a file or changes something in Home Assistant. Only reading is pre-approved. An approval card can offer **Always allow** for the rule Claude Code suggests, saying what it adds and for how long.
+- **On:** both stop asking, and in the chat and the terminal the action gate stops asking its own model about what you meant.
+- **Still guarded with it on:** brAIn's Home Assistant tools refuse your protected entities, and so do plain shell service calls and YAML edits made with Claude's file tools that name one. The tripwire, brAIn's own deny-list and your house rules still decide, and a conversation about a finding always asks before a change.
+- **Not checked:** a shell command that reaches a protected entity some other way, and a change a shell command makes cannot be undone with `brain undo` (edits made with Claude's file tools can). If that matters to you, leave it off.
+- **Never reaches** Fix it runs, voice or background runs — they keep their own rules.
+- **No restart:** a new terminal session and the chat's next message pick it up. A terminal session already open keeps the setting it started with until you end it with `/exit`, and ⚙ says when one does. A setting brAIn cannot read counts as "ask", never as "go ahead".
 
 ### Voice and automation
 
@@ -54,8 +66,8 @@ the Terminal tab itself), because it changes nothing about how the add-on runs.
 | `enable_assist_integration` | bool | `true` | Register brAIn as a conversation agent for Assist. |
 | `enable_automation_integration` | bool | `true` | Watch for task requests from automations. |
 | `assist_fast_mode` | bool | `true` | Serve voice from a pool of pre-warmed persistent workers instead of spawning a CLI per request. |
-| `assist_tool_access` | `mcp_only` \| `full` | `mcp_only` | Whether voice can only touch HA, or also run Bash and edit files. |
-| `assist_exposure` | `exposed` \| `all` | `exposed` | Whether voice sees only what Home Assistant exposes to Assist (Settings → Voice assistants → Expose), or the whole house. |
+
+**What a voice agent may reach is set on the agent, not here.** `assist_tool_access` and `assist_exposure` were removed in 2.10: each agent's **What this agent can reach** (Settings → Devices & services → brAIn → the agent → Configure) is *Voice assistant* (only what you expose to Assist, Home Assistant tools only — the default), *Whole house* (every entity, still no shell or file edits) or *Full admin* (everything the chat can do). An agent that used to follow the add-on is now a *Voice assistant*. See [Voice Assistant](/brain/voice/).
 
 ### Memory and learning
 
@@ -65,6 +77,7 @@ the Terminal tab itself), because it changes nothing about how the add-on runs.
 | `memory_injection` | bool | `true` | Splice learned memory into voice prompts. |
 | `memory_max_kb` | 1–64 | `32` | Size cap for the memory document. A pass that cannot fit under it files nothing, so this is the setting to raise when the log says the document is full. |
 | `study_timeout_minutes` | 2–120 | `30` | Wall-clock limit for a study session. |
+| `ask_why` | bool | `true` | Once a day at most, spend one Claude run working out **why** somebody did something by hand — running the sprinklers, pushing the heating up — and record it or put one short question on the Findings tab. Three a week at most, never twice about the same thing, and never about locks, alarms or where anybody is. |
 | `findings_notify_service` | string | *(empty)* | A `notify.*` service (with or without the prefix) that gets a push when brAIn files a new finding. Empty means no notifications — the Findings feed, the sensor and the `brain_finding` event work either way. |
 | `findings_notify_min_severity` | `info` \| `warning` \| `serious` \| `critical` | `critical` | Only findings at or above this severity are pushed. The default keeps your phone for what cannot wait — a leak, a freeze, a hub that has stopped answering, which are also the only ones brAIn reminds you about a second time. Everything else waits on the Findings feed, in your to-do list and in Repairs. Set it to `serious` for the old behaviour, where a dying battery is pushed once as well. |
 | `notify_quiet_start` | string | `22` | The hour (0–23, your home's timezone) from which only urgent findings ring your phone. Everything else is held and delivered as one message when the quiet ends. |
@@ -79,6 +92,9 @@ the Terminal tab itself), because it changes nothing about how the add-on runs.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `esphome_dashboard_url` | string | *(empty)* | Where your ESPHome dashboard is, when it is not the ESPHome add-on (which brAIn finds by itself) — e.g. `http://192.168.1.20:6052`. Editing device files never needs it; validating, compiling, installing and logs do. |
+| `esphome_ha_token` | password | *(empty)* | A long-lived access token from a Home Assistant administrator, needed to build and install through the ESPHome add-on on a current Home Assistant: the Supervisor no longer lets one add-on open another's dashboard by itself. Used for that one thing only, and stored like every option, so it is in your backups. Not needed if you set the dashboard address above. |
+
+There is no ESPHome or Music Assistant tab in the panel since 2.10 — ask in the chat or the terminal; the [tools](/brain/mcp/) are unchanged.
 
 ### Music Assistant
 
@@ -134,7 +150,7 @@ the Terminal tab itself), because it changes nothing about how the add-on runs.
 | --- | --- | --- | --- |
 | `checks_interval_hours` | 0–168 | `6` | How often the deterministic house checks run. They read Home Assistant and the Supervisor directly and never call Claude, so they cost nothing. `0` means never on a timer; `brain check` and the tab's button still run them. |
 | `self_healing` | bool | `false` | Let brAIn make up to three repairs a night, inside your quiet hours: start an add-on that was set to run at boot, ping a dead Z-Wave node, reload an integration that failed to set up. Nothing else, never on a protected entity, and never on a finding you have already answered. See **The house acts**. |
-| `protected_entities` | list | `[]` | Entity ids (`lock.front_door`) or whole domains (`alarm_control_panel.*`) that brAIn may never act on. Enforced at the one place every Home Assistant tool call passes through, so it covers voice, automations, insight runs, the fixer, the overnight healer and anything the panel writes into `automations.yaml`; a call aimed at an area or device containing one is refused too, and so is a label or floor target, which cannot be resolved there. A shell command or a file edit does not go through that chokepoint — the terminal, the chat and Fix it are *told* the list instead. Protected entities can always be looked at. |
+| `protected_entities` | list | `[]` | Entity ids (`lock.front_door`) or whole domains (`alarm_control_panel.*`) that brAIn may never act on, from any face — the terminal, the chat, Fix it, voice, automations, insight runs and the overnight healer. Enforced at the one place every Home Assistant tool call passes through: a call aimed at an area or device containing one is refused, so is a label or floor target, a scene that names one in its `entities` map, and a scene, script or automation that references one. While the list is set, Claude may not call services from a shell, or write YAML that names one with its file tools. A switch shown as something else is protected if either half is. Protected entities can always be looked at. |
 
 ### Undo and access
 
@@ -174,8 +190,6 @@ enable_insights: true
 enable_ha_mcp_server: true
 enable_assist_integration: true
 assist_fast_mode: true
-assist_tool_access: mcp_only
-assist_exposure: exposed
 enable_automation_integration: true
 study_timeout_minutes: 45
 learning: true
@@ -202,9 +216,11 @@ under the bar:
 | **Ask** | **Chat / Terminal** | Claude Code as a chat or a true terminal | [Terminal](/brain/terminal/) |
 | **House** | **Knowledge** | What brAIn has measured about your house, and its memory | [Memory & Learning](/brain/memory/) |
 | | **Activity** | What happened in the house and what caused it | [Activity](/brain/activity/) |
-| | **ESPHome** | Your ESPHome devices: edit, validate, install, logs | [ESPHome](/brain/esphome/) |
-| | **Music Assistant** | Players, providers, and clearing out stale players | [Music Assistant](/brain/music-assistant/) |
+| | **Upkeep** | Tidy names and rooms, should-I-update-tonight, the overnight check and the house book | [Upkeep](/brain/upkeep/) |
 | **Help** | **Docs** | The same guide, shipped inside the add-on and searchable offline | |
+
+ESPHome and Music Assistant have no pane since 2.10 — both have their own screens, and
+everything brAIn did there is one sentence away in the chat or the terminal.
 
 A number on **Home** means something is waiting on your decision. **To-do** has its own
 count; nothing else carries a badge, because nothing else waits on you.
@@ -244,7 +260,7 @@ to an estimate of brAIn's own spending and the week isn't shown at all.
 
 ## Voice assistant (Assist)
 
-Select **brAIn** as a conversation agent in **Settings → Voice Assistants**. Each agent has its own name, model, personality, and blocked-services list. New agents default to Claude Haiku (`Default` inherits the terminal's model); `brain.clear_conversation` resets conversation memory (omit `conversation_id` to reset all). How it works — fast mode, the area map, personalities: [Voice Assistant](/brain/voice/).
+Select **brAIn** as a conversation agent in **Settings → Voice Assistants**. Each agent has its own name, model, personality, reach (*Voice assistant*, *Whole house* or *Full admin*) and Blocked services list — new agents start with the administration services (restarts, host shutdown, `update.install`, `recorder.purge`, `shell_command.*`, `backup.create` and the `brain.*` registry tools) already ticked. A *Voice assistant* agent may only use an entity's own services on entities you expose, so it cannot restart Home Assistant or create a login however a sentence is misheard. New agents default to Claude Haiku (`Default` inherits the terminal's model); `brain.clear_conversation` resets conversation memory (omit `conversation_id` to reset all). How it works — fast mode, the area map, personalities: [Voice Assistant](/brain/voice/).
 
 ## Insight jobs
 
@@ -268,6 +284,7 @@ data:
   notify_entity: notify.mobile_app_phone   # where the notification goes; omit for a persistent notification
   model: haiku        # optional per-call override
   timeout: 300
+  tools: read_only    # full (default) | house | read_only
 
 # Run one or all insight jobs now
 action: brain.run_insight
@@ -291,11 +308,11 @@ data:
   confidence: high         # high | medium | low
   source: "spouse"         # optional — where the fact came from (default "service")
 
-# Answer one of brAIn's open questions — recorded, and queued as a fact
+# Answer one of brAIn's open guesses — the same as Yes or No on the Findings tab
 action: brain.answer_question
 data:
-  question: "Is the garage fridge meant to run 24/7?"
-  answer: "Yes, it holds the overflow from the kitchen."
+  question: "Is the garage fridge meant to run 24/7?"   # or ts: <id from the Waiting on you sensor>
+  answer: "Yes, it holds the overflow from the kitchen."  # must start with yes or no
 
 # Ask a question and get the answer as DATA an automation can branch on
 action: brain.ask
@@ -309,12 +326,13 @@ data:
   tools: read_only           # read_only (default) | house | full
 response_variable: cold      # cold.data.rooms is a list
 
-# Put something on the to-do list (also todo.brain_system_brain)
+# Put something on the to-do list (the same list as todo.brain_system_brain)
 action: brain.add_todo
 data:
   text: "Replace the hallway smoke alarm battery"
 
 # Run the house checks now instead of waiting for the next pass
+# (also the "Run house checks" button on the brAIn System device)
 action: brain.check
 
 # Reset conversation memory
@@ -327,12 +345,25 @@ Claude produced, validated against that schema before it was returned. It's read
 you say otherwise, because a question isn't a change. `brain.run_task` accepts a `schema`
 too.
 
+**These eleven are brAIn's own services.** The powerful ones need a Home Assistant
+administrator: `brain.run_task` and `brain.ask` with `tools` wider than `read_only`,
+and `brain.add_memory`, `brain.study`, `brain.intent` and `brain.answer_question`
+(what they file is read by every later run). `brain.send_prompt` does not, because it
+is the voice level Assist already gives any user. A task that failed — an expired
+sign-in, a timeout — **raises an error** naming the reason rather than handing your
+automation an apology as if it were the answer.
+
+`brain.answer_question` closes the guess exactly as the Findings tab's Yes or No does:
+a yes files it as something brAIn knows, a no closes it, and anything after the no is
+kept as a correction. The open guesses and their ids are on the **Waiting on you**
+sensor; an answer that does not start with yes or no is refused.
+
 `brain.intent` queues the sentence and returns straight away, and what comes back is a card
 on the Proposals tab — a one-off, or a standing rule simulated against your history — including
 when brAIn will not arm it. Nothing is written until you accept it. See
 [Rules & one-offs](/brain/intents/).
 
-Plus the **65 [Power Tools](/brain/power-tools/)** services for registry administration.
+Plus the **69 [Power Tools](/brain/power-tools/)** services for registry administration — including, since 2.11, the four that change [what a device shows as](/brain/power-tools/entities/#what-a-device-shows-as) (`set_device_class`, `show_switch_as`, `stop_showing_switch_as`, `set_sensor_display`).
 
 ## Sensors
 
@@ -371,13 +402,30 @@ The **Usage tracker** sensor's whole job is to be readable when the four above a
 
 ### Health sensors
 
-`sensor.brain_usage_limits_health` is brAIn's verdict on itself — `ok`, `degraded` or `failed` — with the reason and the switch to look at as attributes. It never goes unavailable: if the add-on has stopped publishing, that *is* the state.
+`sensor.brain_usage_limits_health` (the **Health** sensor) is brAIn's verdict on itself — `ok`, `degraded` or `failed` — with the reason and the switch to look at as attributes. It never goes unavailable: if the add-on has stopped publishing, that *is* the state. While it is not `ok`, Home Assistant's **Repairs** carries the reason too. A credential merely waiting for its next refresh is not a fault and does not degrade it.
 
 `binary_sensor.brain_system_assist_healthy` reports voice-assistant pool health, with worker count, the pre-warmed spare, and last-request latency as attributes.
 
+### House sensor
+
+`sensor.brain_house` is what brAIn thinks the house is doing right now. Its state is the mode — `home`, `away`, `asleep`, `waking`, `guests`, or `unknown` when it cannot tell — and its attributes are `sentence`, `rooms_in_use`, `unusual_together`, `because`, `coming_up` and `published_age_minutes`. It is refreshed every few minutes and never goes unavailable: a reading that is missing or stale is `unknown` with a `reason` attribute, so an automation keyed on it never acts on how the house looked an hour ago. It is context for brAIn's own looks, and a wrong *away* can never make a leak alarm or a protected device any less important.
+
+### Buttons, AI Task and other entities
+
+| Entity | What it is |
+|--------|-----------|
+| `button.brain_system_run_house_checks` | **Run house checks** — the same as `brain.check` |
+| *Run now* button, one per insight job | Runs that job now |
+| `ai_task.brain_system_ai_task` | brAIn as Home Assistant's **AI Task** entity (Home Assistant 2025.7 and later): `ai_task.generate_data` gets a read-only answer, checked against the structure you asked for before it is returned |
+| `sensor.<job>_insight` | One per insight job — see [Insight jobs](#insight-jobs) |
+
+On Home Assistant versions that support it, other assistants can also ask brAIn what it has measured — what is normal for an entity, what it remembers, what caused a change — through Home Assistant's own LLM API, limited to what you expose to them.
+
 ### To-do list
 
-`todo.brain_system_brain` is brAIn's to-do list in Home Assistant's own To-do panel and app: the findings you've accepted as work, plus anything added with `brain.add_todo`. Ticking one off there is the same as **Done** on the panel's To-do tab.
+`todo.brain_system_brain` is brAIn's to-do list in Home Assistant's own To-do panel and app: the open findings brAIn is asking about, the findings you've accepted as work, and anything added with `brain.add_todo` or typed in the app. Ticking a finding off is the same as **I've fixed it**, deleting it the same as **Wrong**; ticking a chore off is the same as **Done** on the panel's To-do tab.
+
+Findings waiting on you also appear in Home Assistant's **Repairs**, with the same buttons as the card.
 
 ## Events
 
@@ -390,11 +438,11 @@ The **Usage tracker** sensor's whole job is to be readable when the four above a
 | `brain_case_ended` | When a case leaves the feed — answered, cleared by its check, or moved to the to-do list | the case, and how it ended |
 | `brain_change` | When brAIn changed something in your house (a fix was applied) | the case, and what changed |
 
-The first two also carry `name` and `message` fields phrased as sentences, so they read properly in the **logbook** — learning and findings appear in your home's timeline next to lights and doors. `brain_finding` is what to trigger on for anything fancier than the built-in push (`findings_notify_service` covers the simple case with no automation at all).
+`brain_finding` still fires beside `brain_case`, so automations written against it keep working. A Dismiss is not an ending — a snoozed case fires no `brain_case_ended` and comes back without a new `brain_case`. The first two also carry `name` and `message` fields phrased as sentences, so they read properly in the **logbook** — learning and findings appear in your home's timeline next to lights and doors. `brain_finding` is what to trigger on for anything fancier than the built-in push (`findings_notify_service` covers the simple case with no automation at all).
 
 ## MCP server tools
 
-The built-in MCP server gives Claude **51 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users) and `call_service` with `return_response` for the [Power Tools](/brain/power-tools/) workflow. Verify them on your own system with **`brain doctor`**. Full tool-by-tool reference: [MCP Tools](/brain/mcp/).
+The built-in MCP server gives Claude **89 tools** against your live install — including `get_registry` (areas, floors, labels, devices, entities, integrations, users — entity rows say what a device shows as), `call_service` with `return_response` for the [Power Tools](/brain/power-tools/) workflow, the measurement tools, live automation traces, and tools for BRUH Minecraft, BRUH Print and BRight. Verify them on your own system with **`brain doctor`**. Full tool-by-tool reference: [MCP Tools](/brain/mcp/).
 
 ![MCP server tools by category](./images/mcp-tools.svg)
 
@@ -426,7 +474,11 @@ brain undo 3              # revert edit #3
 brain undo --all-today    # revert everything Claude changed today
 ```
 
-Snapshots are pruned after `edit_journal_days` and capped by total size. **`secrets.yaml` is never snapshotted.** An existing `/config/.git` directory from an older add-on is left strictly alone — brAIn never writes to it; delete it yourself if you don't want it.
+Snapshots are pruned after `edit_journal_days` and capped by total size. A [Fix it](/brain/findings/) change has its own **Undo** on the card, which puts back the files it edited and lists the service calls it made, each with a separate press to restore the state before it. **`secrets.yaml` is never snapshotted.** An existing `/config/.git` directory from an older add-on is left strictly alone — brAIn never writes to it; delete it yourself if you don't want it.
+
+## File ownership
+
+Home Assistant saves `automations.yaml`, `scripts.yaml` and `scenes.yaml` as root, which used to leave them read-only for Claude. Since 2.11 **brAIn hands them back by itself** — at startup, before Claude edits a file it cannot write or runs a command that names one, and about once a minute for the files the editors rewrite — across `/config`, `/addon_configs`, `/share`, `/media` and `/addons` while each is mounted. Claude is told never to ask you for `sudo` or `chown`. `brain own <path…>` (or `brain own -r <folder…>`) does the same on demand and never touches `.storage`, `.cloud`, brAIn's credentials, `secrets.yaml` or the recorder database.
 
 ## Transport & health
 
@@ -456,16 +508,16 @@ All on the ingress panel (8099), all reachable from the terminal over loopback.
 
 | Channel | Mechanism | Default access |
 |---------|-----------|----------------|
-| Interactive terminal | Prompts (unless `dangerously_skip_permissions: true`) | Everything — you approve actions |
-| Voice / conversation agents | Pre-approved allowlist + `assist_tool_access` + per-agent deny-list | All HA MCP tools; **no** shell, file, or web |
-| Automation tasks | Pre-approved allowlist | All tools (MCP, shell, file edits, web) |
+| Interactive terminal and chat | Prompts for anything but reading, plus the action gate (unless **Let brAIn act without asking** is on) | Everything — you approve actions |
+| Voice / conversation agents | The agent's reach (*Voice assistant*, *Whole house*, *Full admin*) + its Blocked services | *Voice assistant*: exposed entities, their own services, HA tools only |
+| Automation tasks | The task's `tools` (`full`, `house`, `read_only`) — wider than `read_only` needs an administrator | `full`: MCP, shell, file edits, web |
 | Card rendering (snapshot mode) | `--disallowedTools "*"` | **No tools at all** — it renders what it was handed |
 | The analyst — insight runs, study sessions, typed questions | Explicit allow-list **and** explicit deny-list, checked from both ends in CI | **Read-only** HA tools; nothing that can change the house |
-| **Fix it** | Pre-approved allowlist — runs only because a person pressed the button, never on a schedule | Everything |
+| **Fix it** | A read-only plan first; **Apply** carries out exactly those steps, most of them by the panel itself, and any Claude run is held to the approved change — never on a schedule | Only what you approved |
 
 The last three are the panel's three Claude paths, and only one can change the house. The analyst runs unattended, so its tool set is asserted from both ends rather than trusting one flag: `--allowedTools` only governs what runs *without a prompt*, and a headless run can't be prompted, so an un-listed tool merely **fails** rather than being **forbidden** — not the same guarantee with a real house behind it. The deny-list is checked against the MCP server's own tool names in CI, so a newly added acting tool fails the build instead of quietly reaching an unattended run.
 
-Background channels never use `--dangerously-skip-permissions` — they can't prompt, so the add-on writes `/config/.claude/settings.local.json` pre-approving the tools they need. Everything runs sandboxed as a non-root user (UID 1000), limited to `/config`, `/data`, and the enabled volume toggles.
+Background channels never use `--dangerously-skip-permissions` — they can't prompt, so their pre-approvals live in a separate headless settings file. `/config/.claude/settings.local.json`, which the terminal and the chat read, pre-approves only reading Home Assistant. An action gate stands in front of every acting call in the chat and the terminal, decided from your own words and never from anything brAIn read; your `protected_entities` and house rules apply beneath it. Everything runs sandboxed as a non-root user (UID 1000), limited to `/config`, `/data`, and the enabled volume toggles.
 
 ## Ports
 
@@ -487,11 +539,12 @@ A published terminal port answers the LAN with no Home Assistant login in front 
 | `/config/.brain/memory/inbox/` | Candidate facts awaiting consolidation |
 | `/config/.brain/` | IPC bridge — request/response queues, sessions, logs |
 | `/config/.brain/usage_limits.json` | Cached account utilization for the sensors |
+| `/config/.brain/situation.json` | What the house is doing now — what `sensor.brain_house` reads |
 | `/config/.brain/findings_state.json` | The findings mirror — derived, republished on every change; what the sensor, event, and push read (`/data` is invisible to HA, which is why it exists) |
 | `/config/.brain/logs/{assist,automation}-YYYYMMDD.log` | Per-request debug logs |
 | `/config/custom_components/brain/` | The HA integration |
 | `/data/findings.json` | The findings work list itself (the mirror above is derived from it, never read back) |
-| `/data/chat_transcript.json` | The chat tab's scrollback — capped, and only a scrollback: Claude Code owns the real conversation, so losing this file never costs context |
+| `/data/chat/` | The chat tab's scrollback, one file per conversation — capped, and only a scrollback: Claude Code owns the real conversation, so losing it never costs context |
 | `/data/chat-trash/` | Deleted chat conversations, where the toast's Undo restores from (TTL'd and capped) |
 | `/data/capture/` | Captured analyst runs, when `capture` is on — redacted as they are written, capped at the newest 50, and named in `backup_exclude` |
 | `/share/brain/corpus/` | Where **Export** copies one capture, so the file editor and Samba can reach it. The only route out of the add-on |
@@ -570,7 +623,8 @@ The Supervisor only re-pulls add-on repositories periodically. To pick up a fres
 | The panel says you are signed out, but the terminal works fine | Fixed in **1.47**. Before it, brAIn read the Claude CLI's short-lived access token as a dead credential a few hours after every terminal sign-in, put up the sign-in screen, and then never ran the CLI — which was the one thing that would have renewed it. **The workaround on an older version:** open the Terminal tab and run any `claude` command. That renews the token and clears the verdict. |
 | The terminal asks for a second login | One credential is shared with the CLI in both directions; if it doesn't take, `brain doctor`'s auth check names the file it found and the one it expected. |
 | It can't see entities | `enable_ha_mcp_server: true`? Run **`brain doctor`** — it reports any tool that errors. |
-| Voice can't see or control a device | It isn't exposed to Assist — **Settings → Voice assistants → Expose**, or set `assist_exposure: all`. |
+| Voice can't see or control a device | It isn't exposed to Assist — **Settings → Voice assistants → Expose**, or set that agent's reach to *Whole house* (brAIn → the agent → Configure). |
+| Claude says it can't write `automations.yaml` | Shouldn't happen since 2.11 — brAIn hands files back by itself. Run `brain own /config/automations.yaml`; the startup log says how many files changed hands. |
 | Voice agent answers wrong room | Run `brain doctor` — the "Assist area map" check confirms the room map is built. |
 | A study session produced nothing | It probably hit `study_timeout_minutes`; the log says so. Raise it. |
 | Cards look thin | The card found few matching entities — check areas are assigned and the relevant sensors enabled in HA. |

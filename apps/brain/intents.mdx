@@ -40,10 +40,21 @@ you had already done the same on 4, you did the opposite on 1.
   and the card reports how it would have behaved.
 
 The card shows **your sentence and what brAIn understood** side by side, because when a
-rule is wrong the useful thing to know is which half was misread.
+rule is wrong the useful thing to know is which half was misread. Once accepted, the
+automation's description quotes the sentence you asked with (*Asked for in brAIn: "…" —
+accepted on …*), so in six months the file still says why it is there.
+
+A rule can be written **either way round** on a second trigger: ignored while the first run
+is still going, or restarting it. *"Turn the light off ten minutes after the last motion"*
+needs the second — another motion should start the ten minutes again — and brAIn now writes
+it that way. Running several copies at once is still refused.
+
+Rules built from Home Assistant 2026.7's new editor triggers — "When a light turns on", "When
+a door opens" — [replay](/brain/replay/#the-new-editors-triggers) like any other, so they get
+the same simulated case.
 
 brAIn refuses — on the card, never silently — a sentence it can't do properly: a trigger it
-can't replay (a webhook, a device trigger), a sentence that names nothing it could act on,
+can't replay (a webhook, a device trigger, one aimed at a whole area), a sentence that names nothing it could act on,
 and anything that would touch a [protected entity](/brain/reference/).
 
 ## One-offs
@@ -108,10 +119,15 @@ Nothing runs until you press **Enable it**.
 An ordinary automation, in your `automations.yaml`, with `mode: single` and **one extra
 action nobody asked the model for**: `automation.turn_off` pointed at itself.
 
+It switches off **whatever entity Home Assistant registered it as**, rather than a name
+brAIn guessed — on a house that already had an automation with the same name, a guess
+pointed at the other one, and the one-off went on firing for ever. Accepting also reads back
+the entity Home Assistant actually registered.
+
 So Home Assistant does the running. There is no listener inside the add-on to keep alive
 across a restart, no timer to survive an update, and nothing left *doing* anything once it has
-fired. The alias is your own sentence, because in six months that is the only thing in the
-file that says why the automation is there.
+fired. Its description quotes your own sentence, because in six months that is the only
+thing in the file that says why the automation is there.
 
 The write goes down the same path as any other accept —
 [written, reloaded, verified, reverted if it did not take](/brain/proposals/#saying-yes-and-taking-it-back),
@@ -149,8 +165,9 @@ the answer to it is a sentence with a button on it rather than a file that chang
 nobody was watching.
 
 Pressing **Remove** makes the same four claims the accept made, in reverse: the entry is cut
-out of `automations.yaml`, Home Assistant reloads, the entity is gone from Core, and only then
-does the row leave the list. Any of them failing puts the file back and tells you which.
+out of `automations.yaml`, Home Assistant reloads, the entity is gone from Core — its registry
+entry too, so no "unavailable" automation is left behind — and only then does the row leave
+the list. Any of them failing puts the file back and tells you which.
 The toast carries an Undo that puts the automation, the reload and the row back together.
 
 :::note[Your file is not reformatted to take one out]
@@ -171,10 +188,11 @@ for an answer, and *"brAIn will not do this, and here is why"* is one. Each one 
   where it gets a replay, a trial week and a report. The card shows what brAIn understood
   alongside your sentence, so you can see which half it misread and correct it rather than
   wonder.
-- **The trigger cannot be replayed.** Only `time`, `state`, `numeric_state` and `template`
-  triggers can be [replayed](/brain/replay/) against your recorded history. A `webhook` or a
-  `device` trigger would give you a card with no number on it and nothing to read but the
-  model's own restatement of itself.
+- **The trigger cannot be replayed.** `time`, `state`, `numeric_state` and `template`
+  triggers, and the new editor's purpose-specific ones, can be
+  [replayed](/brain/replay/) against your recorded history. A `webhook` or a `device` trigger
+  would give you a card with no number on it and nothing to read but the model's own
+  restatement of itself.
 - **The sentence named nothing brAIn could act on.** An automation that names no entity does
   nothing, and one that does nothing is indistinguishable from one that has not fired yet.
 - **It touches a protected entity.** Anything in the add-on's `protected_entities` option.

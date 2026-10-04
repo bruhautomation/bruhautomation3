@@ -10,7 +10,328 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="2.8.1" date="September 24, 2026" latest>
+<Release version="2.11.0" date="October 4, 2026" latest>
+
+**A leak, smoke or gas alarm now reaches you whatever brAIn is doing; voice, the chat and the terminal are scoped far more tightly; Fix it shows the exact change before it makes it; and a new Upkeep tab keeps names, updates and the house book in order.** This is the largest release brAIn has had. The groups below follow the add-on's own release notes; start with the first one, which lists what you may need to do after updating.
+
+<Changes type="security">
+
+**Before you update: what changes for you**
+
+- **The permission option is now called "Let brAIn act without asking".** It is the same option (the key is still `dangerously_skip_permissions`), it is also in ⚙ → Terminal & chat, and it now reaches the chat as well as the terminal. With it off, the terminal and the chat now really do ask before running commands, editing files or calling services; before, a pre-approval file let them act anyway. See [Safety](/brain/safety/).
+- **A "Voice assistant" agent can no longer restart Home Assistant, shut down the host, install updates or create a login.** A voice-level agent now checks the service as well as the entities: a request naming no entity is refused unless it is a notification or a BRUH play service, and a request naming entities may only use those entities' own services. "Whole house" and "Full admin" agents are unchanged. See [Voice](/brain/voice/).
+- **New voice agents start with the administration services blocked** (restart, host reboot and shutdown, `update.install`, `recorder.purge`, `shell_command.*`, `backup.create` and the `brain.*` registry tools). You can untick any of them; existing agents are not changed.
+- **A signed-in user who is not an administrator gets the voice-assistant level**, even when they pick a Whole-house or Full-admin agent. Satellites and automations keep the agent's own level.
+- **`brain.run_task` and `brain.ask` with `tools: read_only` or `house` can no longer read files in `/config`** (including `secrets.yaml`). Use `full` for a task that genuinely needs files. The wider scopes, `brain.add_memory`, `brain.study`, `brain.intent` and `brain.answer_question` now need an administrator when a signed-in user calls them; automations and scripts are unaffected.
+- **A failed task now raises an error** instead of coming back as if Claude had answered. An automation that read `answer.data` as "no" on failure will now see the error in its trace.
+
+</Changes>
+
+**Safety and the Resident**
+
+<Changes type="added">
+
+- **Leak, smoke, CO and gas alarms are sent the moment they trip** — a critical card naming the sensor and the time, sent straight away through quiet hours with reminders behind it. No AI look, sign-in, automatic switch or usage budget is needed. With no notification service set, it lands in Home Assistant's own notifications. See [Safety](/brain/safety/).
+- **Each trip is its own card**, and when the sensor reports dry the card says so and the reminders stop. A chattering detector within five minutes is still one card.
+
+</Changes>
+<Changes type="changed">
+
+- **The Resident's deeper look corrects its first one**: it rewrites the card already on your list with a fix specific to this house, or holds it back with its reason, instead of filing a second card. A stronger second opinion can now withdraw an unsure conclusion.
+- **Resident cards age out** after a week, a fortnight or a month depending on how much they matter; safety cards never expire on their own. Something brAIn is watching comes back after it happens three more times, and a held finding is looked at again when it gets worse.
+
+</Changes>
+<Changes type="fixed">
+
+- **Yes, No and Add to list work on the Resident's questions and suggestions** (they failed with "already answered"). **Stop raising these** is no longer offered on Resident or safety cards, where it deleted cards and muted nothing.
+- Real evidence is no longer thrown away by the guard against invented readings, and "the small hours" means your small hours rather than UTC's.
+
+</Changes>
+
+**Voice, tools and what brAIn may touch**
+
+<Changes type="security">
+
+- **A protected lock can't be unlocked through a scene any more.** brAIn now reads every entity a request names, wherever it names it: scene maps, group members, a speaker field, a script variable.
+- **Running a scene, script or automation checks what is inside it.** A protected entity it touches refuses the run on every agent; on a "Voice assistant" agent, so does one that is not exposed to Assist. A script that only touches the hall light is not refused just because a protected lock is in the same room.
+
+</Changes>
+<Changes type="added">
+
+- **New read-only tools**: `get_automation_config` (any automation or script, UI, YAML or package) and `search_related` (what a script touches, or what uses an entity). Automation traces are now read live, so runs since the last restart and UI-made automations are visible. See [MCP tools](/brain/mcp/).
+
+</Changes>
+<Changes type="changed">
+
+- **Voice turns start faster and cost less**: voice agents are no longer sent about forty tools they would only be refused, results are smaller, and the control tools are ready on the first turn.
+- **`get_device_registry` is now `get_entity_counts`** (it counted entities, not devices); the old name still works.
+- **Changes you ask for through voice, the chat or the terminal count as yours**, so they feed overrides and habits and no longer produce a false "keeps undoing each other". Facts record which face taught them and the conversation they came from.
+
+</Changes>
+<Changes type="fixed">
+
+- **Multi-day history questions get the whole window** (a three-day question was answered from a single day two days ago), and "what just happened" reads the newest 50 logbook entries rather than the oldest.
+
+</Changes>
+
+**Checks and measurements**
+
+<Changes type="fixed">
+
+- **The automation trace checks can finally fire.** "Ran and errored", "never gets past its conditions" and "still running when triggered again" now read traces live from Home Assistant, including UI and package automations. See [Checks](/brain/checks/).
+- **brAIn no longer suggests deleting your smoke alarm automation for not firing.** Automations watching smoke, gas, leak, CO or safety sensors, alarm panels and brAIn's own playbooks are left alone.
+- **Automations from the 2026.7 editor** ("When a light turns on", with a target) can now be replayed, trialled and checked.
+- **A late night is measured as a late night**: a day now runs 04:00 to 04:00, so a 00:40 bedtime is no longer read as waking up. Washers and dryers that run a few times a week are now recognised.
+- **Batteries you charge are not batteries to replace**: phones, vacuums, mowers, cars, home batteries and UPSs are left out of the low-battery check and forecast.
+
+</Changes>
+<Changes type="changed">
+
+- **The outdoor thermometer is chosen on evidence** (area, integration, agreement with the weather entity, daily swing), never from an indoor room, and you can pick it yourself in the Knowledge tab's heating drill-down.
+- **The nightly baseline pass only spends its 400 places on sensors it can use**, and says how many it had to cut.
+
+</Changes>
+
+**Voice in the room, and services that say when they failed**
+
+<Changes type="added">
+
+- **Voice knows which room you are in and who is talking.** A satellite's room and floor ride with the request, so "turn off the lights" means that room's lights; a signed-in user's preferences are remembered as theirs. When brAIn's reply asks a question, the satellite keeps listening for the answer (Home Assistant 2025.4 and later).
+
+</Changes>
+<Changes type="changed">
+
+- **Insight jobs run with read-only tools**, pause with **Automatic insights** and the usage budget on their schedule, and show a failure as an error on the sensor rather than sending it to your phone as the morning report.
+- **`brain.answer_question` now closes the guess** exactly as the Findings tab's Yes and No do. Start your answer with yes or no; the *Waiting on you* sensor lists open guesses with their ids.
+
+</Changes>
+<Changes type="fixed">
+
+- **A voice command that already did something is not done twice** if the worker dies mid-turn; brAIn says it may have partly happened.
+- **Restarting Home Assistant no longer replays `brain_change` for every past fix**, and Dismiss no longer reads as a finding ending. Streamed answers arrive as separate paragraphs, and voice turns are counted in the run journal and usage figures.
+
+</Changes>
+
+**Memory, insights and what brAIn changes**
+
+<Changes type="fixed">
+
+- **Forgetting reaches everything brAIn reads.** `brain memory forget`, editing or clearing `memory.md`, the ✕ on a queued fact and Undo now reach the facts store every run reads, not just the document. See [Memory](/brain/memory/).
+- **Undo and "Let brAIn raise it again" take back the rule a Wrong made**, so a check you restored starts reporting again. A memory export now carries those rules to a new install.
+- **"I've fixed it" no longer silences a problem for ever.** Only Wrong is permanent; a fixed problem that comes back is filed again, saying how long it stayed away.
+- **Cards only refresh when what they read has changed**, rather than about once a day, and a one-off rule you accept always switches itself off.
+
+</Changes>
+<Changes type="changed">
+
+- **brAIn checks that its own fixes held**: three minutes after a fix it re-runs the check, and a fix that did not hold comes back to the list. Overnight repairs stop after the third repair of the same thing in a fortnight and file a finding instead.
+- Old device-health notes expire after thirty days, facts about removed devices are dropped, and the same fact said two ways is stored once.
+
+</Changes>
+
+**Chat, Discuss and the feed's cards**
+
+<Changes type="changed">
+
+- **Discuss opens a new conversation** beside the one you were in, instead of stopping it, and **asks before it changes anything** — every acting tool shows a permission card. A change you agree on becomes a plan on the card, with Apply and Undo. See [Findings](/brain/findings/).
+- **A fix's report is on its card**, and a proposal's card carries its replay, before-and-after and trial grade. Questions get their own band near the top, and Dismiss on a question puts it to sleep for real.
+- **The chat knows the house before you tell it** (open cases, health, the house's rhythm, and the facts about what you mention), and the terminal's context file now carries an area map and the measurement tools. See [Terminal](/brain/terminal/).
+
+</Changes>
+<Changes type="added">
+
+- **A card can suggest an automation** the house lacks; brAIn drafts, replays and offers it on [Proposals](/brain/proposals/), and **⋯ → Make this an automation** fills the ask bar from any card.
+
+</Changes>
+
+**The engine, the run queue and what each session may do**
+
+<Changes type="changed">
+
+- **Several Claude runs at once, in order of who is waiting**: three at a time by default, safety alerts first, then anything you pressed, then scheduled work, with one place always kept free of scheduled work.
+- **A usage limit pauses scheduled cards** (30 minutes, doubling up to 4 hours) instead of failing them every minute, and a card that keeps failing waits longer each time. Cards you press are never held.
+- **Protected entities are protected in the terminal and the chat too**: shell service calls and YAML edits naming one are refused. Sessions can no longer be messaged by other sessions, and Claude Code's own auto memory is off, so `memory.md` stays the only memory.
+
+</Changes>
+<Changes type="fixed">
+
+- **Structured answers work again** (about two in five first looks and snapshot cards fell back to prose), unattended runs no longer carry Claude Code's whole toolbox, and a retry after "overloaded" really retries.
+- **If part of brAIn stops, brAIn says so**: a stopped background loop now shows in the health check by name. The status poll no longer slows the panel, and choosing the most capable model in Settings no longer puts it on scheduled jobs.
+
+</Changes>
+
+**What brAIn learns from your answers**
+
+<Changes type="added">
+
+- **brAIn records every call the Resident makes and checks it against what you did next**, then writes short judgements where this house keeps disagreeing ("night motion on the landing is the cat"). It never learns to go quiet on a safety sensor or a protected entity.
+- **The Resident sees how its past calls on similar things turned out**, including the reasons you typed when you said one was wrong.
+- **`brain eval first_look`** replays captured looks against today's prompt (with capture switched on in ⚙ → Diagnostics, off by default).
+
+</Changes>
+
+**brAIn understands what is in the house and what it is doing**
+
+<Changes type="added">
+
+- **brAIn reads what each device is, in any language**, instead of matching English words in its name. A reading can make a sensor a safety sensor but never take that away.
+- **What the house is doing, in one line** — home, away, settled for the night, waking up, guests — plus the rooms in use, also as **`sensor.brain_house`**, which reads `unknown` with a reason rather than going stale.
+- **What is coming up**: frost, heavy rain, heat and gales from your forecast, and events from calendars you choose to share.
+
+</Changes>
+<Changes type="fixed">
+
+- **The leak playbook closes valves whose "on" means closed**, showing which way each valve is driven before you accept it.
+
+</Changes>
+
+**Upkeep: names, rooms, updates, the overnight check and the house book**
+
+<Changes type="added">
+
+- **House → Upkeep**, a new tab. See [Upkeep](/brain/upkeep/).
+- **Tidy names, rooms and aliases**, proposed as one table with a tick box per row; nothing changes until Apply, and the whole batch can be undone for 30 days.
+- **Should I update tonight?** For each pending update brAIn answers *safe tonight*, *wait* or *not sure*, quoting a line from the release notes and one from your configuration, both checked word for word. It never installs anything.
+- **An overnight health check** reads the error log, the Zigbee mesh and Z-Wave statistics and names up to five root causes, each citing the records it rests on.
+- **The house book**: a short manual of how this house works, every sentence cited and codes redacted, which you can share with a link and revoke.
+- **Access checks**: a lock or alarm exposed to Alexa or Google, an add-on with protection mode off, banned failed logins, and a weekly access sentence.
+
+</Changes>
+
+**Notifications: your own sentence, better timing, and a record of what you did**
+
+<Changes type="added">
+
+- **Tell brAIn in one sentence what deserves a notification** (⚙ → Insights). Critical alerts still come straight through whatever it says.
+- **Notifications are timed and worded for your lock screen**: sent now, held until a better time, added to the morning list, or left on the Findings list.
+- **A record of what was sent and what you did with it** (⚙ → Diagnostics), and a weekly question when you keep dismissing one kind of notification.
+- **Optional: say urgent problems aloud** on the satellite in the room you are in (⚙ → Advanced, off by default; never to an empty house or in quiet hours).
+
+</Changes>
+<Changes type="fixed">
+
+- The morning brief and weekly report arrive under their own titles, not as "brAIn found a problem".
+
+</Changes>
+
+**Asking, answering and correcting**
+
+<Changes type="added">
+
+- **One reader for what you type**: the ask bar, a notification Reply, the Repairs reason box and `brain.intent` route a question to a card, a rule to Proposals, a fact to memory and "why…" to an explanation.
+- **Reply can end a card** ("it's always like that in winter"), answered with one sentence and an **Undo** button.
+- **Corrections have a scope and a lifetime**: this device, the whole room or everywhere, until a date, a season or for good. Anything wider than one device is asked first, and nothing ever covers a safety sensor, a lock, an alarm or a protected entity.
+- **Ask why**: "Why didn't you tell me the garage was open?" is answered from brAIn's own record of what it decided not to say. An automation made from a sentence keeps that sentence in its description.
+
+</Changes>
+
+**Fix it shows the change, and an action gate that cannot be talked round**
+
+<Changes type="added">
+
+- **Fix it shows exactly what it will change**, as typed steps written out by the code that performs them, and the panel makes most of those changes itself. A step that needs a Claude run may only touch what the plan listed.
+- **Put them back**: a fixed card restores the entities a fix changed to how brAIn recorded them, never unlocking, disarming or opening anything. Fixes are checked again after a day, a week and a month.
+- **An action gate** checks every action from the chat, the terminal, an automation task or a fix against your own words and what it would reach, never against anything brAIn read on the way. See [Safety](/brain/safety/).
+- **A tripwire entity**, **house rules** in your own words (they only ever make brAIn more careful), and outside text such as media titles and calendar descriptions marked as data rather than instructions.
+
+</Changes>
+
+**Cameras, a deep review, the weekly pick and the first hour**
+
+<Changes type="added">
+
+- **Cameras**: brAIn looks only through cameras you tick (⚙ → Generation defaults, all off by default), only for a safety trip or a door, window or lock, and a few times a day.
+- **Deep review** (House → Knowledge): one pressed run that reads everything and writes observations; it files nothing, and the button shows what it is likely to cost.
+- **brAIn as Home Assistant's AI Task** (2025.7 and later), and **brAIn measurements** offered to other assistants through Home Assistant's LLM API (2024.6 and later).
+- **The first hour shows what it found** during onboarding, and may suggest one automation to try for a week.
+
+</Changes>
+<Changes type="changed">
+
+- **Proposals live on the [Proposals](/brain/proposals/) tab only**, no longer duplicated on the Findings feed. The weekly report's one thing to do is chosen across the week, and *Not for this house* on Ideas takes a reason.
+
+</Changes>
+
+**Asking before acting, file ownership and what a device shows as**
+
+<Changes type="changed">
+
+- **One switch, two places, no restart.** Flip *Let brAIn act without asking* in the Configuration tab or ⚙ and the other follows; a new terminal session and the chat's next message pick it up. An open terminal session keeps the setting it started with until you `/exit` it, and ⚙ says so. Anything it cannot read counts as "ask". See [Terminal](/brain/terminal/) and [Safety](/brain/safety/).
+- **What still decides with it on**: the tripwire, brAIn's deny-list, your house rules and protected entities, and conversations about a finding, which always ask. Fix runs, voice and background runs never follow the switch. A shell command that reaches a protected entity some other way is not checked, so leave the switch off if that matters to you.
+- **Approval cards offer "Always allow"** for the rule Claude Code suggests (for this conversation, or until the add-on restarts) and **Stop asking…**, which opens ⚙ at the switch.
+
+</Changes>
+<Changes type="added">
+
+- **brAIn no longer asks you to fix file permissions.** Files Home Assistant saves as root (automations.yaml, scripts.yaml, scenes.yaml and the usual config folders, plus `/addon_configs`, `/share`, `/media` and `/addons` when enabled) are handed back to Claude automatically, at startup, before an edit and about once a minute.
+- **`brain own`** (`brain own -r` for a folder) does the same on demand, raises no approval card, and never touches `.storage`, credentials, `secrets.yaml` or the recorder database.
+- **Change what a device shows as**: a contact sensor as a door or window, a cover as a garage door or blind, a smart plug as a fan or light (and back again), and a sensor's decimals and unit. These are four admin-only services — `brain.set_device_class`, `brain.show_switch_as`, `brain.stop_showing_switch_as` and `brain.set_sensor_display` — and a smoke, gas, CO or leak sensor keeps its type unless you confirm with `confirm_safety: true`. See [Entity Power Tools](/brain/power-tools/entities/).
+
+</Changes>
+
+</Release>
+
+<Release version="2.10.1" date="September 26, 2026">
+
+**The classic terminal on a phone: Paste works, the keyboard stops fighting you.**
+
+<Changes type="fixed">
+
+- **Paste works.** The toolbar's Paste button asked for the clipboard at the start of a tap, which a phone does not count as you asking, so it was refused without a word. It asks at the end of the tap now. Where the browser still says no (Safari two frames deep, the Home Assistant app), a box opens that you can long-press and Paste into, and **Paste into terminal** sends it.
+- **A multi-line paste stays one paste.** It used to arrive as keystrokes, so the first newline pressed Enter and sent half a prompt. Pasted text now goes through the terminal's own paste, as one block.
+- **Autocorrect and predictive text stop mangling what you type.** A correction after ordinary typing could re-send the whole word ("teh" became "tehthe"). brAIn now compares against what is actually in the box, and leaves pastes and other-language keyboards to the terminal.
+- **The keyboard opening is one redraw, not a dozen.** The terminal now resizes once, when the keyboard has finished moving.
+- **The top bar no longer flaps.** In the Home Assistant app, closing the keyboard could leave brAIn's top bar folding and unfolding on its own.
+- **Toolbar keys don't pop the keyboard open.** Tapping ESC or an arrow with the keyboard down used to bring it back up; it only stays up if it was up.
+
+</Changes>
+
+</Release>
+
+<Release version="2.10.0" date="September 25, 2026">
+
+**brAIn runs your other BRUH add-ons, voice reach is set on the agent and nowhere else, and the ESPHome and Music Assistant screens are gone — the tools stay.**
+
+<Changes type="added">
+
+- **Minecraft, labels and light shows, by asking.** Eleven new tools drive BRUH Minecraft, BRUH Print and BRight through their own Home Assistant services: "teleport Emma to Dad", "put Steve in creative", "make it day", "who's on?", "print a label that says chili", "start the Friday party on the den speaker". Spoken names are matched against who is online, and a name that could be two people is asked about rather than guessed.
+- **Playing is not administering.** A voice agent set to **Voice assistant** may play but not administer: op, ban, kick, the whitelist, a raw console command, stopping the server and installing server add-ons need **Whole house** or **Full admin**, and that holds through `call_service` too. Voice prints at most 10 labels at once. Every call goes through `call_service`, so an agent's Blocked services and `protected_entities` apply; scheduled runs may read the three status tools and nothing else.
+
+</Changes>
+<Changes type="removed">
+
+- **The add-on-wide voice options are gone.** `assist_tool_access` and `assist_exposure` were a fallback for agents set to "Follow the add-on"; each agent's own **What this agent can reach** (Settings → Devices & services → brAIn → the agent → Configure) is now the only place it is set. **An agent that was following the add-on is now a Voice assistant**, the narrowest level — if you had set either option wider, open that agent's Configure and pick Whole house or Full admin. See [Voice](/brain/voice/).
+- **No ESPHome or Music Assistant tabs.** Both have their own screens, and a second copy inside brAIn was clutter. Everything they did is still one sentence away in the chat or the terminal, through the same tools. See [ESPHome](/brain/esphome/) and [Music Assistant](/brain/music-assistant/).
+
+</Changes>
+<Changes type="fixed">
+
+- **ESPHome installs work again on Device Builder (ESPHome 2026.9).** The rewrite takes every command over one socket with a job queue, so every validate, compile and install failed a few milliseconds in while listing devices went on working. brAIn now speaks the Builder's protocol: an install follows the compile and then the upload, so "done" means flashed, and an offline device is compiled now and flashed when it comes back. An older dashboard still works the old way.
+
+</Changes>
+
+</Release>
+
+<Release version="2.9.0" date="September 25, 2026">
+
+**A morning brief worth reading, a reach per voice agent, ESPHome builds on a current Supervisor, and a Knowledge tab you can find things in.**
+
+<Changes type="added">
+
+- **Each voice agent chooses its own reach.** When you add an agent, and later under **Configure**, pick *Voice assistant* (only what you expose to Assist, Home Assistant tools only), *Whole house* (every entity, still Home Assistant tools only) or *Full admin* (everything the brAIn chat can do: shell, file edits, config, the web). `protected_entities` and each agent's blocked services still apply at every level. Every agent is told its level, and for a voice-level agent templates, the logbook, the room list and brAIn's own read tools only reach exposed entities. See [Voice](/brain/voice/).
+- **ESPHome: a new `esphome_ha_token` option.** The Supervisor now refuses add-ons the call brAIn used to open the ESPHome dashboard ("Home Assistant would not open an ingress session (Unauthorized)"). A long-lived token from a Home Assistant administrator opens it the way your browser does; the ESPHome add-on's own port is also tried when set, and the message says which to set. See [ESPHome](/brain/esphome/).
+
+</Changes>
+<Changes type="changed">
+
+- **The morning brief names things.** It no longer counts the night ("40 changes, 31 with no recorded cause"). A brief goes out only for something specific: a problem found since the last one (with what to do), a serious one still waiting after a day, something fixed overnight, a door or window open that is normally shut at that hour, or a light left on all night by hand. Held-back findings and `info` notes are never read aloud.
+- **Knowledge tab.** A short explanation of how the memory document, the queue and the facts differ, and a real facts browser: every fact, searchable by device name, filterable by kind and by who taught it, sortable, grouped by subject and paged. *Rules you set* lists the checks you told brAIn to stop raising. See [Memory](/brain/memory/).
+
+</Changes>
+
+</Release>
+
+<Release version="2.8.1" date="September 24, 2026">
 
 **The documentation catches up.** No behaviour changes.
 

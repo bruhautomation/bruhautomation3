@@ -1,98 +1,146 @@
 ---
 title: MCP Tools
-description: Every one of the 71 tools the built-in MCP server gives Claude — live states, device control, cameras, history, registries, measurements, ESPHome, Music Assistant, and service calls with response data.
+description: Every one of the 89 tools the built-in MCP server gives Claude — live states, device control, what a device shows as, cameras, history, live automation traces, measurements, your other BRUH add-ons, ESPHome, Music Assistant, and service calls with response data.
 ---
 
-The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it **71 tools** with live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists and voice scoping enforceable in one place ([how the layers fit](/brain/how-brain-controls-ha/)). Verify every tool on your install with `brain doctor`.
+The add-on ships a built-in **MCP server** that Claude Code launches automatically, giving it **89 tools** with live read/write access to your Home Assistant instance. This is **Claude's only pair of hands** — everything it does to your live home goes through these tools, which is what makes deny-lists, protected entities and voice scoping enforceable in one place ([how the layers fit](/brain/how-brain-controls-ha/)). Verify every tool on your install with `brain doctor`.
+
+Three columns of who-may-use-what run through the tables below:
+
+- **Unattended runs** (scheduled insight cards, the Resident's investigations, study sessions, follow-up looks) get **reading tools only**. Every tool marked *read* below is on their allow-list; everything else is on an explicit deny-list.
+- **A voice agent at the *Voice assistant* level** only reaches what you expose to Assist. Tools marked *not on voice* are not even offered to it; tools marked *exposed only* answer only about an entity that is named and exposed. Agents set to *Whole house* or *Full admin* are not narrowed this way ([voice](/brain/voice/)).
+- **The chat, the terminal and a [Fix it](/brain/findings/) run you approved** can use everything, through the same guards.
 
 ## Reading your home
 
-| Tool | What it does |
-|------|--------------|
-| `get_entity_state` | Current state + attributes of any entity |
-| `get_all_states` | All entities, filterable by domain and name (capped at 300) |
-| `get_areas` | Areas with their entity ids — resolves *"the kitchen lights"* |
-| `get_registry` | **Registry listings**: areas, floors, labels, devices, entities, integrations, users — with the ids [Power Tools](/brain/power-tools/) need. The safe replacement for reading `.storage` |
-| `get_history` | Recent state history (up to 7 days), min/max for numerics |
-| `get_statistics` | Long-term statistics — *"how cold did it get last week?"* |
-| `get_weather_forecast` | Daily/hourly forecast |
-| `get_camera_snapshot` | **Sees** a camera — returns the image so Claude can describe it |
-| `get_logbook` / `get_error_log` | Logbook entries; HA logs from the Supervisor journal |
-| `get_automations` / `get_automation_trace` | Automations with status; stored execution traces for debugging |
-| `get_ha_config` / `get_services` / `get_supervisor_info` | Config details, service catalog, system info |
-| `get_device_registry` | Per-domain entity count summary |
-| `list_dashboards` / `get_dashboard` | Enumerate dashboards; read one's full config — the reading half of the fetch-modify-save flow behind [Power Tools](/brain/power-tools/)' `update_dashboard` |
-| `explain_change` / `get_activity` | What caused a change, and the house's recent activity as [episodes](/brain/activity/) — read off the panel over loopback, so attribution has one implementation |
-| `get_findings` / `get_health` | The Home feed as rows, and brAIn's own verdict on itself — so a card can ask whether the house already knows about a problem |
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `get_entity_state` | Current state + attributes of any entity | read |
+| `get_all_states` | All entities, filterable by domain and name (capped at 300) | read |
+| `get_areas` | Areas with their entity ids — resolves *"the kitchen lights"* | read |
+| `get_registry` | **Registry listings**: areas, floors, labels, devices, entities, integrations, users — with the ids [Power Tools](/brain/power-tools/) need. The safe replacement for reading `.storage`. Entity rows narrowed to 100 or fewer carry `device_class` (a *Show as* somebody chose) and `original_device_class` (what the integration reports), and an entity standing in for a switch names that switch | read · not on voice |
+| `get_entity_counts` | How many entities there are, in total and per domain. Renamed from `get_device_registry` in 2.11 — the old name still works | read · not on voice |
+| `get_history` | State history for one entity, up to 7 days, with min/max for numerics. Since 2.11 a multi-day question gets the whole window, up to now | read |
+| `get_statistics` | Long-term statistics — *"how cold did it get last week?"* A long window that had to be cut says so | read |
+| `get_weather_forecast` | Daily/hourly forecast | read · exposed only |
+| `get_camera_snapshot` | **Sees** a camera — returns the image so Claude can describe it. Unattended runs only for a tripped sensor, at cameras you ticked | exposed only |
+| `get_logbook` | The newest 50 logbook entries, newest first, each with what caused it | read · exposed only |
+| `get_error_log` | Home Assistant's logs from the Supervisor journal | read · not on voice |
+| `get_ha_config` / `get_services` / `get_service_details` / `get_supervisor_info` | Config details, the service catalog, one domain's full field schema, system info | read (`get_supervisor_info` not on voice) |
+| `list_dashboards` / `get_dashboard` | Enumerate dashboards; read one's full config — the reading half of the fetch-modify-save flow behind [Power Tools](/brain/power-tools/)' `update_dashboard` | read · not on voice |
+| `explain_change` / `get_activity` | What caused a change, and the house's recent activity as [episodes](/brain/activity/) — read off the panel over loopback, so attribution has one implementation | read (`get_activity` not on voice) |
+| `get_findings` / `get_health` | The Findings list as rows, and brAIn's own verdict on itself — so a card can ask whether the house already knows about a problem | read · not on voice |
+| `explain_decision` | What brAIn decided **not** to tell you about an entity or a check, and why — a mute, a correction, quiet hours, the budget. Answers *"why didn't you tell me…"*; no rows means no record, never "chose to stay quiet" | read · not on voice |
+
+## Automations and scripts
+
+Since 2.11 traces are read **live** from Home Assistant, keyed the way it keys them — so runs since the last restart are visible, and so are UI-made automations and ones in packages.
+
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `get_automations` | Automations with their status and config id | read · not on voice |
+| `get_automation_trace` | Why an automation or script did (or did not) do something: recent runs, how many times a trigger fired but a condition stopped it, and one run step by step | read · not on voice |
+| `get_automation_config` | The definition of any automation or script — UI-made, YAML or package | read · not on voice |
+| `search_related` | What a script or scene touches, what uses an entity, what is in an area — the same answer as Home Assistant's Related tab | read · not on voice |
 
 ## What brAIn has measured
 
-Since 2.2 every [measurement](/brain/measurements/) is a tool, read over the panel's own routes so each answer has one implementation. Each one says in a sentence when a store has not measured yet rather than answering with a number it does not have.
+Every [measurement](/brain/measurements/) is a tool, read over the panel's own routes so each answer has one implementation. Each one says in a sentence when a store has not measured yet rather than answering with a number it does not have.
 
-| Tool | What it does |
-|------|--------------|
-| `get_house_model` | Every measurement's state in one call — ready, collecting, stale, not available — and one line per ready one |
-| `get_baseline` / `what_is_normal` | A numeric entity's own normal by hour of the week; `what_is_normal` places its reading now inside that band, in its own spreads |
-| `room_physics` | A room's heat-loss and gain rates, its time constant, and how long it takes to warm |
-| `appliance_status` | Whether a washer, dryer or dishwasher is idle, running or finished, by its own measured power shape |
-| `house_rhythm` | When the house gets up and settles, weekdays and weekends apart |
-| `door_habits` | How much of each hour of the week a door, window, lock or cover is usually open |
-| `habits` | What you do by hand with an entity often enough to be a habit, with the overrides and odd presses against it |
-| `simulate_automation` | Replay an automation config over the recorder's last weeks and grade it against what you actually did — calling nothing |
-| `recall` | Search the [facts store](/brain/memory/) by subject or by words: what brAIn knows, who taught it and when |
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `get_house_model` | Every measurement's state in one call — ready, collecting, stale, not available — and one line per ready one | read · not on voice |
+| `get_baseline` / `what_is_normal` | A numeric entity's own normal by hour of the week; `what_is_normal` places its reading now inside that band, in its own spreads | read · exposed only |
+| `room_physics` | A room's heat-loss and gain rates, its time constant, and how long it takes to warm | read · not on voice |
+| `appliance_status` | Whether a washer, dryer or dishwasher is idle, running or finished, by its own measured power shape | read · exposed only |
+| `house_rhythm` | When the house gets up and settles, weekdays and weekends apart | read |
+| `door_habits` | How much of each hour of the week a door, window, lock or cover is usually open | read · exposed only |
+| `habits` | What you do by hand with an entity often enough to be a habit, with the overrides and odd presses against it | read · exposed only |
+| `simulate_automation` | Replay an automation config over the recorder's last weeks and grade it against what you actually did — calling nothing | read · not on voice |
+| `recall` | Search the [facts store](/brain/memory/) by subject or by words: what brAIn knows, who taught it and when | read |
 
 ## Acting on it
 
-| Tool | What it does |
-|------|--------------|
-| `call_service` | Any HA service. With `return_response: true` it routes over the WebSocket API and returns **service response data** — how Claude captures the `area_id` from `brain.create_area` or a todo list's items |
-| `get_service_details` | Full field schema for a domain's services |
-| `control_light` / `control_climate` / `control_media_player` / `control_cover` / `control_fan` / `control_switch` / `control_lock` / `control_alarm` / `control_vacuum` | Purpose-built device control for every major domain |
-| `activate_scene` / `run_script` / `send_notification` / `fire_event` / `reload_config` | Scenes, scripts (with variables), notifications, custom events, config reloads |
-| `render_template` | Render Jinja2 — test a template before it goes in an automation |
-| `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox, tagged with the entity, room or person it is about |
-| `offer_resolutions` | Put the ways the finding under discussion could end on the person's screen as buttons — changes nothing itself; the press is the consent |
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `call_service` | Any HA service. With `return_response: true` it routes over the WebSocket API and returns **service response data** — how Claude captures the `area_id` from `brain.create_area` or a todo list's items | — |
+| `control_light` / `control_climate` / `control_media_player` / `control_cover` / `control_fan` / `control_switch` / `control_lock` / `control_alarm` / `control_vacuum` | Purpose-built device control for every major domain | — |
+| `activate_scene` / `run_script` / `send_notification` | Scenes, scripts (with variables), notifications | — |
+| `fire_event` / `reload_config` | Custom events, config reloads | not on voice |
+| `render_template` | Render Jinja2 — test a template before it goes in an automation | — |
+| `remember_fact` | Store a durable household fact in the [memory](/brain/memory/) inbox, tagged with what it is about and which face (voice, chat, terminal) taught it | — |
+| `offer_resolutions` | Inside a finding discussion, put the ways it could end on your screen as buttons — changes nothing itself; your press is the consent | not on voice |
+
+## What a device shows as
+
+New in 2.11. Each tool is one [Power Tool](/brain/power-tools/entities/#what-a-device-shows-as) called through `call_service`, so protected entities, Blocked services and the action gate stand in front of it. Ask in the chat or the terminal: *"show the back door sensor as a door"*, *"show the fan plug as a fan"*.
+
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `set_device_class` | Home Assistant's *Show as*: a binary sensor as a door, window, garage door, motion or leak sensor; a cover as a garage, blind, shutter, curtain or gate; a switch as an outlet. Empty puts back the integration's own | not on voice |
+| `show_switch_as` | A switch — a smart plug running a fan or a lamp — shown as a light, fan, lock, cover, siren or valve, through Home Assistant's own *Change device type of a switch* helper. Returns the new entity id | not on voice |
+| `stop_showing_switch_as` | Undo it: the switch is a switch again and no longer hidden. Lists what used the entity going away, with a dry run | not on voice |
+| `set_sensor_display` | A sensor's decimal places and, where Home Assistant can convert it, its unit (°C to °F, W to kW) | not on voice |
+
+None of the four is open to unattended runs. A smoke, gas, CO or leak sensor keeps its type unless you say yes — brAIn's [safety alerts](/brain/safety/) go by it.
+
+## Your other BRUH add-ons
+
+New in 2.10. Each tool calls the add-on's own Home Assistant integration, so it needs that add-on and its integration installed. Spoken player names are matched against who is online, and a name that could be two people is asked about, never guessed.
+
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `minecraft_status` | Whether [BRUH Minecraft](/bruh-minecraft/) is answering, who is online, the world, version and TPS | read |
+| `minecraft_teleport` | Teleport a player to another player, or to coordinates; `everyone` means all players | — |
+| `minecraft_player` | One thing to one player: game mode, give an item — or op, deop, kick, ban, pardon and the whitelist (not on a *Voice assistant* agent) | admin actions not on voice |
+| `minecraft_world` | Time of day, weather, or a message in chat to everyone | — |
+| `minecraft_command` | Any server console command, with the server's reply | not on voice |
+| `minecraft_server` | Back up the world now, restart or stop the server | not on voice |
+| `minecraft_addons` | Search, list, install and remove server-side plugins, data packs and mods from Modrinth (install and remove not on voice) | install/remove not on voice |
+| `label_printer_status` | [BRUH Print](/bruh-print/)'s printer, the stock in each roll, the saved templates and their fields | read |
+| `print_label` | Print text fitted as large as it will go, or a saved template with its fields. A voice agent prints at most 10 at once | — |
+| `bright_status` | What [BRight](/bright/) is doing, the saved sets, and the tracks with a show ready | read |
+| `bright_show` | Start a saved party, party mode over the music folder, one track's show — or stop and put the room back | — |
 
 ## ESPHome
 
-Since 2.6. Editing files needs nothing; building, installing and logs go to the ESPHome
-dashboard. See [ESPHome](/brain/esphome/).
+Editing files needs nothing; building, installing and logs go to the ESPHome dashboard. There is no ESPHome tab in the panel since 2.10 — ask in the chat or the terminal. See [ESPHome](/brain/esphome/). None of these is offered to a *Voice assistant* agent.
 
-| Tool | What it does |
-|------|--------------|
-| `esphome_list_devices` | Every device file: node and friendly name, chip and board, online, firmware versions, the Home Assistant device it is |
-| `esphome_get_config` / `esphome_write_config` | Read or save a device's YAML. A save is snapshotted for `brain undo` and refused if the file changed since it was read |
-| `esphome_create_device` | A new device file, the way the dashboard's wizard writes one — fresh encryption key, OTA password and fallback hotspot |
-| `esphome_delete_device` | Move a device file into `archive/` |
-| `esphome_validate` / `esphome_compile` / `esphome_install` / `esphome_clean` | Validate with ESPHome itself; compile; compile and flash over the air; clear build files |
-| `esphome_update_firmware` | Install the update Home Assistant says is waiting, through its own update entity |
-| `esphome_logs` / `esphome_job` | Read a device's live log for a few seconds; follow a build by its job id |
-| `esphome_set_secret` | Set one key in `secrets.yaml` without the value ever being read back |
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `esphome_list_devices` | Every device file: node and friendly name, chip and board, online, firmware versions, the Home Assistant device it is | read |
+| `esphome_get_config` / `esphome_write_config` | Read or save a device's YAML. A save is snapshotted for `brain undo` and refused if the file changed since it was read | read / — |
+| `esphome_create_device` | A new device file, the way the dashboard's wizard writes one — fresh encryption key, OTA password and fallback hotspot | — |
+| `esphome_delete_device` | Move a device file into `archive/` | — |
+| `esphome_validate` | Validate a device's YAML with ESPHome itself | read |
+| `esphome_compile` / `esphome_install` / `esphome_clean` | Compile; compile and flash over the air; clear build files. Works with the ESPHome 2026.9 Device Builder and the older dashboard | — |
+| `esphome_update_firmware` | Install the update Home Assistant says is waiting, through its own update entity | — |
+| `esphome_logs` / `esphome_job` | Read a device's live log for a few seconds; follow a build by its job id | read |
+| `esphome_set_secret` | Set one key in `secrets.yaml` without the value ever being read back | — |
 
 ## Music Assistant
 
-Since 2.7. See [Music Assistant](/brain/music-assistant/).
+There is no Music Assistant tab in the panel since 2.10 — the tools are unchanged. See [Music Assistant](/brain/music-assistant/). None of these is offered to a *Voice assistant* agent; it plays music through `music_assistant.play_media` on an exposed speaker instead.
 
-| Tool | What it does |
-|------|--------------|
-| `music_assistant_status` | Whether brAIn can reach the server and as whom, every player and provider, and the stale players |
-| `music_assistant_search` | Search the library and every music provider |
-| `music_assistant_player` / `music_assistant_play` | One action on a player (play, pause, volume, power…); play a search result or a name on a player |
-| `music_assistant_remove_players` | Forget stale players — a dry run unless told otherwise |
-| `music_assistant_query` | Any **read-only** Music Assistant API command |
-| `music_assistant_command` | **Any** Music Assistant API command: players, queues, groups, the library, playlists, providers and server settings |
-
-Unattended runs get the reading tools only — list, read, validate, logs, status, search and
-query. Anything that writes a file, flashes a device or changes Music Assistant is refused
-to them, and to voice.
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `music_assistant_status` | Whether brAIn can reach the server and as whom, every player and provider, and the stale players | read |
+| `music_assistant_search` | Search the library and every music provider | read |
+| `music_assistant_player` / `music_assistant_play` | One action on a player (play, pause, volume, power…); play a search result or a name on a player | — |
+| `music_assistant_remove_players` | Forget stale players — a dry run unless told otherwise | — |
+| `music_assistant_query` | Any **read-only** Music Assistant API command | read |
+| `music_assistant_command` | **Any** Music Assistant API command: players, queues, groups, the library, playlists, providers and server settings | — |
 
 ## Scoping & safety
 
-- Every control tool funnels through the `call_service` chokepoint, so **per-agent service deny-lists** (e.g. no `lock.unlock` for a bedroom satellite) cover all of them at once. Since 1.26.0 the chokepoint also resolves `homeassistant.*` meta-calls to their targets' domains — `homeassistant.turn_on` aimed at a cover *is* a cover call — refuses targets it can't resolve (a whole area), and refuses `fire_event` outright on restricted channels.
-- Voice agents default to `mcp_only` tool access — HA tools yes, shell and file edits no.
-- Insight and study runs, which run unattended, are scoped from both ends: an explicit read-only **allow-list** of these tools *and* an explicit **deny-list** of every acting one. Both are needed because `--allowedTools` only governs what runs *without a prompt*, and a headless run can't be prompted — so an un-listed tool merely *fails* rather than being *forbidden*, which is not the same guarantee with a real house behind it. `fire_event` and `remember_fact` are why it's an explicit list and not a name prefix: both are shaped like reads, and neither is one. The deny list is checked against the server's own tool names in CI, so a newly added acting tool can't quietly reach an unattended run.
+- Every control tool — and every add-on, device-type and Music Assistant tool that acts — funnels through the `call_service` chokepoint, so **per-agent Blocked services** (e.g. no `lock.unlock` for a bedroom satellite) and **protected entities** cover all of them at once. The chokepoint resolves `homeassistant.*` meta-calls to their targets' domains, refuses targets it can't resolve, and refuses `fire_event` outright while anything is protected.
+- **It reads the whole request.** Since 2.11 an entity named anywhere in a call — a scene's `entities` map, `snapshot_entities`, `group_members`, a speaker field, a script variable — is checked, and running a scene, script or automation is checked by what Home Assistant says it references. A protected lock inside a scene is refused on every agent.
+- **A *Voice assistant* agent is scoped by service as well as by entity.** A request naming no entity is refused unless it is a notification or a BRUH play service, and a request naming entities may only use those entities' own services. `update.install` is refused even on an update entity. New agents start with the administration services already ticked in Blocked services.
+- **Unattended runs** are scoped from both ends: an explicit read-only **allow-list** of these tools *and* an explicit **deny-list** of every acting one. Both are needed because `--allowedTools` only governs what runs *without a prompt*, and a headless run can't be prompted — so an un-listed tool merely *fails* rather than being *forbidden*, which is not the same guarantee with a real house behind it. `fire_event` and `remember_fact` are why it's an explicit list and not a name prefix: both are shaped like reads, and neither is one. Every tool is in exactly one of the two lists, checked against the server's own tool names in CI, so a newly added acting tool can't quietly reach an unattended run.
+- In the chat and the terminal, an **action gate** stands in front of every acting tool and decides from your own words, never from anything brAIn read. With *Let brAIn act without asking* on, it stops asking — the tripwire, the deny-list, your house rules and protected entities still decide ([reference](/brain/reference/#let-brain-act-without-asking)).
+- Text that came from outside the household (a media title, a calendar event, a logbook message) is handed to Claude marked as data, not instructions.
 - `brain.*` Power Tools add their own layer: admin gating and id validation inside the service, regardless of who calls.
 
 ## Generated context
 
-With `auto_generate_context` on (default), the add-on regenerates `/config/CLAUDE.md` at startup — a snapshot of your install (entities by domain, automations and their states, add-ons, integrations, directory guide) plus instructions for using the MCP tools and the Power Tools workflow. Claude reads it at the start of every session, which is why it never has to ask what a `sensor.lumi_lumi_weather_temperature_3` is doing in your kitchen.
+With `auto_generate_context` on (default), the add-on regenerates `/config/CLAUDE.md` at startup — a snapshot of your install (entities by domain, rooms, automations and their states, add-ons, integrations, directory guide) plus instructions for using the MCP tools and the Power Tools workflow. Claude reads it at the start of every session, which is why it never has to ask what a `sensor.lumi_lumi_weather_temperature_3` is doing in your kitchen.

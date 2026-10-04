@@ -30,8 +30,8 @@ set of causes:
 | **Person** | A named user did it, from the app or the UI |
 | **Automation** | A rule fired |
 | **Script** / **Scene** | Something ran |
-| **Voice** | An assistant command |
-| **brAIn** | brAIn changed it — see below |
+| **Voice** | An assistant command — Home Assistant's own Assist, or a brAIn voice agent |
+| **brAIn** | brAIn changed it on its own — a fix you approved, a background run — see below |
 | **Unattributed** | Nothing in the record says |
 
 :::note[Unattributed is an answer, in as many words]
@@ -56,6 +56,17 @@ device target is recorded and **deliberately not resolved**: resolving one needs
 registries as they were at the time, and a wrong expansion would attribute somebody else's
 change to brAIn — the one mistake the ledger exists to prevent.
 
+**What you ask brAIn to do is still yours.** Each row in that ledger says which face asked —
+voice, the chat, the terminal, or a run nobody was watching — and the conversation it came
+from. A change you asked for through a brAIn voice agent is filed as **Voice**, and one you
+asked for in the chat or the terminal as **Person**, marked as made *via brAIn*. Only what
+brAIn did unattended is filed under **brAIn**. That matters below: *"turn the hall light
+back on"* said to brAIn is you overriding the motion rule, not brAIn and the rule fighting.
+
+The ledger also records the state of each entity **just before** brAIn's call, which is
+what lets a fix's [Put them back](/brain/findings/#putting-it-back) set things back the way
+they were.
+
 ## Overrides ride above the list
 
 An **override** is a person putting something back within a few minutes of an automation
@@ -63,12 +74,14 @@ moving it. The automation ran, nothing errored, and the light is off — so no c
 reads Home Assistant can see it, and it is the clearest signal a house gives that an
 automation is wrong for it.
 
-Three rules keep it honest:
+These rules keep it honest:
 
 - **The state has to actually differ.** Pressing "on" after a rule turned it on is
   agreement, and counting it would put the best-behaved automation in your house at the top
   of the list.
 - **One automation move is undone once.** Nudging a dimmer three times is one disagreement.
+- **A person includes voice.** Putting something back by asking Home Assistant's Assist or a
+  brAIn agent counts the same as pressing the switch.
 - **An automation undoing an automation is not an override.** That is a *conflict*, and a
   different finding — two rules that disagree, where which one wins depends on the order two
   triggers happened to fire in.
@@ -87,4 +100,6 @@ logbook to keep true.
 
 Claude can read this too. `explain_change` and `get_activity` are read-only tools on the
 analyst's list, so you can ask *"what turned the porch light on last night?"* in the chat or
-on the ask bar and get the chain rather than a guess.
+on the ask bar and get the chain rather than a guess. A voice agent at the default *Voice
+assistant* level can't read the house-wide activity — it only reaches what you expose to
+Assist.

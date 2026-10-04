@@ -11,11 +11,17 @@ your own history.
 
 ![The Proposals tab, headed "What could be better", with a "Design scenes for" room picker and two proposals — "Stop the away-lighting rule running on weekday mornings" and "Turn the porch light off at 23:10 on weekdays" — each with its evidence and the buttons Try it for a week, Enable it and No thanks](./images/panel-proposals.webp)
 
-Every proposal takes the same answers: **Enable it** (on the Findings feed, where proposals
-appear too, it reads *Make the change*), **Try it for a week**, and **No thanks** — with an
-optional reason, which teaches brAIn more than silence. On the feed, **Dismiss** asks again
-later. Nothing is written until you say yes, and everything written can
-be undone.
+Every proposal takes the same answers: **Enable it**, **Try it for a week**, and **No
+thanks** — with an optional reason, which teaches brAIn more than silence. Nothing is written
+until you say yes, and everything written can be undone.
+
+This tab is the **only** place a proposal is offered. For a while suggestions also rode in
+the [Findings](/brain/findings/) feed, where one decision was counted by two badges and the
+feed's copy carried less of the evidence. Now everything you'd want before saying yes is
+here — the replay and the before-and-after, a playbook's targets by name, the scene
+swatches, a trial's week and its grade, and **Undo** on anything you accepted. The Findings
+badge counts problems and questions; this tab's badge counts suggestions. Turning off
+*Insights* no longer hides this tab, because the free house checks fill it too.
 
 People automate less than a tenth of what they do by hand. Not because the rest is hard —
 because writing an automation means deciding the trigger, the condition and the edge cases
@@ -64,7 +70,9 @@ the week goes on rather than staying blank until Sunday —
 edit it, disable it, delete it, like any other. See
 [Saying yes, and taking it back](#saying-yes-and-taking-it-back).
 
-**Declined.** It goes away, and you can say **why** in a sentence. That sentence is the half
+**Declined.** **No thanks** means *not for this house*: it goes away, and a box lets you say
+**why** in a sentence — optional, but the reason reaches every future suggestion. That
+sentence is the half
 that teaches, exactly as a finding's *Wrong* does: *"the hall light stays on because my
 partner works nights"* is a fact brAIn did not have, and it stops the same proposal coming
 back in different words next month.
@@ -102,6 +110,11 @@ your press, not brAIn's — there is no seventh-day deadline that quietly decide
 
 ### What a trial cannot grade
 
+Automations built in Home Assistant's newer editor — triggers like *"When a light turns
+on"* or *"When a door opens"*, with the device as a target — are replayed like any other, as
+are their matching conditions. A trigger aimed at a whole area, floor or label is refused,
+with the reason.
+
 Two silences, and they are not the same one. *"It would never have fired"* is about the
 automation; *"brAIn cannot replay this"* is about brAIn, and the trial says which rather than
 reporting a confident zero. The [replay's own limits](/brain/replay/) are carried through
@@ -134,7 +147,8 @@ different claims that were being reported as one:
 
 1. **The file was written.**
 2. **Home Assistant read it** — `automation.reload`.
-3. **The automation exists** — the new `automation.<name>` entity actually turns up.
+3. **The automation exists** — the entity Home Assistant actually registered for it turns
+   up (read back from the registry, not guessed from its name).
 
 Only the third is what you meant by pressing the button. A `mode:` Core does not recognise, a
 trigger from a custom integration that has not loaded, a read-only `/config` — each of those
@@ -154,7 +168,8 @@ for quiet hours: it answers a press you made seconds ago.
 ### Undo
 
 **The toast carries an Undo for five minutes**, and it reverses all three effects or says
-which one it could not. The automation is removed, Home Assistant is reloaded, and the
+which one it could not. The automation is removed — its registry entry too, so no
+*unavailable* automation is left behind — Home Assistant is reloaded, and the
 proposal comes back on the list under its own id — along with the memory line the accept had
 queued. A trial that was still running when you accepted it comes back as a **proposal**
 rather than as a trial whose week has since passed, because *try it for a week* is a promise
@@ -267,6 +282,10 @@ The card also carries the sentence saying what this one will never do — on the
 that it will not unlock any door and will not disarm the alarm, because that is where somebody
 decides.
 
+Some water valves close when they are switched *on*. Where brAIn has read a valve that way
+— whatever language its name is in — the leak playbook turns it on rather than off, under
+its own line on the card, so you can see which way each valve is driven before you accept.
+
 Accepting one goes down the path above, unchanged. There is no separate switch.
 
 ### The condition it is missing
@@ -335,10 +354,34 @@ A pass offers at most three, strongest evidence first.
 
 ### Rules and one-offs, in a sentence
 
-Say a rule — *"whenever the front door opens after dark, turn the hall light on"* — and it arrives here replayed over the last month and graded against what you did, with the case in one sentence. Say a one-off instead: a sentence that *opens* with a moment — *"turn the
-porch light off when the guests leave"*, *"tell me when the tumble dryer finishes"* — never
-becomes an insight card. It becomes one automation that runs once and switches itself off, and
-it arrives here with your sentence, what brAIn understood, and a replay of the trigger.
+Say a rule — *"whenever the front door opens after dark, turn the hall light on"* — in the
+ask bar or to voice, and Claude drafts the automation, reading your house but unable to act.
+Before you see it, brAIn **simulates it twice** over your own history: a replay of the last
+month says how often it would have fired, and the last fortnight of those firings is graded
+against what you did yourself. That is the case on the card, in one sentence:
+
+> *Over the last 30 days it would have fired 9 times: 5 in the last 14 days, you had already
+> done the same on 4, you did the opposite on 1.*
+
+The card carries your sentence and what brAIn understood beside it, because when a rule is
+wrong the useful fact is which half was misread. A rule like *"turn the light off ten
+minutes after the last motion"* is written so that a second motion restarts the ten
+minutes. And once accepted, the automation's description quotes the sentence you asked
+with — *Asked for in brAIn: "…" — accepted on …* — so you can tell where it came from in
+six months.
+
+Say a one-off instead: a sentence that *opens* with a moment — *"turn the porch light off
+when the guests leave"*, *"tell me when the tumble dryer finishes"* — never becomes an
+insight card. It becomes one automation that runs once and switches itself off, and it
+arrives here with your sentence, what brAIn understood, and a replay of the trigger. It
+switches off *itself*, whatever Home Assistant named it, so a house that already had an
+automation by that name is no longer a problem.
+
+Two other routes land here as the same kind of proposal, through the same drafting and
+replay: an [insight card](/brain/insights/#a-card-can-suggest-an-automation) that points at
+an automation your house is missing, and the one automation brAIn may suggest at the end
+of its first study of your home — which, if you tick it, starts here already on a
+week-long trial.
 
 `brain.intent` is the same thing from a voice command or an automation, through the same
 request file.
@@ -358,7 +401,9 @@ trial button, because nothing in the last month set these scenes and there is no
 them against — the evidence is a **swatch per light per mood** instead, with the bulbs named
 underneath and anything protected shown as skipped. Accepting writes four scenes to
 `scenes.yaml`, and once they really exist brAIn offers a second proposal — the schedule that
-moves between them, which *is* an ordinary automation and can be tried for a week.
+moves between them, which *is* an ordinary automation and can be tried for a week. That
+schedule is offered for any room, including ones with more than one word in the name
+(*Living Room*, *Master Bedroom*).
 [The scene designer](/brain/scenes/) covers the moods, the capabilities and the two refusals.
 
 ## Where to see it
