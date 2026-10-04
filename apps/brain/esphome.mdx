@@ -1,90 +1,110 @@
 ---
 title: ESPHome
-description: Manage your ESPHome devices from brAIn — edit YAML, validate, install over the air, stream logs, create new devices and set secrets, from the panel or by asking Claude.
+description: Ask brAIn to work on your ESPHome devices — edit YAML, validate, install over the air, read logs, create new devices and set secrets, from the chat or the terminal.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 
-**House → ESPHome** lists every ESPHome device you have and lets you work on it without
-leaving brAIn: edit its YAML, validate it, install it over the air and watch its logs. And
-because it's brAIn, you can also just ask.
+brAIn works on every ESPHome device you have — edits its YAML, validates it, installs it
+over the air, reads its logs — and you ask for it in a sentence. There is no ESPHome screen
+in brAIn's panel: the ESPHome dashboard already is one, and a second copy of it inside
+brAIn was clutter (the tab was removed in 2.10). Everything it did is still there, as the
+tools Claude uses from the chat and the terminal.
 
-![The ESPHome tab: "Connected to ESPHome 2026.9.0 through the ESPHome Device Builder add-on", with New device, Wi-Fi & secrets and Refresh buttons, and three rows — Porch Light (Online, Update available, ESP32 · esp32dev · firmware 2026.8.0 → 2026.9.0 · in Home Assistant as "Porch Light", 4 entities), garage-door (Offline, Protected, ESP8266) and common.yaml (Package / include), each with Edit, Install, Logs and More](./images/panel-esphome.webp)
+## What you can ask for
 
-## What each row tells you
-
-For every file in `/config/esphome`:
-
-- **Its name** and file name.
-- **Online or offline**, and whether an **update is available** — the firmware it's running
-  against the version the dashboard would build now (*2026.8.0 → 2026.9.0*).
-- **The chip and board** (*ESP32 · esp32dev*).
-- **Which Home Assistant device it is**, and how many entities it has.
-- **Protected** if it carries anything on your `protected_entities` list — brAIn won't flash
-  or delete those.
-- Shared files (packages and includes) are listed too, marked as such.
-
-## Working on a device
-
-| Button | What it does |
-| --- | --- |
-| **Edit** | Opens the YAML in the panel, with the output of whatever you run underneath it — edit, **Validate**, read ESPHome's own error, edit again. |
-| **Install** | Compiles and flashes it over the air, with the build scrolling past. |
-| **Logs** | Streams the device's own log, live. |
-| **More → Compile only** | Builds without flashing. |
-| **More → Clean build files** | Clears the build cache when a build gets stuck. |
-| **More → Delete** | Moves the file into `archive/`, exactly as the ESPHome dashboard does. The device keeps running its firmware. |
-
-**＋ New device** writes the file the dashboard's wizard would — a fresh API encryption key,
-OTA password and fallback hotspot for that device, and Wi-Fi from your secrets. The first
-install onto a brand-new board still has to be over USB from the ESPHome dashboard; every
-one after that can be from here.
-
-**Wi-Fi & secrets** lists the names in `secrets.yaml` and lets you set one, without ever
-showing its value.
-
-## Or just ask
-
-Claude can do everything the tab does, from the chat, the terminal or voice:
+From the chat or the terminal (or a voice agent set to **Whole house** or **Full admin**):
 
 ```text
+What ESPHome devices do I have, and which need a firmware update?
 Add a DHT22 on GPIO4 to the garage sensor and install it.
 Why does the porch light keep dropping off Wi-Fi?
 Update every device that has firmware waiting.
 Make a new ESP32 device for the shed with a relay on GPIO26.
+Change the Wi-Fi password in my ESPHome secrets.
 ```
 
-It reads the logs to answer the *why* questions. Scheduled, unattended runs may only read
-device files, validate them and read logs — writing, compiling and installing only ever
-happen because somebody asked.
+What happens behind each kind of request:
+
+- **Listing devices** gives every file in `/config/esphome` with its chip and board,
+  whether it's online, the firmware it's running against the version the dashboard would
+  build now (*2026.8.0 → 2026.9.0*), and which Home Assistant device it is. Shared files
+  (packages and includes) are listed too, marked as such.
+- **Changing a device** edits the YAML, validates it, reads ESPHome's own error if there
+  is one, fixes it, and compiles and flashes over the air — "done" means flashed, not just
+  compiled. A device that's offline is compiled now and flashed by the dashboard when it
+  comes back, and brAIn says so.
+- **"Why" questions** stream the device's own log and read it.
+- **A new device** gets the file the dashboard's wizard would write — a fresh API encryption
+  key, OTA password and fallback hotspot, and Wi-Fi from your secrets. The first install
+  onto a brand-new board still has to be over USB from the ESPHome dashboard itself; every
+  one after that can be asked for.
+- **Secrets** are set without ever being read back. brAIn can list the names in
+  `secrets.yaml`, never the values.
+- **Deleting a device** moves its file into `archive/`, exactly as the dashboard does. The
+  device keeps running its firmware.
+- **A stuck build** can be cleared ("clean the build files for the garage sensor"), and a
+  device can be compiled without flashing.
 
 ## Safety
 
-- **Every save is undoable.** The file is snapshotted before it's written, so
-  `brain undo` puts it back.
+- **Every save is undoable.** The file is snapshotted into the same edit journal before it's
+  written, so `brain undo` puts it back.
 - **Your edits aren't overwritten.** If a file was saved from the ESPHome dashboard since
-  you opened it, brAIn refuses to save over it.
-- **Broken YAML is still saved** — it's your file — and the panel says where the parser
-  stopped.
+  brAIn read it, brAIn refuses to save over it.
+- **Broken YAML is still saved** — it's your file — and brAIn says where the parser stopped.
 - **Protected entities apply.** Installing firmware acts on every entity a device carries,
-  so a device holding anything on `protected_entities` is refused, naming the entity.
+  so a device holding anything on `protected_entities` is refused — install, upload, update
+  and delete alike — naming the entity.
+
+## Who may use these tools
+
+| Who's asking | What they get |
+| --- | --- |
+| The chat and the terminal | Everything above. |
+| A voice agent set to **Whole house** or **Full admin** | Everything above. |
+| A voice agent set to **Voice assistant** | None of the ESPHome tools. |
+| Scheduled, unattended runs (cards, the Resident) | Read device files, validate them, read logs and check on a build. Writing, compiling, installing and deleting only ever happen because somebody asked. |
+
+## How brAIn reaches the dashboard
+
+brAIn edits `/config/esphome` directly, so **editing never needs the dashboard**. Building
+does — validate, compile, install and logs — because ESPHome's toolchains don't run inside
+brAIn's container. brAIn finds the ESPHome add-on on its own and can reach its dashboard
+three ways:
+
+1. **Through Home Assistant's ingress**, the way your browser opens it. Current Supervisor
+   versions no longer let one add-on open another's dashboard with its own credentials, so
+   this needs the `esphome_ha_token` option: a long-lived access token from a Home Assistant
+   administrator. brAIn uses it only to ask Home Assistant for an ingress session.
+2. **The ESPHome add-on's own port**, if you gave it one under that add-on's **Network**
+   settings. Used automatically, but it only answers without a password when that add-on's
+   `leave_front_door_open` is on, which leaves the dashboard open to your whole network.
+3. **`esphome_dashboard_url`**, for a dashboard somewhere else, e.g.
+   `http://192.168.1.20:6052`.
+
+brAIn speaks both the current **ESPHome Device Builder** (ESPHome 2026.9 and later) and the
+older dashboard, and works out which one it's talking to by itself.
+
+When none of the three can be reached, brAIn says exactly why and which setting ends it,
+file editing keeps working, and a device with a firmware update waiting can still be
+updated **through Home Assistant**'s own update entity.
 
 ## Setup
 
 <Steps>
 
 1. **Install and start the ESPHome add-on** (ESPHome Device Builder), if you haven't.
-   brAIn finds it by itself and reaches it through Home Assistant — nothing to configure,
-   no port to open.
 
-2. **Open House → ESPHome.** The line at the top says what brAIn connected to.
+2. **Create a long-lived access token** as a Home Assistant administrator: your profile →
+   **Security** → **Long-lived access tokens**.
+
+3. **Paste it into `esphome_ha_token`** on brAIn's Configuration tab and restart brAIn.
+
+4. **Ask** — "what ESPHome devices do I have?" in the chat. If brAIn can't reach the
+   dashboard, the answer names the setting that's missing.
 
 </Steps>
 
-Running the ESPHome dashboard somewhere else (a container on another machine)? Set the
-`esphome_dashboard_url` option, e.g. `http://192.168.1.20:6052`.
-
-Editing files never needs the dashboard — brAIn edits `/config/esphome` directly. Building
-does, because ESPHome's compilers don't run inside brAIn's container. When no dashboard can
-be reached the tab says exactly why, editing keeps working, and a device with a firmware
-update waiting can still be updated through Home Assistant's own update entity.
+Running the ESPHome dashboard somewhere else (a container on another machine)? Set
+`esphome_dashboard_url` instead of the token.

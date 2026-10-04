@@ -1,0 +1,167 @@
+---
+title: Upkeep
+description: Keeping Home Assistant itself in order — tidier names, rooms and aliases reviewed as one table with a 30-day undo, an answer to "is this update safe tonight?" that quotes its evidence, an overnight check that names root causes, a cited house book you can share and take back, and a weekly sentence about who can reach the house.
+---
+
+Most of brAIn is about your house. **House → Upkeep** is about Home Assistant itself: the
+names nobody tidied, the devices in no room, the updates you are not sure about, the error
+log nobody reads, and the knowledge of how the house works that lives in one person's head.
+
+It has five sections, and every one of them is **a press**. Each section says what it last
+did, when, and — for the parts that also run on a schedule — why a scheduled pass was held
+back (*automatic insights are paused*, *nothing it reads has changed*). A section whose store
+could not be read says so, rather than showing up empty.
+
+:::note[Nothing in Home Assistant changes on its own]
+Each button spends one Claude run. Suggestions are a table you tick; a verdict on an update
+is advice; the overnight check files findings; the house book is a page. The only things on
+this tab that write to Home Assistant are **Apply** and **Undo** in the names-and-rooms table.
+:::
+
+## Names, rooms and aliases
+
+Press **Suggest names and rooms** and brAIn reads the house's own naming style first — a
+sample of the names *you* chose — and then proposes one table of changes:
+
+| Kind | What it fixes |
+| --- | --- |
+| **Rename** | Names that are still the hardware's — `0x00158d0001a2b3c4`, `Shelly Plus 1PM 8A4C` — which are unfindable in a picker and unsayable to Assist |
+| **Room** | Entities and devices in no area, which "turn off the kitchen" and every area card cannot see |
+| **Alias** | Spoken aliases for the things people actually say |
+
+Every row has a tick box. **Nothing changes until you press Apply**, and Apply goes through
+Home Assistant's own registry.
+
+### A room move says what it changes
+
+An automation that targets an *area* follows the room. Moving a lamp out of the lounge stops
+the lounge's "evening" automation reaching it — so a room move lists the automations that will
+start or stop reaching that entity, before you tick it. It matches on what each automation
+actually does, so a light service never claims a sensor in the same room.
+
+### What it refuses
+
+A suggestion is dropped, never offered, when it:
+
+- names an entity it was not shown;
+- moves something into a room that does not exist;
+- touches anything on your `protected_entities` list, or a device that carries one;
+- is still shaped like a hardware name;
+- gives a name another entity already answers to — in the house, or earlier in the same table;
+- changes nothing.
+
+### Undo, for 30 days
+
+An applied batch can be undone for **30 days**, because a registry change is the kind of thing
+somebody notices a fortnight later. Undo is field by field, and **only puts back a field that
+still holds what brAIn wrote**: a rename you made since is yours, and an undo that overwrote it
+would be a second change nobody reviewed. Only the aliases this batch added are removed.
+
+Apply re-reads every field from Home Assistant before writing and records only what Home
+Assistant accepted, so a batch that half-applied undoes exactly the half that happened.
+
+:::tip[From a finding]
+The *named after its hardware* (`reg.hardware_name`) and *no room* (`reg.no_area`) findings
+offer **Fix it**, which opens this table rather than planning one rename at a time.
+:::
+
+## Updates waiting
+
+For each pending update, press **Is it safe tonight?**. brAIn reads the release notes,
+searches your configuration for the integrations and options they mention, and answers one of:
+
+- **Safe tonight**;
+- **Wait** — with the reason, and the edit you would need to make first;
+- **Can't tell**.
+
+**A *safe* or *wait* has to quote its evidence**: one line from the release notes and one line
+from your configuration, and both are checked **word for word** against what was actually
+read. An answer that cannot quote both is shown as *can't tell*, and so are notes that could
+not be fetched — a verdict on notes nobody read is a guess, so no run is spent on one.
+
+The release notes are treated as data, never as instructions, and the run that reads them
+has no tools at all.
+
+:::caution[What it never does]
+- **It never installs anything.** There is no button here that runs an update.
+- **It never reads `secrets.yaml`.** Any line in your configuration whose key looks like a
+  credential is blanked before it is sent, and Home Assistant's own storage and the
+  recorder's database are skipped.
+:::
+
+## Overnight health check
+
+Once a night, between **03:00 and 06:00**, and whenever you press **Run the check now**,
+brAIn reads:
+
+- Home Assistant's error log;
+- the Zigbee mesh — routers, weak links, devices not seen;
+- Z-Wave node statistics and node status;
+- automations that switch a smart plug feeding a Zigbee router.
+
+It asks for **at most five root causes**, named as causes rather than symptoms:
+
+> *The hallway plug that the upstairs Zigbee sensors route through keeps being switched off by
+> the bedtime automation.*
+
+**Every cause must cite the records it rests on**, by an id brAIn handed out — a log line, a
+Zigbee device, a Z-Wave node, an automation. A cause that cites nothing, or cites a record that
+was not there, is dropped and counted. The causes reach the Findings tab through the same
+[first look](/brain/checks/) every finding takes.
+
+A cause re-worded tomorrow is the same finding, not a new card every night: it is keyed by the
+records it cites. And on a night a source could not be read, the findings that rest on it stay
+put — *I could not look* is not *it went away*.
+
+The scheduled run answers to the same switches every scheduled run does: a Claude sign-in,
+**Automatic insights**, and the usage budget. A night with nothing in the log or the mesh worth
+a look costs nothing.
+
+## House book
+
+Press **Write the house book** and brAIn writes a short manual of how this house works: what
+the automations do, how the heating runs, what the alarms do, where the shutoffs are, and
+anything else worth knowing — from your own automations, scripts, scenes and what brAIn has
+learned. It is meant for a partner, a sitter, or the person buying the house.
+
+- **Every sentence is cited.** Each one carries the automations, scripts or facts it came
+  from, and a sentence with no source is dropped.
+- **Secrets are left out, always.** Codes, PINs, passwords and anything shaped like a token are
+  removed from every sentence, whether or not the book is ever shared.
+- **Gaps become questions.** Where it cannot answer from the house — *where is the water
+  shutoff?* — it asks on the Findings tab, at most three per run and five open at once. Your
+  typed answer goes into memory as your own words, so the next book knows. A subject asked
+  once is never asked again.
+- **It keeps itself current.** Once you have asked for one, it is rewritten weekly — but only
+  when something it reads has changed. A held week says why.
+
+### Sharing it, and taking it back
+
+**Publish a link** puts a read-only, redacted copy with no script at an unguessable address
+under your Home Assistant's `/local` folder, and asks search engines to keep away. While it is
+published, every rewrite updates the shared copy.
+
+**Take the link down** deletes the page **and changes the address**, so a link somebody kept is
+dead. The book's link has its own secret, separate from the one your shared insight cards use,
+so taking it down never breaks a card on a dashboard.
+
+## Who can reach the house
+
+Four [house checks](/brain/checks/#rules-worth-knowing-about) look at access, and file
+ordinary findings:
+
+| Check | What it reports |
+| --- | --- |
+| `sec.lock_cloud_voice` | A lock or alarm panel exposed to Alexa or Google through Home Assistant Cloud |
+| `sec.addon_unprotected` | An add-on whose protection mode has been switched off |
+| `sec.login_bans` | Recent failed logins that got an address banned |
+| `sec.brain_posture` | A terminal session still acting without asking after *Let brAIn act without asking* was turned **off** — turning it on is your choice and files nothing |
+
+Each says nothing when it could not look, and **Wrong, because…** stops it for that lock or
+add-on.
+
+Once a week brAIn also writes **one sentence** about who and what can reach the house, from
+what the last checks pass read — no new look at the house of its own. It shows here, with when
+it was written; **Review now** writes it on demand. It answers to the same switches as every
+scheduled run, and a review that failed waits six hours before trying again rather than
+spending a run every few minutes.

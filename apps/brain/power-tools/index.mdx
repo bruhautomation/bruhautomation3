@@ -1,13 +1,13 @@
 ---
 title: Power Tools
-description: 65 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, devices, integrations, zones, users, and more.
+description: 69 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, what a device shows as, devices, integrations, zones, users, and more.
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**BRUH Power Tools** are 65 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities, devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
+**BRUH Power Tools** are 69 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities (including what a device shows as), devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
 
 They exist for one reason: **so nothing ever has to touch `/config/.storage` by hand.** Every call is validated before anything changes, requires admin rights, and runs through Home Assistant's own registry APIs. Claude uses them when you ask it to reorganize your home; your automations and scripts can use them too — every service shows up in **Developer Tools → Actions** with full field pickers.
 
@@ -24,6 +24,7 @@ All of these work by voice, in the terminal, or in a `run_task` prompt:
 - *"Build me a manual heating override — a target slider and an on/off toggle — and the automation that uses them."*
 - *"Make a Guest dashboard with just the lights and the thermostat, and a login for the babysitter."*
 - *"Install the Mushroom cards and redo my overview with them."*
+- *"The bedroom fan is on a smart plug — make it show up as a fan, and show the back door sensor as a door."*
 
 Each service page below shows a 🗣️ line: a natural-language phrasing that works anywhere Claude listens.
 
@@ -39,7 +40,7 @@ Each service page below shows a 🗣️ line: a natural-language phrasing that w
     [Reference →](/brain/power-tools/labels/)
   </Card>
   <Card title="Entities" icon="pencil">
-    9 services: rename, change entity IDs, enable/disable, hide/unhide, voice aliases and icons, and clean up orphaned registry entries (dry-run by default).
+    13 services: rename, change entity IDs, enable/disable, hide/unhide, voice aliases and icons, clean up orphaned registry entries (dry-run by default) — and change what a device **shows as**: a contact sensor as a door, a smart plug as a fan or a light, a sensor's decimals and unit.
     [Reference →](/brain/power-tools/entities/)
   </Card>
   <Card title="Devices & Integrations" icon="setting">
@@ -80,9 +81,11 @@ Power Tools are powerful by design, so the guardrails are built into the service
 
 | Guardrail | What it means |
 |-----------|---------------|
-| **Admin-gated** | Calls from non-admin HA users are rejected. Claude, automations, and scripts run as admin. |
+| **Admin-gated** | Calls from non-admin HA users are rejected. Claude, automations, and scripts run as admin. New voice agents start with `brain.*` ticked in their Blocked services, and a *Voice assistant*-level agent cannot reach them at all. |
 | **Validated first** | Every referenced area/floor/label/device/entity/integration id is checked **before** any change is applied. A typo fails loudly; it never half-applies. |
-| **Dry-run defaults** | Both sweeps — `delete_orphaned_entities` and `delete_orphaned_devices` — only *report* unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. The targeted deletes (`delete_device`, `delete_integration`, `delete_label`, `delete_floor`, `delete_person`) and `disable_integration` also accept `dry_run`, but act by default: you named the thing, so it's not a sweep. |
+| **Dry-run defaults** | Both sweeps — `delete_orphaned_entities` and `delete_orphaned_devices` — only *report* unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. The targeted deletes (`delete_device`, `delete_integration`, `delete_label`, `delete_floor`, `delete_person`), `disable_integration` and `stop_showing_switch_as` also accept `dry_run`, but act by default: you named the thing, so it's not a sweep. |
+| **Safety sensors stay safety sensors** | `set_device_class` refuses to take a smoke, gas, carbon monoxide or leak sensor out of that type without `confirm_safety: true`, because brAIn's [safety alerts](/brain/safety/) go by it. |
+| **Protected entities hold** | Called from the chat or the terminal, every Power Tool passes the same checks as any other change: your protected entities are refused, and a switch shown as something else is protected if either half of the pair is. |
 | **Lockout-proof** | `disable_user` refuses owner accounts and system-generated users. |
 | **Response data** | Creation services return the new id (`area_id`, `floor_id`, `label_id`, …) so multi-step workflows chain without guessing. |
 | **Namespaced** | Everything lives under `brain.*` — no core services are overridden, and running [Spook](https://github.com/frenck/spook) alongside is perfectly fine. |

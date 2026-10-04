@@ -3,11 +3,6 @@ title: Emergency Playbooks
 description: The automation you would want on a bad night — smoke, a leak, a freeze with the heating gone — written from what your house actually has, listed entity by entity, and run by Home Assistant only if you accept it.
 ---
 
-:::note[Requires brAIn 1.45]
-This page documents a release that is on its way. Everything below is built and tested; it
-is not in the current add-on yet.
-:::
-
 Every house can already detect smoke, and almost no house has written down what should
 happen next. Not because the response is hard to think of — because writing it means listing
 every light, every thermostat and every blind by hand, and then never testing it.
@@ -26,6 +21,10 @@ same four refusals, the same edit-journal snapshot, and the same Undo on the toa
 end up with is an ordinary automation in your `automations.yaml`, with an id that says what
 it is (`brain_playbook_smoke`) when you open that file in six months.
 
+An accepted playbook that has never fired is exactly what a healthy one looks like, so the
+"has never run" [house check](/brain/checks/#rules-worth-knowing-about) never offers to
+delete it — nor any other automation watching a smoke, gas, moisture or CO sensor.
+
 ## The three, and exactly what each does
 
 A playbook is only offered when your house has the sensor for it. Most houses get none of
@@ -34,7 +33,7 @@ them, which is the ordinary answer rather than a failure.
 | Playbook | It runs when | What it does |
 | --- | --- | --- |
 | **Smoke or CO** | Any `smoke`, `carbon_monoxide` or `gas` binary sensor goes off | Every light to full brightness, heating and cooling off, blinds and curtains open, then it tells you — naming the room the detector that fired is in |
-| **Water leak** | Any `moisture` sensor goes off | Water valves closed, water switches off, water heaters off, then it tells you, naming the room |
+| **Water leak** | Any `moisture` sensor goes off | Water valves closed, water shutoff switches driven to closed, water heaters off, then it tells you, naming the room |
 | **Freeze with the heating stopped** | The coldest room brAIn has [measured](/brain/climate/) is below 5 °C **and** its thermostat has been doing nothing for 30 minutes | **It tells you. Nothing else.** |
 
 The room is looked up when the automation fires rather than written into it, because a
@@ -80,13 +79,19 @@ A model choosing that would be a guess wearing a config, and a guess nobody can 
 afterwards — the automation looks exactly the same either way.
 
 Claude is used for **one optional thing**: the paragraph on the card explaining what this
-does in plain English. If that run fails, the card keeps the deterministic sentence brAIn
-composed from the list, and nothing else changes.
+does in plain English. It is a scheduled run like any other, so it waits while brAIn is
+paused, signed out or over its usage budget. Until it runs — or if it fails — the card keeps
+the deterministic sentence brAIn composed from the list, and nothing else changes.
 
 ### How a water shutoff is recognised
 
 Anything in the `valve` domain qualifies, because that is what the domain is. A **switch** is
-named by a person, so the word has to be a whole word: **`water`**, **`valve`**,
+named by a person, in whatever language they speak, so brAIn
+[reads what each device is](/brain/checks/#reading-what-a-device-is-in-any-language) once a
+night — its name, make, model and room — and records whether it is a water shutoff. A Dutch
+`hoofdkraan` gets into the leak playbook.
+
+Where brAIn is not sure, it falls back to whole words: **`water`**, **`valve`**,
 **`stopcock`**, **`mains`** or **`shutoff`**, in the entity id or the friendly name.
 
 `main` on its own is deliberately not on that list — `switch.main_bedroom_lamp` matches it,
@@ -94,8 +99,15 @@ and a leak playbook that turns the bedroom lamp off is a playbook you delete. A 
 called only "Main" is missed, which costs you a line on a card you can read. The other way
 round costs trust.
 
-The leak card says as much, and asks you to read the list before you accept: brAIn matched
-those by name, and a switch it read wrong is one it would turn off in a leak.
+### Which way each valve closes
+
+Some water switches close the supply when they are switched **on**. Turning every water
+switch off would open those. A switch brAIn has read as "on closes it" is turned **on**, and
+sits under its own line on the card, so you can see which way each valve is driven before
+you accept.
+
+The leak card asks you to read the list before you accept: a switch brAIn read wrong is one
+it would drive the wrong way in a leak.
 
 ## Every entity is on the card, by name
 

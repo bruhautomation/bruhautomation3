@@ -3,11 +3,6 @@ title: Shadow Runner & Replay
 description: Before any automation is enabled, brAIn runs it against the last month of your recorded history and tells you exactly when it would have fired and what it would have done — calling no service and touching nothing.
 ---
 
-:::note[Requires brAIn 1.42]
-This page documents a release that is on its way. Everything below is built and tested; it
-is not in the current add-on yet.
-:::
-
 The difference between a suggestion and a decision is a number from history.
 
 Every proposal brAIn could make — *automate this*, *add this condition*, *this rule is wrong
@@ -36,14 +31,32 @@ Answered in seconds, before anything is enabled.
 | **Any existing automation** | "What has this actually been doing?" — including ones you did not write |
 | `POST /api/replay` | The same answer, for an automation config you supply |
 
-## The four trigger kinds, and why the refusal is the feature
+## The trigger kinds, and why the refusal is the feature
 
 Replay covers **`time`**, **`state`**, **`numeric_state`** and **`template`** triggers.
-Those are the four the recorder can reconstruct: a time trigger is arithmetic, and the other
-three are answered by state changes Home Assistant already keeps.
+Those are the four classic kinds the recorder can reconstruct: a time trigger is arithmetic,
+and the other three are answered by state changes Home Assistant already keeps.
 
-A `webhook`, an `mqtt` message, an `event`, a `device` trigger — none of those is in the
-recorder in a form anything can replay.
+### The new editor's triggers
+
+Since Home Assistant 2026.7 the automation editor writes purpose-specific triggers by
+default — "When a light turns on", "When a door opens" — with the device under `target:`.
+brAIn replays the common ones as the state changes Home Assistant itself fires them on:
+lights, switches, fans, motion and occupancy, locks, doors, windows, covers, climate, media
+players and alarm panels (`light.turned_on`, `occupancy.detected`, `door.opened`,
+`climate.started_heating`, `media_player.started_playing` and their siblings), plus the
+matching conditions. So an automation built in the new editor gets its "would have fired"
+numbers, can be [trialled for a week](/brain/proposals/#the-three-verdicts), and shows
+evidence on a [condition suggestion](/brain/intents/).
+
+A target that is a **whole area, floor, label or device** is refused, because which entities
+those were at the time is something brAIn would have to guess.
+
+### What is refused
+
+A `webhook`, an `mqtt` message or an `event` is not in the recorder in a form anything can
+replay. A `sun` trigger or a brightness threshold is in the recorder, but brAIn does not know
+how to replay it yet. The refusal says which of those two kinds of no it is.
 
 :::caution[A partial replay is worse than no replay]
 Reporting *"this would have fired twice"* about an automation whose webhook fires forty
@@ -57,8 +70,7 @@ Never trimmed to the replayable subset.
 You will see the refusal in as many words:
 
 > *A `webhook` trigger cannot be replayed — the recorder does not keep what it fires on, so
-> brAIn would be guessing at how often it fired. Replay covers time, state, numeric_state
-> and template triggers.*
+> brAIn would be guessing at how often it fired.*
 
 ## Templates are replayed against the world as it was
 
@@ -78,7 +90,9 @@ state machine only for the entities it fetched history for. So:
 
 **`for:` is a promise about a stretch of time**, not an instant. A state trigger with
 `for: 00:05:00` fires only where the entity then *stayed* that way for five minutes — a
-question about the next sample, not this one. A three-minute door blip does not count.
+question about the next sample, not this one. A three-minute door blip does not count —
+and a light **dimmed** halfway through the hold is still a light that stayed on, so a change
+that only touches an attribute does not cut the stretch short.
 
 **`numeric_state` is a crossing, never a level.** Home Assistant fires when a value moves
 *into* the range, not for every sample it spends inside one. A replay that reported the level

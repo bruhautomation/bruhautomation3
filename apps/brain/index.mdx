@@ -54,14 +54,15 @@ subscription — or your own API key.
 
 <CardGrid>
   <Card title="It runs Home Assistant" icon="setting">
-    Not just "turn on a light" — **[65 admin services](/brain/power-tools/)** reach the
-    parts of HA that normally live behind the Settings UI, plus **71 native tools** and a
+    Not just "turn on a light" — **[69 admin services](/brain/power-tools/)** reach the
+    parts of HA that normally live behind the Settings UI, plus **89 native tools** and a
     real shell in `/config`. [What it can reach →](/brain/how-brain-controls-ha/)
   </Card>
   <Card title="It finds what's broken" icon="magnifier">
     A dying battery, a sensor that stopped reporting three weeks ago, an automation
-    whose trigger can never fire. Press **Fix it**, read the plan, and it makes the
-    change. [Findings →](/brain/findings/)
+    whose trigger can never fire. Press **Fix it** and it shows exactly what it would
+    change; press **Apply** and it does — with an **Undo** on the card.
+    [Findings →](/brain/findings/)
   </Card>
   <Card title="It remembers your house" icon="open-book">
     One plain-markdown document of durable facts — nicknames, rhythms, the devices
@@ -74,21 +75,34 @@ subscription — or your own API key.
     in a sentence, **Share** it as a picture or onto a dashboard.
     [Insights →](/brain/insights/)
   </Card>
-  <Card title="It runs your ESPHome and Music Assistant" icon="rocket">
-    Edit, validate and flash ESPHome devices, stream their logs, and clear out the
-    stale speakers Home Assistant can't delete — from the panel or by asking.
+  <Card title="It tells you about a leak, whatever else is going on" icon="warning">
+    A tripped leak, smoke, CO or gas sensor is a critical card and a phone alert the
+    moment it trips — through quiet hours, with reminders, without waiting for any AI,
+    a sign-in or a usage budget. [Permissions & Safety →](/brain/safety/)
+  </Card>
+  <Card title="It keeps the house in order" icon="list-format">
+    Tidy names and rooms as one table you approve and can undo, an answer to *"should I
+    update tonight?"* that quotes its evidence, an overnight check that names the cause,
+    and a house book you can share. [Upkeep →](/brain/upkeep/)
+  </Card>
+  <Card title="It runs your devices and your other add-ons" icon="rocket">
+    Edit, validate and flash ESPHome devices, clear out stale Music Assistant
+    speakers, and drive BRUH Minecraft, BRUH Print and BRight — *"put Steve in
+    creative"*, *"print a label that says chili"* — all by asking.
     [ESPHome →](/brain/esphome/) · [Music Assistant →](/brain/music-assistant/)
   </Card>
   <Card title="It talks, in a voice you choose" icon="comment-alt">
     Pick brAIn in **Settings → Voice assistants**. Give it a personality, or run
-    several agents with different names and permissions. [Voice →](/brain/voice/)
+    several agents with different names — and each chooses its own reach, from only
+    what you expose to Assist up to everything. [Voice →](/brain/voice/)
   </Card>
   <Card title="It has a terminal" icon="laptop">
     The real Claude Code CLI with your `/config` in front of it, as a chat or as a
     true terminal — one button between them. Several conversations stay open at
     once and switching stops nothing, so one left mid-answer is finished when you
-    come back. Permission asks arrive as cards in the chat, it picks its own
-    model, and conversations delete with an Undo. [Terminal →](/brain/terminal/)
+    come back. Permission asks arrive as cards in the chat — or turn on **Let brAIn
+    act without asking** and it stops asking — and it never asks you to `chown` a
+    file. [Terminal →](/brain/terminal/)
   </Card>
   <Card title="It works from automations" icon="puzzle">
     `brain.run_task` for background jobs, scheduled insight reports rendered to
@@ -114,6 +128,9 @@ for the registry, and a shell for everything that is still a YAML file.
 - **Devices and entities** — rename either, change an `entity_id`, hide, unhide, enable,
   disable. Find references to things that no longer exist and clean them up — dry-run
   first, so you see the list before anything goes.
+- **What a device shows as** — a contact sensor as a door, a cover as a garage door, a
+  smart plug running a fan or a lamp as a fan or a light, a sensor in °F with one decimal.
+  [Show as →](/brain/power-tools/entities/#what-a-device-shows-as)
 - **Dashboards** — read, create, rewrite, restore a previous version. It can build a
   dashboard from a sentence.
 - **Automations, scripts and scenes** — it edits the YAML, validates it, reloads the
@@ -136,7 +153,8 @@ day it started — and what would resolve it.
 ![The Findings tab, headed "What's waiting on you", with a "Back door battery has reported nothing since 26 July" card and a "Two loft sensors never rejoined after the Zigbee channel change" card, each with the evidence, a "How you'd fix it" box, and the buttons Add to list, Dismiss and Not a problem](./images/panel-findings.webp)
 
 Every card takes the same row of answers: **Fix it** (where software can — brAIn shows you
-the plan first and changes nothing until you press **Apply**), **Add to list**, **Dismiss**
+exactly what it will change and changes nothing until you press **Apply**, and the card
+keeps an **Undo** afterwards), **Add to list**, **Dismiss**
 for "not now", and **Not a problem** for "you've got this wrong" — with a box for why,
 which is the half that teaches. *"That sensor always reads on, it's not stuck"* becomes a
 standing fact about your house, so the next run doesn't make the same mistake in new words.
@@ -163,6 +181,15 @@ with a pattern it found:
   from what each bulb in that room can actually be told, shown as swatches before you say yes.
   Accept them and brAIn offers the schedule that moves between them, using the times it has
   measured for when your house gets up and settles.
+
+## It tells you about a leak, whatever else is going on
+
+A tripped **leak, smoke, carbon monoxide or gas** sensor is filed as a critical card naming
+the sensor and the time, and sent to your phone straight away — through quiet hours, with
+reminders behind it — without waiting for any AI to look at it, and without needing a Claude
+sign-in, the automatic switch or any usage budget. With no notification service set, it lands
+in Home Assistant's own notifications. Every trip is its own alert. [Permissions &
+Safety →](/brain/safety/)
 
 ## It acts, twice, and only because you said so
 
@@ -211,16 +238,19 @@ What makes this different from running Claude Code on a regular machine:
 - **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your
   usage; an API key works too. One login covers the panel, the terminal, voice,
   insights and memory.
-- **[71 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
-  history and statistics, registries, dashboards, traces, templates, logs, reloads, what
-  brAIn has measured about your house, ESPHome and Music Assistant.
+- **[89 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
+  history and statistics, registries, dashboards, live automation traces, templates, logs,
+  reloads, what a device shows as, what brAIn has measured about your house, ESPHome, Music
+  Assistant, BRUH Minecraft, BRUH Print and BRight.
 - **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of
   your install that Claude reads at the start of each session.
 - **Usage-limit sensors** — the same session and weekly utilisation as claude.ai, as HA
   sensors with reset times, plus a budget that pauses *scheduled* work before it eats
   your week. Manual presses are never blocked.
-- **Safe by default** — voice agents get HA tools but no shell, file or web access;
-  per-agent blocked-service lists; a non-root sandbox behind an AppArmor profile
+- **Safe by default** — a voice agent reaches only what you expose to Assist unless you
+  widen it, and new agents start with the administration services blocked; the terminal
+  and the chat ask before acting unless you say otherwise, behind an action gate that
+  decides from your own words; protected entities hold on every face; a non-root sandbox behind an AppArmor profile
   (**6/6** on the add-on store's security rating); the terminal port ships
   unpublished *and* password-protected; `backup_exclude` keeps the Claude
   credential out of HA backups; `secrets.yaml` is never snapshotted and never

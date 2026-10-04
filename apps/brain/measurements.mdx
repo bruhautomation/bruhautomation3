@@ -21,11 +21,11 @@ turn — it is arithmetic over history Home Assistant already keeps.
 
 | Engine | The question it answers | Needs |
 | --- | --- | --- |
-| **Baselines** | What does this sensor normally read *at this hour of this day of the week*, and how far does it normally stray? | Any sensor with a `state_class` |
+| **Baselines** | What does this sensor normally read *at this hour of this day of the week*, and how far does it normally stray? | A `measurement` sensor whose readings vary |
 | **Closures** | How much of this hour is this door, window, lock or cover normally open? | Doors/windows/locks/covers |
 | **Appliances** | What does this machine's power look like when it is idle, running, and finished? | A power sensor (a smart plug is enough) |
 | **Rhythm** | When does this house actually get up, and when does it settle? | The action miner |
-| **Thermal** | How fast does each room lose heat, and how fast can anything put it back? | One outdoor thermometer + indoor ones in areas |
+| **Thermal** | How fast does each room lose heat, and how fast can anything put it back? | One outdoor thermometer + indoor ones in areas ([how the outdoor one is chosen](/brain/climate/#the-outdoor-thermometer)) |
 
 The first pass runs overnight. Most engines want about a month of history before they will
 answer at all, and every one of them says *"not measured yet"* rather than guessing.
@@ -38,6 +38,14 @@ two together and produces a "normal" that is wrong on all seven days rather than
 The buckets are in **your** timezone, not UTC — a baseline built in the wrong timezone is
 your evening filed as your morning, and from the outside it looks exactly like one that
 works.
+
+## Only sensors it can use take a place
+
+The nightly pass reads at most **400 sensors**. Only sensors whose readings vary, and that
+are not settings-page sensors (signal strength, uptime), take one of those places — so a big
+house's upstairs thermometers and water flow are not crowded out by energy totals that could
+never have a baseline anyway. If the limit still leaves some out, the Knowledge tab and
+⚙ → Diagnostics say how many.
 
 ## Spread is a median, not an average
 
@@ -60,8 +68,8 @@ floors:
   bar is higher than the number sounds.
 - **Nine spreads** when the answer came from the sensor's whole history rather than from
   this specific hour — a weaker measurement gets a higher bar.
-- **A minimum absolute move.** Six spreads of a band 0.02 wide is 0.12 °C, which is not
-  news.
+- **A minimum move in the sensor's own unit** — 20 W, 2%, half a degree. Six spreads of a
+  band 0.02 wide is 0.12 °C, which is not news.
 - **A cap.** More than a handful of rows at once means the *baseline* has stopped
   describing the house — a heating season starting, a meter replaced — so it says nothing
   at all rather than reporting the measurement.
@@ -121,6 +129,11 @@ That quiet phase is measured too: the gaps between draws fall into two groups �
 inside a cycle, idles between them — and **the jump between the groups is the machine's own
 answer** to how long its quiet phases last.
 
+The "running" level is read from the times the machine is **actually running**, not from the
+whole ten days, so a washer or dryer used a few times a week is recognised. On a house with
+more power sensors than the nightly limit, washers, dryers and dishwashers are measured
+first, and the Knowledge tab says how many sensors were left out.
+
 :::caution[It cannot see that you emptied it]
 An empty machine and a full one draw exactly the same watts. So the chore ends the way any
 finding does — tick it off in the To-do app, press the notification button, or press it in
@@ -137,6 +150,12 @@ and **the first change caused by a person is the house waking up** — not a mot
 (it fires for the cat and for the heating), not a light (an automation does that at dawn),
 but somebody actually doing something.
 
+**A day runs from 04:00 to 04:00**, so a household that goes to bed at 00:40 is measured as
+settling at 00:40 *that night* — not as waking at 00:40 and settling at 22:00, which is what a
+calendar day made of it. The morning brief, the bedtime door check and overnight repairs all
+read this, so a late night used to put them at the wrong ends of the night. A **voice
+command** counts as somebody being up, just as a press of a switch does.
+
 Weekdays and weekends are measured **apart**, because one number over both is wrong on all
 seven days. That costs time: a weekend accrues two days a week, so it takes about five
 weeks to exist. From the outside that looks like a bug; it is the floor doing its job.
@@ -147,11 +166,67 @@ straight median of **12:00** — not a small error, the opposite side of the day
 here is measured around the clock.
 :::
 
+## What the house is doing right now
+
+The measurements above are about what is *normal*. One more reading is about *now*. Every few
+minutes brAIn puts together what it can see — who is home, which rooms have recent motion,
+media or lights on, which doors are open when they usually are not, what is running, the
+weather, and today's event on any calendar you chose. When that picture changes, a quick look
+turns it into a **mode** and one sentence, shown at the top of the Findings feed:
+
+> Home, settled for the evening — the lounge and kitchen in use, the dishwasher running.
+
+The modes are `home`, `away`, `asleep` (settled for the night), `waking`, `guests` and
+`unknown`. Every number and every device the sentence names has to be in what brAIn could
+see, or the previous sentence is kept and labelled **earlier**. *Away* needs somebody's
+presence to say nobody is home, and anything brAIn could not refresh reads `unknown` — never
+"nobody's home". It never says anything about anybody's body, health or sleep.
+
+:::caution[The mode is context, never a switch]
+A wrong *away* cannot make a leak alarm or a protected device any less important.
+:::
+
+The same reading is **`sensor.brain_house`**. Its state is the mode, and its attributes are
+`sentence`, `rooms_in_use`, `unusual_together`, `because`, `coming_up` and
+`published_age_minutes`, plus a `reason` whenever the state is `unknown`. It never goes
+unavailable: a reading that stopped being refreshed reads `unknown`, judged by the age of the
+file, so an automation keyed on it is never acting on how the house looked an hour ago.
+
+```yaml
+trigger:
+  - trigger: state
+    entity_id: sensor.brain_house
+    to: away
+    for: "00:15:00"
+action:
+  - action: climate.set_preset_mode
+    target: { entity_id: climate.hall }
+    data: { preset_mode: away }
+```
+
+Treat `unknown` as "do nothing" — it is the honest answer whenever brAIn cannot tell.
+
+### What is coming up
+
+Twice a day brAIn reads the next three days of your weather forecast. A frost (0 °C or
+below), a hot day (30 °C or above), a day with 10 mm of rain or more, and gusts of 60 km/h or
+more each become a short note — worked out with arithmetic, not a model.
+
+**Calendars brAIn may read**, under the line on the Findings feed, lists your calendars with
+none ticked. Nothing is read until you tick one. A ticked calendar's next three days are read
+too, and the notable events become notes like *"Mum staying Fri–Sun"*. What a calendar says is
+treated as information, never as an instruction.
+
+Every note is kept as a fact that **expires when the occasion is over**, and is offered to the
+Resident's first look and to the house's sentence. Nothing here changes the house.
+
 ## Where to see it
 
 - **⚙ → Diagnostics** shows what has been measured and when, for every engine — including
   the ones that could not run, and why.
-- `GET /api/baselines` and `GET /api/appliances` return the measurements themselves.
+- `GET /api/baselines` and `GET /api/appliances` return the measurements themselves;
+  `GET /api/situation` and `GET /api/occasions` return the house's reading and the notes
+  about what is coming up.
 - `brain doctor` reports the same from the terminal.
 
 A measurement that has stopped is itself a finding: `base.stale` exists because every

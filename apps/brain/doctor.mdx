@@ -3,11 +3,6 @@ title: Deep Check & Rehearsal
 description: brain doctor asks whether the plumbing is connected. --deep asks whether each face of brAIn works right now, by doing the thing. --rehearse plants a few defects in your own house, scores the checks and the analyst against them, and takes everything back out.
 ---
 
-:::note[Requires brAIn 1.47]
-This page documents a release that is on its way. Everything below is built and tested; it
-is not in the current add-on yet.
-:::
-
 A token is present. The MCP server completes a handshake. The panel answers. A daemon has a
 pid. Every one of those can be true while the thing you actually use is broken — a credential
 that stopped working on a Tuesday afternoon, a listener holding a folder open with nothing
@@ -40,7 +35,7 @@ that names the switch or the log to look at when it breaks.
 | **Chat session** | Opens a session of its own, sends one message, closes it | The streaming session spawns, speaks and ends a turn |
 | **Automation listener** | Writes a task in the integration's own wire format | The listener is alive, it claims the task by renaming it inside the grace window, and a result comes back |
 | **Assist** | A `conversation/process` turn with brAIn's own agent id | The worker pool answers through Home Assistant's front door, not just its own health endpoint |
-| **Memory** | Queues a fact, consolidates, then takes it out again | A fact reaches `memory.md`, and can be removed |
+| **Memory** | Queues a fact, consolidates, then takes it out again | A fact reaches `memory.md`, and can be removed — from the document and from the facts store underneath it |
 | **Findings and undo** | Files a finding, ends it, undoes it, ends it for good | The store, the settled ledger, the memory line and the undo token all round-trip |
 | **Fixer** | One real fix run renaming a `brain_test_` helper | The one path that can change your house can, and it puts it back |
 
@@ -71,7 +66,7 @@ somebody else's conversation to make room for itself.
 ### What it creates, and takes back
 
 Everything: the synthetic fact, the synthetic finding, the helper. And **the cleanup is
-verified** — the fact is not in `memory.md` afterwards, the finding is in neither the store
+verified** — the fact is not in `memory.md` or the facts store afterwards, the finding is in neither the store
 nor the settled ledger, the helper is gone. A leftover is reported as a **failure of the
 stage that left it**, not as a footnote.
 
@@ -82,10 +77,8 @@ counted: the runs claim their own `doctor` source before they start, so a probe 
 up in your Chats rail as a conversation somebody had, and the tokens go through the usage
 store, so the topbar pill moves and its popover attributes the movement.
 
-It rides the same generation queue a *Fix it* run does, because one Claude invocation in
-flight across the whole add-on is what keeps a subscription's rate limit intact. A second
-press while one is going watches the run that is already going rather than starting a
-second.
+A second press while one is going watches the run that is already going rather than starting
+a second.
 
 :::caution[It never runs on its own]
 There is no option that schedules a deep check and no timer anywhere. It spends real turns,
@@ -195,8 +188,14 @@ And the free `brain doctor` is what catches the one that could not:
 
 > *a rehearsal left something behind: /config/automations.yaml, input_number.brain_test_reading*
 >
-> *Fix: run `brain doctor --rehearse` again (its cleanup runs first), or delete the
-> `brain_test_*` entries from /config/automations.yaml and reload automations*
+> *Fix: run `brain doctor --sweep`, or press **Clear up what was left** in ⚙ → Diagnostics*
+
+**One press takes it out.** While there is anything to clear, ⚙ → Diagnostics shows a
+**Clear up what was left** button, and `brain doctor --sweep` does the same from the
+terminal. It creates nothing, asks no model and spends nothing — it only ever removes what is
+already named `brain_test_*` — so it needs no consent step. Afterwards the report stops saying
+*left something behind*, while the record of the run that failed to clean up is kept beside
+it.
 
 It reads the files rather than Core where it can, because a doctor line that only works when
 everything else does is a line that is absent exactly when it matters. It is deliberately
@@ -210,6 +209,7 @@ mean something.
 brain doctor --rehearse            # shows what it would create, then asks
 brain doctor --rehearse --yes      # skip the question
 brain doctor --rehearse --json     # the whole object
+brain doctor --sweep               # take out anything a rehearsal left behind
 ```
 
 Or **⚙ Settings → Diagnostics → Rehearse…**.
@@ -220,8 +220,8 @@ Or **⚙ Settings → Diagnostics → Rehearse…**.
   and verdict of its own last run.
 - **`/api/diagnostics`** — when the last deep run was, what it decided and which stage broke;
   the last rehearsal's scores and cleanup line. Never a transcript, never a prompt.
-- **`brain report`** — bundles that payload, `brain doctor --json` and the tail of the add-on
-  log into one redacted archive under `/share/brain/reports/`.
+- **`brain report`** — writes that payload, `brain doctor --json` and the tail of the add-on
+  log into one redacted plain-text file under `/share/brain/reports/`.
 - **Home Assistant's own Download diagnostics button** on the brAIn integration, which is the
   same payload.
 

@@ -376,6 +376,7 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
+								{ label: 'Permissions & Safety', slug: 'brain/safety' },
 								// The panel's own panes, grouped the way the panel's
 								// four tabs group them (Home, Ask, House), in the
 								// order they sit there.
@@ -389,8 +390,7 @@ export default defineConfig({
 										{ label: 'Chat & Terminal', slug: 'brain/terminal' },
 										{ label: 'Memory & Learning', slug: 'brain/memory' },
 										{ label: 'Activity', slug: 'brain/activity' },
-										{ label: 'ESPHome', slug: 'brain/esphome' },
-										{ label: 'Music Assistant', slug: 'brain/music-assistant' },
+										{ label: 'Upkeep', slug: 'brain/upkeep' },
 									],
 								},
 								// What brAIn works out about this particular house, and
@@ -415,6 +415,10 @@ export default defineConfig({
 									items: [
 										{ label: 'Voice Assistant', slug: 'brain/voice' },
 										{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
+										// No panel tab of their own since 2.10: both are
+										// reached by asking, through the same tools.
+										{ label: 'ESPHome', slug: 'brain/esphome' },
+										{ label: 'Music Assistant', slug: 'brain/music-assistant' },
 									],
 								},
 								{

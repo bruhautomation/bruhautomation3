@@ -1,0 +1,327 @@
+---
+title: Permissions & Safety
+description: What brAIn may do in your house without asking, what always asks, what is refused whatever anyone says, and how to put a change back.
+---
+
+brAIn has real authority over Home Assistant: `/config` read-write, admin access to the
+Home Assistant API, and a shell. That is the point of it. This page is the one place that
+says where the edges are — what it does on its own, what it asks you about first, what it
+refuses whatever anyone says, and how to take a change back.
+
+The short version:
+
+- **Reading is never asked about.** Looking at states, history, logs and your YAML is free.
+- **Changing something asks first**, in the terminal and the chat, unless you turn on
+  [Let brAIn act without asking](#let-brain-act-without-asking).
+- **Nothing on a schedule can act on your house.** Cards, the morning brief, the weekly
+  report and study sessions read only. The things that act all need a press —
+  [Fix it](#fix-it-shows-the-change-first), accepting a proposal — or are off by default
+  (overnight self-healing).
+- **A few lines are never crossed**, by anything: your
+  [protected entities](#protected-entities), the [tripwire](#the-tripwire), your
+  [house rules](#house-rules).
+- **What it changed can be put back** — files with `brain undo`, a fix with **Undo the
+  fix** and **Put them back**.
+
+## Let brAIn act without asking
+
+By default the terminal and the chat **ask** before Claude runs a command, edits a file
+or changes something in Home Assistant. Only reading is pre-approved.
+
+One switch stops the asking: **Let brAIn act without asking**. It is on the add-on's
+**Configuration** tab and in the panel under **⚙ → Terminal & chat**, and they are the
+same switch — flip it in either place and the other follows. It is **off** by default.
+(If you set this before 2.11, nothing about your setting changed: the option's key is still
+`dangerously_skip_permissions`, only its label is new.)
+
+**It reaches three things:** the classic terminal, the chat, and — in those two — the
+[action gate](#the-action-gate), which stops asking its own model what you meant. It
+never reaches voice, insight cards, automation tasks, study sessions or a Fix it run.
+Those keep their own rules whatever the switch says.
+
+**No restart.** A new terminal session and the chat's next message pick the change up. A
+chat that is in the middle of an answer finishes it under the old setting first.
+
+:::caution[An open terminal session keeps the setting it started with]
+Reopening the Terminal tab goes back to the same session, so a change reaches the classic
+terminal only when that session ends — in both directions. The line under the switch in
+⚙, and the message after you flip it, say when an open terminal session is still acting
+without asking (or still asking). Type `/exit` in it to start a fresh one under the new
+setting.
+
+If you turn the switch **off** and a terminal session started with it on is still running,
+the next house checks file a finding saying so. That is the only card the switch ever
+produces: turning it **on** is a choice with its own label, and brAIn does not nag you
+about a choice you made on purpose. (The weekly access summary still mentions it.)
+:::
+
+**It fails closed.** If brAIn cannot read the setting, the terminal asks. A garbled or
+unreadable setting counts as "ask", never as "go ahead". If Home Assistant refuses to save
+**on**, ⚙ says brAIn is still asking and the switch goes back off. If it refuses to save
+**off**, brAIn stops acting without asking anyway, and tells you the Configuration tab
+could not be updated.
+
+### What still decides with it on
+
+- **Protected entities** are refused by every Home Assistant tool, and so are a service
+  call typed as a shell command and a YAML edit that names one.
+- **brAIn's own deny-list** — the tools no brAIn session may use — still applies.
+- **The action gate's floors and your house rules** still decide. Only its model check
+  is skipped.
+- **Discuss** conversations still ask before every change (see
+  [below](#discuss-always-asks)).
+- **Edits made with Claude's file tools** can still be undone with `brain undo`.
+
+### What it does not cover
+
+With the switch on, Claude runs shell commands without asking. brAIn catches the obvious
+shell routes to a protected entity, but a command that reaches one some other way — a
+script written to a file and run later, say — is not checked. And `brain undo` can only put
+back changes made through Claude's file tools; a change a shell command made has no
+snapshot.
+
+If either of those matters to you, leave the switch off. That is what it is for.
+
+## The approval card
+
+With the switch off, a change shows up in the chat as a card: what tool, aimed at what,
+**Allow once** or **Don't allow**. An unanswered card declines itself after ten minutes,
+and a "no" renders amber as *Not permitted* — never as a crash. In the classic terminal
+it is Claude Code's own prompt.
+
+Two more buttons appear when they mean something:
+
+- **Always allow** — offered when Claude Code suggests a rule for the command it is
+  asking about. The line under it says exactly what is added and how long it lasts:
+  either the rest of this conversation, or the terminal and every chat **until the add-on
+  restarts**. brAIn only ever offers rules that allow something and that end with the
+  add-on; nothing you press here outlives a restart.
+- **Stop asking…** — takes you to the switch in ⚙, rather than flipping it from a card about
+  one command. The dialog is where what stays guarded is written down.
+
+If a conversation is waiting on a card while you are looking at a different one, its row
+in the list says **Needs your OK**, and the chat you are in raises a toast with a button
+that takes you there. See [Chat & Terminal](/brain/terminal/#asking-before-acting).
+
+## Discuss always asks
+
+**Discuss** on a finding opens a new conversation about it. In that conversation Claude
+can read anything, but every service call, file edit or shell command shows a permission
+card first — **even with Let brAIn act without asking on**. That is a rule the conversation
+starts under, not a sentence in its prompt, and its cards offer neither *Always allow* nor
+*Stop asking…*, because a standing rule is the wrong answer inside a conversation whose
+whole contract is "ask before every change".
+
+When you and Claude agree what to change, it can offer that change as a button. Pressing
+it does not make the change: brAIn plans exactly that change, read-only, and puts the plan
+on the card for you to [Apply](#fix-it-shows-the-change-first). See
+[Findings](/brain/findings/).
+
+## The action gate
+
+Before brAIn acts on your house from the chat, the terminal, an automation task or a fix,
+a gate checks the action against what you asked for. It looks at three things:
+
+- **your own words** in the conversation;
+- **the action** itself;
+- **what the action would reach**, worked out in code from Home Assistant's own
+  registries — through scenes, scripts, rooms and devices.
+
+It never sees anything brAIn read on the way. Text planted in a device name, a calendar
+entry, a media title or a web page cannot argue it into anything, because the gate is
+never shown it. (That text reaches Claude marked as data, not instructions, too.)
+
+It decides in this order, and each step can only make it stricter:
+
+1. **The floors** — the [tripwire](#the-tripwire), your
+   [protected entities](#protected-entities), and a voice agent's exposure limits. These
+   refuse outright, in code.
+2. **Your [house rules](#house-rules)** — only ever tighter.
+3. **A fix's contract** — during a Fix it run, only the service calls and files the plan
+   you approved are allowed (see [below](#fix-it-shows-the-change-first)).
+4. **The obvious case** — one light, fan, blind or thermostat in the room you named goes
+   straight through, with no model.
+5. **The switch** — with *Let brAIn act without asking* on, an action from the chat or the
+   terminal that got this far goes through.
+6. **A cheap judgement** — anything else is asked of a small, fast model: does this match
+   what the person actually said? Its answer is allow, ask or deny, and anything else is
+   "ask".
+
+**Unreachable never means allow.** If the gate cannot be reached, or cannot make up its
+mind, you are asked in the chat or the terminal — and anywhere nobody is watching (an
+automation task, a fix), the action is refused.
+
+Voice agents at the default **Voice assistant** level are not sent to the gate: they
+already run under narrower limits (below), and a voice turn cannot wait for a second
+model. That also means house rules do not reach those agents.
+
+## Protected entities
+
+`protected_entities` is the line brAIn may not cross. Put the front door lock, the alarm
+and the garage door on it — one entity id per line, or a whole domain like
+`alarm_control_panel.*` — and they can still be **looked at**, but never **acted on**, from
+any face: the terminal, the chat, Fix it, voice, automation tasks, overnight self-healing,
+and anything brAIn writes into `automations.yaml` or `scenes.yaml`.
+
+It is enforced where every Home Assistant call brAIn makes passes through, not in a
+prompt, and it is thorough about the indirect routes:
+
+- an **area or device** target that contains a protected entity is refused, and a label
+  or floor target is refused outright while the list is set;
+- a **scene, script or automation** is checked by what it contains — running one that
+  reaches a protected entity is refused (one that only touches the hall light is fine,
+  even if the front door lock is in the same room);
+- a protected entity named **anywhere in a request** — inside a scene's entity map, as a
+  script variable — counts;
+- a switch shown as something else counts as protected if either the switch or the entity
+  standing in for it is on the list;
+- `fire_event` is refused while the list is set, because which automations an event
+  triggers cannot be checked.
+
+**A shell has a second, narrower gate.** A command line cannot be checked for its targets,
+so while the list is set brAIn refuses a Home Assistant service call typed as a shell
+command (`ha service call`, a `curl` to the services API, a WebSocket `call_service`) and a
+YAML edit that names a protected entity, and points Claude at the Home Assistant tool that
+*can* be checked. Something subtler — a script written to a file and run later — is Claude
+keeping a rule it has been told rather than a gate enforcing it, which is one more reason
+the [switch](#let-brain-act-without-asking) is off by default.
+
+## The tripwire
+
+**⚙ → Advanced → Diagnostics → Changes and the action gate → Make a tripwire entity**
+creates `input_boolean.brain_honeytoken` — a switch you never ask brAIn to touch. Nothing in
+the house uses it, and brAIn is never told about it.
+
+If anything ever tries to act on it, the action is refused before it reaches Home
+Assistant, and a security card is filed and sent to your phone straight away, naming the
+conversation that asked. A tripped tripwire means something was talked into trying — which
+is exactly what you want to hear about.
+
+## House rules
+
+In the same place, **Write house rules** takes up to ten rules in your own words:
+
+> *Never turn the heating above 23.*
+>
+> *Don't open the garage after 22:00.*
+
+Each one is turned into a precise check once, when you save it, and from then on every
+action the gate sees is checked against it with no model involved. A rule can only make
+brAIn **more** careful, never less. One brAIn could not understand is listed as such, so you
+can reword it.
+
+## Voice agents
+
+Each brAIn voice agent has its own reach, set under **Settings → Devices & services →
+brAIn → the agent → Configure → What this agent can reach**:
+
+| Level | Sees | Can use |
+| --- | --- | --- |
+| **Voice assistant** (new agents) | Only what you expose to Assist | Home Assistant tools only, on those entities' own services |
+| **Whole house** | Every entity | Home Assistant tools only |
+| **Full admin** | Every entity | Everything the chat can: shell, file edits, config |
+
+A **Voice assistant** agent cannot restart Home Assistant, install an update, take a
+backup, create a user or use brAIn's registry tools — anything that names no entity or
+administers the house needs a wider agent. A non-admin Home Assistant user talking to a
+wider agent is answered at the voice-assistant level.
+
+On top of the level, every agent has its own **Blocked services** list. New agents start
+with the administration services already ticked — restart and stop, host reboot and
+shutdown, `update.install`, `recorder.purge`, `shell_command.*`, `backup.create` and the
+`brain.*` registry tools. Untick any of them for an agent only you talk to. The list is
+checked against what a call *does*, so `homeassistant.turn_on` aimed at a garage door is a
+cover call. See [Voice](/brain/voice/).
+
+## Cameras
+
+A camera frame is the most private thing your house holds, so brAIn looks through one on
+its own only through the cameras you tick under **⚙ → Generation defaults → Cameras**. None
+are ticked to begin with.
+
+- At most **a dozen looks a day** across the house, counted on disk; the list shows how many
+  have been used. If brAIn cannot count, it does not look.
+- The Resident looks only to **confirm** a tripped leak, smoke, CO or gas sensor, or a door,
+  window or lock — using a ticked camera in the same room when there is one.
+- A camera you ask about yourself in the chat or the terminal is you looking, and is not
+  held to the list.
+
+## brAIn never asks you to chown
+
+Claude Code runs as its own non-root user, and Home Assistant saves `automations.yaml`,
+`scripts.yaml` and `scenes.yaml` as root, which used to leave them read-only for Claude.
+Other add-ons do the same with their own config. brAIn now hands those files back by
+itself, and Claude is told — in the chat, the terminal and a Fix it run — never to ask you
+for `sudo` or `chown`.
+
+**When it hands files over:**
+
+- **at startup**, for your top-level YAML and the usual config folders: `packages`,
+  `blueprints`, `esphome`, `themes`, `custom_templates`, `python_scripts` and any folder
+  `configuration.yaml` includes with `!include_dir_*`. The startup log says how many files
+  changed hands, and warns if some could not;
+- **right before** Claude edits a file it cannot write, or runs a shell command that names
+  one;
+- **about once a minute**, for the top-level YAML Home Assistant's editors rewrite, and for
+  each add-on's own folder under `/addon_configs` — so an add-on you install later is
+  covered.
+
+**Which folders:** `/config`, plus `/addon_configs`, `/share`, `/media` and `/addons` while
+the add-on's access option for each is on. A file somebody made read-only — a Samba copy, a
+restored backup — is made writable for Claude too, not just handed over. Files brAIn's
+panel creates in those folders take the folder's owner, so Claude can edit them in place.
+
+**What it never touches:** anything outside those folders, `.storage`, `.cloud`, brAIn's own
+saved credentials, `secrets.yaml`, the recorder database, or a file with other hard links. A
+symbolic link is answered for the file it points at, which has to pass the same checks.
+
+**If it still happens** — usually a command writing to a path held in a variable, which brAIn
+cannot see — run this in the terminal, or ask Claude to:
+
+```bash
+brain own /config/scenes.yaml      # one file
+brain own -r /config/packages      # a whole folder
+```
+
+It raises no approval card and needs no `sudo`. If it says the panel is not answering, the
+add-on is not running; `brain doctor` checks that. See [the CLI](/brain/cli/).
+
+## Fix it shows the change first
+
+**Fix it** on a finding never changes anything straight away. It buys a **plan**: a
+read-only look at the entity, its history and the automation involved, which comes back as
+a list of exact steps. The steps are written out by the code that will carry them out, not
+by Claude, so what you approve is what runs. A change to an automation shows the exact
+lines that change in `automations.yaml`, and how often the old and new versions would have
+run over the last week.
+
+- **Apply** carries out exactly those steps. Most of them — changing one automation,
+  reloading a configuration, calling a service on named devices, renaming, moving to a
+  room — brAIn's panel makes itself, with no model and no shell. It stops at the first one
+  that fails and puts back the edits it had already made.
+- **A step that needs Claude** carries a **contract**: the service calls and files the plan
+  listed, and nothing else. Any other call is refused during that run, any shell command
+  that does more than read is refused, and the one exception is `brain own` on the files
+  the plan edits. A step that cannot say what it will touch is not offered at all.
+- **Cancel** leaves the finding as it was and keeps the plan on the card.
+
+After a fix, brAIn looks again after a day, a week and a month. A problem that comes back
+reopens its card; "could not check" is shown as exactly that, never as success.
+
+## Putting things back
+
+| What changed | How to put it back |
+| --- | --- |
+| A file Claude edited under `/config` | `brain undo` in the terminal — one edit, or everything from today. `secrets.yaml` is never snapshotted. |
+| A fix's file changes | **Undo the fix** on its card — puts back every file and reloads Home Assistant. |
+| A fix's service calls | **Put them back** on its card — sets each device back to how brAIn recorded it just before the fix, reads it again, and says per device whether it is back. |
+| A finding you ended by mistake | **Undo** in the toast, for a few minutes. |
+| An accepted proposal | **Undo** in the toast, or `brain undo`. |
+
+**Put them back** is a press, never something brAIn does by itself, and it never unlocks a
+lock, disarms an alarm, opens a garage, door or gate, or touches a protected entity — it
+says so for each one it skips. **Undo the fix** lists the service calls rather than
+reversing them, because undoing a call is acting on your house a second time.
+
+For the house as a whole, use Home Assistant's own backups. brAIn deliberately does not
+duplicate them. More on all of this in the [Reference](/brain/reference/).

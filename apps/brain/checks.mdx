@@ -1,6 +1,6 @@
 ---
 title: House Checks
-description: Deterministic checks that find what is broken in your house without spending a token — and clear themselves when it is fixed. Around thirty rules over your automations, devices, registry, dashboards and the machine underneath.
+description: Deterministic checks that find what is broken in your house without spending a token — and clear themselves when it is fixed. Dozens of rules over your automations, devices, registry, access, dashboards and the machine underneath.
 ---
 
 Every finding brAIn filed used to come out of a Claude run. Both the analyst and study
@@ -21,15 +21,69 @@ ledger, and it answers "what do these miss, and which of them matter in this hou
 
 | Family | Examples |
 | --- | --- |
-| **Automations** | A trigger watching an entity that no longer exists; one that can never fire; two rules that undo each other; a rule you keep overriding |
-| **Devices** | Unavailable for a day; a Z-Wave node gone dead; a Zigbee device that has stopped reporting; a reading that is physically impossible |
+| **Automations** | A trigger watching an entity that no longer exists; one that can never fire; a run that errored; one that never gets past its conditions; one still running when it is triggered again; two rules that undo each other; a rule you keep overriding |
+| **Devices** | Unavailable for a day; a Z-Wave node gone dead; a Zigbee device that has stopped reporting; a reading that is physically impossible; a battery to replace (not one you charge) |
 | **Registry** | Entities with no area; a helper nothing uses; a device with no entities; a name that is still a hex string |
-| **System** | An add-on that was meant to be running and is stopped; an integration that failed to set up; a recorder database growing without limit; no backup in a fortnight; disk filling |
+| **System** | An add-on that was meant to be running and is stopped; an integration that failed to set up; a recorder database growing without limit; no backup in a fortnight; disk filling; an update waiting to be installed |
+| **Access** | A lock or alarm panel exposed to Alexa or Google; an add-on with its protection mode off; failed logins that got an address banned; a terminal session still acting without asking after you turned that off |
 | **Forecasts** | A battery with a date on it; a device whose behaviour is declining; storage that will be full |
 | **Baselines** | A reading far outside its own normal; a slow drift the band cannot see |
 | **Bedtime** | Something open that is usually shut at this hour |
 | **Chores** | The washing finished and is still in the machine |
 | **Climate** | [Five of them](/brain/climate/) |
+
+## Rules worth knowing about
+
+- **The trace checks read Home Assistant live.** "Ran and errored", "never gets past its
+  conditions" and "still running when it was triggered again" used to read a file Home
+  Assistant writes only when it shuts down, and looked runs up under the wrong key — so on
+  a real house they never found anything. brAIn now asks Home Assistant for the recent runs
+  of every automation and script, UI-made and package automations included. If Home
+  Assistant will not answer, the three checks say they could not look rather than reporting
+  a clean house. "Never gets past its conditions" also waits until the automation's actions
+  have not run for two weeks, so a night-only motion rule failing its conditions all day is
+  not reported.
+- **A safety automation is never offered for deletion.** "Has not run in 30 days" is what a
+  healthy smoke, leak, CO or gas response looks like. `auto.never_fired` leaves alone any
+  automation watching a smoke, gas, moisture, carbon monoxide or safety sensor, any alarm
+  panel, and anything brAIn wrote itself — including the [emergency
+  playbooks](/brain/playbooks/).
+- **Automations built in the new editor are understood.** Home Assistant 2026.7's "When a
+  light turns on" and "When a door opens" triggers put the device under a target. The
+  "unavailable trigger" check now sees those too, and they can be
+  [replayed](/brain/replay/).
+- **A battery you charge is not a battery to replace.** Phones and tablets from the
+  companion app, robot vacuums and mowers, electric cars, home batteries, UPSs, and anything
+  that reports charging are left out of the low-battery check and the battery forecast, or
+  told to charge rather than replace. Pressing **Not a problem** on a battery card now stops
+  that battery being reported again.
+- **Access checks** (`sec.lock_cloud_voice`, `sec.addon_unprotected`, `sec.login_bans`,
+  `sec.brain_posture`). Each says nothing when it could not look, and **Wrong, because…**
+  stops it for that lock or add-on. Turning *Let brAIn act without asking* **on** files
+  nothing — it's your choice, with its own label; the row is for the case nobody chose, the
+  switch off while a terminal session started with it on is still acting. Once a week brAIn
+  also writes one sentence about who and what can reach the house, shown on
+  [Upkeep](/brain/upkeep/).
+
+## Reading what a device is, in any language
+
+Several checks used to decide what a sensor was from English words in its name: "nozzle"
+meant hot, "washer" meant a chore, "main water" meant a shutoff valve, "dew point" meant
+"not the outdoor temperature". A house that named things in Dutch, in shorthand or after the
+shop it came from got none of it.
+
+Once a night brAIn now reads the names, makes, models and rooms of the devices those checks
+care about and records what each one measures, what it controls, whether its battery is
+charged or replaced, and which way its switch closes. Every answer is checked against a
+closed list before it is kept, and a device is only read again when it changes, is renamed
+or moves. **Anything brAIn is unsure about falls back to the old word list**, so a house
+that read correctly before reads exactly the same — and a `hoofdkraan` now gets into the
+leak playbook.
+
+A reading can make a binary sensor Home Assistant never classified into a safety sensor —
+only when brAIn is very sure — but it can **never** stop a leak, smoke, gas or CO sensor
+being one, and it never touches the protected list. The instant alert when a detector trips
+still keys only on Home Assistant's own device class.
 
 ## Three rules that make them trustworthy
 
@@ -77,8 +131,10 @@ and **nothing is promoted automatically**: moving a check onto the visible list 
 somebody makes reading those numbers. That is what stops a floor that is right in one house
 being tested against everybody else's with a week of **Wrong** presses.
 
-**No check is in shadow in this release** — every one that ships has earned its place. How it
-works, and what its numbers mean: [Capture & the Corpus](/brain/corpus/#shadow-mode).
+`sys.update_pending` is on trial now. The rule cannot be wrong about your house — the
+Supervisor either lists an update or it does not — so what is being measured is whether an
+update belongs on a list of decisions at all. How shadow works, and what its numbers mean:
+[Capture & the Corpus](/brain/corpus/#shadow-mode).
 
 ## Do these rules work on *your* house?
 
@@ -92,12 +148,18 @@ floor.
 
 ## When you hear about them
 
-Findings go through the notification router, which decides **whether**, **when** and **to
-whom** — urgency is declared per producer rather than per finding, because a `critical`
-battery forecast is three weeks out and a `warning` about a boiler that has stopped
-answering is now.
+Findings reach your phone in one of three ways, set by severity **and** urgency — a
+`critical` battery forecast is three weeks out and a `warning` about a boiler that has
+stopped answering is now, so urgency is declared per check rather than per finding:
 
-Quiet hours **hold** rather than drop: anything raised overnight arrives as one message when
-the quiet ends, minus anything that resolved itself while it waited. Being told at seven
-about a problem that went away at four is exactly how these messages stop being about
-anything.
+- **Escalate** — `critical` and urgent (a leak, a freeze, a hub that stopped answering).
+  Sent straight away, quiet hours or not, then repeated three times and no more until
+  somebody answers.
+- **Notify** — at or above `findings_notify_min_severity` (default `critical`). Sent once,
+  and held through quiet hours unless its check says it cannot wait.
+- **Quiet** — everything below the floor. No message, and nothing lost: it is on the
+  Findings feed, in `todo.brain` and in Home Assistant's Repairs.
+
+Quiet hours **hold** rather than drop: anything held overnight arrives when the quiet ends,
+minus anything that resolved itself while it waited. Being told at seven about a problem
+that went away at four is exactly how these messages stop being about anything.

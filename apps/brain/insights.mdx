@@ -44,16 +44,22 @@ Refine and Share shrink to their icons.
 
 ![The same card on a phone in dark mode: the heading and four icon buttons on one row, the title on its own row below, and the number tiles two across](./images/insight-card-phone.webp)
 
-### The ask bar has four verbs
+### The ask bar reads what you meant
 
-Most things you type become a card, but the first words decide:
+Most things you type become a card, but brAIn reads the sentence first and sends it where
+it belongs — and one sentence can go two ways at once:
 
 | You type | What happens |
 | --- | --- |
 | A question — *"why is the garage cold?"* | A card with the answer. |
 | **learn about…**, **study…**, **figure out…** | A study session. brAIn reads that corner of the house for a few minutes and files what it learns in [Memory](/brain/memory/) and [Findings](/brain/findings/). No card. |
 | A rule or a moment — *"whenever the front door opens after dark…"*, *"when the guests leave, turn the porch light off"* | A [rule or a one-off](/brain/intents/), simulated against your history and offered on **Proposals**. Nothing runs until you accept it. |
+| A fact — *"the garage freezer is off in winter"* | Kept in [memory](/brain/memory/). |
+| **why…** — *"why did the porch light come on at 3 am?"*, *"why didn't you tell me the garage was open?"* | Answered right under the bar, in words, with what brAIn read to work it out — including [what it decided not to say](/brain/findings/#why-didnt-brain-tell-me). |
 | **design my evening for the living room** | [Four scene moods](/brain/scenes/) for that room, offered on Proposals. |
+
+If brAIn can't reach Claude at that moment, the bar falls back to deciding by the first
+words, the way it always did.
 
 `brain ask "why is the garage cold"` in the [terminal](/brain/terminal/) is the same engine,
 printed as text instead of a card.
@@ -172,10 +178,26 @@ notices after one restart. The Share dialog tells you when that's needed.
 | **⋯ → Regenerate** | Run the card again now. A card you asked for re-runs in place. |
 | **⋯ → Edit** | Name, icon, analysis focus and schedule. On a card you asked for it's **Rename** — the heading and icon. |
 | **⋯ → Edit tags** | What the card can be filtered by in the chip row above the cards. |
+| **⋯ → Make this an automation** | Puts the automation the card suggests — or just "When " — into the ask bar for you to finish and send. It never sends from the menu. |
+| **⋯ → See the automation it suggested** | Once a suggestion from this card is waiting on Proposals. |
 | **⋯ → Delete** | The card and its history. |
 
 **＋ Make recurring** in the foot of a card you asked turns it into a scheduled card that
 refreshes on its own.
+
+## A card can suggest an automation
+
+When a card points at an automation your house clearly lacks — *"the hall light is left on
+most nights after everyone's upstairs"* — brAIn drafts it, replays it against your recorder
+and offers it on **[Proposals](/brain/proposals/)**, exactly as if you had typed the
+sentence into the ask bar. Nothing is written until you accept it there, and the automation
+it makes carries a description saying an insight card suggested it.
+
+Each suggestion stays listed on the card, saying whether it reached Proposals and why, so a
+suggestion that went nowhere doesn't look the same as one waiting for you. Because this
+runs without you pressing anything, it follows the rules of every scheduled run — a
+sign-in, automatic insights on and budget left — and it's limited to two suggestions per
+card and four a day. A card never re-offers what it suggested last time.
 
 ## Where cards come from
 
@@ -183,9 +205,14 @@ A fresh install has **no cards**, deliberately — a generic card about a house 
 never looked at is noise on every run. Instead:
 
 1. **brAIn studies the home first** — naming and areas, occupancy, energy, climate, device
-   reliability — and files what it finds in [memory](/brain/memory/).
+   reliability — and files what it finds in [memory](/brain/memory/). The screen lists what
+   each study session learns as it lands (*"The garage freezer is on a smart plug"*), not
+   just a progress bar.
 2. **It proposes cards** grounded in what it found, each with the evidence that made it
-   think so. **You pick**; nothing generates until you do.
+   think so — and it waits until the study has actually found something before it does.
+   **You pick**; nothing generates until you do. It may also suggest **one automation to
+   try**, written as a sentence from something it saw you do; ticking it starts a
+   week-long trial on [Proposals](/brain/proposals/) and writes nothing to your house.
 3. **Later, [Ideas](/brain/ideas/) keeps proposing.** A house that grows a heat pump or a
    solar array gets suggestions for cards it's now missing — costing nothing until you take
    one.
@@ -200,17 +227,25 @@ For every card and every question, brAIn:
 
 1. **Looks up what the card needs** rather than being handed the whole house. Claude gets a
    *map* of your home — how many entities of each kind, which areas they're in — plus
-   memory and **read-only** Home Assistant tools, and fetches the rows, history and
-   long-term statistics the question needs. If that search fails, it falls back to one
-   slimmed snapshot of the house, so a card always appears.
-2. **Draws it with a fixed design system** — one palette, one y-axis per chart, reserved
+   **read-only** Home Assistant tools, and fetches the rows, history and long-term
+   statistics the question needs. If that search fails, it falls back to one slimmed
+   snapshot of the house, so a card always appears — unless it failed because of your
+   sign-in, a usage limit or an overloaded service, where the snapshot would fail the same
+   way.
+2. **Is handed the memory that matters** — the facts about the rooms and devices the card
+   reads and its own kind of thing, with facts that share words with your question first,
+   rather than the whole memory document. It can look memory up itself too. Free text from
+   your house (media titles, calendar entries, notification bodies) reaches it marked as
+   data, never as instructions.
+3. **Draws it with a fixed design system** — one palette, one y-axis per chart, reserved
    status colours, light and dark mode, and a layout that works from a phone to a desktop.
-3. **Stores the result** and shows the chart in a sandboxed frame that cannot touch your
+4. **Stores the result** and shows the chart in a sandboxed frame that cannot touch your
    Home Assistant session.
 
-**Nothing on this path can change your house.** An insight run holds reading tools only.
-The one path that changes anything is a [finding's](/brain/findings/) **Fix it**, which a
-person presses.
+**Nothing on this path can change your house.** An insight run holds reading tools only,
+and an automation a card suggests is only *offered*, on Proposals. The one path from a
+model to a change is a [finding's](/brain/findings/) **Fix it** — a plan you read and an
+**Apply** a person presses. See [Permissions & safety](/brain/safety/).
 
 A card that declares **live** entities keeps those readings current while it's on screen —
 the foot says *"3 readings live · just now"*, and the prose above it is labelled
@@ -221,13 +256,39 @@ from now.
 
 - **Per-card schedules** — an interval, or fixed daily times (`07:00, 19:00`). Fixed times
   cost far less than a short interval. `0` means manual only.
-- **Refresh only when something changed** — by default a scheduled card only re-runs when
-  something it reads has moved (a finding, memory, a measurement, its feedback). The foot
-  says when it's waiting and what for.
 - **Run history** — past runs are kept, with **‹ ›** in the foot to page back and
   `prev: …` under each number.
 - **Tags** — the analyst tags each card by what it *found*, so `#batteries` surfaces every
   card that hit a battery problem. Edit them from **⋯ → Edit tags**.
+
+### When a card actually re-runs
+
+A schedule only says when a card *may* run. By default it also has to have something new
+to say: a scheduled card re-runs only when **what it is actually told has changed** — a
+finding it reads, the facts from memory it would be given, the state of a measurement it
+uses, feedback you added, a rewritten focus. A card regenerated over identical inputs would
+be the identical card at full price. Its own findings don't count, so a card can't trigger
+its own refresh, and a measurement that was merely rebuilt overnight with the same result
+doesn't either.
+
+The foot says why each run happened — *on its refresh interval*, *a finding it reads
+changed* — and a card that skipped says what it is waiting for, so a quiet dashboard and a
+stopped scheduler never look the same. **When to refresh a card** in ⚙ Settings picks the
+rule:
+
+| Setting | A scheduled card runs when… |
+| --- | --- |
+| **When something it reads has changed** | The interval has passed **and** something it reads has moved. The default. |
+| **Always, on the interval** | The interval has passed. |
+| **Never on a schedule** | Never on its own. **Regenerate** still works. |
+
+If brAIn can't tell whether anything changed, the card refreshes anyway — "I could not
+tell" must never become a card that never updates again.
+
+**A card that fails waits longer each time** — from 15 minutes, doubling up to 12 hours —
+and the next success clears it. If your Claude plan's **usage limit** is hit, scheduled
+cards pause (30 minutes, doubling up to 4 hours) until the first run that succeeds, rather
+than failing every minute. **Regenerate** is never held.
 
 ## What it costs
 
@@ -244,9 +305,33 @@ work. Automatic runs pause at the budget; things you press never do. The meter u
 real Anthropic account usage, so brAIn backs off when you're using Claude elsewhere. Every
 control: [Reference](/brain/reference/#token-budget).
 
+## Beyond cards: the weekly report and a deep review
+
+Two things read the whole house rather than one question, and both are documented with
+their settings in [Reference](/brain/reference/):
+
+- **The weekly report** (*Send a weekly report*) ends on **one thing to do this week**.
+  That pick is made across the week: brAIn reads the open problems alongside the week's
+  numbers and chooses the one whose dealing-with would make the most difference, with a
+  sentence saying why — so three warnings about one flaky hub can outrank a serious row
+  that is simply how your house is. It can only pick something it was shown, it never
+  passes over something critical, and if it can't run (no sign-in, automatic runs paused,
+  the budget spent) the report falls back to the worst-severity, longest-open pick, exactly
+  as before. Its counts match what the Findings tab shows.
+- **A deep review** is a button on **House → Knowledge**. brAIn's most capable model,
+  reading only, sits with everything brAIn knows — the open problems, the measurements,
+  the memory, the last weekly report — and writes up a handful of observations: patterns
+  across rooms, a cause behind several symptoms, what is worth doing next. It **files
+  nothing**; the review is a page you read (the last six are kept). It never runs on a
+  schedule, and the button shows roughly what it will cost before you press it — from the
+  reviews you've run before, or a first guess until then.
+
 ## Insight jobs are the other half
 
 Cards are interactive deep dives in the panel.
 **[Insight jobs](/brain/automations/#insight-jobs)** are the dashboard-native sibling:
 scheduled reports rendered to *sensors*, with markdown in their attributes and an event on
-completion — good for glanceable tiles and spoken briefings.
+completion — good for glanceable tiles and spoken briefings. Like cards, they run with
+reading tools only, pause with **Automatic insights** and the usage budget when they run on
+their schedule (`brain.run_insight` always runs), and a run that fails shows as an error on
+the sensor beside the last good report — it is never sent to your phone as the report.

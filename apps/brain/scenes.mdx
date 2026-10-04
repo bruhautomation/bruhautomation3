@@ -3,11 +3,6 @@ title: Scene Designer
 description: Four moods for a room — morning, day, evening and night — composed from what each bulb in it can actually be told, shown as swatches before you say yes, and written to scenes.yaml only if you accept them.
 ---
 
-:::note[Requires brAIn 1.46]
-The scene designer, [one-off intents](/brain/intents/) and the condition proposal all landed
-in **1.46**, along with the byte-level edit of `automations.yaml` that two of them need.
-:::
-
 Scenes are the thing everybody means to set up and nobody does. Not because any one of them is
 hard — because doing it by hand means opening each bulb in turn, picking a colour temperature
 that will look wrong beside the next one, saving four of them, and then writing the schedule
@@ -71,7 +66,9 @@ vocabulary of the card; the byte is the vocabulary of the file.
 than day on purpose. **Day** is neutral and full. **Evening** is warm and dimmed. **Night** is
 the only one that turns most of the room off.
 
-Which light stays on at night is matched on its **name** — *night*, *bedside*, *hall*,
+Which light stays on at night comes from what brAIn has
+[read about each device](/brain/checks/#reading-what-a-device-is-in-any-language) — in any
+language — and, where it is not sure, from its **name**: *night*, *bedside*, *hall*,
 *landing*, as whole words. There is no attribute for *"this is the one I leave on"*, and
 inventing a rule from the wattage would be a guess about your furniture. A room with nothing
 named that way goes fully dark, which is what night means in a room without a nightlight in
@@ -147,7 +144,9 @@ walks the room through them.
 It is offered off `scenes.yaml` rather than off the proposals store, deliberately — what makes
 the schedule sayable is the scenes being *there*, and somebody who copied the card's YAML in by
 hand has earned it exactly as much as somebody who pressed the button. A schedule naming a
-scene that is not there is an automation that errors at seven every morning.
+scene that is not there is an automation that errors at seven every morning. It is offered
+for any room, including one whose name is more than one word — *Living Room*, *Master
+Bedroom*.
 
 Unlike the scenes it is an ordinary automation, so it can be
 [tried for a week](/brain/proposals/#the-lifecycle) — which is itself a replay of the days you
@@ -160,7 +159,7 @@ Two of its four times are measured and two are not, and the card says which:
 | **Morning** | The wake time brAIn has [measured](/brain/measurements/) for this house |
 | **Day** | 11:00 — a fixed guess |
 | **Evening** | 18:30 — a fixed guess |
-| **Night** | The measured settle time |
+| **Night** | The measured settle time — after midnight, if that is when this house goes to bed |
 
 Nobody's first press of the day is at noon, so midday and the early evening are not things
 brAIn can see. They are stated as the guesses they are, and they are yours to change once the

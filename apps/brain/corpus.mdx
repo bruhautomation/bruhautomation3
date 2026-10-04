@@ -3,11 +3,6 @@ title: Capture & the Corpus
 description: The prompts behind every insight card are the one part of brAIn no test can reach. Capture records what the analyst was sent and the ending you gave its findings; the corpus freezes houses with their labels; the replay scores this release against them; and shadow mode is where a new check runs before anybody sees it.
 ---
 
-:::note[Requires brAIn 1.47]
-This page documents a release that is on its way. Everything below is built and tested; it
-is not in the current add-on yet.
-:::
-
 Everything under [Deep Check & Rehearsal](/brain/doctor/) tests brAIn's *plumbing*. The one
 part no test can reach is the **prompts** — the framing and the ten kilobytes of output rules
 behind every insight card — because nothing in the project runs them against a real house or
@@ -44,6 +39,24 @@ With it on, every card run writes one file under `/data/capture`:
 - And later, **the ending you gave each finding it raised**.
 
 That last part is the whole point.
+
+### The Resident's first looks, too
+
+With capture on, brAIn also keeps the batches the [Resident's](/brain/findings/) first look
+judged — as their **inputs** (the batch, the memory excerpt, the open cases), not as the
+finished prompt, so they can be rebuilt with whatever prompt is current. The nightly pass
+labels each one with what you did next: a card you marked *Not a problem*, one you fixed or
+added to your list, one you put back after brAIn held it.
+
+```bash
+brain eval first_look
+```
+
+replays them against **today's** prompt and reports how often it now agrees with you, next to
+how often it agreed at the time — and confirms every safety signal stayed at its floor. It
+spends real Claude runs, so it is a press, capped (60,000 tokens by default), and checks the
+cap *before* each run. It never changes anything: a prompt or a model changes only when a
+person reads the number and decides it should.
 
 ### An ending is already a label
 
@@ -112,12 +125,13 @@ prompt to grade.
 
 `tests/corpus/` in the repository holds houses **and what was true of them**, frozen.
 
-Two entries ship with it, and neither is hand-written:
+Three entries ship with it, and none is hand-written:
 
 | Entry | What it is | Where its labels come from |
 | --- | --- | --- |
 | The clean house | The test suite's own healthy fixture | None at all — *every check must be silent here*, which is the strongest claim in the directory |
 | The rehearsal house | That same house with the [rehearsal's](/brain/doctor/#brain-doctor---rehearse) own planted defects in it | The rehearsal's plan — the same defects it creates on a real install |
+| The first-look rehearsal | A batch of signals for the Resident's first look, built from the checks and from real-shaped state changes | Floors the code owns — a safety signal may never be answered *ignore* |
 
 Ground truth by construction in both cases, and the second one is why the corpus and the
 rehearsal can never disagree about what a planted defect is.
@@ -152,6 +166,9 @@ halves that cost very different things.
 Every [house check](/brain/checks/) against every entry, compared with what the entry says
 should be found. **No model, no tokens, no network.** It runs in ordinary CI on every pull
 request.
+
+The free half also checks the first-look entry's floors against an adversary that answers
+*ignore* to everything, so a safety signal that could be talked down fails here.
 
 This is what fails when somebody moves a threshold — and it names **the house** rather than a
 line number: a check that gains a condition stops finding a defect that was planted for it,
@@ -241,6 +258,8 @@ beside them, and decides it has earned a place. That is a code change a person m
 producer that promoted itself on a threshold would be a threshold nobody can see deciding what
 your house is told about.
 
-**No check is in shadow in this release.** Every one that ships has earned its place, and the
-set is empty on purpose — a set with something in it "for now" is how a trial becomes
+**One check is in shadow now: `sys.update_pending`**, the "an update is waiting" row. The rule
+cannot be wrong about your house — the Supervisor either lists an update or it does not — so
+what is being measured is whether an update belongs on a list of decisions at all. The set is
+kept as small as that on purpose: a check sitting in it "for now" is how a trial becomes
 permanent.

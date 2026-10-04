@@ -3,11 +3,6 @@ title: Overnight Self-Healing
 description: Three things brAIn may fix while you are asleep — an add-on that should be running, a dead Z-Wave node, an integration that failed to set up — off by default, capped at three a night, with no Claude run anywhere on the path.
 ---
 
-:::note[Requires brAIn 1.45]
-This page documents a release that is on its way. Everything below is built and tested; it
-is not in the current add-on yet.
-:::
-
 Every other thing brAIn does to your house is a press you made on a specific card. This one
 is not: it runs while the house is asleep and nobody is looking, which is the whole point and
 also the reason it is the narrowest thing in the add-on.
@@ -89,6 +84,24 @@ Every one of these is a refusal, and each is tested against the mutation that re
   is not every add-on having come back. A snapshot brAIn could not fetch means *I could not
   look*, which is a skip.
 
+## A fault fixed every night is a fault, not a repair
+
+An add-on that stops every evening, or an integration that fails to start every day, would
+otherwise be put right at 3am every night for ever — and each morning brief would call it a
+fresh success. A fault fixed every night is a fault hidden every night.
+
+So brAIn remembers repairs **across nights**, per thing repaired. After the **third repair of
+the same add-on, node or integration in fourteen days**, it stops repairing it and files a
+finding saying the fault keeps coming back. That finding goes through the same first look as
+every other, and it **quotes the log lines that say why**:
+
+- for an add-on, that add-on's own log;
+- for an integration or a Z-Wave node, Home Assistant's error log, filtered to that
+  integration.
+
+Trouble lines come first, colour codes are stripped and anything shaped like a token is
+removed. A log brAIn could not read says so on the card rather than leaving a gap.
+
 A failed call is recorded and not retried the same night. That needs no machinery: the
 attempt is written down whatever happened to it, and the store is what the next pass reads.
 
@@ -108,7 +121,8 @@ And the morning brief is where you find out which:
 > 03:10 — the call failed.*
 
 Something mended while the house was asleep is itself a reason to send that morning's brief,
-which is otherwise silent on the mornings there is nothing worth saying.
+which is otherwise silent on the mornings there is nothing worth saying. When a repair is
+**not the first** of its kind, the brief says that too, rather than reporting it as new.
 
 ## Where to see it
 
