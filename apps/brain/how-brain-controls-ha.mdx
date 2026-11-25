@@ -18,11 +18,11 @@ brAIn gives itself three ways to touch Home Assistant, and at first glance they 
 
 ## How they fit together
 
-**MCP is Claude's pair of hands.** Everything Claude does to your live home — reading a sensor, turning on a light, looking at a camera, calling *any* service — goes through the MCP server's 89 tools. That single funnel is what makes safety enforceable: protected entities, per-agent service deny-lists, voice scoping and the tripwire are applied at that chokepoint, once, and cover everything that passes through it. [What every action passes](#what-every-action-passes) below lists the checks.
+**MCP is Claude's pair of hands.** Everything Claude does to your live home — reading a sensor, turning on a light, looking at a camera, calling *any* service — goes through the MCP server's 115 tools. That single funnel is what makes safety enforceable: protected entities, per-agent service deny-lists, voice scoping and the tripwire are applied at that chokepoint, once, and cover everything that passes through it. [What every action passes](#what-every-action-passes) below lists the checks.
 
 The terminal and the chat also hold a shell, which is a second route to Home Assistant. brAIn tells Claude to use the MCP tools instead, and while you have protected entities set, a service call typed as a shell command (`ha service call`, a `curl` to the services API) is refused outright and Claude is pointed at the tool that *can* be checked.
 
-**Power Tools are not a second pair of hands — they're verbs installed into HA itself.** Registering the 69 admin operations as real `brain.*` services (instead of private Claude abilities) is a deliberate choice with three payoffs:
+**Power Tools are not a second pair of hands — they're verbs installed into HA itself.** Registering the 91 admin operations as real `brain.*` services (instead of private Claude abilities) is a deliberate choice with three payoffs:
 
 1. **Claude reaches them through MCP** like any other service (`call_service` → `brain.create_area`), so the same deny-lists, protected entities and action gate apply. A voice agent at the default **Voice assistant** level can't use them at all, and new agents start with `brain.*` ticked under **Blocked services**.
 2. **Your automations and scripts get the same superpowers** with no Claude in the loop — a nightly automation can call `find_orphaned_references` by itself.
@@ -87,7 +87,7 @@ make the answer stricter. In order:
    rules** are applied here; one light in the room you named goes straight through; anything
    broader is asked of a small, cheap model. If the gate can't be reached you're asked —
    and an unattended run is refused.
-6. **A fix's contract.** A **Fix it** run may make only the service calls and edit only the
+6. **A fix's contract.** A **Plan** run may make only the service calls and edit only the
    files its approved plan listed. Any other call is refused, and any shell command that
    does more than read — the one exception being `brain own` on the files the plan edits.
 
@@ -104,7 +104,7 @@ ownership and how to undo — is [Permissions & Safety](/brain/safety/).
 Every Claude run the panel starts takes a seat in one small queue — three at a time by
 default — served in order of who is waiting: a safety alert first, then anything you pressed,
 then scheduled work, with one seat always kept free of scheduled work. So pressing
-**Regenerate** or **Fix it** never waits behind the overnight cards, and a burst of scheduled
+**Regenerate** or **Plan** never waits behind the overnight cards, and a burst of scheduled
 work can't make the panel unresponsive.
 
 ## What brAIn can and can't reach
@@ -137,15 +137,15 @@ you'll notice is which layer the work happened in.
 Everything above is Claude with a model in the loop, on your instruction. There are a few
 exceptions, and each one is the narrowest thing that can do its job.
 
-**Applying a Fix it plan** is mostly done by brAIn's panel itself. The plan is a list of
+**Applying a Plan plan** is mostly done by brAIn's panel itself. The plan is a list of
 typed steps — change one automation, reload a configuration, call a service on named
 devices, rename an entity, move it to a room — and **Apply** carries those out with no
 model and no shell, through the same snapshot-and-verify path as the edits below. It stops
 at the first step that fails and puts back the edits it had already made. Only a step that
 needs Claude to work something out starts a Claude run, held to the plan's contract. See
-[Findings](/brain/findings/).
+[Needs you](/brain/needs-you/).
 
-**A press on the Proposals tab writes to `/config`** — [accepting a
+**A press on Needs you writes to `/config`** — [accepting a
 proposal](/brain/proposals/#saying-yes-and-taking-it-back), or removing a one-off that has
 fired — with no Claude run behind it (1.44.0). The file is snapshotted into
 the same edit journal first, the change is only settled once Home Assistant is verifiably

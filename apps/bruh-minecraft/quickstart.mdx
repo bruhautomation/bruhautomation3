@@ -1,83 +1,101 @@
 ---
 title: Quick Start
-description: Install BRUH Minecraft, accept the EULA, and connect from Java or Bedrock in under five minutes.
+description: Install BRUH Minecraft, walk through the first-run wizard, and connect from Java or Bedrock — a Minecraft server inside Home Assistant in about five minutes.
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
 Five minutes from zero to a running Minecraft server.
 
 ## Prerequisites
 
-- **Home Assistant OS** or **Supervised**, version **2023.6.0** or newer
-- A **modern 64-bit HA host** (Pi 4/5, x86 NUC, or any 64-bit server). Java comes bundled in the add-on (Eclipse Temurin JRE 25) — you don't install it — but it needs 64-bit hardware (`aarch64` or `amd64`), so older 32-bit ARM boards won't work.
-- ~**2 GB free RAM** beyond what HA itself uses (4 GB+ for plugin-heavy setups)
+- **Home Assistant OS** or **Supervised**, version **2023.6.0** or newer.
+- A **64-bit host** (`aarch64` or `amd64`: a Raspberry Pi 4/5, an x86 mini PC, any 64-bit server).
+  Java is bundled in the add-on — you do not install it.
+- About **2 GB of free memory** beyond what Home Assistant itself uses (4 GB or more with plugins).
+  The add-on warns at start when its memory setting would leave the host less than about 2 GB.
 
 ## Install it
 
 <Steps>
 
-1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
+1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ →
+   Repositories**, then paste:
 
    ```text title="Repository URL"
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install the add-on.** Find **BRUH Minecraft** in the store and click **Install**. Since 1.15.3 this downloads a prebuilt image (~600 MB) rather than building one on your machine — on a Raspberry Pi, that's minutes of SD-card writes replaced by a pull.
+2. **Install the add-on.** Find **BRUH Minecraft** in the store and click **Install**. It
+   downloads a prebuilt image rather than building one on your machine.
 
-3. **Accept the EULA.** Open the **Configuration** tab and set:
+3. **Start it and open the panel.** Click **Start**, then open **BRUH Minecraft** from the sidebar.
 
-   ```yaml
-   eula: true
-   ```
+4. **Walk through the wizard.** The first-run wizard asks you to accept the
+   [Minecraft EULA](https://www.minecraft.net/eula) (Mojang requires it), then sets up your first
+   world one step at a time: online or offline mode, the server software (Paper is the default) and
+   the first world's settings. Finish, and the add-on restarts and the panel takes over.
 
-   This acknowledges the [Minecraft EULA](https://www.minecraft.net/eula) — required by Mojang. (The panel's first-run wizard walks you through the same acceptance plus the first world's settings — online/offline mode, server software, gamemode — if you'd rather click than edit YAML.) While you're there, you'll likely want:
+   ![The first-run wizard: Welcome to BRUH Minecraft, step 1 of 14, Accept the Minecraft EULA with a checkbox, and Back and Next](./images/panel-wizard.webp)
 
-   - `memory_mb: 4096` if you'll have more than ~5 players or any plugins
+   Prefer YAML? Set `eula: true` on the add-on's **Configuration** tab instead. While you are there,
+   `memory_mb: 4096` is worth it for more than about five players or any plugins.
 
-   Gameplay settings (difficulty, gamemode, online-mode, …) are per-world — the wizard sets them up front, and the panel's **Server Properties** tab edits them any time. For LAN-only / no-Xbox-account play, see [Family mode](#family-mode-no-xbox-required) below. To OP yourself: join once, then click **op** next to your name on the panel's **Players** tab.
+5. **Accept the integration.** When Home Assistant offers the discovered **BRUH Minecraft**
+   integration, click **Configure** under **Settings → Devices & Services**. That adds the sensors,
+   buttons, services and game events.
 
-4. **Start.** Click **Start** and watch the **Log** tab — Paper takes ~30 seconds to reach `Done`. After the integration discovery prompt, click **Configure** in **Settings → Devices & Services**.
+6. **Connect.** Java players use `<your-HA-host>:25565`. Bedrock players (iPad, iPhone, Android,
+   consoles, Windows) use `<your-HA-host>:19132` — and on the same network the server appears in
+   Minecraft's **Friends** tab by itself. Watch the Dashboard's player count tick up.
 
-5. **Connect.** Java players use `<your-HA-host>:25565`. Bedrock players (iOS, Android, console, Win10/11) use `<your-HA-host>:19132` — and the server also auto-appears in the **Friends** tab on the same LAN. The panel's dashboard shows the player count tick up as people join.
+7. **Make yourself an operator.** Join once, then on the panel's **Players** tab choose **Op**
+   from the menu beside your name. Ops are kept per world.
 
 </Steps>
 
 ## Family mode (no Xbox required)
 
-Want kids to join without Microsoft accounts? Pick **offline mode** in the first-run wizard's connectivity step — or flip it later on the panel's **Server Properties** tab:
+Want children to join without Microsoft accounts? Pick **offline mode** in the wizard — or change it
+later on the panel's **Properties** tab:
 
 ```properties
 online-mode=false
 ```
 
-That's the whole change. The add-on then fixes every downstream setting Microsoft and GeyserMC normally gate behind that one flag — secure-profile enforcement, Geyser auth-type, Floodgate, Bedrock login validation. Java and Bedrock both work without Xbox sign-in.
+That is the whole change. The add-on then fixes every setting Microsoft and GeyserMC gate behind
+that one flag — secure-profile enforcement, Geyser's sign-in mode, Floodgate, Bedrock login
+validation — so Java and Bedrock both join without an Xbox sign-in.
 
-:::caution
-**LAN-only.** Offline mode is unsafe on a public/internet-exposed server — anyone who guesses a username can join as that player.
-:::
+<Aside type="caution" title="Home network only">
+Offline mode is unsafe on a server reachable from the internet: anyone who guesses a username can
+join as that player. It also means [brAIn's companion](/bruh-minecraft/companion/) cannot trust a
+name, so a grown-up's *Can ask for anything* is not used.
+</Aside>
 
 ## Open it to the internet
 
-Forward these on your router to your HA host:
+Forward these on your router to your Home Assistant host:
 
 | Port | Why |
 |------|-----|
 | `25565/tcp` + `25565/udp` | Minecraft Java |
 | `19132/udp` | Minecraft Bedrock |
 
-**Don't forward `25575`** — RCON is loopback-only by design. **Don't forward `8099` either** — that's the management panel, which since 1.15.0 refuses any request that didn't arrive through Home Assistant.
+**Do not forward `25575`** — RCON listens only on the machine itself. **Do not forward `8099`** —
+that is the management panel, which refuses any request that did not arrive through Home Assistant.
 
 ## Common first-install hiccups
 
 | Symptom | Fix |
 |---------|-----|
-| `EULA has NOT been accepted` | Set `eula: true`. |
-| `address already in use: 25565` | Another server's running. Stop it, or change the port mapping. |
-| Bedrock not in Friends tab | Same subnet/VLAN as HA? Try `<HA host IPv4>:19132` manually. |
+| `EULA has NOT been accepted` | Finish the wizard, or set `eula: true`. |
+| `address already in use: 25565` | Another server is running. Stop it, or change the port mapping. |
+| Bedrock not in the Friends tab | Same subnet/VLAN as Home Assistant? Add it manually: `<HA IPv4>:19132`. |
 | iOS hangs on "Connecting…" | Set `geyser_mtu: 1200`. |
-| Plugin install warning, server still starts | A bad URL in `plugins:`. Add-on logs which one — fix or remove it. |
-| One-click plugin didn't appear | No Modrinth build for your server's Minecraft version — the log names the plugin it skipped. |
-| Panel does nothing when opened by IP | By design — open it from the HA sidebar. The panel only answers requests that come through Home Assistant. |
+| "Please log into Xbox" | Turn the world's `online-mode` off on the **Properties** tab (home network only). |
+| A plugin warning, server still starts | A bad URL in `plugins:` — the log names it. Fix or remove it. |
+| Panel does nothing when opened by IP | By design — open it from the sidebar. |
 
-For more, see the [Reference](/bruh-minecraft/reference/#troubleshooting).
+For more, see [Bedrock players](/bruh-minecraft/bedrock/) and the
+[Reference](/bruh-minecraft/reference/#troubleshooting).

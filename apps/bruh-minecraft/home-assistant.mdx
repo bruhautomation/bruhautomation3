@@ -1,97 +1,237 @@
 ---
 title: Home Assistant Integration
-description: The bruh_minecraft companion integration — sensors, buttons, services, and automation recipes for your Minecraft server.
+description: The bruh_minecraft integration — sensors for players, TPS and the world's time and weather, game events for chat, joins, deaths and command-block signals, services that answer with the server's reply, brAIn's Minecraft tools, and automation recipes.
 ---
 
-The add-on deploys a companion integration (`bruh_minecraft`) that Home Assistant auto-discovers — turning the server into a first-class smart-home citizen with sensors, buttons, and services you can automate like anything else.
+import { Aside } from '@astrojs/starlight/components';
 
-## Device & entities
+The add-on deploys a companion integration, `bruh_minecraft`, which Home Assistant discovers on
+first boot. It turns the server into a first-class part of the house: sensors to put on a dashboard,
+events to trigger automations, and services that act in the game and **answer with what the server
+said**.
 
-Everything lives under one **BRUH Minecraft** device:
+## Entities
+
+Everything lives under one **BRUH Minecraft** device.
 
 | Entity | What it tells you |
 |--------|-------------------|
-| `sensor.…_players_online` | Player count, with the `players` name list in attributes |
+| `sensor.…_players_online` | Player count. `players` lists names; `details` gives each player's dimension, position, the place they are near, game mode, health and food |
 | `sensor.…_players_max` | Slots |
-| `sensor.…_tps_1m/5m/15m` | Server tick rate (Paper/Purpur/Folia) — the lag early-warning |
+| `sensor.…_tps_1m` / `_5m` / `_15m` | Server tick rate (Paper, Purpur, Folia) — the lag early-warning |
 | `sensor.…_latency_ms` | Status ping latency |
-| `sensor.…_uptime` / `version` / `server_type` / `motd` / `difficulty` / `gamemode` | Server facts |
-| `binary_sensor.…_reachable` | Status ping succeeds |
-| `binary_sensor.…_rcon_ok` | RCON handshake OK (disabled by default) |
-| Buttons | `backup_now`, `restart_server`, `stop_server`, `save_all` |
+| `sensor.…_uptime`, `_version`, `_server_type`, `_motd`, `_difficulty`, `_gamemode` | Server facts |
+| `sensor.…_world_time` | Sunrise, day, sunset or night; `hour`, `clock` and `day` in attributes |
+| `sensor.…_world_day` | The world's day count |
+| `sensor.…_world_weather` | Clear, rain or thunder |
+| `sensor.…_world_feed` | The latest thing that happened; the last 15 events and who was last seen in attributes, plus `listening: false` with the reason when the server log cannot be heard |
+| `sensor.…_last_save` / `_last_backup` | Timestamps |
+| `sensor.…_building` | What the companion is building now, or `idle`, with progress and recent builds |
+| `sensor.…_companion` | `off` when no companion runs, else `idle`, `acting` or `asking` |
+| `binary_sensor.…_reachable` | **Online** — the status ping succeeds; off while the server is down |
+| `binary_sensor.…_rcon_ok` | RCON reachable (disabled by default) |
+| Buttons | **Backup world**, **Restart server**, **Stop server**, **Save world** |
+
+Whoever is on, and the world sensors, go to unknown or off when the add-on has not written for three
+minutes, so a stopped add-on never reads as a world with people in it.
+
+There is also a **notify platform**: `notify.bruh_minecraft_broadcast` takes a `message` and says it
+in game, so anything that can send a notification — doorbells, timers, dinner — reaches the players.
+
+## Game events
+
+Fired for every happening the panel reads, whether or not anything listens. Every event carries
+`world` and the time.
+
+| Event | When, and its data |
+|-------|------|
+| `bruh_minecraft_chat` | A chat line: `player`, `name` (as shown — perhaps a nickname), `text`, `verified` (the server checks the account behind the name) |
+| `bruh_minecraft_join` | `player`, `verified` |
+| `bruh_minecraft_leave` | `player`, `seconds` played |
+| `bruh_minecraft_death` | `player`, `text` (the death message) |
+| `bruh_minecraft_advancement` | `player`, `what`, `text` |
+| `bruh_minecraft_place` | Someone walked into a named place: `player`, `place`, `dimension` |
+| `bruh_minecraft_answer` | A choice pad was answered: `player`, `question`, `answer`, the other options |
+| `bruh_minecraft_point` | Someone looked through a spyglass: `player`, `target` (`{x, y, z, block}`), `building`, `room` |
+| `bruh_minecraft_signal` | A command block said `say bruh:signal <name> [data]`: `name`, `data` |
+
+Chat with nicknames and ranks added by plugins or scripts is still read and matched back to the
+player.
+
+### Command blocks that drive the house
+
+A button, lever or pressure plate in a build can drive Home Assistant with no plugin. Wire it to a
+command block (Impulse, Needs Redstone) whose command is:
+
+```text
+say bruh:signal porch_lights on
+```
+
+```yaml
+automation:
+  - alias: Minecraft porch button
+    triggers:
+      - trigger: event
+        event_type: bruh_minecraft_signal
+        event_data: {name: porch_lights, data: "on"}
+    actions:
+      - action: light.turn_on
+        target: {entity_id: light.porch}
+```
+
+Only a command block nobody renamed can fire it — a player typing the same words, `/say`, or a
+renamed command block fires nothing — so a signal is exactly as trusted as a command block, which
+only an operator can place. Anybody can *press* the button wired to one, which is the point. The
+same signal repeated within a second is one event.
 
 ## Services
 
+Every service that has something to say returns the server's reply as response data, and a
+refusal — or an add-on that did not answer — **fails the call with the reason**, so it shows in the
+automation trace. A player can be a name or `@a`, `@p`, `@r`.
+
+### Server and players
+
 | Service | Fields | What it does |
 |---------|--------|--------------|
-| `bruh_minecraft.say` | `message` | Broadcast to everyone online |
-| `bruh_minecraft.rcon_command` | `command` | Any Minecraft command over RCON |
+| `bruh_minecraft.say` | `message` | Say it to everyone online |
+| `bruh_minecraft.rcon_command` | `command` | Any server command (no leading slash). Plugins that answer only on the console have their console lines returned |
 | `bruh_minecraft.give` | `player`, `item`, `amount` | Give items (player must be online) |
-| `bruh_minecraft.set_weather` | `weather` | `clear` / `rain` / `thunder` |
+| `bruh_minecraft.teleport` | `player`, then `to_player` or `x`, `y`, `z` | Teleport, relative `~` coordinates included |
+| `bruh_minecraft.set_gamemode` | `player`, `gamemode` | Survival, creative, adventure or spectator |
+| `bruh_minecraft.set_weather` | `weather` | `clear`, `rain` or `thunder` |
 | `bruh_minecraft.set_time` | `time` | `day`, `night`, `noon`, `midnight`, or ticks |
-| `bruh_minecraft.backup_now` | — | Git or archive backup, per your config |
-| `bruh_minecraft.restart_server` | — | Graceful save + restart |
-| `bruh_minecraft.stop_server` | — | Graceful save + stop (stays stopped) |
-| `bruh_minecraft.op_player` / `deop_player` / `kick_player` / `ban_player` / `whitelist_add` / `whitelist_remove` | `player` | Player management |
+| `bruh_minecraft.op_player` / `deop_player` / `kick_player` / `ban_player` / `pardon_player` / `whitelist_add` / `whitelist_remove` | `player` | Player management |
+| `bruh_minecraft.set_skin` | `player`, `skin` | Through SkinsRestorer: a Java player's name, an https link to a skin picture, or `clear`; waits for SkinsRestorer's answer |
+| `bruh_minecraft.backup_now` / `restart_server` / `stop_server` | — | Lifecycle. Stop keeps the server down until started again; the add-on keeps running |
+| `bruh_minecraft.rename_world` | `name` | Rename the active world as said; restarts |
+| `bruh_minecraft.get_status` | — | Who is online right now, and whether the server answered (response) |
+| `bruh_minecraft.get_world` | — | Players and where they are, time, weather, the feed, saves and builds (response) |
 
-There's also a **notify platform**: `notify.bruh_minecraft_broadcast` takes a `message` and broadcasts it in-game, so anything that can send a notification — doorbells, timers, dinner — can reach the players.
+### Add-ons and scripts
+
+| Service | Fields | What it does |
+|---------|--------|--------------|
+| `bruh_minecraft.list_addons` | — | What the browser can offer and what the world has (response) |
+| `bruh_minecraft.search_addons` | `query`, `kind`, `offset` | Search Modrinth (response) |
+| `bruh_minecraft.install_addon` | `id`, `kind` | Add a project and what it requires |
+| `bruh_minecraft.remove_addon` | `id` | Remove one, browser-installed or by hand |
+| `bruh_minecraft.write_script` | `kind` (`skript` or `datapack_function`), `name`, `content` | Write and load a script into the running world; errors fail the call |
+| `bruh_minecraft.list_scripts` / `remove_script` | — / `kind`, `name` | Only scripts written through `write_script` |
+
+### The companion's lane
+
+`companion_say`, `companion_appear`, `ask_choice`, `companion_build`, `companion_edit`,
+`look_blocks`, `undo_action`, `companion_progress`, `companion_bar`, `companion_thought`,
+`give_journal`, `give_spyglass`, `render_maps`, `atlas`, `room`, `label_place`, `set_zone`,
+`set_companion`, `get_companion`, `list_builds`, `save_build` and `delete_build`. These are what
+[brAIn's companion](/bruh-minecraft/companion/) uses, and they are open to your own automations.
+The add-on holds the world-side limits itself whoever calls them. The add-on's `DOCS.md` lists
+every field.
+
+## brAIn's Minecraft tools
+
+With [brAIn](/brain/) installed, any brAIn chat, automation task or voice agent can run the server:
+*"teleport Sam to Alex"*, *"put Sam in creative"*, *"give me 32 torches"*, *"make it day"*, *"who's
+on?"*. Names are matched the way you say them — case, spaces and a Bedrock player's dot ignored, a
+unique partial name counts — and a name that could be two people is asked about, never guessed.
+
+| Tool | What it does |
+|------|--------------|
+| `minecraft_status` | Who is online and where, the world, time, weather, the feed, saves, builds and the companion (read-only) |
+| `minecraft_teleport` | Move a player to a player or coordinates |
+| `minecraft_player` | Game mode or give; op, deop, kick, ban, pardon and the whitelist are not available to a voice-level agent |
+| `minecraft_world` | Time, weather and saying something; the companion's actions for a non-voice agent |
+| `minecraft_addons` | List and search the add-on browser; install and remove need a non-voice agent |
+| `minecraft_command` / `minecraft_server` | Any console command; back up, restart or stop — not available to a voice-level agent |
 
 ## Recipes
 
-### Bedtime enforcement
+**Bedtime enforcement**
 
 ```yaml
 automation:
   - alias: Minecraft - bedtime
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.bruh_minecraft_players_online
-      above: 0
-    condition:
-      condition: time
-      after: "22:30:00"
-      before: "06:00:00"
-    action:
-      - service: bruh_minecraft.say
-        data: { message: "Server going to sleep in 60s — save your work!" }
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bruh_minecraft_players_online
+        above: 0
+    conditions:
+      - condition: time
+        after: "20:30:00"
+        before: "06:00:00"
+    actions:
+      - action: bruh_minecraft.say
+        data: { message: "Server going to sleep in 60 seconds — save your work!" }
       - delay: "00:01:00"
-      - service: bruh_minecraft.stop_server
+      - action: bruh_minecraft.stop_server
 ```
 
-### Nightly backup
+**Nightly backup and restart** — the `auto_restart_schedule` option is reserved and currently does
+nothing, so schedule a restart this way:
 
 ```yaml
 automation:
-  - alias: Minecraft - nightly backup
-    trigger: { platform: time, at: "04:00:00" }
-    action:
-      service: bruh_minecraft.backup_now
+  - alias: Minecraft - nightly backup and restart
+    triggers:
+      - trigger: time
+        at: "04:00:00"
+    actions:
+      - action: bruh_minecraft.backup_now
+      - delay: "00:05:00"
+      - action: bruh_minecraft.restart_server
 ```
 
-### Announce over the server
-
-Paired with a [brAIn](/brain/) voice assistant, *"tell everyone dinner's ready"* does this hands-free:
+**Say who joined, on the kitchen speaker**
 
 ```yaml
-- service: bruh_minecraft.say
-  data:
-    message: "Dinner's ready — pause your builds!"
+automation:
+  - alias: Minecraft - announce joins
+    triggers:
+      - trigger: event
+        event_type: bruh_minecraft_join
+    actions:
+      - action: tts.speak
+        target: {entity_id: tts.home_assistant_cloud}
+        data:
+          media_player_entity_id: media_player.kitchen
+          message: "{{ trigger.event.data.player }} just joined Minecraft."
 ```
 
-### TPS watchdog
+**Lag alert**
 
 ```yaml
 automation:
   - alias: Minecraft - lag alert
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.bruh_minecraft_tps_1m
-      below: 15
-      for: "00:05:00"
-    action:
-      service: notify.mobile_app_phone
-      data:
-        message: "Minecraft TPS dropped to {{ states('sensor.bruh_minecraft_tps_1m') }} — {{ state_attr('sensor.bruh_minecraft_players_online','players') | join(', ') }} online."
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bruh_minecraft_tps_1m
+        below: 15
+        for: "00:05:00"
+    actions:
+      - action: notify.notify
+        data:
+          message: >-
+            Minecraft TPS dropped to {{ states('sensor.bruh_minecraft_tps_1m') }} —
+            {{ state_attr('sensor.bruh_minecraft_players_online', 'players') | join(', ') }} online.
 ```
 
-Under the hood, services run through a file-based IPC bridge at `/config/.bruh_minecraft/` — HA drops a JSON request, the add-on executes it over RCON and writes the response back. See the [Reference](/bruh-minecraft/reference/) for RCON and backup configuration.
+**Auto-stop when nobody is playing**
+
+```yaml
+automation:
+  - alias: Minecraft - auto-stop when idle
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bruh_minecraft_players_online
+        below: 1
+        for: "00:30:00"
+    actions:
+      - action: bruh_minecraft.stop_server
+```
+
+<Aside title="Morph dashboard card">
+When brAIn's Morph dashboard is installed, the add-on adds a **Minecraft world** card
+(`custom:morph-minecraft-world`): the world's time, day and weather, who is on and where, what is
+being built with pictures of what was finished, the feed, and the last save and backup.
+</Aside>

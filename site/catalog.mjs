@@ -86,7 +86,7 @@ export const APP_LIST = [
 		name: 'brAIn',
 		tagline: 'Give your house a mind.',
 		blurb:
-			'Claude with the full run of Home Assistant — a dashboard that lays itself out by what matters now, a Resident that notices and investigates, one memory that learns your house, voice, chat and a real terminal.',
+			'Claude with the full run of Home Assistant — a dashboard that knows what matters right now and says why, a Resident that notices and investigates, one memory that learns your house, voice, chat and a real terminal.',
 		tags: ['AI', 'Dashboard', 'Voice'],
 	},
 	{

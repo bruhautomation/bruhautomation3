@@ -3,7 +3,7 @@ title: Upkeep
 description: Keeping Home Assistant itself in order — tidier names, rooms and aliases reviewed as one table with a 30-day undo, an answer to "is this update safe tonight?" that quotes its evidence, an overnight check that names root causes, a cited house book you can share and take back, and a weekly sentence about who can reach the house.
 ---
 
-Most of brAIn is about your house. **House → Upkeep** is about Home Assistant itself: the
+Most of brAIn is about your house. **Insights → Needs you** is about Home Assistant itself: the
 names nobody tidied, the devices in no room, the updates you are not sure about, the error
 log nobody reads, and the knowledge of how the house works that lives in one person's head.
 
@@ -62,7 +62,7 @@ Assistant accepted, so a batch that half-applied undoes exactly the half that ha
 
 :::tip[From a finding]
 The *named after its hardware* (`reg.hardware_name`) and *no room* (`reg.no_area`) findings
-offer **Fix it**, which opens this table rather than planning one rename at a time.
+offer **Plan**, which opens this table rather than planning one rename at a time.
 :::
 
 ## Updates waiting
@@ -106,7 +106,7 @@ It asks for **at most five root causes**, named as causes rather than symptoms:
 
 **Every cause must cite the records it rests on**, by an id brAIn handed out — a log line, a
 Zigbee device, a Z-Wave node, an automation. A cause that cites nothing, or cites a record that
-was not there, is dropped and counted. The causes reach the Findings tab through the same
+was not there, is dropped and counted. The causes reach Needs you through the same
 [first look](/brain/checks/) every finding takes.
 
 A cause re-worded tomorrow is the same finding, not a new card every night: it is keyed by the
@@ -129,7 +129,7 @@ learned. It is meant for a partner, a sitter, or the person buying the house.
 - **Secrets are left out, always.** Codes, PINs, passwords and anything shaped like a token are
   removed from every sentence, whether or not the book is ever shared.
 - **Gaps become questions.** Where it cannot answer from the house — *where is the water
-  shutoff?* — it asks on the Findings tab, at most three per run and five open at once. Your
+  shutoff?* — it asks on Needs you, at most three per run and five open at once. Your
   typed answer goes into memory as your own words, so the next book knows. A subject asked
   once is never asked again.
 - **It keeps itself current.** Once you have asked for one, it is rewritten weekly — but only

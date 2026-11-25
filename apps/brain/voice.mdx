@@ -130,7 +130,7 @@ registry [Power Tools](/brain/power-tools/) — needs an agent set to Whole hous
   whose targets can't be resolved — a whole area, say — is refused on a restricted agent.
   **New agents start with the administration services already ticked**: restart and stop,
   host reboot and shutdown, `update.install`, `recorder.purge`, `shell_command.*`,
-  `backup.create` and `brain.*` (all 69 registry Power Tools, including `brain.create_user`,
+  `backup.create` and `brain.*` (all 91 registry Power Tools, including `brain.create_user`,
   which can mint an admin login). Untick any of them for an agent you alone use. Opening
   blinds, unlocking and running scripts stay one click away in the list rather than ticked.
   Agents you already had are not changed.
@@ -144,7 +144,7 @@ registry [Power Tools](/brain/power-tools/) — needs an agent set to Whole hous
   protected lock is in the same room.
 - **`protected_entities` is refused at every level**, Full admin included.
 
-How all of this fits with the chat, the terminal and Fix it — the protected list, the action
+How all of this fits with the chat, the terminal and Plan — the protected list, the action
 gate, house rules — is on [Safety](/brain/safety/). The option syntax is in the
 [Reference](/brain/reference/).
 
@@ -187,9 +187,9 @@ mid-thought.
 If **BRUH Minecraft**, **BRight** or **BRUH Print** is installed with its Home Assistant
 integration, any agent can drive it through that add-on's own services — nothing to set up.
 
-- **Minecraft.** *"Teleport Emma to Dad"*, *"put Steve in creative"*, *"make it day"*,
-  *"who's on?"* Names are matched against who's online the way you'd say them, so "Emma"
-  finds `.EmmaPlays`; a name that could be two people is asked about, never guessed. A
+- **Minecraft.** *"Teleport Alex to Sam"*, *"put Alex in creative"*, *"make it day"*,
+  *"who's on?"* Names are matched against who's online the way you'd say them, so "Alex"
+  finds `.AlexPlays`; a name that could be two people is asked about, never guessed. A
   voice-level agent may **play but not administer**: op, ban, kick, the whitelist, console
   commands, stopping the server and installing server add-ons need Whole house or Full admin.
 - **Labels.** *"Print three freezer-bag labels for bolognese"* — brAIn checks what's loaded
@@ -204,7 +204,7 @@ if you want to.
 
 ## Speaking first
 
-Off by default: tick **Say urgent problems aloud** under ⚙ → Advanced → **Speak first** and a
+Off by default: switch on **Say urgent problems aloud** under ⚙ → Notifications and a
 serious house-check finding that needs attention now is announced on the voice satellite in
 the room somebody is in, as well as sent to the phone. Never during quiet hours, never when
 everybody is away, at most once per finding and once every half hour, never on a satellite

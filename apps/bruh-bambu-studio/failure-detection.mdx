@@ -3,7 +3,8 @@ title: Print failure detection
 description: brAIn watches your Bambu Lab printer's camera at the moments a print is most likely to fail — planned from the print's own G-code — warns you, and pauses a print that has clearly failed. Free checks catch a covered lens, a frozen camera and a cleared plate.
 ---
 
-import { Aside, Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import panelShot from './images/failure-detection-panel.webp';
 
 Turn on **Failure detection** on a printer's card on the Printers tab (its **i** explains when it
 looks and how it copes with a moving bed). While that printer prints, the add-on watches its
@@ -48,6 +49,9 @@ plate is not a failure. A look it still cannot judge is never a failure; it look
 The chamber light on gives the sharpest pictures.
 
 ## What happens
+
+<img src={panelShot.src} width="475" alt="Failure detection on a printer card: a paused print, what brAIn saw beside what it should be, Resume — not a failure and Stop print, the Where it looks timeline with planned, fine and failed looks, and Check now" />
+
 
 | brAIn sees | What happens |
 |---|---|
@@ -97,6 +101,9 @@ sent to the phone, with the frame brAIn judged and **buttons that answer it**. A
 answered, or clears by itself, takes its notification with it.
 
 ## Settings
+
+![Settings › Print failure detection: Alerts go to, and for each printer the detection switch, Warn and pause or Only warn, Relaxed, Balanced or Careful, and the chamber light and plate-cleared switches](./images/settings-detection.webp)
+
 
 Under **Settings › Print failure detection**, per printer:
 

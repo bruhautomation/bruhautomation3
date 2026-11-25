@@ -18,7 +18,7 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 | Command | What it does |
 |---------|--------------|
 | `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses` (alias `guesses`), `confirm`, `reject`, `log` (`--show <n>` prints one entry in full), `undo`, `consolidate`, `clear`, `export`, `import` |
-| `brain findings <action>` | The [findings](/brain/findings/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
+| `brain findings <action>` | The [findings](/brain/needs-you/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
 | `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
 | `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
 | `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
@@ -32,7 +32,7 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 | `brain eval first_look` | Replay captured first looks against today's prompt and report how often they agree with what you did. Spends real Claude runs, capped (`--days`, `--max-tokens`, `--max-batches`); changes nothing |
 | `brain check` | Run the [house checks](/brain/checks/) now, through the panel's API — `list` for the catalog and when each last ran. No Claude run, no tokens |
 | `brain weekly [send]` | The week's numbers and the last report sent; `send` writes and sends this week's now |
-| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report — also listed under **⚙ → Problems** (`--no-names` to hash entity ids) |
+| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report — also listed under **⚙ → Diagnostics → Report a problem** (`--no-names` to hash entity ids) |
 | `brain login [--status\|--share]` | Sign in to Claude, and share that login with the other BRUH add-ons. The same command as `ha login` — the credential is brAIn's, and this is where people look for it |
 | `brain help` | The full list |
 
@@ -160,7 +160,7 @@ quietly and Claude carries on. A journal that stops you working is worse than no
 What it covers is edits made with Claude's **file tools**. A change made by a shell command
 — a redirect, a script — reaches no journal, which is one reason the terminal and the chat
 [ask before acting](/brain/terminal/#asking-before-acting) by default. The service calls a
-**Fix it** made are put back with **Put them back** on its card instead; see
+**Plan** made are put back with **Restore** on its card instead; see
 [Permissions & Safety](/brain/safety/#putting-things-back).
 
 This is **not a backup system**. brAIn doesn't version your configuration — Home Assistant's

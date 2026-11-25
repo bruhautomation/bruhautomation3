@@ -1,0 +1,244 @@
+---
+title: Guide & Reference
+description: Everything in BRUH Task Manager — the meters, the Apps tab and its Restart/Stop/Start, Level 2's Processes tab and what Protection mode off means, End process and its limits, runaway apps, every option, the Home Assistant sensors, automations and troubleshooting.
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## The top bar
+
+Four figures for the whole machine:
+
+- **CPU**, with the last few minutes as a line;
+- **Memory** — used of total;
+- **Load** — the 1-minute load average beside the number of CPUs;
+- **Up** — how long the machine has been running.
+
+A badge beside the title says which level you are on: *Level 1 · apps* or *Level 2 · every
+process*. On a phone the title and meters scroll away with the page and only the tabs stay
+at the top.
+
+## Apps
+
+Every app, Home Assistant, the Supervisor and the Supervisor's plugins (DNS, Audio, CLI,
+Multicast, Observer), **busiest first**. Search by name, and sort by CPU, memory or name.
+
+For each one:
+
+- **CPU** — its share of the **whole machine**. 50% on a four-core machine is two cores'
+  worth. The line under it is the last few minutes.
+- **Memory**, and **network** (down/up) and **disk** (read/write) traffic per second.
+- Labels — *App*, *Home Assistant*, *Supervisor*, *Supervisor plugin*, *this app*,
+  *stopped*, and *high CPU for…* while it is above the runaway threshold.
+- **Processes** (with Level 2 on) jumps to its processes.
+- **Restart**, **Stop** and **Start**.
+
+![The Apps tab on a phone: the meters in a two-by-two grid, then each app as three short rows — name and labels, CPU beside memory, and its buttons — with Studio Code Server at 89% and a red Stop button](./images/apps-phone.webp)
+
+### Restart, Stop and Start
+
+Each asks first, and the question says what will happen:
+
+- which **Home Assistant integrations** talk to the app — they show as unavailable while
+  it is down;
+- whether its **sidebar panel** will stop opening;
+- whether it **starts again at boot**, and that a watchdog does not undo a manual stop.
+
+**Home Assistant and the Supervisor can be restarted but not stopped.** BRUH Task Manager
+never offers to stop itself. Restarting Home Assistant takes minutes, so the panel runs
+each action as a job and reports how it went. Every app restarted is written to the
+add-on's log.
+
+## Processes (Level 2)
+
+![The Processes tab: 19 processes grouped by app. Studio Code Server's group (27%, 1.2 GB, 3 processes) shows two node processes with End buttons and its s6-svscan supervisor, which explains that ending it stops the whole app. Home Assistant's group explains to use Restart instead and lists python3, an ffmpeg camera stream and s6-svscan; then the Supervisor, Home Assistant OS, Mosquitto, BRUH Task Manager, an unknown container and the DNS plugin](./images/processes.webp)
+
+Every process on the machine, grouped by the app it belongs to — each group with its total
+CPU, memory and number of processes. Open a group to see its processes, busiest first, with
+the **pid** and **command line**.
+
+- **Memory** is resident memory (what is in RAM now). Where the operating system lets the
+  add-on read it, it is *proportional* memory instead, which splits shared libraries fairly
+  between the processes using them; hover the figure to see which.
+- **Kernel threads** are hidden unless you tick the box.
+- A group called **Unknown container** is a container the add-on could not match to an
+  app. It is shown, but nothing in it can be ended.
+- CPU uses the same scale as the Apps tab: a share of the whole machine.
+
+How a process is matched to its app is read, never guessed: the container comes from the
+process's cgroup, and which app owns that container from what it mounts — an app's `/data`,
+Home Assistant's `/config`, the Supervisor's own folder. Supervisor plugins are named by
+their command.
+
+With Level 2 off the tab says so, with a button to the settings:
+
+![The Processes tab at Level 1: "Processes are Level 2 — Level 1: every app, Home Assistant and the Supervisor, measured by the Supervisor. Processes inside them are not shown." and an Open Level 2 settings button](./images/level1-processes.webp)
+
+### What it needs
+
+1. **Show every process** on the Settings tab (or *Level 2: show every process* on the
+   Configuration tab).
+2. **Protection mode off** on this add-on's **Info** page. Only you can do this.
+3. **Restart** the add-on.
+
+The Settings tab ticks off each step and names the one that is missing — *switched on but
+Protection mode is still on*, *Protection mode is off but the add-on hasn't restarted
+since*, or *Protection mode is off but Level 2 is switched off* (then it reads nothing,
+and asks you to turn Protection mode back on).
+
+### What turning Protection mode off does
+
+- It lets **this one add-on see every process** on the machine and its command line.
+  Command lines occasionally contain a password somebody typed into a setting.
+- It lets this add-on **send signals to processes in other apps**, which is how End process
+  works.
+- It does **not** let it read other apps' passwords or tokens: its AppArmor profile blocks
+  reading another process's environment and memory (and its root filesystem, and ptrace),
+  whatever Protection mode says.
+- It does **not** open any network port, and changes nothing about your other apps.
+- The store's **security rating is 5** instead of 6 — because the add-on *asks* for the
+  process list at all, the same with Protection mode on or off.
+
+When you are finished, switch Level 2 off and turn Protection mode back on.
+
+## Ending a process
+
+**Allow ending processes** is a second switch on the Settings tab, off by default, and only
+available with Level 2 on. With it on, **End** appears on processes that belong to an app.
+
+- **End asks the process to stop** (SIGTERM), so it can save and exit cleanly.
+- If it is still running **five seconds later**, **Force end** is offered (SIGKILL), which
+  stops it immediately without letting it save anything.
+- The decision is made again **over a fresh read** when you press: a button drawn a minute
+  ago is not permission to signal whatever holds that pid now. If the process changed, it
+  says so and sends nothing.
+- Every process ended is written to the add-on's log, at warning level whatever the log
+  level.
+
+**Never offered** — each says why in words, and points at **Restart** where that is the
+gentler answer:
+
+| Not offered for | Why |
+|---|---|
+| Home Assistant | Restart it instead — that shuts it down cleanly and saves its database first |
+| The Supervisor, Supervisor plugins | They run every app; restart instead |
+| The operating system, the kernel | Ending them can make the machine unreachable until it is power-cycled |
+| BRUH Task Manager itself | |
+| An unknown container | It can't be matched to an app |
+| An app's init or process supervisor | Ending it stops the whole app; use Restart or Stop |
+| Anything on **Never end these** | Your own list |
+
+**Never end these** takes one entry per line: a process name or an app's slug, with
+wildcards (`mosquitto`, `*_frigate`).
+
+<Aside type="note" title="Could ending a process break something?">
+Ending a helper inside an app (a worker, an ffmpeg stream, an editor's extension host)
+usually leaves the app running; many restart the helper themselves. Ending an app's main
+program usually stops the app, and the Supervisor restarts it if its watchdog is on. When
+you're not sure, **Restart** on the Apps tab is the better answer. Some apps' own security
+profiles refuse signals from other apps; when that happens the add-on says so and points
+at Restart.
+</Aside>
+
+## Runaway apps
+
+An app using at least the **threshold** share of the machine's CPU (default **80%**) for
+at least the **time** (default **10 minutes**) is marked as running away: a banner on the
+panel, a mark on its row, and the **Runaway app** binary sensor turns on.
+
+- It is a **streak**, not an average: a reading below the threshold ends it, so a short
+  burst — an update, a backup — doesn't count.
+- A reading the Supervisor couldn't take doesn't reset the clock.
+- **Nothing is stopped automatically.** What to do is your decision, or an automation's.
+
+## Settings
+
+The **Settings** tab holds Level 2, End processes and its list, and the runaway rule.
+Changes there take effect at once, without a restart — they are the add-on's options,
+written through the Supervisor, so the Configuration tab shows the same values. A change
+the Supervisor refuses says so in its words.
+
+## Options
+
+| Option | Default | Range | What it does |
+|---|---|---|---|
+| **Home Assistant integration** (`enable_ha_integration`) | on | | Install the companion integration and its sensors |
+| **Level 2: show every process** (`process_view`) | off | | Read and show every process; needs Protection mode off and a restart |
+| **Level 2: allow ending processes** (`allow_ending_processes`) | off | | Offer End on processes inside apps |
+| **Never end these** (`protected_processes`) | empty | | Process names or app slugs never offered End; wildcards work |
+| **Runaway threshold** (`runaway_cpu_percent`) | 80 | 10–100 | % of the machine's CPU |
+| **Runaway time** (`runaway_minutes`) | 10 | 1–240 | Minutes above the threshold |
+| **Measure every** (`sample_seconds`) | 5 | 2–60 | Seconds between measurements; also the window each CPU figure covers. Raise it on a slow Raspberry Pi |
+| **Log level** (`log_level`) | `info` | | The add-on's own logging |
+
+Everything except the integration switch and the log level can also be changed on the
+Settings tab.
+
+## Home Assistant integration
+
+With **Home Assistant integration** on, the add-on installs `bruh_task_manager` and Home
+Assistant offers to set it up. It adds, on one *BRUH Task Manager* device:
+
+| Entity | What it is |
+|---|---|
+| **CPU** | The whole machine's CPU, % |
+| **Memory used** | The whole machine's memory, % — used and total bytes as attributes |
+| **Busiest app** | The name of the app using the most CPU; its slug, CPU and memory, and the top ten, as attributes |
+| **Busiest app CPU** | That app's CPU, % |
+| **Runaway app** (binary sensor) | On while an app is running away; the apps (with their slugs), the threshold and the time as attributes |
+
+The measurements go **unavailable** if the add-on stops measuring. **Runaway app** goes
+**unknown** rather than off, with the reason as an attribute — because "the add-on could
+not look" is not "nothing is running hot".
+
+There are no services: Home Assistant's own `hassio.*` actions restart and stop apps.
+
+### Restart a runaway app
+
+```yaml
+alias: Restart a runaway app
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.bruh_task_manager_runaway_app
+    to: "on"
+actions:
+  - action: hassio.addon_restart
+    data:
+      addon: "{{ state_attr('binary_sensor.bruh_task_manager_runaway_app', 'apps')[0].slug }}"
+  - action: notify.notify
+    data:
+      message: >
+        Restarted {{ state_attr('binary_sensor.bruh_task_manager_runaway_app', 'apps')[0].name }}
+        after it used the CPU for too long.
+```
+
+Home Assistant itself and the Supervisor are never listed with an app's slug here;
+`hassio.addon_restart` only restarts apps.
+
+## With brAIn
+
+Task Manager doesn't need [brAIn](/brain/). When both are installed, brAIn's security
+check knows that Task Manager's Protection mode being off is you switching Level 2 on, not
+a fault, and its development loop watches Task Manager's state and log so a problem can be
+reported and fixed.
+
+## Troubleshooting
+
+<CardGrid>
+  <Card title="Processes says Level 2 is off">
+    Settings names the missing step. Most often: Protection mode was turned off but the
+    add-on wasn't restarted since.
+  </Card>
+  <Card title="End is missing on a process">
+    Turn on **Allow ending processes**. If it is on, the process is on the never-offered
+    list or your **Never end these** list — the row says which.
+  </Card>
+  <Card title="End says the app refused">
+    That app's own AppArmor profile refuses signals from other apps. Use **Restart** on the
+    Apps tab.
+  </Card>
+  <Card title="Runaway app is unknown">
+    The add-on stopped measuring, or its figures went stale. The sensor's `reason`
+    attribute says which; check the add-on is running.
+  </Card>
+</CardGrid>

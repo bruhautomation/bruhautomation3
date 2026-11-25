@@ -1,0 +1,71 @@
+---
+title: Quick Start
+description: Install BRUH Task Manager, see every app's CPU and memory in a minute, add its Home Assistant sensors, and turn on Level 2 (every process) only if you need it.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Install — Level 1 in a minute
+
+<Steps>
+
+1. **Add the repository.** **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then:
+
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+2. **Install BRUH Task Manager** and press **Start**. It pulls a prebuilt image.
+
+3. **Open Task Manager** in the sidebar (it is admin-only). The **Apps** tab lists every
+   app, Home Assistant, the Supervisor and its plugins, busiest first, and the meters at
+   the top show the whole machine. That's Level 1 — nothing else to set.
+
+</Steps>
+
+## Add the sensors (optional)
+
+<Steps>
+
+1. **Restart Home Assistant once**, so it loads the `bruh_task_manager` integration the
+   add-on just deployed.
+
+2. Under **Settings → Devices & services**, **BRUH Task Manager** is waiting under
+   *Discovered*. Press **Add**. A *BRUH Task Manager* device appears with **CPU**,
+   **Memory used**, **Busiest app**, **Busiest app CPU** and **Runaway app**.
+
+</Steps>
+
+## Turn on Level 2 (only when you need it)
+
+Level 2 shows every process on the machine. Read
+[what turning Protection mode off does](/bruh-task-manager/guide/#what-turning-protection-mode-off-does)
+first — the Settings tab says the same before you do anything.
+
+<Steps>
+
+1. On the **Settings** tab, switch on **Show every process**.
+
+2. Open this add-on's **Info** page (the button **Open the add-on's Info page** goes
+   there) and turn **Protection mode off**. Only you can do this; an add-on can't change
+   its own Protection mode.
+
+3. **Restart** the add-on: Protection mode only takes effect when it starts.
+
+4. Back on Settings, all three steps are ticked. The **Processes** tab now lists every
+   process, grouped by app.
+
+</Steps>
+
+![The Settings tab with Level 2 on: Show every process switched on and three green ticks — switched on here, Protection mode turned off on the Info page, the add-on restarted since — then the explanation of what turning Protection mode off does, the End processes switch, the Never end these list, and the runaway settings](./images/settings.webp)
+
+<Aside type="tip" title="When you're done">
+Switch **Show every process** off and turn **Protection mode** back on. With Protection
+mode off but Level 2 switched off, the add-on reads nothing and says so on the Settings tab
+and in its log.
+</Aside>
+
+## Next
+
+[The guide](/bruh-task-manager/guide/) covers every tab, End process, the runaway rule,
+every option, the sensors and an automation that restarts a runaway app.

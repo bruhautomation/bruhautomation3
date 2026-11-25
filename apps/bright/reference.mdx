@@ -1,0 +1,217 @@
+---
+title: BRight Reference
+description: Every BRight option with its default, the bright.* services and their fields, the show-status sensor, brAIn's tools, where files live, networking, and troubleshooting for when nothing plays.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Options
+
+Set on the add-on's **Configuration** tab.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `music_folder` | `/media/music` | Where your music lives, under `/media`. Scanned all the way down. |
+| `additional_music_folders` | `[]` | More folders to scan, one per line, e.g. `/media/parties`. Must be under `/media`. Folders ticked in the Library tab are added to these; neither replaces the other. Overlapping folders cost nothing. |
+| `director_mode` | `auto` | `auto` — Claude through brAIn when available, algorithmic otherwise. `algorithmic` — never call Claude. `claude` — Claude only; fail rather than downgrade. |
+| `director_model` | `opus` | The Claude model for writing, revising and inventing shows and effects. Any tier alias (`opus`, `sonnet`) or model id brAIn's login can run. |
+| `enable_ha_integration` | `true` | Deploy the `bright` integration and its bridge: the services and the show-status sensor. Off, the panel still works but nothing in Home Assistant can drive it. |
+| `log_level` | `info` | `trace`, `debug`, `info`, `notice`, `warning`, `error` or `fatal`. Use `debug` when diagnosing. |
+
+<Aside title="Music outside /media">
+A show plays its track by handing the speaker a media-source link, which Home Assistant only
+serves for files in its media folder. If your music lives elsewhere, point Home Assistant's own
+`media_dirs` at it — and keep one entry pointing at `/media`, which is where BRight writes its
+click track.
+</Aside>
+
+## Services
+
+Every service that cannot do what you asked **fails with the reason** — *"no analyzed tracks in
+/media/music — run the Library tab first"* appears in the automation trace, rather than a green
+tick and a dark room.
+
+### `bright.party_mode`
+
+Every analysed track, each with its own show.
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `media_player` | no | Defaults to the most recently calibrated speaker |
+| `folder` | no | One folder under `/media`; defaults to every scanned folder |
+| `party` | no | A saved set's name; its settings fill in anything not given here |
+| `tracks` | no | Exact track hashes, in play order; replaces the folder scan |
+| `end_scene` | no | A scene to call when it stops, instead of restoring the lights |
+| `shuffle` | no | `false` plays the folder in order |
+
+### `bright.start_party`
+
+A saved set by name. The name is required, so a typo fails loudly.
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `party` | yes | The saved set's name, as on the Party tab |
+| `media_player` | no | Override the set's speaker |
+| `end_scene` | no | Override the scene called when it stops |
+
+### `bright.start_show`
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `track` | yes | Path under `/media` (or a track hash) |
+| `media_player` | no | Defaults to the most recently calibrated speaker |
+
+### `bright.stop_show`
+
+Stops the show and puts the room back.
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `scene` | no | Call this scene instead of restoring the lights |
+
+With no `scene`, every light returns to its state before the show — unless the running party named
+an end scene, which is then used.
+
+### `bright.get_status`
+
+What is playing, the saved sets, and the tracks with a show ready, as response data. Changes
+nothing.
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `parties_only` | no | `true` answers with what is playing and the saved sets (each with its speaker and song count) without scanning the library — much cheaper |
+
+### `bright.import_show`
+
+Makes an edited file in `/config/.bright/shows/` the show BRight plays for that track — the same as
+**Reload from file** in the panel. The previous show is kept as a version.
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `track` | yes | The file's name in `/config/.bright/shows/`, or the track's hash |
+
+Invalid JSON is refused with the line it broke on; a script that will not compile is refused with
+the reason; the show that was playing stays.
+
+```yaml
+automation:
+  - alias: "Start party mode"
+    triggers:
+      - trigger: conversation
+        command: "start party mode"
+    actions:
+      - action: bright.party_mode
+        data:
+          media_player: media_player.living_room
+```
+
+## Entity
+
+| Entity | State | Attributes worth keying on |
+| --- | --- | --- |
+| `sensor.bright_show_status` | What BRight is doing (`idle` when nothing runs); a show that failed to start reports `error` rather than claiming to run | `active` (a run is in progress), `lights_busy` (cues still going out), `track`, `media_player`, `position_s`, `party` (the running set), `queue_left`, `cues_sent` / `cues_total`, `parties` (every saved set's name), `playback_warning`, `error` |
+
+Key dashboards and automations on the attributes rather than the state string.
+
+## brAIn's tools
+
+With [brAIn](/brain/) installed, two tools drive BRight through these services:
+
+| Tool | What it does |
+| --- | --- |
+| `bright_status` | Read-only: what is playing, the saved sets, and the tracks with a show ready. Track titles come from the files' own tags and are treated as untrusted. |
+| `bright_show` | `party` (a saved set by name, or party mode), `track` (one track's show), `stop` (put the room back, or call a scene), `import` (load an edited show file), with optional `media_player` and `scene` |
+
+A speaker or scene named to a voice agent has to be one it can see, and anything on brAIn's
+protected entities is refused as it is everywhere else. brAIn is also what runs the Claude
+director — see [How a Show Is Built](/bright/shows/#who-writes-the-show).
+
+## Where BRight keeps things
+
+| Path | What |
+| --- | --- |
+| `/media/<your folders>` | Your music. BRight only ever reads it. |
+| `/media/bright/calibration.wav` | The click track, regenerated when missing |
+| `/config/.bright/` | The folder the integration talks through |
+| `/config/.bright/shows/` | Every show script, mirrored where you can edit it, with `README.md` and `EFFECTS.md` |
+| `/config/custom_components/bright/` | The companion integration, deployed at startup |
+| `/data/shows/<hash>/` | Per-track analysis, scripts and compiled shows (excluded from backups — regenerable) |
+| `/data/calibration/` | One profile per speaker |
+| `/data/light-map.json` | The lights, their roles, zones and positions |
+| `/data/music-folders.json` | Folders ticked in the Library tab |
+| `/data/effect-presets.json` | Saved effects |
+| `/data/parties.json` | Saved sets |
+
+Nothing BRight does is destructive to your Home Assistant configuration, and restarting the
+add-on is always safe.
+
+## Networking
+
+BRight runs with `host_network: true`: LIFX discovery is a UDP broadcast on port 56700 whose
+replies come back to the sender's own address, and host networking also keeps cue packets off a
+NAT path. That puts the panel on a real port on your machine, so:
+
+- **The port is assigned by the Supervisor**, not fixed, because a port written into a manifest is
+  one something else may already own. The startup log names it (`Starting BRight panel on
+  0.0.0.0:<port>`).
+- **The panel refuses every caller except Home Assistant itself** — the Supervisor's network and
+  loopback, judged by the connection's real peer address. There is no public endpoint. Open it
+  from the sidebar.
+- A watchdog inside the add-on polls its own health on loopback and restarts a hung panel.
+
+## When nothing plays
+
+This is the most common problem, it is almost never BRight, and there is one setting behind most
+of it. **Press Test playback on the Calibrate tab first** — it walks the chain and stops at the
+first broken link:
+
+| Step | What it means |
+| --- | --- |
+| **file** | The track (or click track) is not where it should be |
+| **media id** | Home Assistant will not resolve the media-source link — often a custom `media_dirs` |
+| **host** | The speaker cannot reach the address it was given |
+| **player** | The entity does not accept `play_media` |
+| **command** | The call was refused |
+| **playing** | Accepted, but the speaker never started |
+
+### The host step: Chromecast, Google and Nest
+
+Home Assistant hands your speaker a **URL**, and the speaker fetches it by itself. The address comes
+from **Settings → System → Network → Internal URL** — and Chromecast, Google and Nest speakers
+resolve names through **Google's public DNS**, not your router's. So an internal URL of
+`http://homeassistant.local:8123` is a name the speaker is told does not exist. Nothing plays and
+nothing errors.
+
+**The fix:** set the internal URL to the machine's IP address (for example
+`http://192.168.1.50:8123`), or leave it **empty** — Home Assistant then uses its own IP, which
+speakers can fetch. HTTPS with a certificate the speaker cannot verify fails the same silent way.
+
+### The media step
+
+BRight plays a file through a media id built from where it sits under `/media`. Home Assistant's
+local media source is called `local` by default, but setting `media_dirs` in `configuration.yaml`
+replaces that name. BRight works it out for itself by asking Home Assistant to resolve its click
+track under each media source until one answers. If you change `media_dirs` while BRight runs,
+**Look again** under the test result picks up the new name — no restart. If none of Home
+Assistant's media directories is the folder BRight sees as `/media`, add one:
+
+```yaml
+homeassistant:
+  media_dirs:
+    local: /media      # BRight writes here; Home Assistant has to serve from here
+    nas: /mnt/nas
+```
+
+### Other failures
+
+| Symptom | What to do |
+| --- | --- |
+| *"could not write the click track"* | Check Home Assistant's media folder exists, then restart the add-on. |
+| *"does not accept play_media"* | Some entities look like media players and cannot be sent media — group members, some remotes and TV inputs. Pick another. |
+| It plays, but the lights are early or late | That is calibration: re-run **Play clicks & listen**, or use the fine-tune nudge under **Stored profiles** (negative moves the show earlier). |
+| No bulbs discovered | The bulbs must be on the same subnet as Home Assistant. Some managed switches and mesh systems drop broadcasts between bands or VLANs. |
+| *"No LIFX bulbs known — run Lab discovery first."* | Discover in the Lab, place the bulbs on the Light Map, and compile again. |
+| *"Track not analyzed."* | Run the Library's analysis first; shows compile from the analysis. |
+| A track fails to analyse | The reason is reported per file and the folder carries on. Corrupt, empty and undecodable files are the usual causes. |
+| Claude never writes the show | Press **Check Claude** on the Shows tab. brAIn must be installed and running; with `director_mode: auto` BRight quietly uses the algorithmic director instead. |
+| Install blocked: *"no host internet connection"* | That is the Supervisor's connectivity check, usually DNS (often a DNS add-on that is down). `ha resolution info` names the reason; `ha dns reset && ha dns restart` then `ha supervisor reload` usually fixes it. |

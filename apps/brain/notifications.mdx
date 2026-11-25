@@ -1,0 +1,182 @@
+---
+title: Notifications, Repairs & replies
+description: How brAIn reaches you outside its panel. Safety alarms that never wait, tiers and quiet hours, a sentence that decides what deserves a notification, buttons and Reply on your phone, Home Assistant's Repairs, the To-do list and saying urgent problems aloud.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+brAIn reaches you without the panel open. One add-on option turns it on:
+**`findings_notify_service`**, set to one of your `notify.*` services (usually your phone's
+`notify.mobile_app_…`). The first screen of setup asks for it. Everything below works from
+that one setting, with no automation to write.
+
+Without it, nothing is lost. Every card is still on [Needs you](/brain/needs-you/), in Home
+Assistant's Repairs and in `binary_sensor.brain_needs_you`, and safety alarms land in Home
+Assistant's own notifications instead.
+
+## Leaks, smoke, CO and gas never wait
+
+The moment a moisture, smoke, carbon-monoxide or gas sensor **trips** (goes from clear to
+detected), brAIn files a **critical** card naming the sensor and the time and sends it
+straight away, through quiet hours, with reminders behind it.
+
+![The top of the Insights tab in the dark theme with an urgent red banner: "16 things need you: 7 problems, 2 questions, 3 suggestions and 4 tidy-ups (1 urgent)" and, under it, "Kitchen Leak is reporting water", with Review on the right](./images/urgent-banner-dark.webp)
+
+- **No model is asked first.** None of the things that pause brAIn's thinking can hold it
+  back: not being signed in, automatic runs being paused, or the usage budget being spent.
+- **Each trip is its own card.** Dismissing Tuesday's leak does not silence Friday's. A
+  detector chattering on and off within five minutes is one card.
+- **When the sensor reports clear**, the card says so and the reminders stop, but the card
+  stays until you answer it: water that dried by itself still came from somewhere.
+- **The Resident looks afterwards** and may add what it finds to the card, including a look
+  through a camera you ticked in the same room. It never decides whether you hear about it.
+
+The type that decides this is the sensor's *Show as* setting in Home Assistant. brAIn asks
+before showing a smoke, gas, CO or leak sensor as anything else, so its alerts cannot be
+switched off by accident.
+
+## The tiers
+
+| Tier | What you get |
+| --- | --- |
+| **A tripped leak, smoke, CO or gas detector** | Sent the moment it trips, through quiet hours, whatever else brAIn is doing. |
+| **Critical and urgent**: a freeze, a hub that stopped answering | Pushed at once, even in quiet hours, then **asked again** after an hour, four hours and twelve hours. Each repeat says which it is and how long the problem has been open, and the last says brAIn will not ask again. Any answer stops it, and a restart picks the ladder up where it left off. |
+| **At or above `findings_notify_min_severity`** (default `critical`) | Pushed **once**, timed and worded by [your sentence](#what-deserves-a-notification), held through quiet hours unless its check says it cannot wait. |
+| **Everything else** | No message. It is on Needs you, in Repairs, and counted by `binary_sensor.brain_needs_you`. |
+
+Setting `findings_notify_min_severity` to `serious` also pushes a dying battery once.
+
+## Quiet hours
+
+Between `notify_quiet_start` and `notify_quiet_end` (22 to 7 by default, in your home's own
+timezone) only **urgent** messages get through: a device gone offline, an add-on that has
+stopped, a disk about to fill, an impossible reading. Urgency belongs to the check that raised
+the row, not to its wording. A critical battery forecast three weeks away is not urgent; a
+boiler that stopped answering is.
+
+Everything else is **held**, not dropped, and arrives as a single message when the quiet ends.
+Anything you fixed or dismissed overnight is dropped rather than announced. Set both hours to
+the same value, or leave both empty, to notify at any hour.
+
+## What deserves a notification
+
+**⚙ → Notifications → What deserves a notification** takes one sentence in your own words.
+
+![⚙ → Notifications: "Right now: urgent alerts only.", the "What deserves a notification" box with the example "Wake me for water or smoke; batteries can wait until morning.", a note that leaks, smoke and other urgent critical alerts always come through, and the "Say urgent problems aloud" switch](./images/settings-notifications.webp)
+
+> *"Wake me for water, smoke, the freezer or the front door at night; batteries can wait for
+> Saturday."*
+
+Before brAIn sends anything in the middle tier (above your floor, not an emergency), it reads
+that sentence, the time, your quiet hours and what it sent you in the last day, and decides
+one of four things:
+
+- send it now;
+- hold it until a later time, at most a day and a half ahead;
+- put it on the next morning's list, at the end of your quiet hours or when the house usually
+  gets up;
+- leave it on Needs you.
+
+It also writes the message: a short title and a line you can act on from the lock screen,
+such as *"Garage freezer is 6° warmer than a month ago. Check the seal."*
+
+What it cannot do:
+
+- anything escalating (a leak, smoke, a freeze, a hub that stopped answering) never goes
+  through it;
+- a critical card is never left off your phone;
+- a message may only name the device it is about;
+- if brAIn cannot ask Claude (no sign-in, automatic runs paused, the budget spent, an answer it
+  cannot read), the card is sent exactly as it would have been without the sentence.
+  ⚙ → Diagnostics shows how often that happened.
+
+## What brAIn learns from your swipes
+
+Every notification is recorded with what happened to it: a button pressed, swiped away
+(Android reports this, iPhone does not), or left alone. Once a week, if nearly every
+notification about one device or one check was dismissed or swiped away unanswered (at least
+8 of 10, over at least eight), brAIn asks on Needs you whether those should wait for the
+morning list. **Yes** adds a line to your sentence, listed under the box with a **Remove**.
+**No** is remembered. Critical and safety alerts are never counted, and nothing changes until
+you answer.
+
+## Buttons and Reply on your phone
+
+When the notify service is the Home Assistant companion app (`notify.mobile_app_*`) and the
+message is about exactly one card, it carries buttons: **Add to To Do**, **Snooze**,
+**Ignore**, **Dismiss**, and **Reply**. Tapping the message opens brAIn's own panel rather
+than Home Assistant's front page. Android shows only three buttons, so **Dismiss** is always
+one of the first three.
+
+**Reply** opens the companion app's own text box, and what you type goes to brAIn with the
+card it was typed under:
+
+| You type | What happens |
+| --- | --- |
+| *"It's always like that in winter"* | Ignored, until spring. |
+| *"Remind me tomorrow"* | Snoozed. |
+| *"I already replaced it"* | Marked fixed. |
+| *"Why does this matter?"* | brAIn looks (reading tools only; a reply cannot change the house) and answers in the next notification, with the same buttons. |
+
+When a reply ends a card you get one line back, such as *"Got it. brAIn will stop flagging
+it until March."*, with an **Undo** button that puts everything back for five minutes. A reply
+brAIn could not look into still gets an answer saying so.
+
+Answers reach the add-on through a small file under `/config/.brain/`, not over the network,
+so if the add-on is stopped when you press something, the answer waits for it.
+
+## Repairs
+
+Every card that is a decision waiting on you also appears under **Settings → System →
+Repairs**. The entry carries the card's text, what brAIn measured, what to do and which check
+raised it, and opening it offers the same answers as the card: *Add it to my to-do list*,
+*I've fixed it*, *Ignore* (with an optional reason, recorded as a correction), *Remind me
+tomorrow*, *Got it* on a change brAIn made, and **Dismiss: clear it from brAIn too**.
+Answering there is answering on Needs you, so brAIn learns the same thing either way.
+
+Not shown in Repairs: `info` cards, a card brAIn is already fixing, and a fix waiting for
+you to read it. At most 25 entries at once, oldest first, so a busy week cannot fill the
+page. An urgent card (a leak, an alarm, a freezing pipe) always raises a Repairs entry.
+
+## The To-do list
+
+**brAIn to-do** (`todo.brain_system_to_do`) is [To Do](/brain/needs-you/#to-do) in Home
+Assistant's own To-do panel and mobile app: the cards you added to To Do and anything you
+added yourself. Ticking one off is **Done**, which is when brAIn writes the memory line;
+deleting one takes it off the list and lets brAIn raise the problem again. You can add items
+there, and `brain.add_todo` adds them from an automation. It needs Home Assistant 2023.11 or
+later.
+
+## Saying it out loud
+
+**⚙ → Notifications → Say urgent problems aloud** is off by default. When it is on, a serious,
+urgent problem from one of brAIn's own house checks is announced on the voice satellite in the
+room where motion was just seen, as well as sent to your phone. It never speaks to an empty
+house, during quiet hours, for something already escalating on your phone, in words that name a
+person, or through a speaker on your protected list. It needs a Home Assistant version with
+`assist_satellite.announce`. It only announces; answer it on your phone.
+
+## The morning brief and the weekly report
+
+Two more messages are **off by default**, because each one that is sent costs a Claude run:
+
+- **`morning_brief`**: one short message a day, at the hour your house actually starts moving
+  (brAIn measures that, weekdays and weekends apart; `morning_brief_hour` is the fallback). It
+  is sent only when there is something to say: new problems, brAIn itself not working, or an
+  odd night. A quiet morning sends nothing.
+- **`weekly_report`**: one message on `weekly_report_day`: what the house used against the week
+  before, what was found and answered, what brAIn learned, and the one thing worth doing this
+  week. It goes to everyone, so point it at a service that reaches every phone. A week with
+  nothing in it sends nothing.
+
+## For automations
+
+| Entity or event | What it is |
+| --- | --- |
+| `binary_sensor.brain_needs_you` | On while anything waits for a decision, the same number as the badge. |
+| `sensor.brain_status` | The panel's status line: `watching`, `paused`, `needs_restart`, `signed_out` or `degraded`, with the sentence as an attribute. |
+| `sensor.brain_findings_open_findings` | The count, the severity split and the texts. |
+| `brain_case` / `brain_case_ended` / `brain_change` | A case opened, left the list, or brAIn changed the house. |
+
+Those entity ids are what a fresh install gets; if you renamed anything, yours differ. The
+full list is in the [Reference](/brain/reference/#sensors).

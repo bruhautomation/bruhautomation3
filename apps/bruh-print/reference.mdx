@@ -1,0 +1,132 @@
+---
+title: BRUH Print Reference
+description: Every BRUH Print option with its default, the eight bruh_print services and their fields, the entities, brAIn's label tools, supported printers, how the printing works, and troubleshooting.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Options
+
+Set on the add-on's **Configuration** tab.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `enable_ha_integration` | `true` | Deploy the `bruh_print` integration: the services, the sensors, and the data the card reads. Off if you only ever print from the panel. |
+| `install_lovelace_card` | `true` | Copy the card into `/config/www/bruh_print` and register it. Turning it off only stops the registration, so cards already on a dashboard do not break. |
+| `default_stock` | `edcc-082wh` | Which label a new design starts on, and what a text print assumes when it names none. Use the id shown beside each stock on the Printer tab. |
+| `enforce_stock` | `true` | Refuse a label whose stock is not in the target roll. Leave it on. |
+| `log_level` | `info` | `trace` to `fatal`. Successful status polls are logged only at `debug`, because the card polls. |
+
+`default_stock` and `enforce_stock` only **seed** the panel's own settings on first run. After that
+the panel owns them, so a change there is not undone by the next restart.
+
+## Services
+
+Every service answers with what happened (`printed`, `side`, `notes`, `status`) so a script can
+branch on it, and a refusal fails with the reason.
+
+| Service | Fields | What it does |
+| --- | --- | --- |
+| `bruh_print.print_text` | `text`\*, `stock`, `copies`, `font`, `rotate`, `uppercase` | Fit a word or a line to a label as large as it will go and print it. Line breaks are honoured. With no `stock`: the one loaded stock, else the label text prints on. |
+| `bruh_print.print_template` | `template`\*, `fields`, `copies` | Fill in a saved template and print it, on the label it was made for. An empty field refuses. |
+| `bruh_print.print_label` | `label`\*, `copies` | Print a complete [label document](/bruh-print/designer/#the-label-document). |
+| `bruh_print.reprint` | `entry`, `copies` | Print something from History again, exactly as it came out. No `entry` reprints the most recent. |
+| `bruh_print.set_roll` | `side`\*, `stock`\*, `remaining` | Say which labels are in a roll (`left` or `right`). `remaining` defaults to a full roll. |
+| `bruh_print.print_test` | `stock` | Print a check label — a frame around everything the roll can print on. |
+| `bruh_print.choose_label` | `stock`\* | Which loaded label plain text prints on. The same choice the Quick tab and the card show. Prints nothing. |
+| `bruh_print.get_status` | — | Which printer is attached, what is in each roll, which templates exist (with their fields and whether their stock is loaded), and which stock text prints on. Response data; prints nothing. |
+
+\* required
+
+```yaml
+# One word, biggest that fits
+action: bruh_print.print_text
+data:
+  text: Spare batteries
+  copies: 2
+
+# Tell it a new roll went in
+action: bruh_print.set_roll
+data: {side: left, stock: edcc-082wh, remaining: 1000}
+```
+
+## Entities
+
+| Entity | State | Worth knowing |
+| --- | --- | --- |
+| `sensor.bruh_print_printer` | Model name | `two_rolls`, `dots_across`, `serial`, `text_prints_on`, the saved templates |
+| `sensor.bruh_print_left_roll` | Estimated labels left | `stock_name`, `size`, `loaded`; unknown while counting is off |
+| `sensor.bruh_print_right_roll` | Estimated labels left | Unavailable on a one-roll printer |
+| `sensor.bruh_print_last_label` | What came out last | `entry_id` — pass it to `reprint` |
+| `sensor.bruh_print_printed_today` | Count | |
+| `binary_sensor.bruh_print_problem` | `on` = trouble | `reason` says what, in words |
+
+None of them goes unavailable when the add-on stops — they report it and keep their attributes,
+because Home Assistant hides an unavailable entity's attributes and the reason would go with them.
+
+```yaml
+automation:
+  - alias: "Label printer needs attention"
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.bruh_print_problem
+        to: "on"
+    actions:
+      - action: notify.notify
+        data:
+          message: "Label printer: {{ state_attr('binary_sensor.bruh_print_problem', 'reason') }}"
+```
+
+## brAIn's tools
+
+With [brAIn](/brain/) installed, two tools print through these services:
+
+| Tool | What it does |
+| --- | --- |
+| `label_printer_status` | Read-only: the printer, what is loaded in each roll (with stock ids), the saved templates and their fields, and the last few labels |
+| `print_label` | Print text (fitted as large as it will go) or a saved template with its fields; `copies` defaults to 1, and a voice-level agent prints at most 10 |
+
+brAIn reads the status first, so it names a stock and a template that exist.
+
+## Supported printers
+
+Every DYMO LabelWriter that appears on USB. Known by name: **LabelWriter 400, 450, 450 Turbo,
+450 Twin Turbo, 450 DUO, 4XL, Wireless, 550, 550 Turbo and 5XL**. An unrecognised DYMO is driven as
+a 450, with its second roll detected from the device's own product string. The 550 generation reads
+an RFID tag on the roll and refuses stock without one; nothing in software can change that.
+
+## How the printing works
+
+There is no CUPS in the container and no DYMO driver. BRUH Print speaks the LabelWriter's raster
+protocol directly over USB — the same command sequence DYMO's own CUPS driver has sent for twenty
+years, in Standard mode one full raster line per dot row. Roll select, darkness and speed go once per
+job; the top-of-form search, the dot tab and the line skip go per copy.
+
+- The preview and the printed raster are **the same bitmap** with different endings, and nothing is
+  anti-aliased — a thermal head is one bit deep.
+- The **2.25″ label on a 2.24″ head**: the LabelWriter 450's head is 672 dots at 300 dpi. The three
+  extra dot columns are left off the canvas rather than everything being scaled down half a percent,
+  which would make barcode bars fractional.
+- Copies between the first and last get the **short** form feed, so a run of ten is ten labels, not
+  ten printed and ten blank.
+
+## Troubleshooting
+
+| Symptom | What it means |
+| --- | --- |
+| *"No DYMO printer is on the USB bus."* | In order of likelihood: no power (a LabelWriter with no power does not appear at all), a charge-only cable, or an unpowered hub. There is no setting to check. |
+| *"…is connected but this add-on may not open it."* / *"…is claimed by something else"* | Restart the add-on. If it persists, another add-on (CUPS, a print server) has claimed the printer; two drivers cannot share one LabelWriter. |
+| It says it printed and nothing came out | Settings → **If nothing comes out**: try the next mode and **Print a check label**. Please report which one worked. |
+| *"Ask about paper and lid"* cannot ask | The printer's USB interface is one-way. Printing is unaffected; **USB details** shows what it exposes. |
+| *"Ask about paper and lid"* got no answer | Ordinary — a LabelWriter mid-feed, or with older firmware, does not reply. |
+| The whole label comes out rotated, text off the edge | The stock's two measurements are swapped: **Rename or resize → These are the wrong way round**. |
+| The words lie the wrong way along a right-shaped label | **Text direction** on the stock row. |
+| Everything prints too far down (or to one side), the same amount every time | Top-of-form registration on that roll: **Line up this roll**. |
+| The label is blank, or half of it | **Print a check label**. A complete frame means the artwork is outside the printable area (often the wrong stock); a missing side means the roll needs lining up. |
+| The card shows *"Custom element doesn't exist"* | Restart Home Assistant once — see [Dashboard Card](/bruh-print/card/#updates-and-caching). |
+| A refusal naming two stocks | The label is for a stock that is not in that roll. Load it, record it on the Printer tab, or pick a loaded label. |
+
+<Aside title="Backups">
+Everything BRUH Print keeps — stocks, rolls, templates, history and settings — is in `/data` and
+goes into Home Assistant backups. None of it is a credential; the add-on has no login.
+</Aside>

@@ -3,10 +3,15 @@ title: Rules & One-Offs, in a Sentence
 description: Say what you want your house to do, in a sentence. A standing rule is drafted, replayed over the last month and graded against what you did before it's offered; a one-off runs once and switches itself off.
 ---
 
-Say what you want your house to do, in plain English — in the ask bar on **Home → Insights**,
-to a voice assistant, or with the `brain.intent` service. brAIn works out whether you mean
-**a rule** (every time) or **a one-off** (next time), writes the automation, and puts it on
-the **Proposals** tab. Nothing runs until you say yes.
+Say what you want your house to do, in plain English — in the *Ask or tell the house* line on
+the [Morph dashboard](/brain/morph/), in a phone Reply, to a voice assistant, or with the
+`brain.intent` service. brAIn works out whether you mean **a rule** (every time) or **a
+one-off** (next time), writes the automation, and puts it on **Insights → Needs you**. Nothing
+runs until you say yes, unless you chose *Act* or *No limits* in ⚙ → Permissions, where a rule
+you asked for is accepted at once.
+
+In the [Ask](/brain/terminal/) chat, brAIn edits automations directly and says what changed;
+for a new standing rule it can replay it over your history first, the same way.
 
 ## A rule, in a sentence
 
@@ -23,7 +28,7 @@ automation. Then, **before you see it**, brAIn simulates it against your own his
 
 So the proposal arrives with its case in one sentence:
 
-```text title="A rule, on the Proposals tab"
+```text title="A rule, on Needs you"
 You said:    "Whenever the front door opens after dark, turn the hall light on."
 Understood:  When the front door opens between sunset and sunrise, turn on the
              Hall light.
@@ -71,8 +76,8 @@ turn off.
 
 ## Two ways to say one
 
-**The ask bar**, on the Insights tab. A question that *opens* with a moment goes here instead
-of becoming an insight card: *when…*, *whenever…*, *once…*, *as soon as…*, *the next time…*,
+**A sentence** in Morph's *Ask or tell the house* line or a phone Reply. One that *opens* with a
+moment goes here instead of being answered as a question: *when…*, *whenever…*, *once…*, *as soon as…*, *the next time…*,
 *next time…*, *tell me when…*, *let me know when…*, *remind me when…*
 
 It is matched on the opening word for a reason. *"Tell me when the freezer is unusual"* is an
@@ -106,7 +111,7 @@ Those first two are deliberately kept apart. Which half was misread is the only 
 knowing when it is wrong, and one paragraph blending the two cannot say.
 
 :::note[The replay is a sanity check, not evidence that you want it]
-Everywhere else on the Proposals tab, a replay is the argument: *this is how often the thing
+Everywhere else on Needs you, a replay is the argument: *this is how often the thing
 brAIn is suggesting would have happened*. For a one-off it is not that. You already said you
 want it — the replay is the only check there is on a **trigger that has never fired**, and it
 is there so you can see brAIn read the right thing before it goes into your file.
@@ -208,8 +213,8 @@ sentences brAIn cannot use never pushes the armed ones off the tab.
 
 ## Where to see it
 
-- **The Proposals tab**, above the proposals — a one-off is waiting on the *house*, where a
-  proposal is waiting on you. That is also why the tab's badge never counts them.
+- **Needs you**, above the suggestions — a one-off is waiting on the *house*, where a
+  proposal is waiting on you. That is also why the badge never counts them.
 - **⚙ Diagnostics** carries how many are armed, fired, refused, overdue and still queued, plus
   the cap and the fortnight. An empty tab reads the same whether nobody has asked for one or
   every ask was refused.

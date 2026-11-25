@@ -12,10 +12,10 @@ brAIn does the opposite. Once a night it measures what **your** house normally d
 every rule it raises is expressed against that measurement. Nothing here costs a Claude
 turn — it is arithmetic over history Home Assistant already keeps.
 
-**House → Knowledge** shows every measurement and where it has got to — ready, collecting
+**Memory → Knowledge** shows every measurement and where it has got to — ready, collecting
 (with the date it will be ready), stale, or not available here and why:
 
-![House → Knowledge, "What brAIn has measured": When the house wakes, What is normal here, How rooms hold heat, Doors and windows, and Machines — each with a one-line status, a state pill such as "not started" or "not available", and the card that arrives when the measurement lands](./images/panel-knowledge.webp)
+![Memory → Knowledge, "What brAIn has measured": When the house wakes, What is normal here, How rooms hold heat, Doors and windows, and Machines — each with a one-line status, a state pill such as "not started" or "not available", and the card that arrives when the measurement lands](./images/panel-knowledge.webp)
 
 ## What gets measured
 
@@ -172,7 +172,7 @@ The measurements above are about what is *normal*. One more reading is about *no
 minutes brAIn puts together what it can see — who is home, which rooms have recent motion,
 media or lights on, which doors are open when they usually are not, what is running, the
 weather, and today's event on any calendar you chose. When that picture changes, a quick look
-turns it into a **mode** and one sentence, shown at the top of the Findings feed:
+turns it into a **mode** and one sentence, shown at the top of Needs you:
 
 > Home, settled for the evening — the lounge and kitchen in use, the dishwasher running.
 
@@ -212,7 +212,7 @@ Twice a day brAIn reads the next three days of your weather forecast. A frost (0
 below), a hot day (30 °C or above), a day with 10 mm of rain or more, and gusts of 60 km/h or
 more each become a short note — worked out with arithmetic, not a model.
 
-**Calendars brAIn may read**, under the line on the Findings feed, lists your calendars with
+**Calendars brAIn may read**, under the line on Needs you, lists your calendars with
 none ticked. Nothing is read until you tick one. A ticked calendar's next three days are read
 too, and the notable events become notes like *"Mum staying Fri–Sun"*. What a calendar says is
 treated as information, never as an instruction.

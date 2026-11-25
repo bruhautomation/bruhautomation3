@@ -4,12 +4,16 @@ description: How BRUH Bambu Studio prints — the /share/bambu library, importin
 ---
 
 import { Aside, FileTree, Tabs, TabItem } from '@astrojs/starlight/components';
+import phoneShot from './images/printers-phone.webp';
 
 Every print, whoever starts it — the **Files** tab, a designed part, an automation, brAIn — is
 the same job: **slice** (only if the file is not sliced yet), **upload** to the printer over
 FTPS, and **start** over MQTT. Nothing goes through Bambu's cloud.
 
 ## The library: `/share/bambu`
+
+![The Files tab: the library with its import box, a search field, and each file with its format, whether it is sliced, the print time and grams, and a Print button](./images/files.webp)
+
 
 Models and print files live in **`/share/bambu`**, so you can reach them over Samba, from the
 File Editor, from the panel's **Files** tab, and from Bambu Studio's own Open dialog.
@@ -103,6 +107,9 @@ When in doubt, open the model in Bambu Studio, set it up, and save it as a proje
 
 ## Print options
 
+![The Print dialog for an STL: printer, plate, AMS filament, build plate, speed, copies, calibration switches, and the slicer settings grouped by quality, strength and support, each empty field keeping Bambu Studio's profile](./images/print-dialog.webp)
+
+
 Every way of printing offers the same options, from one list: the **Print** dialog on the Files
 tab, **Manual print** for a designed part, the `bruh_bambu.print_file` service, and brAIn in the
 conversation.
@@ -146,6 +153,9 @@ and arranged by Bambu Studio; a print-in-place part stays in one piece.
 
 ## The Printers tab
 
+![A printer card on the Printers tab: camera with light, pause and full-screen buttons, the job with progress ring and controls, an HMS message, speed, temperatures, the AMS with the tray in use, and on the right failure detection, On the printer, and Temperatures and G-code](./images/printer-card.webp)
+
+
 Each printer is one card, laid out by what matters now.
 
 **The header** carries the printer's state in the same words as the dashboard card —
@@ -183,6 +193,10 @@ is shown.
 **On the printer** lists the print jobs on the printer's own storage, newest first, with their
 size and date, to print again or (from **⋯**) delete. The first eight show; the rest are behind
 **Show all**.
+
+On a phone the card stacks into one column:
+
+<img src={phoneShot.src} width="390" alt="The Printers tab on a phone: the printer card in one column, with the camera, the job, the AMS trays and failure detection one under another" />
 
 **Failure detection** has its own box on the card — see
 [Failure detection](/bruh-bambu-studio/failure-detection/).

@@ -1,0 +1,123 @@
+---
+title: The Resident
+description: How brAIn notices, decides what deserves your attention and investigates before you see a card. Signals, the first look, investigations and cases, the floors nothing can talk its way past, and how it learns from your answers.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A rule reads one instant and cannot go and look. A sensor that has not moved in a week is
+stuck, or it is a contact on a cupboard nobody opens. 220°C is impossible for a room and
+ordinary for a 3D printer. That is why a pile of rules produces cards that are true about a
+number and wrong about your house.
+
+The **Resident** is the loop that fixes this. The rules are senses now: they raise
+*signals*, and something with judgement decides which of them deserves anybody's attention
+and goes to find out before it asks you.
+
+## What it watches
+
+brAIn subscribes to Home Assistant's own event bus and turns a small, deliberate set of
+events into signals:
+
+- a protected entity changing;
+- somebody arriving or leaving;
+- a leak, smoke, CO or gas sensor tripping;
+- a change on anything brAIn already holds a fact about.
+
+Beside those: every row the [house checks](/brain/checks/) file (every six hours by default,
+with no Claude run), readings well outside their own [measured normal](/brain/measurements/)
+that no rule said anything about, a person putting back what an automation just did, an answer
+you gave on your phone, and two scheduled moments: your measured bedtime and your measured
+morning. Everything else a house publishes is left to the checks, where arithmetic is cheaper
+than attention.
+
+## The first look
+
+Every ten minutes, or straight away when something urgent happens, one cheap run reads the
+waiting signals as a numbered list and says, for each, **ignore**, **watch**, **investigate**
+or **act**, with one sentence. It has no tools: whether something deserves another thought can
+be answered from a sentence. Most of what a house produces is *ignore*, and that is the point.
+
+**Silence surfaces.** A signal nothing said anything about, a reply that could not be read, a
+run that failed: each of those leaves the card on Needs you, carrying the sentence that says
+nothing looked at it. If brAIn cannot look at all (not signed in, automatic runs paused, the
+budget spent), cards wait for the next look rather than being shown unchecked. Anything that
+has waited an hour with nothing coming back is shown anyway, saying so. *I could not look* and
+*it is not real* are different claims, and only the second may keep a problem off your screen.
+
+## The investigation
+
+*Investigate* buys a stronger run with read-only Home Assistant tools: history, statistics,
+the logbook, traces, what brAIn has measured and what it has been told. It writes a **case**:
+a claim in one sentence, the evidence it actually read, how sure it is, how much it matters,
+and any actions with the consent each needs.
+
+A run that cannot make a claim makes none, which is a good answer and costs nobody anything.
+A claim whose evidence names something the run never read is refused whole.
+
+When the first look says a card a house check filed is worth a look, that card is **not shown
+yet**. The investigation reads the history, the logbook and the device first, then does one of
+three things:
+
+- **rewrites the card** with what it found: its sentence, what to do about *this* device in
+  *this* house, and the readings it was based on, marked *written after looking*;
+- **sets it aside** with its reason, when the problem has already cleared, was a moment that
+  passed (a device that dropped off for a minute, a reading during a restart), is normal for
+  what that thing is, or is something brAIn already knows. You are never asked, and it is in
+  **History › Set aside by brAIn** where you can put it back;
+- **or shows it as it was**, with the first look's reason, if the investigation could not run,
+  made no claim, or today's allowance is spent. A spent allowance is a reason to wait, never a
+  reason to hide a card.
+
+The investigation never tells you to "check" something its tools can read. It reads it and
+says what it found, and it asks you a question only about what no sensor records: what you
+meant, what you prefer, something physical in the house.
+
+A card already on Needs you is rewritten in place, never duplicated. When it is unsure about
+something that matters and a stronger model looks again, that model is shown the first
+conclusion and may withdraw it.
+
+## Floors nothing can talk its way past
+
+- **Water, smoke, gas, a freeze, a device you marked protected**, and anything the house itself
+  flagged as urgent are always shown. Being wrong about a stuck thermometer costs a card; being
+  wrong about a leak costs a floor.
+- **A tripped safety detector does not wait for any of this.** It is filed and sent by code the
+  moment it trips. [Notifications →](/brain/notifications/#leaks-smoke-co-and-gas-never-wait)
+- **Act does not mean brAIn touches your house.** It means a case is filed and your phone is
+  told, through quiet hours. The only route from a model to your `/config` is still a plan you
+  read, a press you make, and an Undo on the card afterwards.
+
+## Cameras, only to confirm
+
+When a leak, smoke, CO or gas sensor trips, or a door, window or lock is involved, the
+investigation may look through the cameras you ticked in **⚙ → Cameras & calendars**: the ones
+in the same room, or all ticked ones if none shares the room. Never the first look, never
+anything else, at most a dozen looks a day across the house, and every prompt that may see a
+frame is told to describe the house and never a person. [Cameras →](/brain/safety/#cameras)
+
+## The budget
+
+Looking is the cheap half and brAIn spends it freely. Investigations are rationed per day, and
+the **thinking** setting in ⚙ → Model & usage is the dial: *light* 6 a day, *normal* 16,
+*generous* 32, at most three per look. What is left over waits rather than being dropped.
+
+## How it learns from your answers
+
+Every call the Resident makes is written down, and once a day brAIn checks each against what
+you did next: **Ignore**, **Done**, **Add to To Do**, restoring something it set aside, a problem
+it passed over turning up within three days, or undoing a fix. Where the record is lopsided
+(the same sensor raised four times and ignored each time) a cheap run writes a short
+judgement into its facts. You will see it under **Memory → Knowledge**, where you can delete
+it. Each look is also shown a handful of brAIn's earlier calls on similar things and how they
+turned out.
+
+Judgements never make brAIn quieter about leaks, smoke, gas, freezing or anything on your
+protected list, never mention people, and disappear when a later card on the same thing
+turns out to be real. `brain eval outcomes` in the terminal shows the record.
+
+<Aside type="tip" title="When it is not working">
+⚙ → Diagnostics carries the loop: how many signals are waiting, when it last looked, what
+the day has cost, and whether the event subscription is connected. A quiet house and a loop
+that has stopped look the same without those numbers, which is why they are there.
+</Aside>

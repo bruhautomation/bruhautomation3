@@ -3,20 +3,20 @@ title: Proposals
 description: brAIn watches what you do by hand, finds the patterns, and offers the automation — with a replay against your own history, a week-long trial graded against what you actually did, and an accept that writes a real automation you can undo. The tab where brAIn offers something rather than reports something.
 ---
 
-**Home → Proposals** is where brAIn offers to change something rather than report something:
+**Insights → Needs you** is where brAIn offers to change something rather than report something:
 a habit worth automating, a condition an automation you keep undoing is missing, an
 emergency playbook, four scenes for a room, or a [rule you asked for in a
 sentence](/brain/intents/). Each arrives with its evidence and what it *would have done* over
 your own history.
 
-![The Proposals tab, headed "What could be better", with a "Design scenes for" room picker and two proposals — "Stop the away-lighting rule running on weekday mornings" and "Turn the porch light off at 23:10 on weekdays" — each with its evidence and the buttons Try it for a week, Enable it and No thanks](./images/panel-proposals.webp)
+![The Needs you, headed "What could be better", with a "Design scenes for" room picker and two proposals — "Stop the away-lighting rule running on weekday mornings" and "Turn the porch light off at 23:10 on weekdays" — each with its evidence and the buttons Try it for a week, Enable it and No thanks](./images/panel-proposals.webp)
 
 Every proposal takes the same answers: **Enable it**, **Try it for a week**, and **No
 thanks** — with an optional reason, which teaches brAIn more than silence. Nothing is written
 until you say yes, and everything written can be undone.
 
 This tab is the **only** place a proposal is offered. For a while suggestions also rode in
-the [Findings](/brain/findings/) feed, where one decision was counted by two badges and the
+[Needs you](/brain/needs-you/), where one decision was counted by two badges and the
 feed's copy carried less of the evidence. Now everything you'd want before saying yes is
 here — the replay and the before-and-after, a playbook's targets by name, the scene
 swatches, a trial's week and its grade, and **Undo** on anything you accepted. The Findings
@@ -38,10 +38,10 @@ worse:
 | | The question it answers | Where it lives |
 | --- | --- | --- |
 | **Memory** | What is *true* of this home? | A document |
-| **Guesses** | What might brAIn have *wrong*? | Findings tab |
-| **Findings** | What is *broken*? | Findings tab |
-| **Activity** | What *happened*? | Activity tab |
-| **Proposals** | What could be *better*? | **Proposals tab** |
+| **Guesses** | What might brAIn have *wrong*? | Needs you |
+| **Findings** | What is *broken*? | Needs you |
+| **Activity** | What *happened*? | Timeline |
+| **Proposals** | What could be *better*? | **Needs you** |
 
 A proposal gets its own tab rather than joining the work list. A list of things you might
 want, sitting beside a list of things that are broken, makes both worse — the broken things
@@ -209,8 +209,8 @@ a wasted no.
 
 ## What gets proposed
 
-Five producers file here, and two of them you can start yourself. The ask bar on the Insights
-tab routes a sentence that opens with a **moment** — *when…*, *once…*, *the next time…*,
+Five producers file here, and two of them you can start yourself. A sentence in Morph's *Ask or
+tell the house* line or a phone Reply routes that opens with a **moment** — *when…*, *once…*, *the next time…*,
 *tell me when…* — to a [one-off intent](/brain/intents/), and one that asks for scenes and
 names a **room** to the [scene designer](/brain/scenes/). Everything else on this page is
 offered on a house-checks pass, off evidence brAIn already had.
@@ -292,7 +292,7 @@ Accepting one goes down the path above, unchanged. There is no separate switch.
 
 When brAIn has watched you put the same automation back, at about the same time of day, on
 enough separate days, it can say more than *"you keep undoing this"*. The
-[finding](/brain/findings/) reports the fight; this is the change that ends it.
+[finding](/brain/needs-you/) reports the fight; this is the change that ends it.
 
 > *Stand Evening lights down between 21:00 and 23:00 on weekdays*
 
@@ -323,7 +323,7 @@ spelled.
 
 #### The evidence is the ledger's, and is never re-derived
 
-The hours and the days come straight from the [override ledger](/brain/findings/), which
+The hours and the days come straight from the [override ledger](/brain/needs-you/), which
 already carries every floor that makes a band mean anything: at least four overrides, on at
 least three separate days, the most recent one inside the last week, and at least three
 quarters of them inside the band — which is reported as the hours actually occupied rather
@@ -354,8 +354,8 @@ A pass offers at most three, strongest evidence first.
 
 ### Rules and one-offs, in a sentence
 
-Say a rule — *"whenever the front door opens after dark, turn the hall light on"* — in the
-ask bar or to voice, and Claude drafts the automation, reading your house but unable to act.
+Say a rule — *"whenever the front door opens after dark, turn the hall light on"* — in
+Morph's Ask line or to voice, and Claude drafts the automation, reading your house but unable to act.
 Before you see it, brAIn **simulates it twice** over your own history: a replay of the last
 month says how often it would have fired, and the last fortnight of those firings is graded
 against what you did yourself. That is the case on the card, in one sentence:
@@ -408,7 +408,7 @@ schedule is offered for any room, including ones with more than one word in the 
 
 ## Where to see it
 
-- **The Proposals tab** in the panel.
+- **The Needs you** in the panel.
 - `GET /api/proposals` — the store as JSON.
 - Declines are recorded with their note, so the scorecard can show which producers earn
   their place. A proposal source that gets declined nine times out of ten stops proposing.
