@@ -221,7 +221,7 @@ a second lookup:
 | Event | When | Carries |
 | --- | --- | --- |
 | **`brain_case`** | A finding opens on [Needs you](/brain/needs-you/) — something waiting on you. (Suggestions and guesses are on the feed too, but aren't announced by an event.) | `case_id`, `kind`, `claim`, `severity`, `status`, `entity_id`, `fixable`, `source` |
-| **`brain_case_ended`** | That finding leaves the feed, whichever ending it got. **Dismiss** isn't an ending: a dismissed finding fires nothing when it goes and nothing when it comes back. | `case_id`, `kind`, `claim` |
+| **`brain_case_ended`** | That finding leaves the feed, whichever ending it got. **Snooze** isn't an ending: a snoozed finding fires nothing when it goes and nothing when it comes back. | `case_id`, `kind`, `claim` |
 | **`brain_change`** | brAIn changed something in the house (a fix landed). A Home Assistant restart doesn't replay old ones. | `case_id`, `claim`, `entity_id` |
 | **`brain_finding`** | The same moment as `brain_case`, in the older shape — kept so nothing written against it breaks. | `ts`, `text`, `severity`, `entity_id`, `fixable` |
 | **`brain_learned`** | A fact was filed into [memory](/brain/memory/). | `fact`, `source` |

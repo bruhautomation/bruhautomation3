@@ -137,7 +137,7 @@ you'll notice is which layer the work happened in.
 Everything above is Claude with a model in the loop, on your instruction. There are a few
 exceptions, and each one is the narrowest thing that can do its job.
 
-**Applying a Plan plan** is mostly done by brAIn's panel itself. The plan is a list of
+**Applying a plan** is mostly done by brAIn's panel itself. The plan is a list of
 typed steps — change one automation, reload a configuration, call a service on named
 devices, rename an entity, move it to a room — and **Apply** carries those out with no
 model and no shell, through the same snapshot-and-verify path as the edits below. It stops
@@ -147,12 +147,12 @@ needs Claude to work something out starts a Claude run, held to the plan's contr
 
 **A press on Needs you writes to `/config`** — [accepting a
 proposal](/brain/proposals/#saying-yes-and-taking-it-back), or removing a one-off that has
-fired — with no Claude run behind it (1.44.0). The file is snapshotted into
+fired — with no Claude run behind it. The file is snapshotted into
 the same edit journal first, the change is only settled once Home Assistant is verifiably
 running it, the write is reverted if it is not, and both the toast and `brain undo` take it
 back.
 
-Since 1.46 that write has three shapes, because what the producers need is three different
+That write has three shapes, because what the producers need is three different
 things:
 
 - **Append** — the ordinary case. One automation on the end of `automations.yaml`, or four

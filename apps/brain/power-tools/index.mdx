@@ -71,9 +71,13 @@ Each service page below shows a 🗣️ line: a natural-language phrasing that w
     3 services: find references to dead entities; raise and clear custom repair issues.
     [Reference →](/brain/power-tools/diagnostics-and-repairs/)
   </Card>
+  <Card title="Backups, Energy, Networks & More" icon="rocket">
+    22 services: backups, long-term statistics and the energy dashboard, Z-Wave and Thread, Home Assistant's addresses, categories, integration options, group members, user roles and dashboard settings.
+    [Reference →](/brain/power-tools/system/)
+  </Card>
 </CardGrid>
 
-**Nothing is create-only.** Every attribute a `create_*` service accepts has a service that changes it later, and every registry object that can be created can also be renamed and deleted — so a label created with `create_label` can be renamed, recoloured, and removed again without ever touching `.storage`. That isn't a promise, it's a test: [`tests/test_power_tools.py`](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/tests/test_power_tools.py) asserts the `rename_*` and `delete_*` families are complete, so a `create_*` service can't ship without its counterparts. And an `update_*` writes only the fields you name — pass just `color` and the icon and description stay exactly as they were.
+**Nothing is create-only.** Every attribute a `create_*` service accepts has a service that changes it later, and every registry object that can be created can also be renamed and deleted — so a label created with `create_label` can be renamed, recoloured, and removed again without ever touching `.storage`. And an `update_*` writes only the fields you name — pass just `color` and the icon and description stay exactly as they were.
 
 ## The safety model
 

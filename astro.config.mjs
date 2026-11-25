@@ -115,6 +115,10 @@ const retiredAppUrls = {
 	'/bruh-insights/how-it-works/': '/brain/insights/',
 	'/bruh-insights/reference/': '/brain/reference/',
 	'/bruh-insights/changelog/': '/brain/archive/bruh-insights-changelog/',
+	// Pages folded into others when the app docs were rebuilt (November 2026).
+	'/bruh-print/labels/': '/bruh-print/designer/',
+	// The add-on's PLUGINS.md links here.
+	'/bruh-minecraft/commands/': '/bruh-minecraft/command-generator/',
 };
 
 const powerToolsPages = [
@@ -467,6 +471,51 @@ export default defineConfig({
 							],
 						},
 						{
+							label: 'BRight',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bright' },
+								{ label: 'Quick Start', slug: 'bright/quickstart' },
+								{ label: 'Light Map, Lab & Calibration', slug: 'bright/light-map' },
+								{ label: 'Effects', slug: 'bright/effects' },
+								{ label: 'How a Show Is Built', slug: 'bright/shows' },
+								{ label: 'Manual Mode', slug: 'bright/manual' },
+								{ label: 'Parties', slug: 'bright/parties' },
+								{ label: 'Reference', slug: 'bright/reference' },
+								{ label: 'Changelog', slug: 'bright/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Print',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-print' },
+								{ label: 'Quick Start', slug: 'bruh-print/quickstart' },
+								{ label: 'Quick & the Designer', slug: 'bruh-print/designer' },
+								{ label: 'Templates', slug: 'bruh-print/templates' },
+								{ label: 'Rolls, Stock & Twin Turbo', slug: 'bruh-print/rolls' },
+								{ label: 'Dashboard Card', slug: 'bruh-print/card' },
+								{ label: 'Reference', slug: 'bruh-print/reference' },
+								{ label: 'Changelog', slug: 'bruh-print/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Minecraft',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-minecraft' },
+								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
+								{ label: 'Add-on Browser', slug: 'bruh-minecraft/addons' },
+								{ label: 'Bedrock Players', slug: 'bruh-minecraft/bedrock' },
+								{ label: 'The Companion & BRUH Sight', slug: 'bruh-minecraft/companion' },
+								{ label: 'Worlds & Backups', slug: 'bruh-minecraft/worlds' },
+								{ label: 'Home Assistant Integration', slug: 'bruh-minecraft/home-assistant' },
+								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/' },
+								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
+								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
+							],
+						},
+						{
 							label: 'BRUH Bambu Studio',
 							collapsed: true,
 							items: [
@@ -523,33 +572,6 @@ export default defineConfig({
 								{ label: 'Quick Start', slug: 'bruh-browser/quickstart' },
 								{ label: 'Errands & Purchases', slug: 'bruh-browser/guide' },
 								{ label: 'Changelog', slug: 'bruh-browser/changelog' },
-							],
-						},
-						{
-							label: 'BRight',
-							items: [
-								{ label: 'Overview', slug: 'bright' },
-								{ label: 'Quick Start', slug: 'bright/quickstart' },
-								{ label: 'How a Show Is Built', slug: 'bright/shows' },
-							],
-						},
-						{
-							label: 'BRUH Print',
-							items: [
-								{ label: 'Overview', slug: 'bruh-print' },
-								{ label: 'Quick Start', slug: 'bruh-print/quickstart' },
-								{ label: 'Labels, Stock & the Designer', slug: 'bruh-print/labels' },
-							],
-						},
-						{
-							label: 'BRUH Minecraft',
-							items: [
-								{ label: 'Overview', slug: 'bruh-minecraft' },
-								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
-								{ label: 'Home Assistant Integration', slug: 'bruh-minecraft/home-assistant' },
-								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/' },
-								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
-								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
 							],
 						},
 					],

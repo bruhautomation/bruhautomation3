@@ -25,6 +25,10 @@ Each conversation agent you create gets its own **name, model, system prompt and
 
 ![A voice assistant in Home Assistant with the conversation-agent picker open, showing custom brAIn personalities — Opus, Picard, Data, HAL, Jarvis, GLADOS, Haiku and more](./images/voice-assistant-agent.webp)
 
+With **Personality** on in [⚙ › Features](/brain/features/), the name and personality written
+in ⚙ › Personality are the household's assistant everywhere, voice included; an agent's own
+prompt still leads for that agent.
+
 Without a personality, a built-in default applies ("helpful, efficient, 1–2 short sentences"). With one, that default is dropped entirely — so if your persona should stay brief for TTS, say so in the persona: *"…no matter how excited you get, keep spoken replies under two sentences."*
 
 New agents default to **Claude Haiku** for snappy responses; pick any model per agent in the integration options. An agent set to **Default** runs on brAIn's own voice model and thinking depth.
@@ -184,8 +188,8 @@ mid-thought.
 
 ## Your other BRUH add-ons, by voice
 
-If **BRUH Minecraft**, **BRight** or **BRUH Print** is installed with its Home Assistant
-integration, any agent can drive it through that add-on's own services — nothing to set up.
+With another BRUH app installed, any agent can drive it through that app's own services —
+nothing to set up. The full list, app by app: [brAIn and the BRUH apps](/brain/apps/).
 
 - **Minecraft.** *"Teleport Alex to Sam"*, *"put Alex in creative"*, *"make it day"*,
   *"who's on?"* Names are matched against who's online the way you'd say them, so "Alex"
@@ -197,6 +201,14 @@ integration, any agent can drive it through that add-on's own services — nothi
   because a misheard "two hundred" is a roll.
 - **Light shows.** *"Start the Friday party on the den speaker."* A speaker or scene named
   to a voice agent has to be one it can see.
+- **3D printing.** *"Design a 40 mm knob for a 6 mm D-shaft and print two"*, *"pause the
+  print"*. Voice may design and start a print from a file (four copies at most), pause, resume,
+  and change speed, light and temperature; it may not stop a print, slice, send G-code or import
+  a link.
+- **Cooking.** *"Start the Joule at 57 for two hours."* Voice may start and stop a cook.
+- **The garden.** *"Log two pounds of tomatoes."* Voice may log a harvest, a spray and a note.
+- **Errands.** *"Add my usual order to the grocery cart."* Voice may start a cart errand and ask
+  how it went; it may never buy or stop one.
 
 Every one of these goes through the same checks as any other service call, so an agent's
 Blocked services list applies — take `bruh_minecraft.teleport` away from the kitchen speaker
