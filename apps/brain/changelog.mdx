@@ -19,7 +19,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 - **Done for a check you make yourself.** A finding that asks you to go and look at something offers **Done**, with an optional note of what you found, instead of Yes and No — on Needs you, Insights, Home Assistant's Repairs, phone notifications and Morph's cases. A real yes-or-no question still asks Yes or No (5.5.21, remade in 5.5.23).
 - **Steps that fit the device.** Before saying how to fix something, brAIn looks at the device the reading comes from, what else is on it and its battery, so a door reading that comes from a smart lock's own door sensor gets "recalibrate the lock's door sensor", not a battery swap in a sensor that is not there.
 - **Readings judged against their own normal.** A freezer probe at its usual temperature is no longer reported for being warmer than a generic target; a real rise says how far it is from usual.
-- **"You keep undoing…" names the cause and a fix**: which trigger started the runs you undid ("a triple press on the hall switch started 3 of the 4"), and the one condition brAIn put on the [Proposals](/brain/proposals/) tab for you to approve.
+- **"You keep undoing…" names the cause and a fix**: which trigger started the runs you undid ("a double press on the porch switch started 3 of the 4"), and the one condition brAIn put on the [Proposals](/brain/proposals/) tab for you to approve.
 - **An automation triggered by a device you no longer use** is offered a clean-up (take that trigger out, or turn the automation off) instead of being reported as broken. Nothing changes until you apply it.
 - **Stop watching holds across every check**, and Watch again undoes it.
 - **Every finding says how soon it needs you** — Act today, Soon or When convenient — set by what is at stake (food, water, heat and security first), and the list is ordered by it (5.5.9).
@@ -39,7 +39,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 - **Impossible service reminders** ("overdue by 12,000 miles") are asked about as the reminder's setting, and one Wrong holds.
 - **A Home Assistant restart is one report**, "Home Assistant did not answer", instead of one per failed read.
 - **While Claude's usage limit has paused brAIn, nothing brAIn starts on its own runs** until the pause ends; your own chats and presses can still try.
-- **Words and lists**: temperatures in the house's own unit, dates in one short style, device lists grouped ("Porch light 1, 2 and 3") and given whole, headlines that say what was measured ("offline on the Zigbee network for 16 days" rather than "struggling"), and brAIn called by the one name you gave it everywhere, including Repairs and To-do.
+- **Words and lists**: temperatures in the house's own unit, dates in one short style, device lists grouped ("Porch light 1, 2 and 3") and given whole, headlines that say what was measured ("offline on the Zigbee network for two weeks" rather than "struggling"), and brAIn called by the one name you gave it everywhere, including Repairs and To-do.
 - **The house book** reads Home Assistant first (rooms, automations, scripts) and stops asking what it can now answer, while still asking what only you know (which breaker, which key).
 - **Ask's chat list** marks only chats that are answering or waiting on you; History › Ignored says when and why; Knowledge opens on facts about the house.
 - **Phone fixes**: Settings' More and Details, Morph's room chips, chart zoom reset and All lights slider are full-size tap targets.
@@ -133,7 +133,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Release version="5.3.0" date="November 14, 2026">
 
-**Morph is calmer and steadier: nothing on the dashboard reorders itself any more, rooms never fold, and the room rail, haptics and pull-to-refresh make it feel like an app.** The design is the one a real house built for itself over a month of daily use. If you relied on rooms rising to the top or folding, those behaviours are gone; your `dashboard.yaml` order is now the order. See [Morph](/brain/morph/).
+**Morph is calmer and steadier: nothing on the dashboard reorders itself any more, rooms never fold, and the room rail, haptics and pull-to-refresh make it feel like an app.** If you relied on rooms rising to the top or folding, those behaviours are gone; your `dashboard.yaml` order is now the order. See [Morph](/brain/morph/).
 
 <Changes type="added">
 
@@ -185,12 +185,12 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 - **⚙ › Model & usage says where brAIn's own work went** in household words (Watching the house, Insight cards, Dashboard requests, Voice, Automations, Memory and learning, Fixes…), with each one's share.
 - **Weak-link findings need evidence**: a faint Bluetooth device must stay faint for two hours and drop out at least twice in two days; Done on a weak-link finding holds until the signal clearly gets worse.
-- **Morph's light group tiles** read one way ("20 of 31 on · avg 50%", "5 off · 1 unavailable"), and an unreachable switch or fan draws no toggle.
+- **Morph's light group tiles** read one way ("6 of 8 on · avg 50%", "5 off · 1 unavailable"), and an unreachable switch or fan draws no toggle.
 
 </Changes>
 <Changes type="fixed">
 
-- **To Do items made from findings** read as one short headline naming the device and the job ("Replace the battery in the Hall sensor."), with one line under it; Home Assistant's To-do list shows the same.
+- **To Do items made from findings** read as one short headline naming the device and the job ("Replace the battery in the Back door sensor."), with one line under it; Home Assistant's To-do list shows the same.
 - **Chats brAIn opened for you** are titled by what you asked, never by the prompt behind them.
 - **iPhone**: the message box on Ask sits fully above the home indicator, with the app's full screen on or off.
 - With Personality on, message boxes say your assistant's name.
@@ -455,7 +455,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 - **Every chat line is for the companion** for family members (guests still say its name); it stays quiet when a line needs no answer. Turn this off in ⚙ › Minecraft.
 - **A desk for long requests**: a line is answered within seconds, and anything longer becomes a background job (up to five at once), with progress above the hotbar. "Make it red" reaches the running job, "stop that" stops and undoes it, and each finished job is in History › Changes with its own Undo.
-- **It remembers the conversation** for twenty minutes, and **knows the world**: which building and room each player is in, so "build a couch in this room" is enough. It can name places ("this is Alex's room") and find them again.
+- **It remembers the conversation** for twenty minutes, and **knows the world**: which building and room each player is in, so "build a couch in this room" is enough. It can name places ("this is the guest room") and find them again.
 - **Organic builds**: trees, foliage, rocks and domes built from shapes, all undoable.
 - **The spyglass**: look at something and say "make this taller", or just look and wait for two or three ideas on picture pads — which is how a child who doesn't type can ask for things.
 

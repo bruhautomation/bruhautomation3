@@ -1,0 +1,110 @@
+---
+title: Troubleshooting
+description: Fixes for the common BRUH Bambu Studio problems — no sensors after install, a refused camera or access code, commands that do nothing, slices that fail, and a black Studio tab.
+---
+
+## Installing
+
+**The add-on is not in the store, or will not install.**
+It is **amd64 only**. Bambu Lab publishes Bambu Studio for Linux as an x86-64 AppImage and
+nothing else, so it does not install on a Raspberry Pi or another ARM machine.
+
+**No sensors, services, camera or card in Home Assistant.**
+Restart Home Assistant once — the Printers tab and **Settings › Home Assistant** have the
+button. Home Assistant loads the integration only when it starts; the add-on sets it up by
+itself after that. Check `enable_ha_integration` is on.
+
+**"Restart Home Assistant" said it was restarting and nothing seemed to happen.**
+Home Assistant often stops before it answers a restart request. Give it a minute and reload the
+page.
+
+**The Studio tab stays on "Downloading…" or says it could not be installed.**
+The first start fetches about 220 MB from Bambu Lab's GitHub releases. If GitHub is unreachable
+from your Home Assistant, put a direct AppImage link in `appimage_url`.
+
+## The Studio tab
+
+**It stays black or says Bambu Studio closed.**
+Its last output is under *What it last printed* on that tab. If it lists missing system
+libraries, a newer Bambu Studio needs something this version of the add-on does not have yet:
+update the add-on, or pin an older Bambu Studio in `bambu_studio_version`.
+
+**Bambu Studio's 3D view is slow.**
+The slicer draws with software OpenGL, because the add-on has no graphics card to use. A large
+model's 3D view is slow; slicing is unaffected.
+
+**It says Bambu Studio is closed while a print is slicing.**
+On a machine short of memory the window is closed while a print from elsewhere slices, and opens
+again on the same file when it is done.
+
+## Printers
+
+**"The printer refused the access code."**
+The code changes whenever LAN mode is switched off and on. Read it from the printer's screen
+again and save it on **Settings › Printers**. After restoring a backup, codes have to be added
+again too — they are kept out of backups.
+
+**Find printers finds nothing.**
+The scan covers each of Home Assistant's networks up to a /22. If your printers are on a separate
+network (an IoT VLAN, say), use *Search a different network* with its range, such as
+`192.168.2.0/24`, or *Add a printer by hand* with the IP address, serial number and access code.
+Home Assistant has to be able to reach the printer on port 8883.
+
+**Commands do nothing, or come back with "The printer did not confirm it".**
+Switch on **LAN-only mode** and **Developer mode** on the printer.
+
+**"The printer refused the command" / HMS 0500-0500-0001-0007.**
+Firmware with Bambu's authorization refuses commands from Home Assistant unless Developer mode
+is on (**Settings › LAN only mode › Developer mode** on the printer). The printer's own message
+says to update Bambu Studio or Bambu Handy; that does not apply here.
+
+**The camera says it was refused.**
+On an X1, P2S or H2, switch on **LAN mode live view** in the printer's settings. On a P1 or A1,
+check LAN mode is on.
+
+**A printer moved to a new address.**
+**Find printers** offers **Update address** for it, keeping its access code.
+
+## Printing
+
+**A print is refused because the printer is busy.**
+A printer that is printing or paused is refused, with the reason. Idle, finished and failed
+printers are taken to be ready.
+
+**A bare model is sliced for the wrong bed.**
+Set the printer's **model** on the Printers tab. The model picks the profile, never the words in
+the printer's name.
+
+**A slice fails with "the file carries a setting value it rejects".**
+The message ends with the setting Bambu Studio named. Change it, or open the file in Bambu
+Studio to see it in context — and please report it on
+[GitHub](https://github.com/bruhautomation/BRUH-HA-Apps/issues).
+
+**A MakerWorld link will not import.**
+MakerWorld only gives models to a signed-in Bambu account. Open the model from Bambu Studio's
+MakerWorld page on the Studio tab instead.
+
+## Failure detection
+
+**The card says it could not see the print.**
+The chamber was dark or the lens covered. Turn the chamber light on (the card offers it), or
+keep *Turn the chamber light on to see* switched on in **Settings › Print failure detection**.
+
+**It says Watching (basic).**
+brAIn is not installed, or not reachable. The free checks still run; brAIn's looks need brAIn.
+
+**The finished print never leaves the card.**
+Press **Plate is clear**. That plate is then remembered as the empty plate, so the next finish
+clears by itself.
+
+## Design
+
+**There is no Design tab.**
+It needs [brAIn](/brain/) with its Automation integration on.
+
+**brAIn asks for measurements instead of reading my link or photo.**
+The design conversation cannot open a link or see a photo. Give it the sizes that matter.
+
+**A multi-colour part says a colour is not loaded.**
+Each body prints from its own AMS tray. Load the colour it names, change the body's colour from
+its dot under the 3D view, or use **Manual print** to choose trays yourself.

@@ -1,0 +1,342 @@
+---
+title: Morph on Home Assistant Dashboards
+description: Since brAIn 5.0, Morph is a layer on Home Assistant's own dashboards — 21 Morph cards with HA's visual editor, card types brAIn builds once and you use everywhere, dashboards brAIn changes live with full history and undo, the room rail on any sections view, and Morph's themes as HA themes.
+---
+
+import { Steps, Aside, Card, CardGrid, FileTree } from '@astrojs/starlight/components';
+
+Since brAIn 5.0, Morph is also a layer on **any Home Assistant dashboard**. The dashboard
+stays Home Assistant's own: every built-in card, every HACS card, the visual editor, the card
+picker, the sidebar and your themes work exactly as they always did. What Morph adds:
+
+<CardGrid>
+  <Card title="Morph's cards, as HA cards" icon="puzzle">
+    21 cards in **Add card** as **Morph · …**, each with HA's visual editor and HA's sizing.
+  </Card>
+  <Card title="Card types" icon="seti:config">
+    A card brAIn builds once and you use on any dashboard. Change the type, and every copy
+    changes.
+  </Card>
+  <Card title="Dashboards brAIn looks after" icon="pencil">
+    Tap a card, tell brAIn what to change, watch it change live — with history and undo.
+  </Card>
+  <Card title="The room rail and themes" icon="laptop">
+    Morph's room rail on any sections tab, and Morph's looks as ordinary HA themes.
+  </Card>
+</CardGrid>
+
+Everything here loads on every Home Assistant page through the brAIn integration, so there is
+nothing to add to your resources. And the rule that makes it calm to depend on: **if Morph's
+layer fails to load, the dashboard is still a working Home Assistant dashboard.**
+
+## Morph cards
+
+Morph's cards are ordinary Home Assistant cards. In **Add card** they are under *Custom
+cards*, all named **Morph · …**, and each has Home Assistant's visual editor. They keep Morph's
+way of working: **tap** does the main thing, **slide** sets a level, and **hold** opens the
+card in place with its options, its history and **Details** (Home Assistant's own more-info).
+
+| Card | Type | For |
+| --- | --- | --- |
+| Morph · Light | `custom:morph-light-card` | A light as a strip: tap toggles, slide sets brightness, hold for colour and history. |
+| Morph · Light group | `custom:morph-light-group-card` | A room of lights in one strip, each light a lane. |
+| Morph · Fan | `custom:morph-fan-card` | Tap toggles, slide sets the speed. |
+| Morph · Cover | `custom:morph-cover-card` | Blinds, shades and garage doors; a garage door asks before it opens. |
+| Morph · Lock | `custom:morph-lock-card` | Lock or unlock, with a second tap to confirm. |
+| Morph · Switch | `custom:morph-switch-card` | A switch, helper, siren or automation. |
+| Morph · Button | `custom:morph-button-card` | A button, script or scene, with when it last ran. |
+| Morph · Vacuum | `custom:morph-vacuum-card` | Start, dock and state. |
+| Morph · Thermostat | `custom:morph-climate-card` | The temperature on a ruler with the target band; up to four script or scene buttons. |
+| Morph · Sensor | `custom:morph-sensor-card` | A reading with today's sparkline. |
+| Morph · Readings | `custom:morph-readings-card` | Several temperature or humidity sensors on one chart. |
+| Morph · Meter | `custom:morph-meter-card` | Energy, water or gas: today, and the last seven days as bars. |
+| Morph · Media | `custom:morph-media-card` | What is playing, play and pause, volume and source. |
+| Morph · Camera | `custom:morph-camera-card` | A snapshot every ten seconds; opened, it streams. |
+| Morph · Openings | `custom:morph-list-card` | Doors, windows, motion and leaks as a list that says what needs you. |
+| Morph · Person | `custom:morph-person-card` | Who is home, and since when. |
+| Morph · Weather | `custom:morph-weather-card` | Now and the forecast. |
+| Morph · Alarm | `custom:morph-alarm-card` | The alarm's modes as buttons; disarming asks twice. |
+| Morph · Scenes | `custom:morph-scenes-card` | A row of scenes, with the one last set lit. |
+| Morph · Entity | `custom:morph-entity-card` | Any entity as a strip with its state. |
+| Morph · Note | `custom:morph-note-card` | A line of words on the dashboard. |
+
+### Everything is in the visual editor
+
+Entity (or entities), name, icon, **room**, **colour**, **Interactions** — Home Assistant's own
+tap, hold and double-tap actions; left empty, Morph's own tap and hold — and **Card shown when
+it is opened**: any Lovelace card, shown under the card while it is open. Nothing has to be
+typed as YAML, but here is what the editor writes:
+
+```yaml
+type: custom:morph-light-card
+entity: light.kitchen_ceiling
+name: Ceiling
+room: Kitchen
+color: amber
+detail:
+  type: history-graph
+  entities:
+    - sensor.kitchen_temperature
+  hours_to_show: 24
+```
+
+A thermostat with its script buttons on the card's one control row:
+
+```yaml
+type: custom:morph-climate-card
+entity: climate.downstairs
+actions:
+  - script.boost_heat
+  - script.eco_mode
+```
+
+A list card takes `entities` instead of `entity`:
+
+```yaml
+type: custom:morph-list-card
+name: Doors & windows
+entities:
+  - binary_sensor.front_door
+  - binary_sensor.back_door
+  - binary_sensor.kitchen_window
+```
+
+### Sizes are Home Assistant's
+
+In a sections view each Morph card starts at a size that suits it: a light one row, a reading
+two, a thermostat two rows the full width, a camera or a forecast three. Resize it with Home
+Assistant's handles or the editor's **Layout** tab, and **the card fills whatever you give
+it**: a taller light is a bigger slider, a camera fills its card, and a small card drops its
+smaller lines instead of being cut off. Holding a card open makes room for it, and the cards
+below move down until you close it.
+
+## brAIn's cases and Ask, as cards
+
+Two more cards bring brAIn itself onto a dashboard.
+
+**Morph · brAIn's cases** (`custom:morph-cases-card`) is what brAIn wants you to know or
+decide, each case with a **reply line**: every case, or only one area's. Put one in each room
+section and brAIn's cases appear in the room they are about.
+
+```yaml
+type: custom:morph-cases-card
+title: Kitchen
+area: kitchen
+```
+
+Leave `area` and `entities` both empty for every case brAIn has; or list `entities` to show
+only cases about those.
+
+**Morph · Ask** (`custom:morph-ask-card`) is the *Ask or tell the house…* line. brAIn reads the
+words; a question is answered on the card, and a change to this dashboard becomes a Tell, made
+on the dashboard it was asked on.
+
+```yaml
+type: custom:morph-ask-card
+placeholder: Ask or tell the house…
+```
+
+## Letting brAIn change a dashboard
+
+On any dashboard, an administrator sees a **brAIn button** at the bottom right. On a dashboard
+brAIn does not look after yet, it offers **Let brAIn change it**. After that it offers:
+
+- **Tell brAIn about a card…** — tap the card you mean (the tap never presses the card), say
+  what should change, and watch it change. brAIn gets a picture of the card and its YAML, and
+  may make the Home Assistant changes the request needs too (a helper, a template sensor, a
+  script). **Keep** and **Undo** work as they do in [Morph's Tell](/brain/morph/tell-brain/).
+- **Tell brAIn about this dashboard…** — tabs, layout, theme, behaviour.
+- **History and undo** — every change to this dashboard, **including ones made in Home
+  Assistant's own editor**, with **Restore** on each.
+- **Morph on this tab** — the room rail for this tab (below).
+- **Stop letting brAIn change this dashboard** — leaves it exactly as it is.
+
+A Tell's save appears on every open screen in the house at once, with no reload.
+
+### Where it is kept
+
+brAIn keeps each dashboard it may change as a file in Morph's git repository:
+
+<FileTree>
+- config/
+  - morph/
+    - dashboards/
+      - default.yaml the default Overview dashboard
+      - lovelace-kitchen.yaml any other, by its URL path
+    - types/ card types
+    - themes/ Morph's themes
+</FileTree>
+
+You can edit that file too, and Home Assistant shows the change at once. Every save — by you,
+by brAIn, by the learning loop, or in HA's editor — is one commit.
+
+<Aside type="caution" title="YAML-mode dashboards">
+A dashboard kept in YAML files (YAML mode) cannot be changed this way, because Home Assistant
+cannot save it. Storage-mode dashboards — the ones you build in the UI — all can.
+</Aside>
+
+### HACS cards
+
+HACS cards keep working exactly as installed. brAIn changes one through **its own settings**
+and, for its looks, **card-mod**; it never edits a HACS card's code, which a HACS update would
+overwrite. When a change needs the code, brAIn makes a **card type** from it instead and says so.
+
+### brAIn sees any dashboard
+
+brAIn can look at any dashboard tab exactly as Home Assistant draws it — before it answers about
+how one looks, and again after it changes one. It does this as its own system user, **brAIn
+(screenshots)**, which appears under Settings › People › Users as a system user: nobody can log
+in as it, and nothing on a page can change anything while brAIn photographs it.
+
+brAIn can also change one card, size or setting of any dashboard without rewriting the rest
+(each save is backed up and can be undone), and a dashboard's sidebar title, icon, visibility
+and admin-only setting — the `brain.update_dashboard_info` service, which you can call yourself:
+
+```yaml
+action: brain.update_dashboard_info
+data:
+  url_path: lovelace-kitchen
+  title: Kitchen
+  icon: mdi:silverware-fork-knife
+  require_admin: false
+  dry_run: true
+```
+
+## Card types: built once, used everywhere
+
+When brAIn builds a card for you, it can build it as a **card type**. It then appears in **Add
+card** as **Morph · ‹its name›**, with an editor for what each copy sets — which thermostat,
+which script. **Change the type and every copy on every dashboard changes at once.** When you
+tell brAIn about a copy, it asks first whether you mean **just this one** or **every copy**.
+
+A type is a file in `/config/morph/types/`, and each is the card `custom:morph-type-<slug>`.
+There are two kinds:
+
+- **template** — any Lovelace card config, built-in or HACS, with `[[variable]]` placeholders.
+- **element** — for a card no existing card can draw: `<slug>.js` beside the YAML, whose
+  default export is the card's class.
+
+`/config/morph/types/thermostat-buttons.yaml`:
+
+```yaml
+name: Thermostat with buttons
+description: A thermostat and the scripts that go with it.
+kind: template
+variables:
+  - name: entity
+    label: Thermostat
+    required: true
+    selector:
+      entity:
+        filter:
+          - domain: climate
+  - name: boost
+    label: Boost script
+    selector:
+      entity:
+        filter:
+          - domain: script
+card:
+  type: vertical-stack
+  cards:
+    - type: thermostat
+      entity: "[[entity]]"
+    - type: button
+      entity: "[[boost]]"
+      name: Boost
+```
+
+A copy on a dashboard holds only its variables:
+
+```yaml
+type: custom:morph-type-thermostat-buttons
+entity: climate.bedroom
+boost: script.bedroom_boost
+```
+
+`[[name]]` alone is the value itself (a list stays a list); inside a longer string it is the
+value as text. A variable nobody set leaves its key out.
+
+## The room rail on any tab
+
+Any Home Assistant **sections** tab can have Morph's **room rail**: the brAIn button › **Morph on
+this tab** switches it on. On a phone or tablet, swipe the strip at the right edge left and
+slide room to room — each section is a stop, coloured by its state. Home Assistant still lays
+out, edits and sizes the tab, nothing on it reorders itself or folds, and in edit mode the rail
+is off.
+
+In YAML it is one key on the view:
+
+```yaml
+views:
+  - title: Home
+    type: sections
+    morph:
+      rail: true
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Kitchen
+          - type: custom:morph-light-card
+            entity: light.kitchen_ceiling
+          - type: custom:morph-cases-card
+            area: kitchen
+```
+
+<Aside type="note" title="What happened to Morph's view?">
+5.0 shipped `custom:morph-view`, a view type of its own. In 5.1 Home Assistant's own sections
+view took its place — a custom view never gets HA's section editing, badges or columns — and
+every 5.0 Morph view was changed once to a sections view with `morph: {rail: true}`. The change
+is in that dashboard's history, so Restore can undo it.
+</Aside>
+
+## Themes
+
+Morph's looks are Home Assistant themes, in your profile's theme list with no setup:
+
+| Theme | Looks |
+| --- | --- |
+| **Morph** | Light and dark, following each person's own setting. |
+| **Morph Light** | Always light. |
+| **Morph Dark** | Always dark. |
+| **Morph Medium** | Between the two. |
+
+They live in `/config/morph/themes/` as ordinary Home Assistant theme files, so brAIn can change
+them — *"make the cards rounder"* — and every open screen repaints. A theme change is a commit,
+so Undo puts it back. Any other theme dresses Morph's cards too.
+
+## Bringing your Morph dashboard over
+
+While you still have a Morph dashboard of the old kind (brAIn's first tab), the brAIn button
+offers **Bring over your Morph dashboard…**. It makes a new Home Assistant dashboard, **Home**,
+in the sidebar:
+
+- each floor a sections tab with the room rail on;
+- each room a section (a switch from its title row goes on its heading);
+- every card its Morph card at the width you had set, your hosted Lovelace cards as they were,
+  and brAIn's cases in the room they are about.
+
+It tells you anything that could not come along — Coming up and the story line are the old
+panel's own. Morph's old panel is left exactly as it was.
+
+## Use cases
+
+**A family dashboard everyone already knows.** Your household uses the default Overview. You let
+brAIn change it, tap the hallway's tile card, and say *"make this a Morph light card that opens
+the hallway's motion history"*. The rest of the dashboard is untouched, HA's editor still works,
+and **History and undo** has the change.
+
+**One thermostat card, five rooms.** brAIn builds *Thermostat with buttons* as a card type; you
+add a copy to each bedroom's dashboard, picking that room's climate entity and boost script in
+HA's editor. Months later you ask for the current humidity under the temperature — on one copy,
+choosing **every copy** — and all five change.
+
+**The wall tablet.** The kitchen tablet's dashboard is a sections view with `morph: {rail: true}`
+and the **Morph Medium** theme. Anyone can swipe the right edge and slide to the room they want,
+and a **Morph · brAIn's cases** card in the Kitchen section shows only the cases about the
+kitchen, with a reply line to answer them.
+
+**A HACS card that is almost right.** Your favourite HACS card's corners don't match the rest of
+the dashboard. brAIn changes it with card-mod, not by editing its code, so the next HACS update
+lands cleanly.
