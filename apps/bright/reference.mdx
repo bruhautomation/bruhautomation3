@@ -152,8 +152,8 @@ replies come back to the sender's own address, and host networking also keeps cu
 NAT path. That puts the panel on a real port on your machine, so:
 
 - **The port is assigned by the Supervisor**, not fixed, because a port written into a manifest is
-  one something else may already own. The startup log names it (`Starting BRight panel on
-  0.0.0.0:<port>`).
+  one something else may already own. The startup log names it:
+  `Starting BRight panel on 0.0.0.0:<port>`.
 - **The panel refuses every caller except Home Assistant itself** — the Supervisor's network and
   loopback, judged by the connection's real peer address. There is no public endpoint. Open it
   from the sidebar.

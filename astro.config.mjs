@@ -371,6 +371,7 @@ export default defineConfig({
 					label: 'Apps',
 					collapsed: true,
 					items: [
+						{ label: 'All Apps', slug: 'apps' },
 						{
 							label: 'brAIn',
 							items: [
@@ -463,6 +464,65 @@ export default defineConfig({
 										{ label: 'BRUH Insights changelog', slug: 'brain/archive/bruh-insights-changelog' },
 									],
 								},
+							],
+						},
+						{
+							label: 'BRUH Bambu Studio',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-bambu-studio' },
+								{ label: 'Quick Start', slug: 'bruh-bambu-studio/quickstart' },
+								{ label: 'Printing & Jobs', slug: 'bruh-bambu-studio/printing' },
+								{ label: 'Designing Parts with brAIn', slug: 'bruh-bambu-studio/design' },
+								{ label: 'Print Failure Detection', slug: 'bruh-bambu-studio/failure-detection' },
+								{ label: 'The Studio', slug: 'bruh-bambu-studio/studio' },
+								{ label: 'Home Assistant Integration', slug: 'bruh-bambu-studio/home-assistant' },
+								{ label: 'Voice & brAIn', slug: 'bruh-bambu-studio/voice' },
+								{ label: 'Reference', slug: 'bruh-bambu-studio/reference' },
+								{ label: 'Troubleshooting', slug: 'bruh-bambu-studio/troubleshooting' },
+								{ label: 'Changelog', slug: 'bruh-bambu-studio/changelog' },
+							],
+						},
+						{
+							label: 'GardenRX',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'gardenrx' },
+								{ label: 'Quick Start', slug: 'gardenrx/quickstart' },
+								{ label: 'Using GardenRX', slug: 'gardenrx/guide' },
+								{ label: 'Cards, Sensors & Services', slug: 'gardenrx/home-assistant' },
+								{ label: 'Changelog', slug: 'gardenrx/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Task Manager',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-task-manager' },
+								{ label: 'Quick Start', slug: 'bruh-task-manager/quickstart' },
+								{ label: 'Guide & Reference', slug: 'bruh-task-manager/guide' },
+								{ label: 'Changelog', slug: 'bruh-task-manager/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Cooking',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-cooking' },
+								{ label: 'Quick Start', slug: 'bruh-cooking/quickstart' },
+								{ label: 'Cooking with It', slug: 'bruh-cooking/guide' },
+								{ label: 'Entities, Services & Options', slug: 'bruh-cooking/reference' },
+								{ label: 'Changelog', slug: 'bruh-cooking/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Browser',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-browser' },
+								{ label: 'Quick Start', slug: 'bruh-browser/quickstart' },
+								{ label: 'Errands & Purchases', slug: 'bruh-browser/guide' },
+								{ label: 'Changelog', slug: 'bruh-browser/changelog' },
 							],
 						},
 						{

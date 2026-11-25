@@ -73,7 +73,7 @@ Every [measurement](/brain/measurements/) is a tool, read over the panel's own r
 
 ## What a device shows as
 
-New in 2.11. Each tool is one [Power Tool](/brain/power-tools/entities/#what-a-device-shows-as) called through `call_service`, so protected entities, Blocked services and the action gate stand in front of it. Ask in the chat or the terminal: *"show the back door sensor as a door"*, *"show the fan plug as a fan"*.
+Each tool is one [Power Tool](/brain/power-tools/entities/#what-a-device-shows-as) called through `call_service`, so protected entities, Blocked services and the action gate stand in front of it. Ask in the chat or the terminal: *"show the back door sensor as a door"*, *"show the fan plug as a fan"*.
 
 | Tool | What it does | Who |
 |------|--------------|-----|
@@ -86,7 +86,7 @@ None of the four is open to unattended runs. A smoke, gas, CO or leak sensor kee
 
 ## Your other BRUH add-ons
 
-New in 2.10. Each tool calls the add-on's own Home Assistant integration, so it needs that add-on and its integration installed. Spoken player names are matched against who is online, and a name that could be two people is asked about, never guessed.
+Each tool calls the add-on's own Home Assistant integration (BRUH Browser's own API), and is listed only where that add-on is installed. What each lets you ask for, and what voice may do with it: [brAIn and the BRUH apps](/brain/apps/). Spoken player names are matched against who is online, and a name that could be two people is asked about, never guessed.
 
 | Tool | What it does | Who |
 |------|--------------|-----|
@@ -101,10 +101,42 @@ New in 2.10. Each tool calls the add-on's own Home Assistant integration, so it 
 | `print_label` | Print text fitted as large as it will go, or a saved template with its fields. A voice agent prints at most 10 at once | — |
 | `bright_status` | What [BRight](/bright/) is doing, the saved sets, and the tracks with a show ready | read |
 | `bright_show` | Start a saved party, party mode over the music folder, one track's show — or stop and put the room back | — |
+| `minecraft_job` | A companion job's progress | not on voice |
+| `bambu_status` | [BRUH Bambu Studio](/bruh-bambu-studio/)'s printers: state, progress, temperatures, AMS trays, jobs and files | read |
+| `bambu_print` | Start a file or a model link; pause, resume or stop | stop and links not on voice |
+| `bambu_control` | Speed, chamber light, temperatures, home, G-code | G-code and home not on voice |
+| `bambu_slice` | Slice a file with Bambu Studio's command line | not on voice |
+| `bambu_design` | Design a printable part from a sentence, change it, print it | — |
+| `cooking_status` | [BRUH Cooking](/bruh-cooking/)'s appliances: state, temperatures, time left, presets | read |
+| `cooking_control` | Start a cook by preset or temperature and time, stop it, say the food is in or out | — |
+| `garden_status` | [GardenRX](/gardenrx/): this season's harvest, sprays, intervals running, low stock | read |
+| `garden_harvests` | What was picked, per crop, between two dates | read |
+| `garden_log_harvest` / `garden_log_spray` / `garden_log_note` | Log a pick, a spray or a note | — |
+| `garden_queue_spray` / `garden_adjust_inventory` / `garden_add_crop` | Queue a spray, change stock, add a crop | not on voice |
+| `browser_task` | Start a [BRUH Browser](/bruh-browser/) errand, such as a grocery cart. Never buys | — |
+| `browser_status` | How an errand is going, and the cart | — |
+| `browser_answer` | Answer a question a paused errand asked | — |
+| `browser_stop` | Stop an errand | not on voice |
+| `browser_purchase` | Buy a cart the person heard and approved. Always asked, in every mode short of *No limits* | not on voice |
+| `bruh_addon_status` | How each other BRUH add-on is doing: version, running, update waiting, log errors | read |
+
+## More tools
+
+| Tool | What it does | Who |
+|------|--------------|-----|
+| `get_device_details` | One device read whole: maker, model, firmware, its integrations, and a Z-Wave device's configuration parameters | read |
+| `edit_dashboard` | Change part of any storage dashboard exactly, as a list of operations on paths | — |
+| `assistant_exposure` | What Assist, Alexa, Google Assistant and each HomeKit Bridge can reach, and what is missing or dead | read |
+| `set_assistant_exposure` | Change what they can reach, in bulk. Protected entities are refused | — |
+| `timed_action` | Do something now and undo it later, or after a delay, without writing an automation (*"water the garden for 90 minutes"*). Each step is listed and stoppable | — |
+| `notification_history` | What brAIn's own notifications were and what happened to each | read |
+| `screenshot_panel` | A picture of a brAIn or BRUH add-on screen, or any dashboard tab, redacted | — |
+| `report_bug` | File a bug in brAIn or another BRUH add-on through the [development loop](/brain/development-loop/) | — |
+| `note_personality_change` | Record a change to how the assistant speaks or behaves that you settled with it | — |
 
 ## ESPHome
 
-Editing files needs nothing; building, installing and logs go to the ESPHome dashboard. There is no ESPHome tab in the panel since 2.10 — ask in the chat or the terminal. See [ESPHome](/brain/esphome/). None of these is offered to a *Voice assistant* agent.
+Editing files needs nothing; building, installing and logs go to the ESPHome dashboard. There is no ESPHome tab in the panel — ask in the chat or the terminal. See [ESPHome](/brain/esphome/). None of these is offered to a *Voice assistant* agent.
 
 | Tool | What it does | Who |
 |------|--------------|-----|
@@ -120,7 +152,7 @@ Editing files needs nothing; building, installing and logs go to the ESPHome das
 
 ## Music Assistant
 
-There is no Music Assistant tab in the panel since 2.10 — the tools are unchanged. See [Music Assistant](/brain/music-assistant/). None of these is offered to a *Voice assistant* agent; it plays music through `music_assistant.play_media` on an exposed speaker instead.
+There is no Music Assistant tab in the panel — ask in the chat or the terminal. See [Music Assistant](/brain/music-assistant/). None of these is offered to a *Voice assistant* agent; it plays music through `music_assistant.play_media` on an exposed speaker instead.
 
 | Tool | What it does | Who |
 |------|--------------|-----|
