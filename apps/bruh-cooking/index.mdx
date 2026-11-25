@@ -1,0 +1,136 @@
+---
+title: BRUH Cooking
+description: Breville+ and Sage cooking appliances — the ChefSteps Joule, Joule Turbo and Joule Oven Air Fryer Pro — in Home Assistant and brAIn. Start, stop and watch a cook by voice, presets, notifications when the water is ready, and a sidebar panel that draws each appliance.
+template: splash
+hero:
+  tagline: "\"Heat the Joule for a medium-rare steak.\" Your sous vide and countertop oven in Home Assistant — driven by brAIn, drawn as they really are."
+  actions:
+    - text: Quick Start
+      link: /bruh-cooking/quickstart/
+      icon: right-arrow
+    - text: Cooking with it
+      link: /bruh-cooking/guide/
+      icon: open-book
+      variant: secondary
+    - text: Entities & Services
+      link: /bruh-cooking/reference/
+      icon: puzzle
+      variant: minimal
+    - text: GitHub
+      link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bruh-cooking
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Experimental · requires brAIn">
+BRUH Cooking is marked **experimental**, and it is built to be driven by
+[brAIn](/brain/): the add-on **won't start without brAIn installed**. It uses Breville's
+cloud, the same one the Breville+ Cooking app uses; it is unofficial, and isn't affiliated
+with or endorsed by Breville.
+</Aside>
+
+## What it is
+
+BRUH Cooking puts your Breville+ and Sage cooking appliances into Home Assistant and hands
+them to brAIn. Start and stop cooks, change the temperature and timer, fill in a preset,
+and get told when the water is ready or the food is done — from the brAIn chat, by voice,
+from an automation, or from a sidebar panel that draws each appliance as it really is.
+
+![The BRUH Cooking panel's overview: a Kitchen Oven drawn mid air-fry with fries on the rack, its display reading 7:48 and Air fry 400°, and a Joule sous vide clipped in a clear container of water holding a bagged steak at 132.4° of 132.8°, both marked Cooking with the time left and when they finish](./images/overview.webp)
+
+## Highlights
+
+<CardGrid>
+  <Card title="brAIn drives it" icon="comment-alt">
+    *"Start the Joule for chicken breast."* *"Set the oven to air fry at 400 for 20
+    minutes."* *"Is the water ready?"* *"Stop the oven."* In chat, in the terminal, and by
+    voice — brAIn's `cooking_status` and `cooking_control` tools call the add-on's
+    services by appliance name.
+  </Card>
+  <Card title="Every appliance as a device" icon="setting">
+    Status, temperature, time left, cook end, preheat, target temperature, cook time, the
+    Cook switch and Continue — and for the oven its mode, convection, level, keep warm,
+    frozen food, door and active mode.
+  </Card>
+  <Card title="A panel that draws the real thing" icon="laptop">
+    The Joule circulates and steams in its water and holds the bag once the food is in; the
+    oven shows its display, the rack at the mode's position, the elements glowing as the
+    mode uses them and the fan turning. Every control, a temperature chart and presets.
+  </Card>
+  <Card title="Presets that follow the guidance" icon="open-book">
+    Built-in sous vide and oven presets from USDA FSIS, the FDA Food Code and Douglas
+    Baldwin's sous vide tables. A Fahrenheit house cooks the whole degree it is shown.
+  </Card>
+  <Card title="Honest when it's offline" icon="information">
+    It says why — Breville refusing the sign-in, the cloud connection down, or the appliance
+    itself silent — since when, and one thing to try. Readings keep their last value,
+    marked as old; controls go unavailable.
+  </Card>
+  <Card title="The appliance is the last check" icon="approve-check">
+    The Joule Oven waits for **Start** on its own panel before it heats after a remote
+    start, and UL-certified Joules wait for their top button above 85 °C.
+  </Card>
+</CardGrid>
+
+## Use cases
+
+**Dinner that starts on the drive home.** At 5:30 pm an automation heats the Joule to
+57 °C and holds it there. When the water is up to temperature your phone says *"The water
+is at temperature. Add the food and press Continue."* You drop the bag in, press Continue
+on the dashboard, and the timer starts.
+
+**Hands covered in flour.** *"Hey, set the oven to bake at 350 for 25 minutes."* brAIn
+starts the cook; the oven waits for you to press Start on it, so nothing heats with nobody
+there. *"How long is left on the oven?"* — *"Twelve minutes; it finishes at 6:42."*
+
+**Ten minutes' warning.** An automation fires ten minutes before **Cook end**, so the sides
+are ready when the steak is.
+
+**"What can I make in the Joule?"** brAIn reads the presets each appliance can cook — steak
+from rare to well done, chicken breast, salmon, pork — with their temperatures and times
+in your unit, and starts the one you pick.
+
+**The forgotten bath.** The **Cooking** binary sensor has been on for six hours. A
+reminder asks whether anyone meant to leave it running; *"stop the sous vide"* ends it.
+
+![The oven's full view: the drawing beside the Cook card (oven temperature 370 °F, which it holds below the setpoint, mode Air fry 400°, 7:48 left ending 6:07 PM, door closed, a red Stop button) and This cook, locked while it runs, with the oven's fifteen modes, temperature and cook time](./images/oven.webp)
+
+## Supported appliances
+
+| Appliance | Model | Status |
+|---|---|---|
+| ChefSteps Joule Sous Vide | CSJ100 | Tested on a real appliance |
+| Joule Turbo Sous Vide | BSV600 | Built from the app's code; untested — monitor-only until you allow control |
+| Joule Oven Air Fryer Pro | BOV950 | Tested on a real oven: all 15 modes start; bake, air fry and broil run to the end, with Continue after preheating and Keep warm. Cooks started on the oven itself show up and can be stopped |
+
+Sage-branded appliances (UK, Europe and the UAE) are supported the same way, but nobody has
+tried a Sage account yet. Other appliances on the account are ignored — for espresso
+machines, use the [Sage Coffee](https://github.com/simonjgreen/sageha) integration.
+
+## What you need
+
+- **[brAIn](/brain/)**, installed and running. Install it first.
+- **Home Assistant 2026.2 or newer**, on a 64-bit machine (`amd64` or `aarch64`).
+- **Your Breville+ (or Sage) account** — the one you use in the Breville+ Cooking app.
+  Accounts with multi-factor authentication aren't supported.
+- **The appliance on Wi-Fi**, set up in the app. A Joule set to "Bluetooth only" can't be
+  reached.
+
+## Credits
+
+BRUH Cooking's integration, sidebar panel and protocol notes are derived from
+[kedube/ha-breville-cooking](https://github.com/kedube/ha-breville-cooking) by kedube, who
+recovered the protocol from the Breville+ Cooking app. Like the original, BRUH Cooking is
+licensed under the **GNU GPL v3.0** — the add-on's folder carries the
+[licence](https://github.com/bruhautomation/BRUH-HA-Apps/blob/main/bruh-cooking/LICENSE).
+It is renamed to the `bruh_cooking` domain so it can sit beside a HACS install of the
+original (use one or the other for an account, not both). Breville, Breville+, Sage,
+ChefSteps and Joule are trademarks of their owners, used only to say which appliances it
+works with; Breville's logos are not used.
+
+<CardGrid>
+  <LinkCard title="Quick Start" description="Install brAIn and BRUH Cooking, add your account, start a first cook." href="/bruh-cooking/quickstart/" />
+  <LinkCard title="Changelog" description="What changed in each release." href="/bruh-cooking/changelog/" />
+</CardGrid>

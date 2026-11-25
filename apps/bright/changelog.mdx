@@ -1,0 +1,372 @@
+---
+title: BRight Changelog
+description: Release notes for the BRight light-show director add-on for Home Assistant — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+A condensed history. Patch releases that only polished the panel are grouped with the release they
+followed; the add-on's own `CHANGELOG.md` has every line.
+
+<Changelog>
+
+<Release version="0.24.3" date="November 24, 2026" latest>
+<Changes type="changed">
+
+- **Party** says *Latest* in full on each song's version picker, and a song with one show says so.
+- **Test mode** groups bulbs by zone in closed folds, each with a tick for the whole zone and a count.
+- **Light Map: Suggest zones from names** proposes zones from a word the lights' names share, and saves them only when you press **Use these zones**.
+- **Shows** says *"Pick a song above to open its show"* when none is open; **Library** says how many tracks are ready and how many still need analysing.
+- On a phone the tab strip fades at an edge with more tabs past it, and the open tab scrolls into view.
+
+</Changes>
+</Release>
+
+<Release version="0.24.2" date="November 23, 2026">
+<Changes type="fixed">
+
+- Every row of the Party set list has the same layout, whether a song has several shows, one, or none yet.
+- The Shows page opens with one summary line, lists eight songs with **Show all**, and tapping a song scrolls to its show.
+
+</Changes>
+</Release>
+
+<Release version="0.24.1" date="November 23, 2026">
+<Changes type="fixed">
+
+- Library, Shows and Party show each song's length, and a short clip and the full song it was cut from are marked as a pair.
+- The Light Map list explains zones, counts unplaced lights, groups lights by zone and has a search box.
+- Test mode starts with the bulbs this browser last tested with, not every light in the house.
+
+</Changes>
+</Release>
+
+<Release version="0.24.0" date="November 17, 2026">
+<Changes type="changed">
+
+- **The shared BRUH panel look**: one centred page column, a clear button hierarchy (one main action per card), one-grid effect forms, and on a phone a single scrolling row of tabs.
+
+</Changes>
+</Release>
+
+<Release version="0.23.x">
+
+Plain words on every tab, and two new services.
+
+<Changes type="added">
+
+- **`bright.import_show`** loads an edited show file from `/config/.bright/shows`, with a `README.md` and an `EFFECTS.md` beside the files.
+- **`bright.get_status`** answers what is playing, the saved sets and the tracks with a show ready; `parties_only` skips the library scan.
+
+</Changes>
+<Changes type="changed">
+
+- Shows read in plain words (*"Written by Claude · 2032 cues · 3 min ago"*, *"Ready · played 3 d ago"*) with one visible action and the rest behind ⋯.
+- The bulb checks list each bulb in one compact row (*"Fast, 42 ms, no loss"*), with **Probe all unprobed**.
+- The Library folds its folders into one line, and songs show their own title and artist, with duplicates marked *"Same song as …"*.
+- The show director's answer is checked against a schema; the mood comes first in what Claude is told.
+- The add-on says when Home Assistant needs a restart for a new integration, and only then. Marked **experimental** in the store.
+
+</Changes>
+<Changes type="fixed">
+
+- With no calibrated speaker, the pickers say so and offer **Calibrate a speaker first**; Play stays off until there is one.
+- Light Map names are readable in both themes; lights sharing a spot show as one dot with a count.
+- Phones no longer zoom into text boxes or scroll the page sideways.
+- Speaker-name lookups give up after 2 seconds on a slow Home Assistant instead of 15.
+- Starting and stopping parties and shows from brAIn works.
+
+</Changes>
+<Changes type="security">
+
+- The show director's requests to brAIn ask for read-only tools.
+- Track paths from a request are normalised and confined to `/media`.
+
+</Changes>
+</Release>
+
+<Release version="0.22.0">
+
+**Manual mode has a transport — an instrument you can keep time with.**
+
+<Changes type="changed">
+
+- **The song's own grid is the clock**, with a transport showing BPM, bar and beat, or a tapped tempo with a downbeat reset.
+- **Loops are clips**, recorded the way a DAW records them: choose 1, 2, 4 or 8 bars and a snap, count in, and the loop closes itself on the bar line.
+
+</Changes>
+<Changes type="fixed">
+
+- A Manual session now powers the room on and lays down a dim base first — a switched-off bulb accepted every packet and showed none of them.
+- Live gestures no longer wait in the rate limiter.
+
+</Changes>
+</Release>
+
+<Release version="0.21.0">
+<Changes type="changed">
+
+- **The map is the instrument.** The Manual tab is one phone screen; gestures ride one live connection, and late work is dropped rather than queued.
+
+</Changes>
+</Release>
+
+<Release version="0.20.0">
+<Changes type="added">
+
+- **Manual — play the lights yourself.** A new tab: tap bulbs, record loops, DROP, FLASH and a rack of effects, with the room restored when you stop.
+
+</Changes>
+</Release>
+
+<Release version="0.19.0">
+
+**Test mode, and a show that never loses the beat.**
+
+<Changes type="added">
+
+- **🧪 Test mode — beats & drops** in the Lab: a song plays while the ticked bulbs pulse on the beat and flash on every drop.
+
+</Changes>
+<Changes type="changed">
+
+- There is always a beat on some light, through intros and quiet sections too. A drop is the whole room.
+
+</Changes>
+<Changes type="fixed">
+
+- A party's end scene no longer fires between songs, and the run state no longer drops to idle between tracks.
+- A show is stoppable from its first second; a Stop racing the play command no longer leaves the music playing.
+- Party lights turn off when their cue ends, not when the track does.
+
+</Changes>
+</Release>
+
+<Release version="0.18.x">
+
+**Lights with an attack, four layers, and the song on screen.**
+
+<Changes type="added">
+
+- **`hit` and `accent`**: strikes that are at full brightness the instant they land and decay from there — on the drums the analyser actually heard.
+- **The song is drawn** in the show editor: chords, melody and drums on the waveform's ruler, and one named row per effect drawn from what was compiled.
+- **Show versions**: every compile, revision and hand edit is kept; one is live, and a named version is kept for good.
+- **The tune runs across the room** — `melody` places each note by its pitch. A party can pin which version of a show each song plays.
+
+</Changes>
+<Changes type="changed">
+
+- **The automatic director builds four layers on different lights** — ground, pulse, hits and voice — and Claude's brief teaches the same model.
+- **One party mode**: tick the shows you want and press Play. The vibe moved to the Shows tab.
+
+</Changes>
+<Changes type="fixed">
+
+- **The beat pulse peaked on the off-beat** in every show since the first release; every shape now lands its peak on the beat.
+- The drum detector found no accents in ordinary music, and could not tell a kick from a snare. Existing libraries are re-analysed.
+- An effect whose selection matches no light now says so.
+
+</Changes>
+</Release>
+
+<Release version="0.17.0">
+
+**Colour that moves without flickering, and lights that follow the audio.**
+
+<Changes type="added">
+
+- **`colour_drift`** (the hue walks, brightness never moves), **`saturate`** (colour swell) and **`level`** (brightness follows the audio itself, per band) — and the automatic show uses all three.
+
+</Changes>
+<Changes type="fixed">
+
+- Two bulb-run effects on one light cancelled each other silently; the editor now says so.
+
+</Changes>
+</Release>
+
+<Release version="0.16.x">
+
+**The analyser learns to hear the music.**
+
+<Changes type="added">
+
+- **Harmony, melody, phrases and repetition** are analysed, and **`melody`** and **`harmony`** follow them.
+- **Test the Claude director** on the Shows tab, and **Or suggest some** on the Effects tab.
+
+</Changes>
+<Changes type="fixed">
+
+- An upgraded analyser now re-hears a library that was analysed before it.
+- Asking Claude for a show is a background job, so a long compile no longer fails with *"load failed"*.
+
+</Changes>
+</Release>
+
+<Release version="0.15.0">
+
+**Stabs on the beat, notes to the director, and a party you can steer.**
+
+<Changes type="added">
+
+- The analyser ranks the song's hits, and `"snap": "beat"` moves a moment onto the nearest beat.
+- **Notes for the director** and **Revise with Claude** in the show editor.
+- **`director_model`** option (default `opus`).
+- **⏮ Prev / ⏭ Next** and **🎤 Sync by ear** while a party plays.
+
+</Changes>
+</Release>
+
+<Release version="0.14.x">
+<Changes type="added">
+
+- **Party mode shows what it is doing**, **live ±25 ms sync trim**, saved parties that name exact songs in order, and calibrated speakers you can delete.
+
+</Changes>
+<Changes type="fixed">
+
+- **Stop stops the music**, and the calibration sound can be stopped.
+- Some four-minute songs were read as 26 minutes long.
+
+</Changes>
+</Release>
+
+<Release version="0.13.x">
+<Changes type="added">
+
+- **The effect library is shared with Claude**: saved effects are in every brief, a script can `use` one by name, and **＋ Library** saves an effect from a show.
+
+</Changes>
+<Changes type="fixed">
+
+- BRight finds the media source that actually holds the file, and passes on Home Assistant's own error text.
+
+</Changes>
+</Release>
+
+<Release version="0.12.0">
+<Changes type="added">
+
+- **✨ Claude on every track**, a record of who wrote each show, a readable brief, the song's waveform, and a playhead that follows the real show.
+
+</Changes>
+</Release>
+
+<Release version="0.11.x">
+<Changes type="added">
+
+- **Describe an effect and Claude writes it.** Zones can be set on any light at any time, and Claude is told the room it is designing for.
+
+</Changes>
+<Changes type="fixed">
+
+- Stopping a show stops the bulbs too; Claude-written shows no longer fall back silently.
+
+</Changes>
+</Release>
+
+<Release version="0.10.x">
+<Changes type="added">
+
+- **A visual show editor**: your room, the song as a strip and the scenes as blocks, with a live preview of unsaved edits.
+
+</Changes>
+<Changes type="fixed">
+
+- Nothing played on an install that sets `media_dirs`; BRight now works out what Home Assistant calls its media folder.
+
+</Changes>
+</Release>
+
+<Release version="0.9.x">
+
+**BRigt is BRight** — the name is spelled right, with a new slug, domain and data folder.
+
+<Changes type="added">
+
+- **An effect builder** (the Effects tab) with a preview drawn from the same render as the packets.
+- Shows as editable scripts, every cue naming its effect, saved effects and saved parties, an end scene, bulbs added one at a time, and `bright.start_party`.
+
+</Changes>
+<Changes type="changed">
+
+- BRight installs from a prebuilt image instead of building on your machine.
+
+</Changes>
+</Release>
+
+<Release version="0.8.x">
+<Changes type="added">
+
+- **Party mode** end to end — the sentence the add-on was built for.
+- **Test playback**, which names the step that broke; folders you can browse and tick; a delay you can type in; `additional_music_folders`.
+
+</Changes>
+<Changes type="fixed">
+
+- BRight no longer pins a host port, so it starts on machines where another service already used it; the panel answers only Home Assistant.
+- The click track can be written again, and a show that cannot start says so.
+
+</Changes>
+</Release>
+
+<Release version="0.7.0">
+<Changes type="added">
+
+- **Claude-designed shows through brAIn**, with `director_mode` doing what it says and lyric-aware moments.
+
+</Changes>
+</Release>
+
+<Release version="0.6.0">
+<Changes type="added">
+
+- **The Light Map**, the algorithmic choreographer, the compiler, role rules (candles never strobe), and the Shows tab.
+
+</Changes>
+</Release>
+
+<Release version="0.5.0">
+<Changes type="added">
+
+- **The playback engine**: a show clock anchored to the speaker's measured delay, drift correction, and the metronome sync proof. `bright.start_show` and `bright.stop_show` work end to end.
+
+</Changes>
+</Release>
+
+<Release version="0.4.0">
+<Changes type="added">
+
+- **The analyser**: beat tracking, energy bands, sections and drops, and synced lyrics from LRCLIB. The Library tab.
+
+</Changes>
+</Release>
+
+<Release version="0.3.0">
+<Changes type="added">
+
+- **Speaker calibration**: a click track measured through your phone's microphone, with a tap-along fallback and per-speaker profiles.
+
+</Changes>
+</Release>
+
+<Release version="0.2.0">
+<Changes type="added">
+
+- **The Lab**: direct LIFX LAN control, round-trip and sustained-rate probes, the waveform demo, and a Home Assistant latency probe.
+
+</Changes>
+</Release>
+
+<Release version="0.1.0">
+<Changes type="added">
+
+- The installable skeleton: the panel, host networking for LIFX, the companion integration and the options.
+
+</Changes>
+</Release>
+
+</Changelog>

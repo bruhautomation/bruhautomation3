@@ -1,114 +1,141 @@
 ---
 title: Quick Start
-description: Install brAIn, restart HA once, sign in, and let it learn your home — in about five minutes.
+description: Install brAIn, restart Home Assistant once, sign in with your Claude account and let it learn your home. About five minutes, plus a few minutes of study in the background.
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-Five minutes from zero to an AI that knows your house.
+Five minutes from nothing to an assistant that knows your house.
 
-## Prerequisites
+## Before you start
 
-- **Home Assistant OS** or **Supervised** (the add-on system requires the Supervisor).
-- An **Anthropic account** — a **Claude Pro** or **Max** subscription is the most economical option, since Claude Code authenticates via OAuth and uses your subscription. An API key works too if you'd rather pay per token (note: usage-limit sensors need the subscription login).
-- A **modern 64-bit HA host** (any Pi 4/5, x86 NUC, or generic 64-bit server). Older 32-bit ARM boards (Pi 3 and earlier) aren't supported — prebuilt images exist for `amd64` and `aarch64` only.
-- ~**1 GB of free RAM** beyond what HA itself uses. Fast voice mode keeps pre-warmed workers around (~150–300 MB each, max 3); you can turn it off on tight hosts.
+- **Home Assistant OS** or **Supervised** (add-ons need the Supervisor), Home Assistant 2023.6 or
+  later.
+- A **64-bit host**: prebuilt images exist for `amd64` and `aarch64` only. A Raspberry Pi 4 or 5,
+  an x86 mini PC or a generic 64-bit server is fine; 32-bit boards are not supported.
+- About **1 GB of free memory** beyond Home Assistant's own. Fast voice responses keep a few
+  pre-warmed workers around; turn `assist_fast_mode` off on a tight host.
+- An **Anthropic account**. A Claude **Pro** or **Max** subscription is the most economical: brAIn
+  signs in with it and uses the plan you already pay for. An API key works too, but the
+  usage-limit sensors need the subscription sign-in.
 
-:::caution[Back up Home Assistant first — somewhere that isn't this machine]
-brAIn edits your real configuration: automations, dashboards, helpers, entities. It
-snapshots files before it changes them and `brain undo` puts them back — but that is not a
-backup you can restore from. **Settings → System → Backups**, then copy it off the device.
-This is also the first thing the panel's own first-run screen tells you.
-:::
+<Aside type="caution" title="Back up Home Assistant first, somewhere that isn't this machine">
+brAIn edits your real configuration: automations, dashboards, helpers, entities. It snapshots
+files before it changes them and `brain undo` puts them back, but that is not a backup you can
+restore from. **Settings → System → Backups**, then copy it off the device. The panel's own first
+screen tells you the same.
+</Aside>
 
 ## Install it
 
 <Steps>
 
-1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**, then paste:
+1. **Add the repository.** In Home Assistant open **Settings → Add-ons → Add-on Store**, then
+   **⋮ → Repositories**, and paste:
 
    ```text title="Repository URL"
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install the add-on.** Find **brAIn** in the store and click **Install**, then **Start** when it's done. The install pulls a prebuilt image from `ghcr.io` rather than building on your machine — a download, not minutes of SD-card writes, and everyone gets the identical image.
+2. **Install brAIn.** Find **brAIn** in the store, press **Install**, then **Start**. The install
+   pulls a prebuilt image rather than building on your machine.
 
-3. **Restart Home Assistant** — required on first install so HA loads the brAIn integration: **Settings → System → Restart**. A persistent notification tells you whenever a restart is needed (first install and add-on version upgrades); add-on restarts within the same version don't need one.
+3. **Restart Home Assistant** once, so it loads the brAIn integration: **Settings → System →
+   Restart**. A notification tells you whenever a restart is needed (first install, and add-on
+   updates that change the integration).
 
-4. **Set up the integration.** After the restart, HA discovers it automatically — accept the prompt in **Settings → Devices & Services**. This registers the conversation agent, the usage-limit sensors, the learning sensors, the eleven `brain.*` core services, and the 69 [Power Tools](/brain/power-tools/) admin services.
+4. **Accept the integration.** After the restart, Home Assistant discovers **brAIn**: accept it in
+   **Settings → Devices & services**. That gives you the conversation agent, the sensors, the
+   To-do list, the `brain.*` services and the 91 [Power Tools](/brain/power-tools/) admin
+   services.
 
-5. **Sign in with Anthropic.** Open **brAIn** in the HA sidebar and complete the sign-in. This is the **only** login — the terminal, insight generation, voice, and memory consolidation all share it.
+5. **Sign in.** Open **brAIn** in the sidebar and sign in with your Claude account. This is the
+   **only** login: the chat, the terminal, cards, voice and memory all share it. You can manage it
+   later in **⚙ → Account**.
 
 </Steps>
 
 ## Let it learn your home
 
-A fresh install has **no cards**, on purpose. A generic "Energy" or "Climate" card about a home brAIn has never looked at says nothing useful and costs tokens on every run, forever.
+A fresh install has **no insight cards**, on purpose. A generic "Energy" card about a house brAIn
+has never looked at says nothing useful and costs tokens on every run.
 
 <Steps>
 
-1. **Press "Start learning."** brAIn studies your house one topic at a time — naming and areas, occupancy rhythms, energy, climate, device reliability — and files what it finds in memory. This takes a few minutes and runs in the background; close the panel and come back, it picks up where it left off.
+1. **Say where brAIn may reach you.** The first screen asks for a notify service (your phone's
+   `notify.mobile_app_…`) and, optionally, quiet hours. That is what lets a leak reach you at
+   3 am. [Notifications →](/brain/notifications/)
 
-2. **Pick your cards.** When the study finishes, brAIn proposes a handful of cards grounded in what it actually found, each with a one-line reason citing the evidence. Tick the ones you want. Nothing generates, and the scheduler stays idle, until you do.
+2. **Press Start learning.** brAIn studies your house one topic at a time (names and areas,
+   occupancy rhythms, energy, climate, device reliability) and files what it finds into memory.
+   What it finds appears under the progress as it lands. One overview card starts straight away so
+   the Insights tab is not empty. Close the panel if you like; it carries on.
 
-3. **Watch the first run.** Cards generate one at a time through a queue (friendly to subscription rate limits), so they fill in over a few minutes.
+3. **Pick your cards.** When the study finishes, brAIn proposes cards grounded in what it found,
+   each with a one-line reason. Only the ones you tick are created.
+
+4. **Try one automation for a week.** If the study turned up something an automation would fix,
+   the last step offers it as one sentence. Left ticked, it is drafted, replayed over your history
+   and trialled for a week on Needs you. Nothing is written to your house until you accept it.
 
 </Steps>
 
-**If your home is too sparse to learn from**, brAIn says what's missing instead of inventing generic cards — add more entities, let history accumulate, and run it again. There is deliberately no canned fallback: cards about a house it can't read would be noise on every run, and would teach you to ignore the dashboard.
+If your home is too sparse to learn from, brAIn says what is missing instead of inventing cards.
+Add entities, let some history build up, and run it again.
 
-## Try it
+## The first day
 
-Open **Home → Insights** and ask something you'd otherwise have gone digging for. The
-answer comes back as a card:
+**Look at Insights → Needs you.** The [house checks](/brain/checks/) run two minutes after the
+add-on starts and cost no Claude run, so this is usually the first thing with something in it: a
+battery gone quiet, a device unavailable for days, an automation naming an entity that no longer
+exists. Each card leads with one press: **Plan**, **Add to To Do**, **Snooze** or **Ignore**.
+[Needs you →](/brain/needs-you/)
 
-```text title="In the Ask box on Insights"
-How quickly does the downstairs humidity drop when the AC turns on?
-Which of my devices have stopped reporting?
-What's my standby power, and what's causing it?
-```
+![Insights → Needs you on a phone: a "Needs you" picker, "Watching", "8 things need you", a Problem card "Back door battery has reported nothing since 26 July" with Add to To Do, Respond, Snooze and Ignore, then Chores and suggestions, Tidy-ups, and a To Do list with two items, with the Insights, Ask and Memory tabs along the bottom](./images/panel-phone.webp)
 
-![An insight card titled "Downstairs dries 15 min before it cools", with the answer in bold, five number tiles and two charts](./images/insight-card.webp)
-
-Not quite what you wanted? Press **✎ Refine** and say what should change — *"compare it with
-upstairs"*, *"just the chart"*. Want it somewhere else? **↗ Share** copies it as a picture
-or adds it to a dashboard. [More about cards →](/brain/insights/)
-
-Or switch to **Ask** — Claude Code as a chat — for things that need doing rather than
-answering:
+**Open Ask** and ask for something you'd otherwise have gone digging for, or something that needs
+doing:
 
 ```text title="In Ask"
 Why did the hallway light come on at 3am? Fix it.
+Which of my devices have stopped reporting?
 Write me an automation that turns the towel rail on when the shower humidity spikes
 Rename the switches in the garage to what they actually control
 ```
 
-Then look at **Home → Findings**. The number on the Home tab is what brAIn already thinks
-is broken in your house, each with a row of answers: **Fix it**, **Add to list**,
-**Dismiss**, **Not a problem**.
+Off by default, brAIn asks before it changes anything: a card appears in the chat with
+**Allow once** or **Don't allow**. [Ask →](/brain/terminal/)
+
+**Teach it something.** Type a fact into **Memory → Knowledge** (*"the garage fridge is meant to
+run 24/7"*), or tell a voice assistant *"remember that we call the office lamp the beacon"*.
 
 ## Next steps
 
-- **Use brAIn as your voice assistant.** Go to **Settings → Voice Assistants → [your pipeline]** and pick **brAIn** as the conversation agent. Give the agent a name, a model, (optionally) a personality, and what it can reach. The default, *Voice assistant*, sees and controls only what you've exposed to Assist (**Settings → Voice assistants → Expose**) and can't run shell commands or read files; *Whole house* and *Full admin* widen it, per agent.
-- **Teach it something.** Say *"remember that we call the office lamp the beacon"* to a voice assistant, or run `brain memory add "…"` in the terminal. It lands in the same document every other surface reads.
-- **Answer its guesses.** When brAIn believes something it can't confirm, it asks on the **Findings** tab as a yes/no — everything waiting on your decision in one list. Two taps settle it. `binary_sensor.brain_memory_waiting_on_you` exists so you can push that to your phone — a guess sitting in a panel nobody has open just expires.
-- **Get findings on your phone.** Set `findings_notify_service` to your `notify.mobile_app_*` service in the add-on config — one option turns findings into phone pushes with answer buttons, no automation needed. By default only critical ones ring; `findings_notify_min_severity` changes that.
-- **Trigger it from automations.** `brain.ask` answers a question with data an automation can branch on; `brain.run_task` runs a job in the background. [Automations →](/brain/automations/)
-- **Let it manage your devices.** With the [ESPHome](/brain/esphome/) or [Music Assistant](/brain/music-assistant/) add-ons — or BRUH Minecraft, BRUH Print and BRight — installed, just ask in **Ask**: *"flash the porch sensor"*, *"clear out the stale speakers"*, *"print a label that says chili"*. There are no separate tabs for them.
-- **Show a device as what it is.** *"Show the back door sensor as a door"* or *"the bedroom fan is on a smart plug — show it as a fan"*. [Show as →](/brain/power-tools/entities/#what-a-device-shows-as)
-- **Decide how much it asks.** Off by default, the terminal and the chat ask before changing anything; **Let brAIn act without asking** (⚙ → Terminal & chat) stops that. [Reference →](/brain/reference/#let-brain-act-without-asking)
-- **Know a leak will reach you.** Leak, smoke, CO and gas alarms are sent the moment they trip, whatever else brAIn is doing — set `findings_notify_service` so they reach your phone. [Permissions & Safety →](/brain/safety/)
-- **Tune behaviour.** See the [Reference](/brain/reference/) for every config option and the full service / sensor / tool list.
+- **Turn on what you want** in [⚙ › Features](/brain/features/): the Morph dashboard, a
+  Personality, the Learning loop and the Development loop.
+- **Use brAIn as your voice assistant.** **Settings → Voice assistants → your assistant →
+  Conversation agent → brAIn.** The default agent sees and controls only what you expose to
+  Assist. [Voice →](/brain/voice/)
+- **Decide how much it asks.** ⚙ → Permissions has three levels: *Ask first* (the default),
+  *Act*, and *No limits*. [Permissions & Safety →](/brain/safety/)
+- **Protect what matters.** Put locks, alarms and the garage door on `protected_entities`.
+- **Tick cameras and calendars** brAIn may use on its own in ⚙ → Cameras & calendars. None are
+  ticked at first.
+- **Turn on the morning brief or weekly report** with `morning_brief` and `weekly_report`.
+- **Call it from automations**: `brain.ask` returns data, `brain.run_task` runs a job.
+  [Automations →](/brain/automations/)
+- **Drive your other BRUH apps** by asking. [brAIn and the BRUH apps →](/brain/apps/)
+- **Every option** is in the [Reference](/brain/reference/).
 
 ## Common first-install hiccups
 
 | Symptom | Fix |
 |---------|-----|
-| Add-on won't start | Check the **Log** tab. Almost always an architecture mismatch — prebuilt images exist for `amd64` and `aarch64` only. |
-| Integration not discovered | You probably skipped step 3. Restart HA, then check **Settings → Devices & Services** (or add **brAIn** manually). |
-| Sign-in fails | Verify the HA host can reach `console.anthropic.com`. After updates, you may need to re-authenticate. |
-| The panel says you are signed out, but the terminal works fine | Fixed in **1.47**. Before it, brAIn read the Claude CLI's short-lived access token as a dead credential a few hours after every terminal sign-in, put up the sign-in screen, and then never ran the CLI — which was the one thing that would have renewed it. **The workaround on an older version:** open **Ask**, switch to the classic terminal, and run any `claude` command. That renews the token and clears the verdict. |
-| The terminal asks for a second login | It shouldn't — one credential is shared with the CLI both ways. If it does, run `brain doctor`; the auth check names the file it found and the one it expected. |
-| "It can't see my entities" | Confirm `enable_ha_mcp_server: true`, then run **`brain doctor`** in the terminal — it drives the MCP server end-to-end and reports any tool that errors. |
-| Learning seems stuck | Study sessions are deliberately long-running (up to `study_timeout_minutes`, default 30). The progress list shows which topic is in flight; the add-on log shows the session. A session that actually fails names its real reason in the log — a timeout says timeout — rather than reporting a generic failure. |
-| Usage-limit sensors stay *unavailable* | They need an OAuth/subscription login (not an API key). New installs show data once you've used Claude; the sensor's `error` attribute explains why if not. |
+| The add-on won't install or start | Check the **Log** tab. Almost always an architecture mismatch: images exist for `amd64` and `aarch64` only. |
+| The integration was not discovered | You probably skipped the restart. Restart Home Assistant, then check **Settings → Devices & services**, or add **brAIn** there by hand. |
+| A banner says Home Assistant needs a restart | The add-on was updated with a newer integration than Home Assistant has loaded. Restart Home Assistant. |
+| Sign-in fails | Check the host can reach Anthropic. **⚙ → Account → Sign in again** opens the sign-in screen. |
+| The usage pill shows `~` and the sensors stay unavailable | They need the account sign-in, not a pasted token or `ha login`. **⚙ → Account → Sign in again → Sign in to your Claude account**. |
+| "It can't see my entities" | Confirm `enable_ha_mcp_server` is on, then run `brain doctor` in the terminal. It drives the tools end to end and names any that fail. |
+| Learning seems stuck | Study sessions are long-running (up to `study_timeout_minutes`, 30 by default). The progress list shows which topic is in flight. |
+| Something else | ⚙ → Diagnostics → **Run all tests**, and **Report a problem** for one redacted text file to share. [Deep check →](/brain/doctor/) |

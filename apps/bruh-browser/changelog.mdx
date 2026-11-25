@@ -1,0 +1,87 @@
+---
+title: Changelog
+description: Release notes for the BRUH Browser Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="0.2.0" latest>
+<Changes type="changed">
+
+- **No more endless scroll.** The errand and the live browser stay up front; Your shopping profile, Browsers this account has connected and Recent errands are folded away, each saying what's inside ("1 store", "2 connected", "4 errands"), and stay open while the page refreshes.
+- The top bar lines up with the page on every screen size.
+- Text is 14 px, with 12 px for small grey lines; headings and the errand's question are 16 px.
+- On a phone every row of buttons behaves the same way.
+- Spacing, corners and button heights follow the shared BRUH standard.
+
+</Changes>
+</Release>
+
+<Release version="0.1.3">
+<Changes type="fixed">
+
+- The errand's prompt, details, report and cart table have room between them, as do the browser and shopping-profile lists; the Send button keeps its normal height.
+
+</Changes>
+</Release>
+
+<Release version="0.1.2">
+<Changes type="added">
+
+- **A shopping profile for each store.** Ask brAIn to look at your past orders and the errand saves what you usually buy (each item, its size, how many and how often), the brands you prefer and anything to avoid, read only from the orders the site shows. Later cart errands for that store start from it, so "my usual" means your usual. It never leaves the add-on except into those errands and to brAIn, and it's on the page with **Remove** on every line and **Clear profile**. A profile never approves a purchase.
+
+</Changes>
+<Changes type="fixed">
+
+- A long errand report is kept whole; it used to be cut to its first 4,000 characters.
+
+</Changes>
+</Release>
+
+<Release version="0.1.1">
+<Changes type="added">
+
+- **Questions you can answer.** When an errand stops to ask you something, the page gives a button for each choice (or Yes and No), a box to tell it what to do instead, and **Stop this errand**. When it needs a sign-in, CAPTCHA, code or pop-up handled, it points you to the live browser and **I've done it, carry on** picks up where it stopped.
+- **brAIn can answer** those questions in chat or by voice — by voice only a choice or a yes/no that doesn't change what you spend.
+- **Buy this** and **Don't buy** under a finished cart. Buy this asks once more with the total and goes through the same checks as buying through brAIn; Don't buy means that cart can never be bought.
+- **Browsers this account has connected**: every Chrome with the Claude extension on your account, this app's own marked, and a default you choose.
+- A new setup step, **Let it act without asking**, and the Test now checks it.
+
+</Changes>
+<Changes type="changed">
+
+- Errands always use this app's own Chrome unless you or brAIn pick another; if it isn't connected, or can't be told apart, the errand stops and asks instead of quietly using a Chrome on another computer.
+- Errands tell the extension in this app's Chrome to act without asking, so a run no longer stalls on a permission question nobody could see.
+- Searching, opening pages and filling the cart are the job: errands no longer stop to ask permission for them, and never ask you to "approve" something without giving you the choices.
+
+</Changes>
+<Changes type="fixed">
+
+- An errand could stop with "approve this or don't approve this" and the page had no way to answer it.
+- When the extension was waiting for permission in its own side panel, the errand hung until it timed out. It now stops and says where the question is and how to open it.
+
+</Changes>
+</Release>
+
+<Release version="0.1.0">
+<Changes type="added">
+
+- **First release**, experimental, amd64 only: a real Google Chrome with Anthropic's Claude in Chrome extension on a virtual screen in the sidebar, running one errand at a time for brAIn — a grocery cart first.
+- A setup page with live steps read from the real state: the extension (force-installed by Chrome policy), its claude.ai sign-in, Claude Code's own sign-in in a terminal on the same screen, and a harmless Test.
+- Errands as jobs, with a token for brAIn in `/config/.bruh_browser/api_token`: one running, three waiting, Continue after a login or CAPTCHA.
+- **A purchase is always a second errand after a reviewed cart**, refused without an approval the add-on can check (its own finished cart, under 30 minutes old, used once, its exact total), plus a spending guard that refuses order-placing clicks in any errand without that approval.
+
+</Changes>
+<Changes type="security">
+
+- The screen, its websocket and the setup routes answer Home Assistant's ingress only; other add-ons reach the errand routes only with the token. Chrome runs with remote debugging off by policy.
+
+</Changes>
+</Release>
+
+</Changelog>

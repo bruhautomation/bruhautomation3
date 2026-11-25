@@ -1,0 +1,256 @@
+---
+title: Using Morph
+description: Everything on the Morph dashboard — the verdict and its colours, rooms and floors, tap, slide and hold, cards that open in place, hosted Lovelace cards, Coming up, Ask, asleep rooms and the room rail.
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+Morph is one page, read top to bottom: a greeting and a **verdict** that say what is going
+on, the **Ask** line, the **Coming up** strip, the house's **scenes**, and then your floors
+and rooms. This page walks through each part, then the gestures that work on every card.
+
+![Morph on a wide screen, light theme: brAIn's top bar with the Morph UI tab selected, the greeting "Good night.", the verdict, the Ask or tell the house line, the Coming up strip, the scenes line with Evening underlined, and the Kitchen room](./images/morph-home-light.webp)
+
+## The verdict: what is going on, and why
+
+The first lines answer the two-second question. Under the greeting (*Good morning*, *Good
+night*), the **story** sentence says what is going on in the house. Its first clause is set
+in the colour of what it means:
+
+| Colour | Means |
+| --- | --- |
+| **Rose** | Something is wrong — a door unlocked that should not be, a leak. |
+| **Amber** | Something worth a look. |
+| **Indigo** | The house is at rest. |
+
+Each card's colour and its **"because" line** come from the same reading, so the
+sentence and the cards never disagree. They colour what is there; **they never move it**.
+
+What Morph reads to decide is brAIn's: what is normal for each sensor and door at this
+hour, and the house's rhythm, all measured on your house (see
+[What brAIn Measures](/brain/measurements/)). Without brAIn's measurements yet — on a
+fresh install, say — the page still works from the house's own state.
+
+## The order is yours
+
+Nothing on the page reorders itself. Floors, rooms and cards keep the order you gave them.
+Nothing is lifted to the top, and no room rises because someone walked in. Several people
+use the page, and they learn where things are — so Morph keeps them there.
+
+**Rooms never fold**: every room always shows all of its cards. A room's title line carries
+its name, an optional faint icon of its own, and its scenes as one segmented control. A
+room with a single card is just that card, with no box around it.
+
+Every tile sits on one grid of equal columns; on a phone that is two half-columns. A
+section's `width` is its share of the page (see [Settings & files](/brain/morph/settings/#dashboardyaml)).
+
+![Morph's rooms in the light theme: the end of the Living Room's Party group, Entry with its lights, a locked front door and a closed garage door, then the Upstairs floor with the Master Bedroom (light strips, a fan and blinds at 60%), the Loft and the Laundry with a docked vacuum](./images/morph-rooms-light.webp)
+
+## Tap, slide, hold
+
+| Gesture | Does |
+| --- | --- |
+| **Tap** | The main thing: toggle a light, play, lock, run a script. A garage door, an unlock and locking a lock ask for a second tap. |
+| **Slide** | A level: brightness, fan speed, blind position. |
+| **Hold** | Opens the card **in place** with its options and its history. Everything else makes room. |
+| **Tap outside** | Folds everything back. |
+
+An opened card also offers **Details**, which opens Home Assistant's own dialog for that
+entity (its history, attributes, settings and related items), and **Device page** for an
+administrator, which goes to the device in Home Assistant's settings. On a card that lists
+several things, tap one row first.
+
+**History is what Home Assistant records for that kind of thing:** a light's day as a strip
+of on and off, a sensor's readings as a line you can scrub, a meter's week as bars. Tap a
+day or a bar to see its hours, and the logbook's "who" for each change. Charts with many
+lines have drag-to-zoom and a chip per line to hide or show it.
+
+A few touches that make it feel alive:
+
+- **Numbers roll** when they change, and a tile **glows briefly** when something changes it
+  from elsewhere (a wall switch, an automation, someone else's phone).
+- **Tap a number or name that comes from a sensor** to open that sensor's own card, with how
+  recently it updated.
+- **Light colour** is one slim track: the whites, then a rainbow dot that opens the full
+  spectrum. An opened light or blind group ends with an **All** slider that sets every
+  member.
+- **Off fans stand still**; a running fan spins faster with its speed.
+- In the Home Assistant app, every action, slide detent and rail notch has a **haptic**.
+
+## The cards
+
+Morph draws these itself, each tuned to its kind of thing:
+
+<CardGrid>
+  <Card title="Lights">
+    **Light** — a strip: tap toggles, slide sets brightness, hold for colour and history.
+    **Light group** — a room of lights in one strip, each light a lane.
+  </Card>
+  <Card title="Movement and air">
+    **Fan**, **Cover** (blinds, shades, garage doors), and fan and cover groups. Slide sets
+    the speed or position.
+  </Card>
+  <Card title="Security">
+    **Lock** (a second tap to confirm), **Alarm** (its modes as buttons; disarming asks
+    twice), **Openings** (doors, windows, motion and leaks as a list that says what needs
+    you), **Camera** (a snapshot every ten seconds; opened, it streams).
+  </Card>
+  <Card title="Climate and readings">
+    **Thermostat** (the temperature on a ruler with the target band, and up to four script
+    or scene buttons), **Sensor** (a reading with today's sparkline), **Readings** (several
+    temperature or humidity sensors on one chart), **Meter** (energy, water or gas: today,
+    and the last seven days as bars), **Weather**.
+  </Card>
+  <Card title="Everything else">
+    **Media**, **Vacuum**, **Person** (who is home, and since when), **Switch**, **Button**
+    (a button, script or scene, with when it last ran), **Scenes**, **Entity** (any entity
+    as a strip), **Note** (a line of words).
+  </Card>
+  <Card title="Any Lovelace card">
+    Anything else is hosted as it is — see below.
+  </Card>
+</CardGrid>
+
+![The Whole house floor in the medium theme: a Climate room with the weather now and a five-day forecast, and two thermostat cards, Downstairs cooling to 72° and Upstairs idle at 73°, each with its mode chips and, Downstairs, a Drop humidity script button](./images/morph-climate-medium.webp)
+
+### Hosting any Lovelace card
+
+Morph runs inside Home Assistant's own frontend, which gives it the live state, your theme
+and Lovelace's card helpers — so **any card you already use can be hosted** in a room: a
+built-in card, a HACS card, anything. In Edit, **Add card** offers **Lovelace card**: paste
+the card's YAML or JSON. In `dashboard.yaml` it looks like this:
+
+```yaml
+- title: Kitchen
+  color: amber
+  groups:
+    - cards:
+        - entity: light.kitchen_ceiling
+        - type: lovelace
+          card:
+            type: history-graph
+            entities:
+              - sensor.kitchen_temperature
+            hours_to_show: 24
+```
+
+A Lovelace card written directly (`type: tile`, `type: custom:…`) is hosted the same way.
+
+### Groups that show only when they matter
+
+A group of cards inside a room can carry `when:` so it appears only at those times — the
+patio heater controls only while the patio door is open, the "Party" group only while a
+party mode is on:
+
+```yaml
+groups:
+  - label: Party
+    when:
+      entity: input_boolean.party_mode
+      state: "on"
+    cards:
+      - entity: switch.party_lights
+      - entity: script.movie_time
+```
+
+`state_not:` works the other way round. Either can be a list.
+
+## Coming up
+
+The **Coming up** strip is the day on a line: what is scheduled and what is running now,
+with a reading point a little left of centre and the day sliding behind it.
+
+- **Tap any item** to open it in place.
+- In the expanded view, **tap a lane's name** to hide or show that lane, and **drag along
+  the time axis** to zoom.
+- **`coming_up_lanes:`** gives machines a lane of their own, showing when each one ran and
+  what is running now — a washer, the irrigation zones, a 3D printer.
+
+```yaml
+coming_up_lanes:
+  - label: Laundry
+    entities: [sensor.washer_status, sensor.dryer_status]
+    running: [running, drying]
+  - label: Irrigation
+    entities: [switch.zone_front_lawn, switch.zone_back_beds]
+```
+
+It is shown while `coming_up:` is on (the default).
+
+## Ask
+
+The line under the verdict — *Ask or tell the house…* — is brAIn's chat with the dashboard
+in front of it. brAIn decides what the words are:
+
+- **A question** — *"what's using the most power right now?"* — is answered under the line,
+  and the page lifts what the answer names. Answer again to carry on: it is one
+  conversation, also in brAIn's **Ask** tab.
+- **Something to remember or a rule** — *"remember the sump pump is in the laundry"*,
+  *"tell me when the dryer is done"* — is done and said in a line.
+- **A change to the dashboard or to Morph** — *"put the porch light in Entry"* — is a
+  [Tell](/brain/morph/tell-brain/), with Undo. If an answer was not what you wanted,
+  **Change the dashboard instead** sends the same words as a change.
+
+## brAIn's cases and To Do
+
+What brAIn wants you to know or decide — its **cases** — and its **To Do** list live in
+brAIn's own **Insights › Needs you**, not on the Morph page. There, the box at the left of a
+To Do item ticks it off at once; tap the item to open its whole story with a line to tell
+brAIn what to do with it, and brAIn's answer is drawn under the item. The list is the same
+one Home Assistant's To-do app shows. See [Needs you & To Do](/brain/needs-you/).
+
+On a Home Assistant dashboard, the **Morph · brAIn's cases** card puts them back in the
+room: every case, or only one area's, each with a **reply line**
+([Morph on HA dashboards](/brain/morph/home-assistant-dashboards/#brains-cases-and-ask-as-cards)).
+
+Morph's own suggestions for the dashboard are brAIn's cases too, answered the same way; a
+yes makes the change as a Tell ([How it learns](/brain/morph/learning/)).
+
+## Asleep rooms, night and away
+
+- **Asleep rooms.** A room whose sleeper is asleep is dimmed. A sleep sensor that reads
+  *In bed* / *Up* decides that over every other sign.
+- **Sleep guard.** With `sleep_guard: true` on a room, anything the page would do to that
+  room — a light, the fan, a scene, a slide — is held while it is asleep, and the room's
+  header asks before sending it. Ideal for a child's room or a nursery.
+- **Night.** The page is not dimmed at night unless `night_dim: true` is in
+  `dashboard.yaml`.
+- **Away.** With everybody away, the page says so.
+
+## The room rail
+
+On a touch screen, the right edge of the page is a **rail of notches**, one per room in its
+own colour, with the floors set apart. **Swipe left** to open it, then **slide the same
+finger** from room to room: the room you are heading to is ringed while the rest of the page
+dims, and letting go lands on it. In the Home Assistant app, every notch is a haptic tick.
+
+**Pull to refresh**: pull the page down past the top and let go; the Morph mark draws itself
+in as you pull.
+
+## On a phone
+
+On a phone brAIn's tabs sit in a row under its header and ☰ opens Home Assistant's sidebar.
+Morph's tiles fall into two half-columns, and the room rail is the quickest way around a big
+house.
+
+![Morph on a phone in the dark theme: brAIn's four tabs under its header, the Living Room's scenes as one segmented control, its light group, fan, blinds and TV in two half-columns, the Party group, and the room rail's notches down the right edge](./images/morph-phone-rooms-dark.webp)
+
+## When to reload
+
+A page left open does not change by itself when Morph's code does. When the code on screen
+is no longer what Home Assistant would serve — after an update, or when brAIn changes your
+copy of Morph's code — a bar at the top of the dashboard says so, with **Reload**. When brAIn
+has been updated but Home Assistant is still running the older integration, the bar asks you
+to **restart Home Assistant** instead. Nothing else needs a reload: changes to the dashboard
+itself appear on their own, on every open screen.
+
+<Aside>
+Morph's code is cached by your browser under a name for exactly that version, so opening
+Morph again downloads nothing. While it opens you see the outline of the dashboard rather
+than a blank page.
+</Aside>
+
+## Who sees what
+
+Somebody in the house who is not a Home Assistant administrator sees the dashboard alone,
+without brAIn's other tabs. Changing the dashboard, Tell and ⚙ are for administrators.

@@ -1,82 +1,130 @@
 ---
 title: BRUH Print
-description: A DYMO LabelWriter driver and label designer for Home Assistant — a full designer in the sidebar, fill-in-the-blank templates, one-word autofit, Twin Turbo roll selection, and a Lovelace card.
+description: A DYMO LabelWriter driver and label designer for Home Assistant — type a word and print it, design labels with barcodes and QR codes, fill in templates from automations, print from a dashboard card, and never print onto the wrong roll.
 template: splash
 hero:
-  tagline: Plug a DYMO LabelWriter into your Home Assistant box and print from the sidebar, from a template, from an automation, or from a card on your dashboard.
+  tagline: Plug a DYMO LabelWriter into your Home Assistant machine and print from the sidebar, a template, an automation, a dashboard card, or by asking brAIn.
   actions:
     - text: Quick Start
       link: /bruh-print/quickstart/
       icon: right-arrow
-    - text: Labels & Stock
-      link: /bruh-print/labels/
-      icon: open-book
+    - text: The Designer
+      link: /bruh-print/designer/
+      icon: pencil
       variant: secondary
+    - text: Reference
+      link: /bruh-print/reference/
+      icon: setting
+      variant: minimal
     - text: GitHub
       link: https://github.com/bruhautomation/BRUH-HA-Apps/tree/main/bruh-print
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
 
 ## What it is
 
-A Home Assistant add-on that drives a USB DYMO LabelWriter directly — no CUPS, no spooler,
-no PPD, no filter chain. About 300 lines speaking the printer's own raster protocol over a
-bulk USB endpoint, which is the same shape the CUPS DYMO path has printed with for twenty
-years, minus four more places for a job to get stuck.
+A Home Assistant add-on that drives a USB **DYMO LabelWriter** directly — no CUPS, no spooler, no
+driver to install. It speaks the printer's own raster protocol over USB, and puts a full label
+studio in your sidebar: a one-word **Quick** tab, a **designer** for text, Code 128 barcodes, QR
+codes, boxes and rules, fill-in-the-blank **templates**, a **history** you can print again from,
+and a **Lovelace card** so anyone in the house can print from a dashboard.
+
+![The BRUH Print Quick tab: Type it. Print it. with a text box, the label, copies and font settings, a Print button reading Type something to print and a Prints on line, beside the label preview; the top bar shows a LabelWriter 450 Twin Turbo with its left and right rolls](./images/quick.webp)
 
 <CardGrid>
-  <Card title="A real designer">
-    Text, barcodes, QR, images and shapes, dragged into place with snapping, alignment and
-    nudge — in the sidebar, not a separate app.
+  <Card title="Type a word, get a label" icon="pencil">
+    The Quick tab tries every way of breaking your words across lines and prints the arrangement
+    whose letters come out biggest. *Spare keys* lands on two lines; *Attic* on one.
   </Card>
-  <Card title="One word, biggest possible">
-    Type `Rice`, get `Rice` at the largest size that fits — chosen by trying every way of
-    breaking the words across lines, not just one.
+  <Card title="A real designer" icon="laptop">
+    Text, barcodes, QR codes, boxes and rules, dragged into place with snapping. The canvas *is*
+    the printable area, and the preview is the printer's own bitmap.
   </Card>
-  <Card title="Templates">
-    A saved label with blanks. Fill them in on the panel, or from an automation.
+  <Card title="Templates for automations" icon="document">
+    Write `{{contents}}` on a label and it becomes a box to fill in — on the panel, on the card,
+    and in `bruh_print.print_template`. Dates fill themselves in.
   </Card>
-  <Card title="It knows what is loaded">
-    A LabelWriter cannot tell you what stock is in it. BRUH Print remembers — and refuses the
-    one print that ruins a roll.
+  <Card title="It knows what is loaded" icon="approve-check">
+    A LabelWriter cannot tell what stock is in it. BRUH Print remembers — per roll on a Twin Turbo
+    — and refuses the one print that ruins a roll.
+  </Card>
+  <Card title="Barcodes that scan" icon="star">
+    Every bar and every QR module is a whole number of printer dots. A barcode that will not fit
+    is reported, never silently shrunk into one that does not scan.
+  </Card>
+  <Card title="Lined up to your roll" icon="setting">
+    **Line up this roll** prints a numbered grid; you read four numbers off it, and every label on
+    that roll lands where it should.
   </Card>
 </CardGrid>
 
+## Use cases
+
+**The freezer, finally organised.** A **Freezer bag** template with `{{contents}}` and a date that
+fills itself in. Sam opens the dashboard card on a phone, types *Chili*, presses Print, and a dated
+label comes out on the right roll.
+
+**"Print a label that says spare batteries."** With [brAIn](/brain/), say it to any voice
+assistant. brAIn checks what is loaded and which templates exist first, so it names a stock that is
+in the printer. A voice agent prints at most ten copies at once, because a misheard "two hundred"
+is a roll.
+
+**Twenty-five numbered boxes for the move.** A template that says *Box 1* takes a number. Enter
+**From** 1 and **To** 25 and the panel says *"Prints 1–25, 25 labels"* before anything prints;
+History shows the run as one row.
+
+**The pantry, with QR codes.** Design a jar label with the name across the top and a QR code
+linking to a recipe, save it as a template, and reprint any jar from History in two taps.
+
+**Labels from an automation.** When a package arrives, an automation calls
+`bruh_print.print_template` with the sender's name. Because the template's label says which stock
+it is for and BRUH Print knows which bay holds it, the automation never names a roll.
+
+**Two stocks, no mistakes.** A Twin Turbo holds address labels on the left and narrow wrap-around
+labels on the right. Nobody ever picks a roll: you pick the label, and BRUH Print sends it to the
+bay that holds it — and refuses a wide label aimed at the narrow roll.
+
 ## What you need
 
-- A **DYMO LabelWriter** on USB. The 450 family is the reference; an unrecognised model is
-  **driven, not refused** — it gets the 450's geometry and its twin-roll flag is read from
-  the device's own product string.
-- Home Assistant on a machine you can plug it into.
-- The add-on's **USB permission**, which is a manifest permission the Supervisor grants when
-  it creates the container — not a switch on the Configuration tab. It takes effect on the
-  next **restart**.
+- **A DYMO LabelWriter on USB.** Known by name: LabelWriter 400, 450, 450 Turbo, **450 Twin
+  Turbo**, 450 DUO, 4XL, Wireless, 550, 550 Turbo and 5XL. An unrecognised DYMO is driven as a
+  450 rather than refused.
+- **Home Assistant** 2023.6 or newer with the add-on store, on an `aarch64` or `amd64` machine you
+  can plug the printer into.
+- **Nothing to switch on for USB.** The add-on's manifest asks for USB access and the Supervisor
+  grants it when it creates the container.
+
+<Aside type="caution" title="The 550 generation checks its media">
+LabelWriter 550, 550 Turbo and 5XL read an RFID tag on the roll and will not feed stock without one.
+Nothing in software can work around that, and the panel says so rather than reporting a silent
+no-op as a print.
+</Aside>
 
 ## The one thing it refuses
 
-Sending a 2.25″-wide raster to a 0.56″ roll prints across the liner — once per copy, with no
-error anywhere. A run of fifty ruins fifty labels.
-
-So a **stock/roll mismatch** is the single reason a print is refused. Everything else that
-could be wrong — a barcode that will not fit, an image that could not be read, a fixed font
+Sending a 2.25″-wide label to a 0.56″ roll prints across the backing paper — once per copy, with no
+error anywhere. A run of fifty ruins fifty labels. So a **stock/roll mismatch** is the single reason
+a print is refused. Everything else that could be wrong — a barcode that will not fit, a fixed font
 size that clips — comes back as a **note** beside a label that still prints.
 
-A refusal is always somebody unable to work.
+## The panel
 
-## Printing from Home Assistant
-
-| Service | What it does |
+| Tab | What it is for |
 | --- | --- |
-| `bruh_print.print_text` | One line (or a few words), autofitted |
-| `bruh_print.print_template` | A saved template with its blanks filled in |
-| `bruh_print.print_label` | A full label document |
-| `bruh_print.reprint` | The last thing, again |
-| `bruh_print.set_roll` | Record what you just loaded |
-| `bruh_print.print_test` | A ruler label, for measuring |
+| **Quick** | Type it, see it, print it — autofitted to the label |
+| **Design** | The full designer, and *Save as template* |
+| **Templates** | Fill in a saved template's blanks and print, or print a numbered run |
+| **Printer** | The printer, what is loaded in each roll, lining up a roll, the label stock catalog, and settings |
+| **History** | Every print with a thumbnail, folded by label, with **Print again** and **Edit** |
 
-Plus a **Lovelace card** for the dashboard, which reads the sensors and calls the services —
-never the panel. It runs in whoever's browser is looking, which may be a phone on mobile data
-through Nabu Casa; it has no route to the ingress port and no business having one.
+<CardGrid>
+  <LinkCard title="Quick Start" href="/bruh-print/quickstart/" description="Plug in, say what is loaded, line up the roll, print." />
+  <LinkCard title="Quick & the Designer" href="/bruh-print/designer/" description="Autofit, the canvas, barcodes, QR codes and fonts." />
+  <LinkCard title="Templates" href="/bruh-print/templates/" description="Blanks, dates, numbered runs and printing from automations." />
+  <LinkCard title="Rolls, Stock & Twin Turbo" href="/bruh-print/rolls/" description="What is loaded, lining up a roll, the stock catalog and print quality." />
+  <LinkCard title="Dashboard Card" href="/bruh-print/card/" description="Print from any Lovelace dashboard, from any phone." />
+  <LinkCard title="Reference" href="/bruh-print/reference/" description="Options, services, entities, brAIn tools and troubleshooting." />
+</CardGrid>

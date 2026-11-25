@@ -1,0 +1,94 @@
+---
+title: Reference
+description: Every BRUH Bambu Studio add-on option with its default, the ports and folders it uses, what it keeps out of backups, and the printers it supports.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Options
+
+Set on the add-on's **Configuration** tab. Most people never change any of them.
+
+| Option | Default | What it does |
+|---|---|---|
+| `enable_ha_integration` | `true` | Deploy the companion `bruh_bambu` integration and its bridge — the services, the sensors, the camera, and the route brAIn takes to your printers. Turn it off if you only ever use the panel. |
+| `install_lovelace_card` | `true` | Put the printer card in your dashboard card picker. It is a file in `/config/www/bruh_bambu`; turning this off stops it being updated and registered. |
+| `install_morph_card` | `true` | When Morph is in use, put the same card in `/config/morph/cards` as `custom:morph-bambu-printer`. Nothing happens without Morph. |
+| `bambu_studio_version` | `latest` | `latest` downloads the newest Bambu Studio release on first start and keeps it. A release tag such as `v02.08.02.61` stays on that version; changing it downloads the new one on the next start. |
+| `appimage_url` | *(empty)* | A direct link to a Bambu Studio Linux AppImage, used instead of looking the release up on GitHub. Leave it empty unless GitHub is unreachable from Home Assistant or you want a build Bambu Lab did not publish as a release. |
+| `screen_resolution` | `1600x900` | The virtual screen Bambu Studio draws on, as `WIDTHxHEIGHT` (three or four digits each). The panel scales it to your window; a larger screen shows more of the slicer and makes text smaller on a phone. |
+| `log_level` | `info` | `trace`, `debug`, `info`, `notice`, `warning`, `error` or `fatal`. Successful status polls are hidden at every level except `debug`. |
+
+```yaml title="Configuration (defaults)"
+enable_ha_integration: true
+install_lovelace_card: true
+install_morph_card: true
+bambu_studio_version: latest
+appimage_url: ""
+screen_resolution: "1600x900"
+log_level: info
+```
+
+## Panel settings
+
+Everything else is set in the panel's **Settings** tab, not in the add-on's configuration:
+
+| Section | Holds |
+|---|---|
+| Printers | The printers added, **Find printers**, *Add a printer by hand* |
+| Print failure detection | **Alerts go to**; per printer: on/off, *Warn and pause* or *Only warn*, Relaxed / Balanced / Careful, *Turn the chamber light on to see*, *Notice when the plate is cleared* |
+| brAIn | The Design model and the print-check model (*brAIn's choice*, Haiku, Sonnet, Opus, Fable); your *Designing* and *Printing* standing instructions |
+| 3D view | *Invert vertical drag* (on by default, remembered per browser) |
+| Home Assistant | Whether the integration is set up, the restart when one is owed, the dashboard cards |
+
+## Printers
+
+| Family | Camera | Bed (build volume brAIn designs for) |
+|---|---|---|
+| X1 series | RTSPS on port 322, with *LAN mode live view* on | 256 mm |
+| P1 series | Pictures on port 6000 | 256 mm |
+| P2S | RTSPS on port 322, with *LAN mode live view* on | 256 mm |
+| A1 | Pictures on port 6000 | 256 mm |
+| A1 mini | Pictures on port 6000 | 180 mm |
+| H2 series | RTSPS on port 322, with *LAN mode live view* on | about 325 mm |
+
+Every printer needs its **access code**, and on recent firmware **LAN-only mode** and
+**Developer mode** on, for commands to be accepted.
+
+## Network
+
+The add-on runs on Home Assistant's bridged network and publishes no port. It reaches the
+printers **outbound** only:
+
+| Port | What |
+|---|---|
+| 8883 | MQTT over TLS — status and commands (also what **Find printers** reads the certificate from) |
+| 990 | Implicit FTPS — uploading prints, reading the printer's storage |
+| 6000 | Camera pictures (P1, A1) |
+| 322 | RTSPS camera stream (X1, P2S, H2) |
+
+The panel itself is only reachable through Home Assistant's ingress, and only by
+administrators. Nothing goes through Bambu's cloud unless you sign in to Bambu Studio yourself.
+
+## Folders
+
+| Path | What lives there |
+|---|---|
+| `/share/bambu` | Your models and projects — reachable over Samba, the File Editor, the Files tab and Bambu Studio |
+| `/share/bambu/imports` | What **Import** brought in |
+| `/share/bambu/sliced` | The add-on's slices on the way to a print |
+| `/share/bambu/designs` | Every designed part, its conversation and each version's files |
+| `/config/www/bruh_bambu` | The dashboard card |
+| `/config/morph/cards` | The Morph printer card, when Morph is in use |
+
+## Backups
+
+Left out of Home Assistant backups on purpose:
+
+- **Printer access codes** — they are credentials, and backups are unencrypted unless you opt in.
+  Add each code again after a restore.
+- **The downloaded Bambu Studio** — about 220 MB the add-on fetches again on its own.
+
+<Aside type="note">
+**Architecture:** amd64 only. **Home Assistant:** 2024.7.0 or newer. **Stage:** experimental.
+</Aside>

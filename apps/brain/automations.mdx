@@ -135,7 +135,7 @@ the automation's trace instead of in your notification:
 
 - `brain.run_task`, `brain.ask` and `brain.send_prompt` raise a `HomeAssistantError` with the
   sentence a person should read. When the reason is a sign-in, it names the button that fixes
-  it: **⚙ → Claude account → Sign in again** in the panel.
+  it: **⚙ → Account → Sign in again** in the panel.
 - `brain_task_complete` carries `status: failed` and an `error` code from a short, fixed list
   — `auth`, `timeout`, `empty`, `refused`, `permission`, `paused`, `budget`, `partial`,
   `error` and the like — so an automation can branch on *which* failure it was.
@@ -151,7 +151,7 @@ Scheduled reports rendered to **sensors** — the dashboard-native sibling of th
 Create them from the integration: **Settings → Devices & Services → brAIn → Add service → Insight job**. Pick a shipped template — daily briefing, anomaly watch, battery & maintenance, camera check — or write a custom prompt. Custom prompts can embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
 
 - **Scheduling**: an interval, a daily time (HH:MM), both, or manual-only. Every job also gets a **Run now** button, and `brain.run_insight` triggers by name from automations.
-- **Read-only**: a job looks and changes nothing — no shell, no file edits. The shipped camera-check template is the one that may look at a camera, and only the cameras you've ticked in the panel's ⚙ → Generation defaults.
+- **Read-only**: a job looks and changes nothing — no shell, no file edits. The shipped camera-check template is the one that may look at a camera, and only the cameras you've ticked in the panel's ⚙ → Cameras & calendars.
 - **It pauses with the rest of brAIn**: on its schedule, a job waits while **Automatic insights** is off or the usage budget is spent, like every other run nobody pressed. `brain.run_insight` and **Run now** always run.
 - **Reading it**: the report lives in the sensor's attributes — `preview`, full `markdown`, and ready-to-paste `card_yaml`. After the first successful run you get a notification containing the dashboard card.
 - **Continuity**: each run gets what brAIn knows about the house — the same [memory](/brain/memory/) retrieval the panel's own cards use — plus the previous report, so recurring insights note what *changed* instead of rediscovering the house.
@@ -220,8 +220,8 @@ a second lookup:
 
 | Event | When | Carries |
 | --- | --- | --- |
-| **`brain_case`** | A finding opens on the [Findings](/brain/findings/) feed — something waiting on you. (Suggestions and guesses are on the feed too, but aren't announced by an event.) | `case_id`, `kind`, `claim`, `severity`, `status`, `entity_id`, `fixable`, `source` |
-| **`brain_case_ended`** | That finding leaves the feed, whichever ending it got. **Dismiss** isn't an ending: a dismissed finding fires nothing when it goes and nothing when it comes back. | `case_id`, `kind`, `claim` |
+| **`brain_case`** | A finding opens on [Needs you](/brain/needs-you/) — something waiting on you. (Suggestions and guesses are on the feed too, but aren't announced by an event.) | `case_id`, `kind`, `claim`, `severity`, `status`, `entity_id`, `fixable`, `source` |
+| **`brain_case_ended`** | That finding leaves the feed, whichever ending it got. **Snooze** isn't an ending: a snoozed finding fires nothing when it goes and nothing when it comes back. | `case_id`, `kind`, `claim` |
 | **`brain_change`** | brAIn changed something in the house (a fix landed). A Home Assistant restart doesn't replay old ones. | `case_id`, `claim`, `entity_id` |
 | **`brain_finding`** | The same moment as `brain_case`, in the older shape — kept so nothing written against it breaks. | `ts`, `text`, `severity`, `entity_id`, `fixable` |
 | **`brain_learned`** | A fact was filed into [memory](/brain/memory/). | `fact`, `source` |
@@ -249,9 +249,11 @@ these on it:
 | Entity | What it's for |
 | --- | --- |
 | **`sensor.brain_findings_open_findings`** | The open count, with the severity split and the texts as attributes — enough to put what's actually broken on a lock screen. |
-| **`todo.brain_system_brain`** | brAIn's to-do list, in Home Assistant's To-do app. Ticking a finding off is "I've fixed it" and deleting one is "not a problem here". `brain.add_todo` adds to it. |
+| **`todo.brain_system_to_do`** | To Do, in Home Assistant's To-do app (`todo.brain_system_brain` on an older install). Ticking an item off is **Done**; deleting one takes it off the list. `brain.add_todo` adds to it. |
 | **Repairs** | Every finding waiting on you, with its answers, under **Settings → System → Repairs**. |
-| **`sensor.brain_usage_limits_health`** | Whether brAIn itself is working, so an automation can tell you the add-on is in trouble. |
+| **`binary_sensor.brain_needs_you`** | On while anything waits for a decision. |
+| **`sensor.brain_status`** | The panel's status line: `watching`, `paused`, `needs_restart`, `signed_out` or `degraded`. |
+| **`sensor.brain_system_health`** | Whether brAIn itself is working (`sensor.brain_usage_limits_health` on an older install), so an automation can tell you the add-on is in trouble. |
 
 Those ids are what a fresh install gets; if you've renamed anything, find yours under
 Settings → Devices & services → brAIn → entities.
@@ -266,21 +268,21 @@ ring.
 
 - **`brain.check`** runs the house checks now instead of waiting for the next scheduled pass
   (`checks_interval_hours`). It returns immediately — a pass takes a minute or two, and what
-  it finds arrives on the Findings feed. Two calls close together are one pass, and a call
+  it finds arrives on Needs you. Two calls close together are one pass, and a call
   made while a pass is running is noted in the log rather than queued.
   **`button.brain_system_run_house_checks`** on the *brAIn System* device is the same press with nothing
   to type.
 - **`brain.answer_question`** answers one of the guesses brAIn is waiting on, exactly as
-  pressing Yes or No on the Findings tab does: a yes files the guess as something brAIn
+  pressing Yes or No on Needs you does: a yes files the guess as something brAIn
   knows, a no closes it and keeps any reason after the no as a correction. Start the
-  `answer` with yes or no, and name the guess by its id (`ts`) or its wording — the *Waiting
-  on you* sensor lists the open guesses with their ids. An answer that isn't a yes or no, or a
+  `answer` with yes or no, and name the guess by its id (`ts`) or its wording — the *Questions
+  waiting* sensor lists the open guesses with their ids. An answer that isn't a yes or no, or a
   guess that isn't open, is refused with the reason. (Before 2.11 this filed your answer as a
   fact and left the guess open.)
 - **`brain.add_memory`** queues a fact from an automation; its optional `source` field records
   where the fact came from.
 - **`brain.study`** sends brAIn off to research a topic, and **`brain.intent`** turns one
-  sentence into an automation offered on the [Proposals](/brain/proposals/) tab.
+  sentence into an automation offered as a [suggestion](/brain/proposals/) on Insights → Needs you.
 
 ## Power Tools from automations
 

@@ -1,0 +1,207 @@
+---
+title: Changelog
+description: Release notes for the GardenRX Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="0.2.5" latest>
+<Changes type="changed">
+
+- **Readable in every theme.** Grey text (subtitles, counts, tab labels, hints) and the green money and "% left" figures are at least 4.5:1 against what they sit on.
+- **The phone's bottom bar** fits all seven labels whole, and each is the screen's own title: Today, Crops, Garden, Harvest, Spray, Products, Weather.
+- **Today out of season** shows what matters while the garden rests — a frost warning, when each crop usually wakes and what to do then, the last spray and the last pick — and drops the watering tip while nothing is growing.
+- **Product badges say what they are**: "REI 24h", "Re-spray 10d", or "n/a".
+- **The spray window says why** an hour or a day is on hold ("below 40°", "wind", "rain"), and at night the rating reads "Dark" rather than a good spraying score.
+
+</Changes>
+</Release>
+
+<Release version="0.2.4">
+<Changes type="fixed">
+
+- **Watering advice reads the forecast.** With a quarter inch or more of rain due in the next three days it says to wait for the rain, and Today's chip and the Weather card agree. In real heat a "water now" stays when the rain coming is less than the soil is short.
+- **The dashboard cards have headings** (Last spray, Harvest, Stock), which `title:` can change or remove. The calm stock card says "Nothing at 20% or less" and names the lowest, and Log harvest says what it still needs before it can log.
+- **The 3-day spray window** greys hours that are over and hours in the dark, and the banner's next opening is the grid's first green hour. Nothing says it is good to spray in the dark.
+- **Season states.** Annual crops at the end of the season read "Finished for the year"; garlic and shallots, in the ground over winter, read "Dormant". A crop with no varieties follows its group's season, and the resting note names the crops still growing.
+
+</Changes>
+
+This is the 0.2.2 work, made again from a clean start after its revert in 0.2.3.
+
+</Release>
+
+<Release version="0.2.3">
+<Changes type="removed">
+
+- The 0.2.2 changes were taken back out while they were redone: the development loop's own monitor found that a reviewer had written scratch test files while checking the change, and its rule is to revert and redo such a change from a clean start. They returned in 0.2.4.
+
+</Changes>
+</Release>
+
+<Release version="0.2.1">
+<Changes type="security">
+
+- Next.js updated from 16.4.2 to 16.4.5, a security release.
+
+</Changes>
+<Changes type="fixed">
+
+- The cards' Mark sprayed button and status text are readable on Home Assistant's default theme, light and dark.
+
+</Changes>
+</Release>
+
+<Release version="0.2.0">
+<Changes type="changed">
+
+- **One page grid.** Every screen's title and content share the same edges, and the header's search and weather line up with the page instead of drifting to the window edge. Phones use a 16 px margin.
+- **One heading style** replaces five, including the tiny uppercase labels on Weather, Spray and Harvest; crop detail shows every section as a card.
+- **The shared BRUH design standard**: one set of corner radii, nothing smaller than 12 px, 40 px buttons and fields (44 px on touch screens).
+- **Tablets** (640–900 px) keep two or more columns, and the bottom bar switches to the sidebar at 900 px.
+- Harvest picks switch to stacked cards below 900 px so the Value column is never cut off.
+- The Lovelace cards follow the shared card style — 16 px padding, 44 px buttons, the theme's primary colour — and take a `title` option.
+
+</Changes>
+</Release>
+
+<Release version="0.1.13">
+<Changes type="changed">
+
+- The stock card says "Nothing running low · 14 in stock" when nothing is low, then lists the three lowest.
+- Harvest's three zero cards become one line when nothing is ready, held or developing ("Nothing to pick or hold right now · 21 crops off season").
+- Crops on a phone: the title stays on one line and the search gets its own full-width row.
+
+</Changes>
+<Changes type="fixed">
+
+- The rainfall card no longer shows a red DROUGHT badge for a resting garden: a dormant garden short of rain is at most "Dry", and DROUGHT appears only in the growing season.
+
+</Changes>
+</Release>
+
+<Release version="0.1.12">
+<Changes type="changed">
+
+- **One season rule** for Harvest, Crops, Weather and Today: dormant or past-harvest crops are left out of "Still developing" and counted in one line as off season.
+- The 7-day forecast's chip says when: "Spray 3–7 pm", "Short 4–5 pm" for a window under three hours, or nothing when no spray is due.
+- Each crop on Crops is one compact row; spray lines say when the next spray is due and are left off for resting crops.
+- Log Harvest sits in the picks log's header.
+
+</Changes>
+<Changes type="fixed">
+
+- A resting garden is never told "Water now"; each watering card gives one instruction, and Today shows a one-line rain summary that links to Weather.
+- Bigger stock search and sort chips on a phone; the stock card colours red exactly what it counts as running low.
+
+</Changes>
+</Release>
+
+<Release version="0.1.11">
+<Changes type="changed">
+
+- Stock cards on a phone show the whole product name, the level bar and the amount left; size, count and cost sit behind a pencil button.
+
+</Changes>
+</Release>
+
+<Release version="0.1.10">
+<Changes type="fixed">
+
+- **Crop stages follow the date and the garden's own season**, so a past-season crop reads Dormant in November, and a stage set by hand gives way to the calendar once its season is over. "Fungicide due" and "Ready to pick" count only crops in season; the pre-harvest warning is never hidden.
+- Touch targets on a phone are at least 40 px.
+- The hold-off card names the next good spray window with its day and time, and a crop's attention row opens a tank mix with that crop chosen.
+- The picks log on a phone is one compact row per pick that opens for editing on a tap.
+
+</Changes>
+</Release>
+
+<Release version="0.1.8 – 0.1.9">
+<Changes type="removed">
+
+- 0.1.8's fixes were reverted in 0.1.9 by the development loop's transcript monitor (a scratch test file had been edited while fixing) and redone in 0.1.10.
+
+</Changes>
+</Release>
+
+<Release version="0.1.7">
+<Changes type="fixed">
+
+- Resting crops no longer show a red "lapsed" or count as due, and Crops and Today agree because both ask one rule. "Fung" and "Ins" are written out.
+- Picks on a phone are small cards instead of a table running off the edge.
+- No "water now" for a mostly resting garden in cool weather; the best spray window only ever names a time still to come.
+- Readable amber pills, percentages, FRAC codes and tabs in light mode; 40 px header buttons and 16 px fields on a phone.
+
+</Changes>
+</Release>
+
+<Release version="0.1.4 – 0.1.6">
+<Changes type="changed">
+
+- **An update asks for a Home Assistant restart only when it needs one** — when the integration's code changed. Card changes need only a page reload.
+
+</Changes>
+<Changes type="fixed">
+
+- Today no longer says coverage is due, or suggests a spray, for crops that are dormant or past harvest.
+
+</Changes>
+<Changes type="security">
+
+- Bundled web libraries used by the MCP SDK updated (hono 4.13.18, and the HTTP server library to 2.1.6), closing request-validation and static-path advisories.
+
+</Changes>
+</Release>
+
+<Release version="0.1.3">
+<Changes type="added">
+
+- **Everything the panel logs can be logged from Home Assistant, voice or brAIn.** New services: `gardenrx.log_spray`, `gardenrx.queue_spray`, `gardenrx.adjust_inventory`, `gardenrx.add_crop`, `gardenrx.add_variety`, `gardenrx.log_note` (a dated note on a bed or tree on the Garden Map, which now shows its notes) and `gardenrx.get_harvests`. Each answers with the record it made and refuses with a sentence naming what is wrong.
+
+</Changes>
+<Changes type="security">
+
+- Six dependencies updated within their ranges (shadcn, @shadcn/registry, zod, undici, fast-uri, body-parser).
+
+</Changes>
+</Release>
+
+<Release version="0.1.2">
+<Changes type="security">
+
+- Next.js 16.4.2, which closes an unauthenticated remote code execution in its image optimizer when SVG files are served, and a Server Actions denial of service. `proxy-addr` 2.0.8 and `@modelcontextprotocol/sdk` 1.32.1 also updated.
+
+</Changes>
+</Release>
+
+<Release version="0.1.1">
+<Changes type="fixed">
+
+- The Today link opened a 404: it pointed at the panel's address without a trailing slash, which Home Assistant doesn't answer. Every page link now ends in a slash, and CI follows every link through an ingress stand-in.
+
+</Changes>
+</Release>
+
+<Release version="0.1.0">
+<Changes type="added">
+
+- **GardenRX as a Home Assistant add-on**: Today, Crops, Garden Map, Harvest, Spray, Treatments, Inventory and Weather in the sidebar through ingress, behind Home Assistant's login.
+- **Data in one SQLite file** in the add-on (`gardenrx.db`), in every backup, with no database server. The catalog — 256 products, their active ingredients, crop uses and pre-harvest intervals, crop groups, phenology and tank-mix rules — loads on first start.
+- Forecasts and rainfall for Home Assistant's own location and time zone.
+- The `gardenrx` integration with sensors for the harvest (weight and value), the last spray, queued sprays, crops in a pre-harvest interval and treatments running low, and services to log and delete harvests, complete and delete queued sprays, and refresh.
+- Harvest, spray and stock cards, for Lovelace and for Morph.
+
+</Changes>
+<Changes type="fixed">
+
+- The theme picker saved nothing, so the theme reverted on the next load.
+
+</Changes>
+</Release>
+
+</Changelog>

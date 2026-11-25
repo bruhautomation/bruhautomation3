@@ -2,7 +2,8 @@
 // Custom landing page — standalone, outside Starlight's content collection.
 import logoLight from '../assets/bruh-logo-light.svg';
 import logoDark from '../assets/bruh-logo-dark.svg';
-import { APPS, groupByCategory, readProjects } from '../catalog.mjs';
+import { APPS, APP_LIST, groupByCategory, readProjects } from '../catalog.mjs';
+import brainHero from '../assets/images/apps/brain-hero.webp';
 
 // Counts come from the project folders, so the numbers on the front page are
 // the repo — not a figure anyone has to remember to bump. A project counts as
@@ -22,14 +23,19 @@ const stats = [
 	// of folders and the label a claim the site does not meet.
 	{ number: projects.filter((p) => p.guide && !p.pending).length, label: 'Build<br />Guides' },
 	{ number: projects.filter((p) => p.tags.includes('esphome')).length, label: 'ESPHome<br />Devices' },
-	{ number: 2, label: 'HA<br />Apps' },
+	{ number: APP_LIST.length, label: 'HA<br />Apps' },
 ];
 
 // One card per category, in catalog order, each landing on its own section of
 // the project list. The glyphs come from the catalog, which is also where the
 // sidebar gets them — one icon per category, defined once.
+// brAIn gets the wide card with a picture; every other app is a tile.
+const [featuredApp, ...otherApps] = APP_LIST;
+
 const cards = [...groups, APPS].map((group) => ({
-	href: `/project-list/#${group.id}`,
+	// The apps have a hub of their own; the categories land on their section
+	// of the project list.
+	href: group.id === APPS.id ? '/apps/' : `/project-list/#${group.id}`,
 	title: group.label,
 	blurb: group.blurb,
 	icon: group.icon,
@@ -507,8 +513,163 @@ const cards = [...groups, APPS].map((group) => ({
 				display: block;
 			}
 
+			/* ── Apps ── */
+			.apps {
+				max-width: 1100px;
+				width: 100%;
+				margin: 0 auto;
+				padding: 1rem 1.5rem 3.5rem;
+			}
+			.section-head {
+				text-align: center;
+				margin-bottom: 2rem;
+			}
+			.eyebrow {
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--accent);
+				margin-bottom: 0.5rem;
+			}
+			.section-head h2 {
+				font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+				font-weight: 700;
+				letter-spacing: -0.02em;
+			}
+			.section-sub {
+				margin: 0.75rem auto 0;
+				max-width: 38rem;
+				color: var(--text-muted);
+				line-height: 1.6;
+			}
+			.app-featured {
+				display: grid;
+				grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+				gap: 2rem;
+				align-items: center;
+				background: linear-gradient(135deg, var(--accent-glow), transparent 60%), var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 2rem;
+				margin-bottom: 1.25rem;
+				transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+			}
+			.app-featured:hover,
+			.app-tile:hover {
+				border-color: var(--accent);
+				box-shadow: 0 4px 24px var(--accent-glow);
+				transform: translateY(-2px);
+			}
+			.app-featured-text {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+			.app-featured-text > p {
+				color: var(--text-muted);
+				line-height: 1.6;
+			}
+			.app-featured h3 {
+				font-size: 1.6rem;
+				font-weight: 700;
+			}
+			.app-featured-shot img {
+				display: block;
+				width: 100%;
+				height: auto;
+				border-radius: 10px;
+				border: 1px solid var(--border);
+				box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+			}
+			.app-title-row {
+				display: flex;
+				align-items: center;
+				gap: 0.85rem;
+			}
+			.app-title-row img {
+				border-radius: 12px;
+				flex-shrink: 0;
+			}
+			.app-tagline {
+				font-size: 0.9rem;
+				color: var(--accent);
+				font-weight: 600;
+				margin-top: 0.15rem;
+			}
+			.app-tags {
+				list-style: none;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+			}
+			.app-tags li {
+				font-size: 0.75rem;
+				font-weight: 600;
+				padding: 0.2rem 0.6rem;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				color: var(--text-muted);
+			}
+			.app-grid {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 1.25rem;
+			}
+			.app-tile {
+				background: var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.35rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.85rem;
+				transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+			}
+			.app-tile h3 {
+				font-size: 1.02rem;
+				font-weight: 650;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.4rem;
+			}
+			.app-tile > p {
+				font-size: 0.88rem;
+				color: var(--text-muted);
+				line-height: 1.5;
+			}
+			.app-badge {
+				font-size: 0.65rem;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				padding: 0.1rem 0.45rem;
+				border-radius: 999px;
+				background: rgba(245, 158, 11, 0.15);
+				color: #d97706;
+			}
+			.apps-more {
+				text-align: center;
+				margin-top: 1.5rem;
+				font-size: 0.95rem;
+			}
+			.apps-more a {
+				color: var(--accent);
+				font-weight: 600;
+			}
+			.apps-more a:hover {
+				text-decoration: underline;
+			}
+
 			/* ── Responsive ── */
 			@media (max-width: 900px) {
+				.app-featured {
+					grid-template-columns: 1fr;
+				}
+				.app-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
 				.categories {
 					grid-template-columns: repeat(2, 1fr);
 				}
@@ -519,6 +680,12 @@ const cards = [...groups, APPS].map((group) => ({
 				}
 				.categories {
 					grid-template-columns: 1fr;
+				}
+				.app-grid {
+					grid-template-columns: 1fr;
+				}
+				.app-featured {
+					padding: 1.35rem;
 				}
 				.hero {
 					padding: 3rem 1.25rem 3rem;
@@ -533,7 +700,8 @@ const cards = [...groups, APPS].map((group) => ({
 		<!-- Nav — no logo here since the hero has it -->
 		<nav>
 			<div class="nav-right">
-				<a href="/project-list/" class="nav-link">Docs</a>
+				<a href="/apps/" class="nav-link">Apps</a>
+					<a href="/project-list/" class="nav-link">Projects</a>
 				<a
 					href="https://www.youtube.com/@BRUHAutomation1"
 					class="nav-link"
@@ -637,6 +805,7 @@ const cards = [...groups, APPS].map((group) => ({
 							<polyline points="12 5 19 12 12 19"></polyline>
 						</svg>
 					</a>
+					<a href="/apps/" class="btn btn-outline">Explore the Apps</a>
 					<a
 						href="https://www.youtube.com/@BRUHAutomation1"
 						class="btn btn-outline"
@@ -668,6 +837,65 @@ const cards = [...groups, APPS].map((group) => ({
 						</div>
 					))
 				}
+			</section>
+
+			<!-- Apps -->
+			<section class="apps" aria-labelledby="apps-heading">
+				<div class="section-head">
+					<p class="eyebrow">Home Assistant Apps</p>
+					<h2 id="apps-heading">Software for the house, too</h2>
+					<p class="section-sub">
+						{APP_LIST.length} open-source apps for Home Assistant, from one repository. brAIn is
+						the mind; the rest give it hands.
+					</p>
+				</div>
+				<a href={featuredApp.href} class="app-featured">
+					<div class="app-featured-text">
+						<div class="app-title-row">
+							<img src={featuredApp.icon} alt="" width="56" height="56" loading="lazy" />
+							<div>
+								<h3>{featuredApp.name}</h3>
+								<p class="app-tagline">{featuredApp.tagline}</p>
+							</div>
+						</div>
+						<p>{featuredApp.blurb}</p>
+						<ul class="app-tags">{featuredApp.tags.map((t) => <li>{t}</li>)}</ul>
+						<span class="cat-link">
+							Meet brAIn <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+						</span>
+					</div>
+					<div class="app-featured-shot">
+						<img
+							src={brainHero.src}
+							width={brainHero.width}
+							height={brainHero.height}
+							alt="brAIn's Home tab: the Morph dashboard with a plain-language summary of the house, a Coming up timeline, scenes and rooms of live controls"
+							loading="lazy"
+						/>
+					</div>
+				</a>
+				<div class="app-grid">
+					{
+						otherApps.map((app) => (
+							<a href={app.href} class="app-tile">
+								<div class="app-title-row">
+									<img src={app.icon} alt="" width="44" height="44" loading="lazy" />
+									<div>
+										<h3>
+											{app.name}
+											{app.experimental && <span class="app-badge">Experimental</span>}
+										</h3>
+										<p class="app-tagline">{app.tagline}</p>
+									</div>
+								</div>
+								<p>{app.blurb}</p>
+							</a>
+						))
+					}
+				</div>
+				<p class="apps-more">
+					<a href="/apps/">Compare every app, what each needs and how they work together →</a>
+				</p>
 			</section>
 
 			<!-- Categories -->

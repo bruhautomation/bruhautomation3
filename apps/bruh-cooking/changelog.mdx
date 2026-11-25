@@ -1,0 +1,141 @@
+---
+title: Changelog
+description: Release notes for the BRUH Cooking Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="0.2.4" latest>
+<Changes type="changed">
+
+- While an appliance is offline, its "offline since" always agrees with the message, which takes its time from the same moment; an appliance never heard from says "Never heard from since BRUH Cooking started at 13:41" and leaves "last contact" empty.
+- The **Problem** sensor carries the offline reason and what to try (`offline_reason`, `offline_to_try`), so an entity card explains why the controls are unavailable.
+- A next cook with no timer says one thing ("No timer: heats the water to 140 °F and holds it there until you stop it"); presets at that temperature are a separate, labelled tip (`next_cook.tip`).
+
+</Changes>
+</Release>
+
+<Release version="0.2.3">
+<Changes type="changed">
+
+- **Out of contact for 10 minutes turns Problem on** (with `cause: offline`), and the status says since when ("Offline since 16:04, when it was last heard from").
+
+</Changes>
+<Changes type="fixed">
+
+- Preheat, time remaining, active mode and error no longer read "unavailable" while the appliance is offline: they are kept and marked as old, so they aren't mistaken for broken entities. Controls still go unavailable.
+- "Last cook" says the history is unknown for an appliance never heard from, instead of "no cook yet".
+- **The next cook is described in words**, with a matching preset named when one fits; for the oven the words come from the same settings Cook sends.
+
+</Changes>
+
+This is the 0.2.1 work, made again from a clean start after its revert in 0.2.2 by the development loop's own monitor.
+
+</Release>
+
+<Release version="0.2.0">
+<Changes type="changed">
+
+- The panel's overview lines up on one 16 px edge; on wide screens it is centred and capped, so the cards no longer pack to the left. Text and spacing follow the shared design standard.
+
+</Changes>
+</Release>
+
+<Release version="0.1.13">
+<Changes type="changed">
+
+- While an appliance is out of contact, **Temperature, Cooking and Cook end keep their last known values**, marked old (`stale`, `as_of`); controls stay unavailable, and the panel still draws the appliance as offline.
+- The Repairs notice for an update that needs a restart reads "Restart Home Assistant to finish updating BRUH Cooking".
+
+</Changes>
+
+This is 0.1.11 made again after its revert in 0.1.12.
+
+</Release>
+
+<Release version="0.1.10">
+<Changes type="added">
+
+- **Repairs says when a restart is owed** — when Home Assistant is still running the integration it loaded before an update — and the restart clears it. Until now only the add-on's log said so, so a fix could sit unused until someone happened to restart.
+
+</Changes>
+<Changes type="fixed">
+
+- An offline appliance says how long from when it was last heard from ("Offline for 3 days, counted from when it was last heard from"), never "under a minute" for one silent for days.
+- The Cooking sensor keeps a real state while offline, and Status carries the offline reason, since and cause.
+- The last cook reads "no cook yet" before the first, gives the target in your unit, and says where its settings came from.
+- Presets for a Fahrenheit house are whole degrees, and the cook is sent the matching Celsius value.
+
+</Changes>
+</Release>
+
+<Release version="0.1.9">
+<Changes type="added">
+
+- **An account device** for each Breville or Sage account, with a sensor: connected or not, appliances found, the last good poll, and any appliance not driven, with the reason. The add-on's log says the same.
+- **A Repairs fix renames an appliance's entity ids** to its current name, only when you confirm.
+
+</Changes>
+<Changes type="fixed">
+
+- Presets show the temperature the cook really uses, each with a one-line note on the doneness or food it is for.
+- With a cooker offline the problem sensor still reads on or off, and the last cook stays readable across a reload. Losing contact no longer ends a cook, and contact coming back no longer starts a new one.
+- A preset named for a start the cloud never began no longer labels a later manual cook.
+- The device name follows a rename in the Breville app.
+
+</Changes>
+
+0.1.5 and 0.1.7 carried earlier versions of these fixes and were reverted (0.1.6, 0.1.8) by the development loop's transcript monitor, then redone here.
+
+</Release>
+
+<Release version="0.1.4">
+<Changes type="added">
+
+- The log says when BRUH Cooking signs in to Breville, when an appliance comes online or goes offline, and when a cook starts or stops; the status sensor and brAIn carry the last contact and the last cook.
+- Repairs says when an appliance's entity ids still use an older name.
+
+</Changes>
+<Changes type="fixed">
+
+- In a Fahrenheit home the built-in presets show whole degrees (133 °F, not 132.8 °F), and the Joule cooks at exactly the temperature shown.
+- An offline appliance says why — the sign-in failing, the cloud connection down, or the appliance not answering — with one thing to try.
+
+</Changes>
+</Release>
+
+<Release version="0.1.1 – 0.1.3">
+<Changes type="changed">
+
+- **An update asks for a restart only when it needs one**; a new panel bundle is picked up without a restart.
+
+</Changes>
+<Changes type="fixed">
+
+- An offline appliance no longer reports its last temperature and time remaining as current, and a deprecated device-registry lookup is gone.
+
+</Changes>
+<Changes type="security">
+
+- The panel's test tooling updated (vitest 5.1.0, happy-dom 21.0.4). Development dependencies only; the shipped panel was unchanged.
+
+</Changes>
+</Release>
+
+<Release version="0.1.0">
+<Changes type="added">
+
+- **BRUH Cooking, a new add-on**: Breville+ and Sage cooking appliances (ChefSteps Joule CSJ100, Joule Turbo BSV600, Joule Oven Air Fryer Pro BOV950) in Home Assistant, built from [kedube/ha-breville-cooking](https://github.com/kedube/ha-breville-cooking) 0.11 (GPL-3.0). The add-on deploys the `bruh_cooking` integration — renamed from `breville_cooking` so it can sit beside the HACS original — announces it for one-click setup, and puts it back if it goes missing.
+- **brAIn is required.** The add-on stops if brAIn isn't installed, and again if brAIn is removed later.
+- **Services brAIn calls by appliance name**: `get_status`, `get_presets`, `start`, `stop` and `continue_cook`, each answering with what happened and refusing with a reason.
+- **The BRUH Cooking mark**, in place of Breville's logo.
+
+</Changes>
+</Release>
+
+</Changelog>

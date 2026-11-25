@@ -1,0 +1,143 @@
+---
+title: The Companion & BRUH Sight
+description: With brAIn installed, a companion plays in your BRUH Minecraft world with the family — it answers chat, builds what you ask as jobs, reads a spyglass point, asks children questions on picture pads, and keeps every change undoable. BRUH Sight, the add-on's own plugin, lets it see the live world.
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+BRUH Minecraft is a server first: with nothing else installed it runs no companion, shows none and
+logs nothing about one. Install [brAIn](/brain/) and a **companion** joins the family in the world,
+under the name you gave brAIn in ⚙ › Personality ("brAIn" if you gave none). It appears as a small
+named **allay** beside whoever it is working for.
+
+## What it is like to play with
+
+<CardGrid>
+  <Card title="Just talk" icon="comment-alt">
+    Everything the family types in chat is for it (the default), and it stays quiet for chatter
+    like "lol" and players talking to each other. *"Build Sam a little bridge"*, *"make the roof
+    red"*, *"put a couch in this room"*.
+  </Card>
+  <Card title="Point with a spyglass" icon="magnifier">
+    Everyone gets a named spyglass on joining. Point it at something and say nothing, and the
+    companion offers two or three ideas on choice pads; point and then talk, and "this" means what
+    you pointed at.
+  </Card>
+  <Card title="Questions without reading" icon="star">
+    For children who do not read yet: two or three coloured pads appear beside them, each with a
+    picture and an item floating over it. Standing on one for two seconds is the answer.
+  </Card>
+  <Card title="Big requests become jobs" icon="rocket">
+    A build, a room made over or a tree runs as a **job** while you keep playing — up to five at
+    once. You see its progress over your hotbar and hear one line when it is done.
+  </Card>
+</CardGrid>
+
+Something quick is done at once. Asking about a running job changes it, and *"stop the bridge"*
+stops it **and puts back what it changed**. A message longer than one chat line can be sent in
+parts — `1 build a stone tower`, `2 with a spiral staircase`, `3 and a red roof`, then `end`
+(`cancel` drops it).
+
+### Seeing what it is thinking
+
+While it works for you, a small **thought bubble** floats over its allay with what it is doing right
+now — *"looking at the blocks around you"*, *"placing 340 blocks"* — and a line per job with how far
+along it is. The allay hovers by what it is building (or circles you while it only thinks), and
+everyone in the game can see it. A quick answer never shows a bubble, and nothing goes in chat.
+Use the **journal** book named after the companion to read everything: what it is doing now, every
+job, and its recent steps. A long job can also show a **boss bar** at the top of the screen, which
+Bedrock players see too.
+
+The bubble and the journal need **BRUH Sight** (below), so a Paper or Purpur server. On other server
+types steps of work show on the action bar instead.
+
+## Setting it up
+
+The companion belongs to brAIn: who is family, bedtime, limits and the models are set in **brAIn ›
+⚙ › Minecraft** (the section appears when BRUH Minecraft is installed).
+
+| Setting | What it does |
+| --- | --- |
+| **On or off**, and **say hello** | Whether it plays, and whether it greets the family on joining |
+| **Answer every line from the family** | On by default; off, only lines that start with its name |
+| **Give everyone a spyglass** | On by default |
+| **Show what it is thinking** | The bubble and journal; on by default |
+| **Jobs at once** | 1–5, 5 by default. More wait their turn, and so does a job in the same place as one already running |
+| **The family** | Each person as Child or Grown-up, with their in-game names (Bedrock names with the dot) and any nickname a server script shows. Anybody not on the list is left alone |
+| **Bedtime** | A switch (or a door sensor) that means bedtime: children get a goodnight and nothing new starts for them |
+| **Limits** | Turns a day, things it does a day, and things it does for one player in a sitting. 0 means no limit, which is where they start |
+| **Models** | One for answering in chat, one for building |
+| **Can ask for anything** | Per grown-up, off by default — see below |
+| **What it did** | Everything it did in the world, with **Undo** |
+
+On the panel's Dashboard, the **Companion** card carries the companion's name and shows what it is
+doing, the **protected places**, a question to put on the pads, and everything it did with
+**Undo**. Without brAIn the card is one line: *"Install brAIn to have a companion play in the
+world."*
+
+![The Companion card on the Dashboard: Protected places with two named places and an Add place form that can fill in where a player is standing, Ask a question with who to ask and a green and a red pad each with an answer and a picture, What it did with an Undo button, and Questions & answers](./images/panel-companion.webp)
+
+## What it may do
+
+Everyone on the family list — children too — may ask for anything **in the game**: build, change
+blocks (saved first, so Undo puts them back), look around, ask a question on the pads, time and
+weather. Anything outside the game is answered *"I can't do that from the game"*. A child is never
+told about another child.
+
+**Can ask for anything** turns a grown-up's game chat into brAIn's chat: game modes, items,
+teleports, any console command, any block anywhere — and the house, following brAIn's permission
+setting (with *act without asking* off, a house change waits for a Yes in brAIn and on the phone).
+It is only used while the **server checks accounts** (`online-mode` on, or Bedrock players signed in
+through Floodgate): an unchecked name could be anybody. Children never get it.
+
+<Aside title="Held next to the world, whoever asks">
+The add-on itself enforces the companion's limits in code: it only ever summons its own allay;
+plays only gentle sounds, quietly, to one player; removes only its own entities; builds on its own
+only into empty space on natural ground, never in a **protected place** or next to a build; backs
+the world up before anything large; and logs every action with an Undo. A *trusted edit* for a
+grown-up with *Can ask for anything* may change any block, and every block's state is saved first
+so Undo still puts it all back.
+</Aside>
+
+## BRUH Sight
+
+On **Paper and Purpur** the add-on builds and installs a small plugin of its own, **BRUH Sight**. It
+answers the panel from the running server over a private local connection (loopback only, with a
+token), instead of from RCON polls and the saved world files.
+
+- **Where everybody is** updates every second instead of every five.
+- Each player comes with the **block and creature under their crosshair**, what they hold and carry,
+  what is around them, and the blocks they just placed or broke.
+- **Looking at blocks**, an edit's undo snapshot and the spyglass read the world **as it is now**,
+  including builds the server has not saved yet.
+- It draws the companion's **thought bubble** and **journal**, and sees where the companion is
+  actually building so its allay goes there.
+
+BRUH Sight changes no block. On Vanilla, Fabric, Forge and Folia the panel reads the world the
+older way, and everything still works without the bubble.
+
+## The world atlas
+
+In the background the add-on reads the saved world, a few chunks a second and nearest the players
+first, and works out its **buildings**, the **rooms** inside them (floor, free floor space, doors,
+windows, light, furniture, the blocks they are made of, and a guess at what each room is), the
+**roads** between them, and names from **signs**. Name anything with `label_place` (*"this is Sam's
+room"*). That is how *"put a couch in this room"* works without coordinates.
+
+## More things it can do
+
+- **Maps of your builds** — `render_maps` draws finished maps from the saved world and puts them in
+  a player's inventory, named A1, A2, B1… so they hang edge to edge in item frames.
+- **Skins** — `set_skin` puts a skin on a player through SkinsRestorer and waits for its answer.
+- **Scripts** — brAIn can write a Skript script or a data-pack function into the running world,
+  load it without a restart and hear any errors (`write_script`, `list_scripts`,
+  `remove_script`). It never touches a file it did not write.
+- **Rename the world** — *"rename the world to Our World"*.
+
+## For your own automations
+
+The companion is built on a public contract: the add-on **tells** Home Assistant what happens as
+events (`bruh_minecraft_chat`, `_join`, `_leave`, `_death`, `_advancement`, `_place`, `_answer`,
+`_point`) and **does** what it is asked through services (`companion_say`, `ask_choice`,
+`companion_build`, `undo_action`, …). It decides nothing on its own, so your own automations can
+use the same lane. See [Home Assistant Integration](/bruh-minecraft/home-assistant/#game-events).

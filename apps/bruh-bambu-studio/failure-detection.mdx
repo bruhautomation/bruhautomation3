@@ -1,0 +1,129 @@
+---
+title: Print failure detection
+description: brAIn watches your Bambu Lab printer's camera at the moments a print is most likely to fail — planned from the print's own G-code — warns you, and pauses a print that has clearly failed. Free checks catch a covered lens, a frozen camera and a cleared plate.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import panelShot from './images/failure-detection-panel.webp';
+
+Turn on **Failure detection** on a printer's card on the Printers tab (its **i** explains when it
+looks and how it copes with a moving bed). While that printer prints, the add-on watches its
+camera, and brAIn looks at the print at the moments it is most likely to go wrong.
+
+Without [brAIn](/brain/) the free checks still run and the card says *Watching (basic)*.
+
+## Where it looks
+
+When a print starts, its G-code is read — from the library when the print was sent from here,
+from the printer's storage otherwise — and the looks are planned layer by layer:
+
+- the **first layer**, once it is down — most failed prints fail here;
+- **a couple of millimetres up**, where a part that is going to come loose has;
+- the layer where the part **narrows sharply** (a wide base becoming a thin column);
+- the first **bridges and overhangs**, and where **supports** start;
+- a **colour or filament change**;
+- the height where a part gets **tall for its base** and could wobble or be knocked over;
+- the **last layers**;
+- and one routine look in any long stretch with nothing else planned.
+
+**Relaxed** plans 5 looks a print, **Balanced** 8 and **Careful** 13, never two within a few
+minutes. When the file cannot be read, the looks are spread by layer instead, and the card says
+so.
+
+**The timeline.** The card shows the plan as dots along the print's layers, from layer 1 to the
+last, with *Now* at the layer it is on and a key under it: hollow is planned, green looked fine,
+amber a doubt, red a failure, dashed missed. Press a dot for what that look is for; the next one
+is said under the line. *3 of 8 planned looks done · 2 extra* counts the extra looks that a
+doubt or a sudden change asked for.
+
+## What brAIn is shown
+
+The camera now, Bambu Studio's picture of the finished plate (what the print should become), and
+the frame from its last look — with the layer, the height the part should have reached, and why
+this moment was chosen. Its run is read-only.
+
+**A moving bed.** The bed and the toolhead move while it prints — an A1's bed slides front to
+back, every bed drops at each layer — so one frame is often a smear. A look takes a burst of four
+frames about a second apart and sends brAIn the sharpest, and brAIn is told a smear or a moved
+plate is not a failure. A look it still cannot judge is never a failure; it looks again later.
+The chamber light on gives the sharpest pictures.
+
+## What happens
+
+<img src={panelShot.src} width="475" alt="Failure detection on a printer card: a paused print, what brAIn saw beside what it should be, Resume — not a failure and Stop print, the Where it looks timeline with planned, fine and failed looks, and Check now" />
+
+
+| brAIn sees | What happens |
+|---|---|
+| **Looks fine** | Nothing. |
+| **Unsure** | Nobody is told; brAIn looks again a few minutes later. |
+| **Warning** — something looks wrong but the print may still be fine | You are told, with **Ignore** (no more warnings about that problem for the rest of the print) and **Pause print**. It looks again soon, and closes the warning itself if the print looks fine. |
+| **Failure** — spaghetti, a part come loose or knocked over, a blob on the nozzle, nothing coming out | The printer is **paused** and you are told, with **Resume — not a failure** (the same problem then only warns for the rest of the print) and **Stop print**. |
+
+With **Only warn** chosen the printer is never paused. Stringing and warping only ever warn.
+
+## Free checks, all the time
+
+These need no brAIn and cost nothing:
+
+- **A covered lens or a dark chamber.** A flat picture, or a black one with the chamber light
+  on, is a covered lens; a black one with the light off is a dark chamber. Either way nothing is
+  checked until it can see again, and the card says why, with **Turn the light on** when the
+  light is the reason. *Turn the chamber light on to see* (on by default) turns the light on once
+  per print when it is dark. A print starting in the dark with that setting off is warned about
+  before the first look.
+- **A frozen camera.** A picture that has stopped changing is not judged.
+- **A sudden change on the plate.** The toolhead is taken out of the picture, and a jump far
+  beyond this print's usual change asks brAIn to look now.
+- **The printer's own camera alerts.** An HMS message from the printer's camera asks brAIn to
+  look now; without brAIn it is raised as a warning.
+
+brAIn's own pause and usage budget apply to every look nobody pressed for. **Check now** always
+asks.
+
+## Plate clear
+
+Only once a print has finished — **even with failure detection off** — the add-on watches for the
+plate being cleared, a picture a minute or so for up to 12 hours. It compares the plate with an
+empty plate it has seen before (the one before the first layer, or the plate as it was the last
+time it was cleared), or, with none known yet, asks brAIn once when the plate changes. Once clear,
+the finished print leaves the card and the printer says *Ready*.
+
+**Plate is clear** on the card says so by hand, and that plate is kept as the empty plate the next
+finish is compared with — so later prints clear by themselves without asking brAIn. *Notice when
+the plate is cleared* in Settings turns the watch off.
+
+## Alerts
+
+Every warning and failure is a **Home Assistant notification** and a `bruh_bambu_print_alert`
+event. Choose a phone under **Settings › Print failure detection › Alerts go to** and it is also
+sent to the phone, with the frame brAIn judged and **buttons that answer it**. An alert that is
+answered, or clears by itself, takes its notification with it.
+
+## Settings
+
+![Settings › Print failure detection: Alerts go to, and for each printer the detection switch, Warn and pause or Only warn, Relaxed, Balanced or Careful, and the chamber light and plate-cleared switches](./images/settings-detection.webp)
+
+
+Under **Settings › Print failure detection**, per printer:
+
+| Setting | Choices |
+|---|---|
+| On / off | Watch this printer's prints |
+| Mode | **Warn and pause** or **Only warn** |
+| Sensitivity | **Relaxed**, **Balanced**, **Careful** (5, 8 or 13 looks a print) |
+| Turn the chamber light on to see | on by default |
+| Notice when the plate is cleared | on by default |
+
+and once for all printers, **Alerts go to** — the notify service that gets phone alerts.
+**Settings › brAIn** picks the model print checks run on.
+
+The same settings are the `bruh_bambu.set_failure_detection` service (`mode` pause or warn,
+`sensitivity` low, medium or high, `light`, `plate`, `notify`), and the Home Assistant entities
+are listed on [Home Assistant](/bruh-bambu-studio/home-assistant/#failure-detection-entities).
+
+<Aside type="caution">
+Failure detection is a second pair of eyes, not a fire alarm. It looks at planned moments, not
+every second, and a camera that cannot see the plate cannot judge it. Don't leave a printer
+running unattended on its word alone.
+</Aside>

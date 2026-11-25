@@ -18,9 +18,9 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 | Command | What it does |
 |---------|--------------|
 | `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses` (alias `guesses`), `confirm`, `reject`, `log` (`--show <n>` prints one entry in full), `undo`, `consolidate`, `clear`, `export`, `import` |
-| `brain findings <action>` | The [findings](/brain/findings/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
+| `brain findings <action>` | The [findings](/brain/needs-you/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
 | `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
-| `brain ask "<question>"` | One-shot question about your home — the same engine as the panel's Ask card |
+| `brain ask "<question>"` | One-shot question about your home, answered as text |
 | `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
 | `brain own [-r] <path…>` | [Make a file Claude cannot write writable again](#files-claude-cannot-write-brain-own) — usually one Home Assistant saved as root. `-r` does a whole folder. Raises no approval card and needs no `sudo` |
 | `brain why [ask]` | What brAIn is curious about — why somebody here does something by hand — and what it has worked out. `ask` asks the next question now, which spends one Claude run |
@@ -32,7 +32,9 @@ These cover the **file-and-workflow side** that live APIs don't; the live home b
 | `brain eval first_look` | Replay captured first looks against today's prompt and report how often they agree with what you did. Spends real Claude runs, capped (`--days`, `--max-tokens`, `--max-batches`); changes nothing |
 | `brain check` | Run the [house checks](/brain/checks/) now, through the panel's API — `list` for the catalog and when each last ran. No Claude run, no tokens |
 | `brain weekly [send]` | The week's numbers and the last report sent; `send` writes and sends this week's now |
-| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report — also listed under **⚙ → Problems** (`--no-names` to hash entity ids) |
+| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report — also listed under **⚙ → Diagnostics → Report a problem** (`--no-names` to hash entity ids) |
+| `brain devloop status\|run [stream]\|look "<what to fix>"` | The [development loop](/brain/development-loop/): its state, run one stream now, or file *What do you want to fix?* |
+| `brain tune "<asked>" "<answered>"` | Record something you settled with the assistant about how it should be (used by ⚙ › Personality's *Talk it through*) |
 | `brain login [--status\|--share]` | Sign in to Claude, and share that login with the other BRUH add-ons. The same command as `ha login` — the credential is brAIn's, and this is where people look for it |
 | `brain help` | The full list |
 
@@ -68,8 +70,8 @@ against its own view. Since 1.47 it also warns if a rehearsal left anything name
 | `brain doctor --deep` | Does each face work end to end, right now? | about five Claude turns |
 | `brain doctor --rehearse` | Do the checks and the analyst find a defect planted in *this* house? | one analyst run |
 
-Neither costed one ever runs on a timer, and both are also buttons in **⚙ Settings →
-Diagnostics**. The full walk-through: [Deep Check & Rehearsal](/brain/doctor/).
+Neither costed one ever runs on a timer, and both are also in the panel: **Run all tests** in **⚙ → Diagnostics**, and the rehearsal in
+**⚙ → Developer**. The full walk-through: [Deep Check & Rehearsal](/brain/doctor/).
 
 ## `ha` — Home Assistant operations
 
@@ -160,7 +162,7 @@ quietly and Claude carries on. A journal that stops you working is worse than no
 What it covers is edits made with Claude's **file tools**. A change made by a shell command
 — a redirect, a script — reaches no journal, which is one reason the terminal and the chat
 [ask before acting](/brain/terminal/#asking-before-acting) by default. The service calls a
-**Fix it** made are put back with **Put them back** on its card instead; see
+**Plan** made are put back with **Restore** on its card instead; see
 [Permissions & Safety](/brain/safety/#putting-things-back).
 
 This is **not a backup system**. brAIn doesn't version your configuration — Home Assistant's

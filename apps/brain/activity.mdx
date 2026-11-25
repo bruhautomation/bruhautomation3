@@ -1,28 +1,33 @@
 ---
-title: Activity
-description: What happened in your house, and what caused it. Not a log — every change filed under whether a person, an automation, a script, a voice command or brAIn itself made it, because nothing in a state says who moved it.
+title: Timeline
+description: Memory → Timeline shows what your house is doing now, what happened, and what caused it. Not a log — every change filed under whether a person, an automation, a script, a voice command or brAIn itself made it, because nothing in a state says who moved it.
 ---
 
 Nothing in `light.kitchen` being *on* says whether a person pressed a switch, an automation
 fired, a voice command asked, or brAIn did it.
 
 That is the question behind most of what people actually want to ask their house — *why did
-the hallway light come on at 3am?* — and until the Activity tab it was unanswerable from
+the hallway light come on at 3am?* — and until Memory → Timeline it was unanswerable from
 every surface brAIn had.
 
-![House → Activity, headed "What happened": cause filters (Everything, brAIn, Automation, Voice, Person, No cause recorded), a "Nobody home 09:35–14:39" span, a "What does this add up to?" button, and episodes grouped under People, Doors, windows & blinds, and Media — "Lounge TV playing → off, 11:09–14:09 · 3h, Person: Ben"](./images/panel-activity.webp)
+**Memory → Timeline** opens on what the house is doing right now, in one sentence (*Home,
+settled for the evening — the lounge and kitchen in use, the dishwasher running*), then what
+happened and what caused it. Search by device, narrow it by room, kind of thing, cause and
+window (6 hours to 2 days) with **‹ Earlier** and **Later ›**, and each filter counts what is
+under the others, with **Clear all**. **What does this add up to?** asks brAIn to read a stretch
+of it and say what it means.
 
 ## The fourth kind of knowledge
 
 Memory is what is *true*. A finding is what is *broken*. A guess is what brAIn might have
-*wrong*. Activity is what **happened**.
+*wrong*. The Timeline is what **happened**.
 
 It is a record rather than a queue, so **it has no badge**. Nothing on it is waiting on you.
 
 ## Where the cause comes from
 
 Home Assistant's logbook records a *context* for every state change — a chain saying what
-set it off. The Activity tab walks that chain and files each change under one of a closed
+set it off. The Timeline walks that chain and files each change under one of a closed
 set of causes:
 
 | Cause | What it means |
@@ -64,7 +69,7 @@ brAIn did unattended is filed under **brAIn**. That matters below: *"turn the ha
 back on"* said to brAIn is you overriding the motion rule, not brAIn and the rule fighting.
 
 The ledger also records the state of each entity **just before** brAIn's call, which is
-what lets a fix's [Put them back](/brain/findings/#putting-it-back) set things back the way
+what lets a fix's [Restore](/brain/needs-you/#plan-apply-and-undo) set things back the way
 they were.
 
 ## Overrides ride above the list
@@ -100,6 +105,6 @@ logbook to keep true.
 
 Claude can read this too. `explain_change` and `get_activity` are read-only tools on the
 analyst's list, so you can ask *"what turned the porch light on last night?"* in the chat or
-on the ask bar and get the chain rather than a guess. A voice agent at the default *Voice
+in Morph's Ask line and get the chain rather than a guess. A voice agent at the default *Voice
 assistant* level can't read the house-wide activity — it only reaches what you expose to
 Assist.

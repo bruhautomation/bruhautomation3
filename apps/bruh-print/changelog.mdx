@@ -1,0 +1,173 @@
+---
+title: BRUH Print Changelog
+description: Release notes for the BRUH Print DYMO LabelWriter add-on for Home Assistant — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+A condensed history; small panel-polish patches are grouped with their release. The add-on's own
+`CHANGELOG.md` has every line.
+
+<Changelog>
+
+<Release version="0.15.4" date="November 24, 2026" latest>
+<Changes type="added">
+
+- **A numbered template prints a run**: From and To, with a line such as *"Prints 28–52, 25 labels"*. The run is one row in History.
+- **The dashboard card can list your saved templates** to print from (`show_templates`, off by default).
+
+</Changes>
+<Changes type="changed">
+
+- History folds every print of the same label into one row (*"3 prints, last Nov 21"*), and *Open* is now **Edit**.
+- Each loaded roll says *"About N left"* or *"Not counting yet — tell me how many are on it"*, and that line is the button that sets it. A low roll is marked in the header, on the Printer tab and on the card.
+- A roll whose name gives a different label size explains why (*0.75″ × 2″ label on a 1.0″ backing*) instead of showing two figures that disagree.
+
+</Changes>
+</Release>
+
+<Release version="0.15.3" date="November 23, 2026">
+<Changes type="fixed">
+
+- The Design bar's label picker shows the whole name with its size, so two labels can be told apart on a phone.
+- The card's roll tiles say *Left roll* and *Right roll* and mark the roll text prints on.
+
+</Changes>
+</Release>
+
+<Release version="0.15.2" date="November 23, 2026">
+<Changes type="fixed">
+
+- The roll chip names each roll in words (*Left: Address Labels · prints text*).
+- The printer card has its own status line, and **Ask about paper and lid** puts its answer there.
+- History folds identical prints in a row; Quick's disabled Print says what it needs (*Type something to print*).
+
+</Changes>
+</Release>
+
+<Release version="0.15.1" date="November 18, 2026">
+<Changes type="fixed">
+
+- The card's Print button is readable on Home Assistant's default blue.
+
+</Changes>
+</Release>
+
+<Release version="0.15.0" date="November 18, 2026">
+<Changes type="changed">
+
+- **The shared BRUH panel look**: one centred column, the Printer tab's sections each in a card, one control height and four text sizes. The card follows the shared card layout and your theme's primary colour.
+
+</Changes>
+</Release>
+
+<Release version="0.14.x">
+<Changes type="added">
+
+- **`bruh_print.get_status`**: the printer, what is loaded, the templates (and whether each one's stock is loaded), and which stock plain text prints on.
+- **`bruh_print.choose_label`**: one answer for which roll text prints on, shared by the Quick tab and the card.
+- History rows show a thumbnail of each label.
+
+</Changes>
+<Changes type="changed">
+
+- The Printer tab folds into Printer, What is loaded, Label stock and Settings; a lined-up roll says *Lined up ✓*; *Ask the printer* is now **Check paper and lid**.
+- Marked **experimental** in the add-on store; the add-on says when Home Assistant needs a restart, and only then.
+
+</Changes>
+<Changes type="fixed">
+
+- **Printing text from brAIn prints** — it used to build a preview and print nothing. A print that prints nothing now always says why.
+- A template whose label holds one number takes it as a field, so *"print lesson 29"* works.
+- Text with no stock named prints on the one stock that is loaded, instead of being refused for a default that is not.
+- Roll sensors read unknown while counting is off, instead of 0.
+- Every text on the card reads at 4.5:1 or better in light and dark.
+
+</Changes>
+</Release>
+
+<Release version="0.13.x">
+<Changes type="changed">
+
+- **You pick a roll by its name**, with its size underneath, and **Rename or resize** makes the name yours.
+- The tab strip is one row on a phone. The designer's nudge, alignment and size boxes became three named rows (**Across**, **Down**, **Nudge 1 mm**) stepping in whole millimetres; **⟳ Rotate** sits with Duplicate and Delete.
+
+</Changes>
+</Release>
+
+<Release version="0.12.0">
+<Changes type="changed">
+
+- **The designer draws what prints, and nothing else.** The canvas is the printable area — margin, dead band, head shortfall and held edges are already off it — so nothing needs to be aimed away from.
+
+</Changes>
+</Release>
+
+<Release version="0.11.0">
+<Changes type="changed">
+
+- **Lining a roll up is a loop**: both prints sit in the step you type into, and a lined-up roll reopens with its numbers filled in. **Where to print on it** holds edges blank on purpose, with **Even up the ends**.
+
+</Changes>
+</Release>
+
+<Release version="0.9.x – 0.10.0">
+<Changes type="added">
+
+- **Line up this roll**: print a numbered grid over the whole printable area, read four coordinates off it, and every label on that roll lands where it should. **Print a check label** draws a frame to confirm it. This replaced the old ruler and offset boxes.
+
+</Changes>
+</Release>
+
+<Release version="0.8.0">
+<Changes type="removed">
+
+- The `image` element, which never had a way to upload an image. Nothing on disk was touched.
+
+</Changes>
+</Release>
+
+<Release version="0.5.0 – 0.7.0">
+<Changes type="fixed">
+
+- **Three printer commands were re-read from DYMO's reference and corrected**: the top-of-form search is a budget that must reach past the label (a short one made each label start a little further down the roll), and Twin Turbo roll select is an ASCII digit.
+- Narrow media is placed where it actually sits under the print head.
+
+</Changes>
+</Release>
+
+<Release version="0.3.0 – 0.4.0">
+<Changes type="fixed">
+
+- The card is served and updated reliably: it is registered under a URL that changes with the file, and a repair explains the one Home Assistant restart a house without `/config/www` needs.
+
+</Changes>
+</Release>
+
+<Release version="0.2.x">
+<Changes type="added">
+
+- **You pick the label; BRUH Print remembers where it is.** No roll picker anywhere.
+- **If nothing comes out**: Standard, Compact and Bare minimum print modes, and **USB details**.
+
+</Changes>
+<Changes type="fixed">
+
+- A printer that accepted a job and printed nothing is no longer reported as a print.
+- *Ask the printer* finds the two-way USB channel when the printer has one.
+
+</Changes>
+</Release>
+
+<Release version="0.1.x">
+<Changes type="added">
+
+- **First release**: a label designer in the sidebar (text, Code 128, QR, boxes, rules), one-word autofit, `{{field}}` templates, stock per roll with the mismatch refusal, Twin Turbo roll selection, the DYMO raster protocol directly over USB, six services and six entities, and a Lovelace card.
+
+</Changes>
+</Release>
+
+</Changelog>

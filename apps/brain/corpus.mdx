@@ -27,7 +27,7 @@ else.
 
 ## Capture
 
-**⚙ Settings → Diagnostics → Capture runs for the corpus.** Off by default.
+**⚙ → Developer → Capture runs for the corpus.** Off by default.
 
 With it on, every card run writes one file under `/data/capture`:
 
@@ -42,10 +42,10 @@ That last part is the whole point.
 
 ### The Resident's first looks, too
 
-With capture on, brAIn also keeps the batches the [Resident's](/brain/findings/) first look
+With capture on, brAIn also keeps the batches the [Resident's](/brain/resident/) first look
 judged — as their **inputs** (the batch, the memory excerpt, the open cases), not as the
 finished prompt, so they can be rebuilt with whatever prompt is current. The nightly pass
-labels each one with what you did next: a card you marked *Not a problem*, one you fixed or
+labels each one with what you did next: a card you marked *Ignore*, one you fixed or
 added to your list, one you put back after brAIn held it.
 
 ```bash
@@ -60,22 +60,22 @@ person reads the number and decides it should.
 
 ### An ending is already a label
 
-Every press that ends a row on the [Findings](/brain/findings/) tab is a judgement about
+Every press that ends a row on [Needs you](/brain/needs-you/) is a judgement about
 whether the report was right:
 
 | The press | What it says about the report |
 | --- | --- |
 | **I've fixed it** | It was right |
 | **Got it**, after an automated fix | It was right |
-| **Add to list** | It was right — it's real work |
-| **Not a problem** | It was not |
+| **Add to To Do** | It was right — it's real work |
+| **Ignore** | It was not |
 
 Pair that with the prompt that produced it and a house becomes a **graded example**. A
 directory of graded examples is something a prompt change can be scored against *before* it
 ships, which is the thing that has never existed.
 
 The label is recorded where every ending goes through — not in the tab's buttons — so a tick
-in the [To-do app](/brain/findings/), a button on a notification and a press in the panel all
+in the [To-do app](/brain/needs-you/#to-do), a button on a notification and a press in the panel all
 land the same way. The label is a property of the **answer**, not of the surface you gave it
 on.
 
@@ -146,7 +146,7 @@ exactly what a replay today does.
 
 Entirely optional, and it should be. Four steps, and **the third is the important one**:
 
-1. **Switch capture on.** ⚙ → Diagnostics → *Capture runs for the corpus*.
+1. **Switch capture on.** ⚙ → Developer → *Capture runs for the corpus*.
 2. **Use brAIn normally for a while, and answer its findings.** The endings are the labels.
 3. **Read one.** Press **View**. That is the whole file, exactly as it is on disk. If there
    is anything in it you would not put in a public pull request, press **Delete** instead.
@@ -214,7 +214,7 @@ the best possible one.
 A house check that is new goes into **shadow** first. It runs on every pass, files to a store
 of its own, and reaches nothing you look at:
 
-- not the [Findings](/brain/findings/) tab,
+- not [Needs you](/brain/needs-you/),
 - not the badge,
 - not a notification,
 - not the To-do list,
@@ -233,7 +233,7 @@ separate file cannot do that.
 
 ### The number is agreement, not precision
 
-Nothing in shadow has an ending on it — nobody can press **Wrong** on a row they cannot see.
+Nothing in shadow has an ending on it — nobody can press **Ignore** on a row they cannot see.
 So what can be counted is whether something **else** reported the same thing: a matching row
 in the visible store, or in the settled ledger. That is weaker than a person's judgement, and
 it says so by its name.

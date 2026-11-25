@@ -1,5 +1,5 @@
 ---
-title: Chat & Terminal
+title: Ask (Chat & Terminal)
 description: The real Claude Code CLI in your browser with your /config in front of it — as a chat, or as a true terminal. Several conversations answering at once, one login, one button between the two faces.
 ---
 
@@ -10,7 +10,7 @@ history and traces, edit YAML, reload a domain.
 It's the same terminal the add-on runs, served through the same panel — so there's no second
 sidebar entry and no second login.
 
-![The Ask tab in chat mode: the question "The hallway light came on at 3am again. Find out why and fix it", a folded Thinking line, five folded tool calls including get_logbook and get_automation_trace, and Claude's explanation and confirmation that it edited the automation, validated the YAML and reloaded](./images/panel-chat.webp)
+![The Ask tab in chat mode: "Your chats" down the left, the question "The hallway light came on at 3am again. Find out why and fix it.", a folded "Worked through 6 steps", and brAIn's answer explaining the missing brightness and confirming it edited the automation, validated the YAML and reloaded, with Save as report under it](./images/panel-chat.webp)
 
 ## What you'd actually use it for
 
@@ -36,21 +36,18 @@ default it **asks before it changes anything** — a command, a file, a service 
 first time it touches your house is a card you pressed. See
 [Asking before acting](#asking-before-acting).
 
+## Save as report
+
+Under the last answer to a question you typed is **Save as report**: the question is asked again
+as an [insight card](/brain/insights/), so an answer worth keeping outlives the conversation and
+can refresh on a schedule.
+
 ## Two faces, one login
 
-The button in the corner switches between them, and so does **⚙ Settings**. Both run the
+**⋯** on the Ask tab switches between them, and so does **⚙ → Permissions → Ask tab** (the
+choice is saved). Both run the
 same Claude Code, on the same login, in the same `/config`, with the same permissions — the
 difference is entirely how you see it.
-
-:::note[If you only ever sign in here — fixed in 1.47]
-A sign-in done in this terminal lands in the Claude CLI's own credential file, which is the
-**last** of the three stores brAIn consults. That file holds a short-lived token plus the
-thing the CLI renews it from, on its own, on its next run — and before 1.47 brAIn read the
-lapsed token as a dead credential. The panel put up the sign-in screen a few hours after
-every terminal login, and because every Claude run in the add-on is gated on the same
-answer, nothing ever ran the CLI, which was the one thing that would have renewed it. On an
-older version, running any `claude` command in this tab clears it.
-:::
 
 **Chat** is the default. Claude Code's output rendered as a conversation: text that reflows
 to your screen, code blocks that scroll inside their own box, tool calls folded into one line
@@ -98,11 +95,6 @@ so rather than failing.
 
 ## Several conversations, and switching stops nothing
 
-:::note[Requires brAIn 1.45]
-Before it, the chat held one Claude Code process. Switching conversations stopped the answer
-being written, and doing it mid-answer was refused with *"Claude is still responding"*.
-:::
-
 Every conversation you have open holds its own Claude Code process, the way a terminal tab
 does. Picking another one **attaches the view** to it, and that is all it does — nothing is
 stopped and nothing is thrown away.
@@ -140,26 +132,22 @@ change when something already had an event to send.
 
 ### How many stay open at once
 
-**⚙ Settings → Conversations kept open at once** — three by default, one to eight
+**⚙ → Permissions → Ask tab → Conversations kept running at once** — **no limit** by default
 (`chat_max_sessions`).
 
 It counts **processes, not conversations.** You may have as many conversations as you like;
 Claude Code keeps every one of them, and one with no process is a transcript and an id, which
-costs nothing to hold. What the number governs is what runs on your box — so lower it on a
-small one, raise it if you keep several going at a time.
-
-Open one more than the cap and the session untouched for longest is closed to make room.
-Never one that is mid-answer: an answer surviving you looking somewhere else is the entire
-point of this, and an eviction that could take the busy one would break exactly the thing it
-exists to protect. What closes is the *process*. The conversation keeps its transcript, keeps
-its row, and gets a note in its own pane saying why its session went — so going back explains
-the gap instead of reading as a crash, and your next message there picks the conversation
-straight up again.
+costs nothing to hold. With no limit, every conversation can be working at once, and when
+memory runs short brAIn puts the quietest idle one to sleep; a message wakes it. Set a number
+on a small box and, past it, the session untouched for longest is closed to make room. Never
+one that is mid-answer. What closes is the *process*: the conversation keeps its transcript and
+its row, and your next message there picks it straight up again.
 
 **One refusal is left, and it is about the cap** rather than about an answer: every open chat
 still answering, and nothing idle to close. It says that, with the count and the setting that
 changes it — *"all 3 open chats are still answering — brAIn keeps 3 of them alive at once
-(`chat_max_sessions` in Settings). Stop one, or wait for it to finish."*
+(`chat_max_sessions` in Settings). Stop one, or wait for it to finish."* It only applies when
+you set a number.
 
 :::tip[Try it once and it explains itself]
 Ask for something slow — *"read the last week of the error log and tell me what's failing"*.
@@ -185,9 +173,11 @@ Yours is the default because everything else that drives Claude Code from `/conf
 automation tasks, memory filing, study sessions — files its conversations in the same place,
 and a rail of forty consolidator prompts buried the chats you actually had. Every background
 run claims its session id before it starts, so an unclaimed conversation is yours by
-definition — including a finding you opened with **Discuss**. **Automation / Cards / Fixes /
-Memory / Study / Voice** chips are one press away, each with a count, and only for faces
-that have actually run in your house. Switching back from the Classic face only ever picks
+definition — including a card you opened with **Ask**. The other kinds (automation tasks,
+cards, fixes, memory, study, voice) are pills over the list, each with a count, and only for
+kinds that have actually run in your house. Each chat gets a short topic title after its first
+reply, and the list is grouped: live chats first, then Today, Yesterday, This week and by
+month. Switching back from the Classic face only ever picks
 up a conversation of *yours*, never the consolidator's.
 
 **Cards** and **Fixes** open read-only, as a record: exactly what brAIn sent to Claude about
@@ -195,11 +185,11 @@ your house, every tool call it made, and what came back. Those runs happened und
 analyst's or the fixer's narrower rules, and continuing one under the chat's would change
 the conversation's rules mid-thread — so to talk about what a run found, ask in a new chat.
 
-**✕** on a row deletes a conversation — a move into a short-lived trash, not an unlink, and
+**⋯ → Delete** on a row deletes a conversation — a move into a short-lived trash, not an unlink, and
 the toast grows an **Undo** that puts back exactly what was taken. Any conversation a live
 session is holding is refused — not only the one on screen, now that several may be open at
 once — because deleting the ground a live session stands on would kill it or quietly fork it.
-The ✕ offers the way out rather than leaving you with a no: close that session, then delete.
+It offers the way out rather than leaving you with a no: close that session, then delete.
 It asks first, because closing one mid-answer loses what it was writing. A checklist button
 turns on selection mode — checkboxes per row, **Select all**, one **Delete**, one Undo for
 the whole batch — and a conversation something is holding open is skipped and reported rather
@@ -242,7 +232,7 @@ windows are five times apart, and a percentage of a guessed denominator is worse
 Press the model name under the composer, or **⋯ → Model**. The choice is the chat's own
 (`chat_model`) — it never touches the global `model` option, so insight runs and the
 listeners keep costing what the Configuration tab says. **Default** in this picker means
-"follow ⚙ Settings", and names the model that setting currently resolves to. Applying a
+"follow ⚙ → Model & usage", and names the model that setting currently resolves to. Applying a
 pick restarts the CLI with `--resume` — the conversation carries straight across — and the
 label under the composer updates on the spot, which is your confirmation it landed. It's
 refused while *that* conversation is being answered, because restarting the process would
@@ -254,7 +244,7 @@ chat.
 ## The ⋯ menu
 
 - **New chat** — start again in a separate conversation.
-- **Conversations** — the same list as the rail, with the same filter chips, the same
+- **Conversations** — the same list as the rail, with the same pills, the same
   selection mode and the same **answering…** / **Needs your OK** marks. Pick one and it
   carries on where it was — this is the only surface a phone has, since the rail isn't drawn
   below 1100px. Both faces stand in the same directory, which is what lets each see the
@@ -276,7 +266,7 @@ On a Pro or Max subscription those tokens are already bought, so there is nothin
 
 ## The chat knows the house before you tell it
 
-Every chat starts with a short brief: what brAIn is, the open cases on your Findings list,
+Every chat starts with a short brief: what brAIn is, the open cases on Needs you,
 its own health, and when the house usually wakes and settles. Then each message you send
 brings in the facts brAIn has about what you mentioned — the boiler, the garage, the
 beacon — each one once per conversation rather than on every message. If the panel is busy
@@ -284,31 +274,33 @@ or down, the chat works exactly as before; it just starts without the brief.
 
 The classic terminal gets the same knowledge a different way: `/config/CLAUDE.md`, which
 brAIn writes at startup, describes your installation — including a map of your rooms and
-their entities — and tells Claude to make automations with `brain.intent` rather than by
-editing `automations.yaml` by hand.
+their entities. Both edit an automation, script, scene or dashboard directly when you ask and
+say what changed; for a new standing rule, brAIn can replay it over your history first.
 
 **And it learns from you here.** After each turn of a conversation of yours — chat or
 terminal — a small, cheap run reads only what was said since it last looked and, if you
 taught it something durable (a nickname, a preference, a correction, a plan), queues it for
 [memory](/brain/memory/) like any other writer. It needs two new messages, or one that
 plainly teaches something; voice, study and every scheduled run are skipped, and the
-`learning` option switches it off. Claude Code's own "auto memory" is off for every brAIn
+[Learning loop](/brain/features/#learning-loop) switch turns it off. Claude Code's own "auto memory" is off for every brAIn
 session, so there is one memory and you can read all of it.
 
-## Discussing a finding
+## Talking about a card
 
-**Discuss** on a [finding](/brain/findings/) opens a **new** conversation beside whatever you
-were doing — an answer being written, or an approval card waiting, carries on in the
-background. It starts with the case's evidence, how sure brAIn was and what its
-investigation said, and it knows which finding it is about even after a reload.
+**Ask** on a card on [Needs you](/brain/needs-you/) or on an insight card opens a **new**
+conversation beside whatever you were doing — an answer being written, or an approval card
+waiting, carries on in the background. It starts with the case's evidence, how sure brAIn was
+and what its investigation said, and it knows which card it is about even after a reload.
 
-In it, Claude can read anything but **asks before every change** — every service call, file
-edit or shell command shows a card first, even with
-[Let brAIn act without asking](#asking-before-acting) on. When you've talked it through,
-Claude offers the ways the finding could end as buttons under its answer ("Replaced the
-CR2032", "That cupboard is never opened"), and an agreed change as a button that has brAIn
-**plan** exactly that change, read-only, and put it on the card for you to **Apply** — with
-an Undo. See [Permissions & Safety](/brain/safety/#discuss-always-asks).
+In it, Claude can read anything. With *Let brAIn act without asking* off, every service call,
+file edit or shell command shows a card first. With it on, Claude runs what it needs to work
+the problem out without asking, and only changing Home Assistant still shows a card. When
+you've talked it through, Claude offers the ways the card could end as buttons under its
+answer ("Replaced the CR2032", "That cupboard is never opened"), and an agreed change as a
+button that has brAIn **plan** exactly that change, read-only, and put it on the card for you
+to **Apply** — with an Undo. See [Permissions & Safety](/brain/safety/#a-conversation-about-a-card).
+
+![The Ask tab on a phone: the question, "Worked through 6 steps", brAIn's answer and Save as report, the message box, and the Insights, Ask and Memory tabs along the bottom](./images/panel-chat-phone.webp)
 
 ## On a phone
 
@@ -322,7 +314,7 @@ touchscreen doesn't have: `ESC`, `Tab`, arrows, `PgUp`/`PgDn`, `^C`, `^D`, `^L`,
 the punctuation that's two keyboard layers deep on iOS — `/`, `@`, `#`, `!`, `|`. Copying an
 OAuth URL out of the terminal works, which on iOS it normally doesn't.
 
-Since 2.10.1 the rest of the phone experience behaves too:
+The rest of the phone experience behaves too:
 
 - **Paste works.** Where the browser won't hand over the clipboard (Safari two frames deep,
   the Home Assistant app), a box opens that you can long-press and Paste into, and **Paste
@@ -362,11 +354,11 @@ own answer. **Don't answer** tells Claude to use its best judgement.
 
 ### Let brAIn act without asking
 
-To stop the asking, turn on **Let brAIn act without asking** — in **⚙ → Terminal & chat**,
+To stop the asking, turn on **Let brAIn act without asking** — in **⚙ → Permissions**,
 or on the add-on's Configuration tab; they are the same switch, and the option key is still
 `dangerously_skip_permissions`. It's **off** by default. It reaches the terminal and the
 chat (and, in those two, stops the [action gate](/brain/safety/#the-action-gate) asking its
-own model), and never reaches voice, cards, automation tasks or Fix it.
+own model), and never reaches voice, cards, automation tasks or Plan.
 
 No restart: a new terminal session and the chat's next message pick it up, and a chat in
 the middle of an answer finishes it first. **An open terminal session keeps the setting it
@@ -374,7 +366,7 @@ started with**, because reopening the tab goes back to that same session — the
 the switch says when one is still acting (or still asking) the old way; end it with `/exit`.
 
 With it on, protected entities, brAIn's deny-list, the action gate's floors, your house rules
-and Discuss conversations all still hold. What it does not cover — a shell command that
+and conversations about a card all still hold. What it does not cover — a shell command that
 reaches a protected entity in a way brAIn can't see, and the fact that `brain undo` can't put
 back a change a shell command made — is spelled out in
 [Permissions & Safety](/brain/safety/#let-brain-act-without-asking). Read that before you

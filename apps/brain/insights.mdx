@@ -1,81 +1,77 @@
 ---
 title: Insights
-description: brAIn as your home's analyst — ask a question and get a card with the answer, the numbers and a chart. Refine a card by saying what should change, share it as a picture or put it on a dashboard.
+description: brAIn as your home's analyst. Insight cards answer a question about your house with the answer first, the numbers and a chart drawn for your data, refreshed on a schedule, shared as a picture or put on a dashboard.
 ---
 
 import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
-**Home → Insights** is brAIn acting as your home's analyst. Ask a question about your
-house and the answer comes back as a **card**: a one-line headline, the answer in a
-sentence, a handful of numbers, and one chart built for *your* data.
+**Insights → Cards** is brAIn acting as your home's analyst. Each **insight card** answers one
+question about your house: a one-line headline, the answer first, the numbers it rests on, and
+one chart built for *your* data. Cards refresh on their own schedule, so the answer keeps up
+with the house.
 
-![The brAIn Insights tab: an ask bar across the top, tag filters beneath it, and two cards side by side — "Why did the hallway light come on at 3 am?" with a trace timeline, and "Downstairs dries 15 min before it cools" with humidity and temperature charts](./images/panel-insights.webp)
+![Insights → Cards: the Cards, Needs you and History control, and four insight cards: "Why did the hallway light come on at 3 am?" with the automation's trace, "Downstairs dries 15 min before it cools" with number tiles and humidity and temperature charts, "The dehumidifier is your quiet £12 a month" and "Three sensors have gone quiet this week"](./images/panel-insights.webp)
 
-## Ask, and get a card
+## Where cards come from
 
-Type a question into the bar at the top and press **Ask**. A minute or two later the answer
-is on a card.
+A fresh install has **no cards**, deliberately: a generic card about a house brAIn has never
+looked at is noise on every run. Instead:
 
-```text title="Questions that make good cards"
-How quickly does the downstairs humidity drop when the AC turns on?
-Why did the hallway light come on at 3 am?
-Which rooms are coldest at night?
-What's actually driving my standby power?
-Which automations haven't triggered in 30 days?
-```
+1. **brAIn studies the home first** (naming and areas, occupancy, energy, climate, device
+   reliability) and files what it finds in [memory](/brain/memory/). The setup screen lists what
+   each study session learns as it lands.
+2. **It proposes cards** grounded in what it found, each with the evidence that made it think
+   so. **You pick**; only the ones you tick are created.
+3. **Suggested reports keep coming.** **Memory → Knowledge → Suggested reports** lists cards
+   brAIn thinks your house is now missing, each with *why this house* and *what it would
+   answer*. **Run** asks for a fresh look; once a week brAIn tops the list up on its own. An
+   idea costs nothing until you take it. Take one and it becomes a card; refuse it, optionally
+   saying why (*"we don't have solar"*), and it is never suggested again, reworded or not.
+4. **An answer from a conversation.** In [Ask](/brain/terminal/), an answer worth keeping has
+   **Save as report** under it: the question is asked again as a card that outlives the
+   conversation. A question that is not about the house, or a turn that read nothing from it,
+   stays an answer in Ask.
 
-Here is the card that the first of those produced on a real house:
+Deleted cards don't come back on their own.
 
-![An insight card headed "HVAC · Humidity · Cooling", titled "Downstairs dries 15 min before it cools". The answer reads "Yes — the drying comes first and nearly free", with five number tiles (drying rate −10 RH pts/hr, lag before the air cools 14–16 min, cost of the dry ≈7 RH points per °F, drying stops before the cycle does, downstairs right now 66% RH) and two line charts of humidity and temperature across three cooling cycles](./images/insight-card.webp)
+## Reading a card
 
-Reading it top to bottom:
+![An insight card headed "HVAC · Humidity · Cooling", titled "Downstairs dries 15 min before it cools". The answer reads "Yes — the drying comes first and nearly free", with number tiles and two line charts of humidity and temperature across three cooling cycles](./images/insight-card.webp)
 
 | Part | What it tells you |
 | --- | --- |
-| **The small heading** | What the card is *about* — "HVAC · Humidity · Cooling". For a card you asked, that's its topics; for a recurring card, its name. Hover it to see the question you originally typed. |
+| **The small heading** | What the card is about, such as *HVAC · Humidity · Cooling*. Hover it to see the question you originally asked. |
 | **The title** | The finding, in one line. It names what brAIn found rather than repeating your question. |
-| **The summary** | The answer first, in bold (*"Yes — the drying comes first and nearly free."*), then the reason with its numbers. |
-| **The tiles** | The numbers the answer rests on, each with its unit and where it came from. They sit in even rows — four across, three for five or six, two on a phone. |
-| **The chart** | One visualisation, drawn for this answer. Hover it for exact values. It sits straight on the card and stacks its panels on a phone. |
-| **The foot** | When it was analysed, why it ran (*you asked*, *on its refresh interval*, *a finding it reads changed*), what it cost in tokens, and the run history. |
+| **The summary** | The answer first, in bold, then the reason with its numbers. Cards open with a verdict and a comparison to the thing's own history. |
+| **The tiles** | The numbers the answer rests on, each with its unit. |
+| **The chart** | One visualisation, drawn for this answer. Hover it for exact values. |
+| **Also on Needs you** | A link when a problem the card found is waiting on [Needs you](/brain/needs-you/). |
+| **The foot** | When it was analysed and why it ran (*you asked*, *on its refresh interval*, *something it reads changed*). |
 
-On a phone the card rearranges itself: the title gets its own row under the buttons, and
-Refine and Share shrink to their icons.
+Press a card to open it full size. A card nobody asked for whose verdict is all fine folds into
+an *All quiet* line.
 
-![The same card on a phone in dark mode: the heading and four icon buttons on one row, the title on its own row below, and the number tiles two across](./images/insight-card-phone.webp)
+## Ask about a card, or change it
 
-### The ask bar reads what you meant
+Every card has two controls: **Ask** and **⋯**.
 
-Most things you type become a card, but brAIn reads the sentence first and sends it where
-it belongs — and one sentence can go two ways at once:
+- **Ask** opens a conversation with brAIn in the [Ask tab](/brain/terminal/), with the card as its
+  first message. Talk about it, ask a follow-up, ask why a number is what it is.
+- **⋯ → Edit** says what should change next time, and holds the card's schedule and prompt,
+  **Rename it**, and **Make it recurring** for a card you asked once.
 
-| You type | What happens |
-| --- | --- |
-| A question — *"why is the garage cold?"* | A card with the answer. |
-| **learn about…**, **study…**, **figure out…** | A study session. brAIn reads that corner of the house for a few minutes and files what it learns in [Memory](/brain/memory/) and [Findings](/brain/findings/). No card. |
-| A rule or a moment — *"whenever the front door opens after dark…"*, *"when the guests leave, turn the porch light off"* | A [rule or a one-off](/brain/intents/), simulated against your history and offered on **Proposals**. Nothing runs until you accept it. |
-| A fact — *"the garage freezer is off in winter"* | Kept in [memory](/brain/memory/). |
-| **why…** — *"why did the porch light come on at 3 am?"*, *"why didn't you tell me the garage was open?"* | Answered right under the bar, in words, with what brAIn read to work it out — including [what it decided not to say](/brain/findings/#why-didnt-brain-tell-me). |
-| **design my evening for the living room** | [Four scene moods](/brain/scenes/) for that room, offered on Proposals. |
+## Edit: change a card by saying what's different
 
-If brAIn can't reach Claude at that moment, the bar falls back to deciding by the first
-words, the way it always did.
+Type what should change and brAIn regenerates *that* card with the change, keeping everything you
+didn't ask to change.
 
-`brain ask "why is the garage cold"` in the [terminal](/brain/terminal/) is the same engine,
-printed as text instead of a card.
-
-## Refine: change a card by saying what's different
-
-Every card has a **✎ Refine** button. Type what should change and brAIn regenerates *that*
-card with the change, keeping everything you didn't ask to change.
-
-![The Refine dialog: "What should change?" with the text "Compare it with upstairs, and use the last 7 days" typed in, suggestion chips (Compare with last week, Look further back, Fewer numbers, Just the chart, Explain it more simply), a ticked "Keep asking this on every future run of the card" box, the original question shown underneath, and a "Regenerate with changes" button](./images/insight-refine.webp)
+![The Edit dialog: "What should change?" with "Compare it with upstairs, and use the last 7 days" typed in, suggestion chips, a ticked "Keep asking this on every future run of the card" box, and a "Regenerate with changes" button](./images/insight-refine.webp)
 
 <Steps>
 
-1. Press **✎ Refine** on the card.
+1. Open **⋯ → Edit** on the card.
 
-2. Say what should change. A few examples that work well:
+2. Say what should change:
 
    ```text
    Compare it with upstairs
@@ -85,30 +81,20 @@ card with the change, keeping everything you didn't ask to change.
    Ignore the guest room sensor, it's in a drawer
    ```
 
-   The chips under the box add common ones with a tap; you can combine several.
+3. Leave **Keep asking this on every future run** ticked if the change should stick, so the next
+   scheduled refresh won't quietly undo it. Untick it for a one-off look.
 
-3. Leave **Keep asking this on every future run** ticked if the change should stick — the
-   next scheduled refresh won't quietly undo it. Untick it for a one-off look.
-
-4. Press **Regenerate with changes**. The card shows its progress and redraws in a minute
-   or two.
+4. Press **Regenerate with changes**. The card redraws in a minute or two.
 
 </Steps>
 
-The version it replaced stays in the card's history — page back with **‹ ›** in the foot.
-Everything you've asked a card to keep doing is listed at the bottom of the Refine dialog,
-each with a ✕ to stop it. Kept changes are also written into
-[memory](/brain/memory/), so brAIn learns your preferences, not just this card's.
-
-:::tip[Refine vs. Edit]
-**Refine** is for *what the card says* and is just a sentence. **⋯ → Edit** on a recurring
-card changes its name, icon, schedule and the full analysis prompt — use it when you want to
-see and rewrite exactly what brAIn is asked each run.
-:::
+The version it replaced stays under **⋯ → Past versions**. Everything you've asked a card to keep
+doing is listed in the same dialog, each with a ✕ to stop it. Kept changes are written into
+[memory](/brain/memory/) too, so brAIn learns your preferences, not just this card's.
 
 ## Share: a picture, or a card on your dashboard
 
-**↗ Share** takes a card somewhere else, two ways.
+**⋯ → Share** takes a card somewhere else, two ways.
 
 ![The Share dialog: a preview of the card drawn as a picture, with Copy picture and Download buttons; below it "On a dashboard" with Dashboard, View and Show pickers and an Add card button; and a folded "YAML, for a dashboard kept in YAML" section](./images/insight-share.webp)
 
@@ -168,58 +154,30 @@ notices after one restart. The Share dialog tells you when that's needed.
 </TabItem>
 </Tabs>
 
-## The card's other buttons
+## The card's menu
 
 | Control | What it does |
 | --- | --- |
-| **✎ Refine** | Change the card by saying what should be different. |
-| **↗ Share** | Copy or download it as a picture, or add it to a dashboard. |
-| **⤢ Expand** | The chart at full size. |
-| **⋯ → Regenerate** | Run the card again now. A card you asked for re-runs in place. |
-| **⋯ → Edit** | Name, icon, analysis focus and schedule. On a card you asked for it's **Rename** — the heading and icon. |
-| **⋯ → Edit tags** | What the card can be filtered by in the chip row above the cards. |
-| **⋯ → Make this an automation** | Puts the automation the card suggests — or just "When " — into the ask bar for you to finish and send. It never sends from the menu. |
-| **⋯ → See the automation it suggested** | Once a suggestion from this card is waiting on Proposals. |
+| **Ask** | Talk about the card with brAIn in a new conversation. |
+| **⋯ → Edit** | Say what should change next time; change its schedule and prompt; rename it; make an asked card recurring; make an automation from it. |
+| **⋯ → Share** | Copy or download it as a picture, or add it to a dashboard. |
+| **⋯ → Past versions** | Read what the card said before. |
+| **⋯ → Run** | Make the card again now. A card you asked re-runs in place. |
 | **⋯ → Delete** | The card and its history. |
-
-**＋ Make recurring** in the foot of a card you asked turns it into a scheduled card that
-refreshes on its own.
 
 ## A card can suggest an automation
 
 When a card points at an automation your house clearly lacks — *"the hall light is left on
 most nights after everyone's upstairs"* — brAIn drafts it, replays it against your recorder
-and offers it on **[Proposals](/brain/proposals/)**, exactly as if you had typed the
-sentence into the ask bar. Nothing is written until you accept it there, and the automation
+and offers it as a [suggestion](/brain/proposals/) on **Needs you**. Nothing is written until
+you accept it there, and the automation
 it makes carries a description saying an insight card suggested it.
 
-Each suggestion stays listed on the card, saying whether it reached Proposals and why, so a
+Each suggestion stays listed on the card, saying whether it reached Needs you and why, so a
 suggestion that went nowhere doesn't look the same as one waiting for you. Because this
 runs without you pressing anything, it follows the rules of every scheduled run — a
 sign-in, automatic insights on and budget left — and it's limited to two suggestions per
 card and four a day. A card never re-offers what it suggested last time.
-
-## Where cards come from
-
-A fresh install has **no cards**, deliberately — a generic card about a house brAIn has
-never looked at is noise on every run. Instead:
-
-1. **brAIn studies the home first** — naming and areas, occupancy, energy, climate, device
-   reliability — and files what it finds in [memory](/brain/memory/). The screen lists what
-   each study session learns as it lands (*"The garage freezer is on a smart plug"*), not
-   just a progress bar.
-2. **It proposes cards** grounded in what it found, each with the evidence that made it
-   think so — and it waits until the study has actually found something before it does.
-   **You pick**; nothing generates until you do. It may also suggest **one automation to
-   try**, written as a sentence from something it saw you do; ticking it starts a
-   week-long trial on [Proposals](/brain/proposals/) and writes nothing to your house.
-3. **Later, [Ideas](/brain/ideas/) keeps proposing.** A house that grows a heat pump or a
-   solar array gets suggestions for cards it's now missing — costing nothing until you take
-   one.
-
-Deleted cards don't come back on their own. brAIn proposes the cards your home should have,
-so the answer to *"I want that card again"* is to ask for it and let brAIn build it for the
-house it now knows.
 
 ## How a card is made
 
@@ -243,9 +201,9 @@ For every card and every question, brAIn:
    Home Assistant session.
 
 **Nothing on this path can change your house.** An insight run holds reading tools only,
-and an automation a card suggests is only *offered*, on Proposals. The one path from a
-model to a change is a [finding's](/brain/findings/) **Fix it** — a plan you read and an
-**Apply** a person presses. See [Permissions & safety](/brain/safety/).
+and an automation a card suggests is only *offered*, on Needs you. The one path from a
+model to a change is a card's [**Plan**](/brain/needs-you/#plan-apply-and-undo) — a plan you
+read and an **Apply** a person presses. See [Permissions & safety](/brain/safety/).
 
 A card that declares **live** entities keeps those readings current while it's on screen —
 the foot says *"3 readings live · just now"*, and the prose above it is labelled
@@ -257,9 +215,8 @@ from now.
 - **Per-card schedules** — an interval, or fixed daily times (`07:00, 19:00`). Fixed times
   cost far less than a short interval. `0` means manual only.
 - **Run history** — past runs are kept, with **‹ ›** in the foot to page back and
-  `prev: …` under each number.
-- **Tags** — the analyst tags each card by what it *found*, so `#batteries` surfaces every
-  card that hit a battery problem. Edit them from **⋯ → Edit tags**.
+  `prev: …` under each number, and **⋯ → Past versions**.
+- **Search** — once there are more than a handful of cards, a search box finds them.
 
 ### When a card actually re-runs
 
@@ -273,8 +230,8 @@ doesn't either.
 
 The foot says why each run happened — *on its refresh interval*, *a finding it reads
 changed* — and a card that skipped says what it is waiting for, so a quiet dashboard and a
-stopped scheduler never look the same. **When to refresh a card** in ⚙ Settings picks the
-rule:
+stopped scheduler never look the same. **When to refresh a card** in ⚙ → Model & usage picks
+the rule:
 
 | Setting | A scheduled card runs when… |
 | --- | --- |
@@ -297,10 +254,10 @@ says what it cost in its foot (hover for the in/out split and how long it took),
 usage pill's popover itemises brAIn's runs biggest first.
 
 **An asked question costs more than a recurring card.** A recurring card reads its own
-slice of the home; a question could be about anything. **Refine** costs about the same as
+slice of the home; a question could be about anything. **Edit** costs about the same as
 a regenerate.
 
-**⚙ Settings** caps how much of each 5-hour session window brAIn may spend on *scheduled*
+**⚙ → Model & usage** caps how much of each 5-hour session window brAIn may spend on *scheduled*
 work. Automatic runs pause at the budget; things you press never do. The meter uses your
 real Anthropic account usage, so brAIn backs off when you're using Claude elsewhere. Every
 control: [Reference](/brain/reference/#token-budget).
@@ -317,8 +274,8 @@ their settings in [Reference](/brain/reference/):
   that is simply how your house is. It can only pick something it was shown, it never
   passes over something critical, and if it can't run (no sign-in, automatic runs paused,
   the budget spent) the report falls back to the worst-severity, longest-open pick, exactly
-  as before. Its counts match what the Findings tab shows.
-- **A deep review** is a button on **House → Knowledge**. brAIn's most capable model,
+  as before. Its counts match what Needs you shows.
+- **A deep review** is under **Memory → Knowledge → Tools**. brAIn's most capable model,
   reading only, sits with everything brAIn knows — the open problems, the measurements,
   the memory, the last weekly report — and writes up a handful of observations: patterns
   across rooms, a cause behind several symptoms, what is worth doing next. It **files

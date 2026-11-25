@@ -1,0 +1,384 @@
+---
+title: Changelog
+description: Release notes for the BRUH Bambu Studio Home Assistant add-on — every notable change, newest first.
+tableOfContents: false
+---
+
+import Changelog from '../../site/components/changelog/Changelog.astro';
+import Release from '../../site/components/changelog/Release.astro';
+import Changes from '../../site/components/changelog/Changes.astro';
+
+<Changelog>
+
+<Release version="0.5.3" latest>
+
+<Changes type="changed">
+
+- **Failure detection stops taking looks it cannot use.** After one look comes back blind with the chamber light off, it holds, says so on the Printers tab with a **Turn the light on** button, and looks again as soon as the light comes on. With *Turn the chamber light on to see* set, it turns the light on once and carries on; a print starting in the dark with that setting off is warned about before the first look.
+- **Each printer's header carries its state** (Printing, Finished, Ready) and, under the name, the file with its progress or "finished 2 h ago", in the same words the dashboard card uses.
+- **Every Files row has Print in the same place** and a slice line ("1 h 30 min · 31 g", or "Not sliced yet"); a 3MF and an STL of the same model sit together.
+- The card's failure-detection line shows a whole sentence without cutting it off.
+
+</Changes>
+
+</Release>
+
+<Release version="0.5.2">
+
+<Changes type="fixed">
+
+- A print name whose characters the screen cannot draw no longer ends in empty brackets.
+- The Files list is quieter, and the same model kept as STL, 3MF and STEP shows its format on each row even when the names differ in case or punctuation.
+- The card's failure-detection row agrees with itself — a check-mark shield when all is well, a warning shield with the reason when the last look saw nothing — and fits on one line on a phone.
+- A warning that the last print could not be watched folds to one quiet note once no print is running.
+- Look marks on the layer line no longer overlap.
+
+</Changes>
+
+</Release>
+
+<Release version="0.5.1">
+
+<Changes type="fixed">
+
+- The dashboard card's main button, its Stop button and its warning and failure notices are readable on Home Assistant's default theme, light and dark.
+
+</Changes>
+
+</Release>
+
+<Release version="0.5.0">
+
+<Changes type="changed">
+
+- **One page width and one left edge** for Printers, Files and Settings, with the top bar lined up at every screen size. Studio and Design stay full width.
+- On a printer's card, Failure detection, On the printer and Temperatures and G-code are boxes of the same shape.
+- Files is three clear parts — the library's title and Upload, the import box, and the file list with its search. On a phone, Print and ⋯ sit under a file's title.
+- Spacing, text sizes and corners follow the shared BRUH standard, and the dashboard card follows the shared card layout with 44 px buttons and the theme's primary colour.
+
+</Changes>
+
+</Release>
+
+<Release version="0.4.5 – 0.4.9">
+
+<Changes type="changed">
+
+- **Print names read as a person would write them** everywhere — no folder, extension, slicer time stamp, trailing "(1)", underscores or empty boxes — and wrap rather than being cut off.
+- **Each file row says how long it prints and how much filament it uses**, or that it is not sliced yet, with its own plate picture or a clear icon for its kind. The library has a search box and sorts by newest or name.
+
+</Changes>
+
+<Changes type="fixed">
+
+- Failure detection says up front when it could not watch a print and why, never shows a blind look as a green "fine" dot, and offers **Turn on light** beside the notice.
+- The camera's light, pause and full-screen buttons are 40 px and nothing covers them; menus open in their own row instead of floating over the camera.
+- Timeline markers are 40 px targets, spaced for a finger; the Printers page no longer scrolls sideways on a phone.
+- AMS spools say their colour and material ("White PLA"), with the amount left only when the printer sends it.
+- Blue buttons and the active tab are readable (5.4:1 contrast).
+- The 3D view's named-view buttons wrap on a phone instead of being cut off.
+- The Files list's Slice item works again.
+
+</Changes>
+
+</Release>
+
+<Release version="0.4.4">
+
+<Changes type="added">
+
+- Files name the slice already made from them, so a reprint needs no reslice.
+
+</Changes>
+
+<Changes type="changed">
+
+- The design chat says it cannot open a link or see a photo, and asks for the measurements instead.
+
+</Changes>
+
+<Changes type="fixed">
+
+- A finished print's plate clears when the finish look sees it empty or lifted out.
+- An A1 no longer shows a chamber temperature, or 100% for spools it cannot measure.
+
+</Changes>
+
+</Release>
+
+<Release version="0.4.1 – 0.4.3">
+
+<Changes type="changed">
+
+- **An update asks for a restart only when it needs one.** The panel compares the integration code Home Assistant loaded with what was installed, so a version-only update shows no restart banner, and a card change needs only a page reload.
+- **The version is one line under the 3D view** — version, size, weight, warnings — and the rest opens from it. More room for the conversation on a phone.
+
+</Changes>
+
+<Changes type="fixed">
+
+- **Restart Home Assistant** no longer reports a failure while Home Assistant is restarting.
+- Failure detection's **i** stays open until you close it, and fits a phone screen.
+
+</Changes>
+
+</Release>
+
+<Release version="0.4.0">
+
+<Changes type="added">
+
+- **A Settings tab** for the printers, failure detection's settings and where alerts go, brAIn's models and your standing instructions, the 3D view, and the Home Assistant card.
+- **Choose brAIn's model** for Design conversations and for print checks.
+- **Standing instructions** for brAIn: *Designing* is added to every Design conversation, *Printing* is followed whenever brAIn picks print settings.
+- **The plate is watched after a print, even with failure detection off**, and a plate you mark clear becomes the empty plate later prints are compared with.
+- **↓ Latest** in a scrolled-up Design conversation.
+
+</Changes>
+
+<Changes type="changed">
+
+- One header row with the five tabs, even on a phone, and a cleaner, denser layout throughout.
+- **Where it looks reads as a timeline**, from layer 1 to the last, with *Now*, a key and the next look.
+- **On the printer** is a list, newest first, with date, size and Print.
+- **The Design tab fits the window** — side by side on a desktop, the part filling the screen on a phone.
+- **Invert vertical drag** is the default (dragging down raises the view).
+
+</Changes>
+
+<Changes type="fixed">
+
+- **A look is no longer a picture of a moving bed**: four frames a second apart, and brAIn sees the sharpest.
+
+</Changes>
+
+</Release>
+
+<Release version="0.3.3">
+
+<Changes type="added">
+
+- **Measure snaps the way Fusion's does** — corners, edge midpoints, edges, face centres and faces — with the ΔX, ΔY and ΔZ legs drawn in the axes' colours, distance square to a face, angles between faces or edges, and the last five measurements kept.
+- **Change a body's colour from its dot**: the AMS trays' colours first, then any colour. The colour is what that body prints in.
+
+</Changes>
+
+</Release>
+
+<Release version="0.3.2">
+
+<Changes type="added">
+
+- **The 3D view moves the way Fusion 360's does**, on a mouse and on touch, with Z kept up.
+- **Home and named views** that move rather than jump, each framing the whole part.
+- **Full screen** for the 3D view, and a view you can drag taller on a desktop.
+
+</Changes>
+
+<Changes type="changed">
+
+- **The dashboard card is compact**: a printing printer with an open alert is about 400 px tall, down from about 560. Stop, speed, light, Refresh, Reconnect and the AMS are behind the printer's ⋯.
+- The printer card on the Printers tab is laid out by what matters now.
+
+</Changes>
+
+<Changes type="fixed">
+
+- No green bar through the camera, and the camera picture keeps the stream's own shape.
+- Pictures of files on the printer are read one at a time, and reliably.
+- **An A1's AMS Lite reports no humidity**, because it has no sensor.
+
+</Changes>
+
+</Release>
+
+<Release version="0.3.1">
+
+<Changes type="fixed">
+
+- **A bare model sliced for an A1 is sliced for the A1's 256 mm bed.** Profiles are handed over complete, a printer can be named by the name you gave it, and a profile that does not say how big its bed is is refused.
+
+</Changes>
+
+</Release>
+
+<Release version="0.3.0">
+
+<Changes type="added">
+
+- **Print failure detection.** While a print runs, brAIn looks at the camera at the moments the print's own G-code says it is most likely to fail, compares it with Bambu Studio's picture of the finished plate, warns you with **Ignore** and **Pause print**, and pauses a print that has clearly failed. *Only warn* never pauses; Relaxed, Balanced or Careful set how often it looks.
+- **Free checks without brAIn**: a covered lens or dark chamber, a frozen camera, a sudden change on the plate, and the printer's own camera alerts.
+- **Plate clear** after a print.
+- **In Home Assistant**: Failure detection, Print problem, Plate clear and Camera covered entities, a Last print check camera, phone alerts with buttons, the `check_print`, `print_alert_action` and `set_failure_detection` services and a `bruh_bambu_print_alert` event.
+
+</Changes>
+
+<Changes type="fixed">
+
+- Downloaded 3MF and STEP files are named after the part, its version and its kind.
+
+</Changes>
+
+</Release>
+
+<Release version="0.2.6">
+
+<Changes type="added">
+
+- **Design and print a part from Home Assistant**: `bruh_bambu.design_part`, `design_status` and `print_part` run the Design tab's own conversation and its own Slice and print. brAIn's chat and voice use them.
+
+</Changes>
+
+</Release>
+
+<Release version="0.2.5">
+
+<Changes type="added">
+
+- **Bambu Studio works on a phone**: tap to click, hold to right-click, two fingers to zoom and move, a toolbar for what one finger does, Fit, and the phone's keyboard.
+
+</Changes>
+
+</Release>
+
+<Release version="0.2.4">
+
+<Changes type="changed">
+
+- **A print starts without asking whether the plate is clear** on an idle, finished or failed printer; a busy one is refused with the reason.
+
+</Changes>
+
+<Changes type="fixed">
+
+- Printing more than one copy works: anything that is not a Bambu Studio project is laid out as copies before slicing.
+- A command the printer refuses is reported as refused, with how to switch on Developer mode.
+
+</Changes>
+
+</Release>
+
+<Release version="0.2.1 – 0.2.3">
+
+<Changes type="fixed">
+
+- Printed designs get the printer's start and filament-change G-code.
+- When Bambu Studio refuses to slice, you see its own error lines and every exit code in plain words.
+- Settings Bambu Studio would refuse (such as 100% infill in a grid pattern) are fixed before slicing, and you are told.
+- **Open in Bambu Studio** opens a designed part as a full project.
+- The camera no longer flashes or flickers between frames.
+- brAIn's replies in the design conversation render as rich text.
+
+</Changes>
+
+</Release>
+
+<Release version="0.2.0">
+
+<Changes type="added">
+
+- **The printer's camera** on the printer card and as a Camera entity.
+- **A redesigned printer card**: stage, progress ring, finish time, temperature and fan tiles, the AMS as spools with humidity, and links for HMS codes.
+- **Refresh and Reconnect**, on the card and as services.
+- **What is on the printer**, to print again or delete.
+- **Pictures in the Files tab.**
+- **Every common print option, everywhere you print** — the Print dialog, Manual print, `print_file` and brAIn.
+- **brAIn designs for the printer**: build volume, nozzle, splitting, copies, and keeping colour changes cheap.
+- **A Stage sensor** per printer.
+
+</Changes>
+
+<Changes type="fixed">
+
+- The integration, sensors and cards appear without hunting: a **Restart Home Assistant** button and notification, and automatic setup afterwards.
+- A rejected slice names the setting.
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.6">
+
+<Changes type="fixed">
+
+- Bambu Studio no longer closes when a print starts: its built-in pages draw in software.
+- A print from the panel slices on its own settings folder, without disturbing the window in the sidebar.
+- A slice killed by running out of memory says so.
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.5">
+
+<Changes type="fixed">
+
+- Designed parts slice again, and a failed slice says why in words.
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.4">
+
+<Changes type="added">
+
+- **brAIn starts the print from the conversation** — say *print it*, or press **Auto print**.
+- **Print offers three ways**: Auto print, Manual print, Open in Bambu Studio.
+- **Multi-colour parts print in their colours**, each body from its own AMS tray.
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.3">
+
+<Changes type="added">
+
+- **Find printers on your network**, and `bruh_bambu.find_printers`.
+
+</Changes>
+
+<Changes type="fixed">
+
+- Bambu Studio no longer stops on "Switching language failed".
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.2">
+
+<Changes type="added">
+
+- **Import a model from a link** (Printables, or a direct file link), and `bruh_bambu.import_url`.
+- **Bare models print**, sliced with Bambu Studio's own profiles for the printer and the tray you choose.
+- **The 3D view shows the part in its colours**, with a key to hide or show each body, and a **?** for the controls.
+
+</Changes>
+
+<Changes type="fixed">
+
+- Bambu Studio 2.x starts.
+
+</Changes>
+
+</Release>
+
+<Release version="0.1.0 – 0.1.1">
+
+<Changes type="added">
+
+- **Bambu Studio in the sidebar**, downloaded on first start and run on a virtual screen through noVNC.
+- **Your Bambu Lab printers in Home Assistant** over the LAN: state, progress, time left, temperatures, speed, light and AMS.
+- **Printing from anywhere**: slice, upload and start any file in `/share/bambu`.
+- **The `bruh_bambu` integration** with its services and five sensors per printer.
+- **Design parts with brAIn**: a Design tab, a 3D view, versions, and Print.
+- **A printer card** for Lovelace and Morph.
+- **brAIn's printer tools**: `bambu_status`, `bambu_print`, `bambu_control` and `bambu_slice`.
+
+</Changes>
+
+</Release>
+
+</Changelog>

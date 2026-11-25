@@ -1,0 +1,102 @@
+---
+title: Quick Start
+description: Install GardenRX in Home Assistant, add its integration, and set up your first crops, products and spray in about ten minutes.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+From the add-on store to a planned spray in about ten minutes.
+
+## Before you start
+
+- **Home Assistant OS or Supervised**, 2024.1 or newer, on an `amd64` or `aarch64` machine.
+- **Your home's location and time zone** set under **Settings → System → General**. GardenRX
+  uses them for the forecast, the time of day and the season.
+
+## Install
+
+<Steps>
+
+1. **Add the repository.** In Home Assistant open **Settings → Add-ons → Add-on Store →
+   ⋮ → Repositories** and add:
+
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+2. **Install GardenRX** from the store and press **Start**. The add-on pulls a prebuilt
+   image — a Next.js build is minutes of CPU and a gigabyte of packages, so it is never
+   built on your machine. **GardenRX** appears in the sidebar with a sprout icon.
+
+3. **Restart Home Assistant once** (**Settings → System → Restart**), so it loads the
+   `gardenrx` integration the add-on just copied into `/config/custom_components`.
+
+4. **Add the integration.** Under **Settings → Devices & services**, GardenRX is waiting
+   under *Discovered*. Press **Add**. The six sensors, the twelve services and the three
+   dashboard cards are now there.
+
+</Steps>
+
+<Aside type="tip">
+After this first time, an update asks for a Home Assistant restart **only when the
+integration's code changed**: the add-on log says so. A change to the cards needs only a
+page reload.
+</Aside>
+
+## Set up your garden
+
+The first start loads the product and label catalog. Your own crops, varieties, sprays,
+harvests and stock start empty — the screens fill in as you add them.
+
+<Steps>
+
+1. **Add your crops.** Open **Crops → Add crop** and add what you grow: Apples, Peaches,
+   Blueberries, Tomatoes… A crop the catalog knows gets its crop group (Pome Fruit, Stone
+   Fruit, Berries, Nightshades…) without being told, and the group decides its season and
+   which labels apply.
+
+2. **Add varieties.** Open a crop and add its varieties — *Liberty*, *Honeycrisp*,
+   *Redhaven*. Set each crop's **$/lb** (and an average weight each, for crops you count
+   rather than weigh) so the Harvest page can value your picks.
+
+3. **Stock your shelf.** On **Products → Your stock**, search for the products you own and
+   add them. Set the bottle or bag size and how much is left; drag the level bar later as
+   you use it.
+
+4. **Tell it about your sprayer.** In Settings (the gear at the bottom of the sidebar), set
+   your **sprayer tank size** in gallons. Every dose GardenRX gives is for that tank.
+
+5. **Plan a spray.** Open **Spray**, tick the crops you want to spray, and look at the
+   recommended mix: the amount of each product for your tank, the cost, the PPE, and any
+   warning. Press **Queue This Spray**.
+
+6. **Log it.** When you have sprayed, press **Log Spray** on the queued spray (on Today or
+   the Spray page). The spray goes into the history, the pre-harvest clock starts for those
+   crops, and what you used comes out of stock.
+
+</Steps>
+
+## Put it on a dashboard
+
+Edit any dashboard, **Add card**, and search for *GardenRX* — or paste:
+
+```yaml
+type: custom:gardenrx-spray-card
+```
+
+```yaml
+type: custom:gardenrx-harvest-card
+```
+
+```yaml
+type: custom:gardenrx-inventory-card
+```
+
+There is no resource to add: the integration loads the cards on every dashboard.
+
+## Next
+
+- [A tour of every screen](/gardenrx/guide/) — what Today, Crops, Garden, Harvest, Spray,
+  Products and Weather show, and how the spray window and the season work.
+- [Cards, sensors and services](/gardenrx/home-assistant/) — card options, every service
+  with its fields, and automation recipes.

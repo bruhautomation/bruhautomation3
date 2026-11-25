@@ -1,0 +1,130 @@
+---
+title: Rolls, Stock & Twin Turbo
+description: How BRUH Print knows which labels are in each roll of a LabelWriter or Twin Turbo, how to line up a roll so ink lands where it should, the label stock catalog, text direction, the remaining-label count, and the print quality settings.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Everything on this page lives on the **Printer** tab: the printer, **What is loaded**, **Label
+stock** and **Settings**.
+
+![The Printer tab: the printer card with Idle, Ask about paper and lid and USB details, and What is loaded with the left and right rolls, each with a label picker, About N left — press to correct, Full roll, Not lined up yet, Line up this roll and Print a check label](./images/printer.webp)
+
+## What is loaded
+
+Tell BRUH Print which stock is in each roll and it refuses a label that does not match. Without
+that check, a 2.25″-wide label sent to a 0.56″ roll prints across the backing paper — once per
+copy, with no error anywhere.
+
+**Nothing asks you which roll.** You pick the label; BRUH Print knows which bay it is in. There is
+no roll picker on the Quick tab, in the designer, on a template, on the card or in the print
+services — naming the stock has already named the bay.
+
+**Only what is loaded can be picked.** Every label picker outside the Printer tab lists only the
+rolls actually in the printer. The whole catalog lives on the Printer tab, where the question is
+"what did I just load".
+
+### Twin Turbo
+
+On a **LabelWriter 450 Twin Turbo** you get two bays, **Left roll** and **Right roll**. The roll
+chip at the top of every tab names both in words (*Left: Address Labels · prints text*), and the
+roll that plain text prints on is marked **prints text** everywhere — on the panel, on the card and
+in the printer sensor's `text_prints_on` attribute. Change it from the Quick tab's **Prints on**
+line, from the card, or with `bruh_print.choose_label`; all three are the same setting. A printer
+with one roll never shows a control for a second.
+
+### How many are left
+
+Each loaded roll says *"About N left"* or *"Not counting yet — tell me how many are on it"*, and
+that line **is** the button that sets it. Nothing on a LabelWriter reports a real level, so the
+count is an estimate counted down from prints — it drifts the moment somebody prints from another
+machine, which is why it is a control and not just a readout. **Full roll** resets it. A low roll is
+marked in the header, on the Printer tab and on the card. Turn **Keep an estimate of how many labels
+are left** off under Settings and the count stops moving as well as showing.
+
+## Lining up a roll
+
+A LabelWriter finds the top of each label with a sensor looking for the punched hole in the gap
+between labels, and where that hole sits relative to the label is punched into the **roll**. So a
+given printer and roll can start laying ink a few millimetres after the label's leading edge, every
+time — and no command moves it earlier. BRUH Print's answer is to find out where the printable area
+really is, and lay labels out inside it.
+
+<Steps>
+
+1. Press **Line up this roll** on the bay that holds it, then **Print**. One label comes out with a
+   numbered grid drawn across the whole print head and on past the end of the label — some ink
+   lands on the backing and the next label. That overrun is the instrument.
+2. Read where the label's four edges fall on the grid and type them in. The white numbers on the
+   black strips run **across** the label (X); the black numbers in the plain columns run **down**
+   it (Y). The end with the small numbers is the top, and came out first. Every scale has a number
+   every 5 mm and a tick every 1 mm.
+3. Press **Apply**. BRUH Print says, in one sentence, what your printer does with this roll.
+4. Press **Print a check label**. It draws a frame around everything the roll can print on, with
+   *"Should reach every edge"* inside. A complete frame means you are done; a missing side says
+   which way it is out.
+
+</Steps>
+
+| Reading | What to read |
+| --- | --- |
+| **X1** | Where the label's **left** edge falls on a black strip |
+| **X2** | Where the **right** edge falls — leave empty if the strip stops short (the label is wider than the print head) |
+| **Y1** | Where the **top** edge falls in a plain column — **0 if the top edge is above the grid**, the common case |
+| **Y2** | Where the **bottom** edge falls (the grid always runs past it) |
+
+It is a loop, not a form: both prints sit at the top of the step you type into, and reopening a
+roll that is already lined up brings its numbers back filled in, so a small correction is one box.
+**Forget** throws the measurement away — back to nothing, not to a guess, so an un-lined-up roll gets
+exactly the job BRUH Print has always sent.
+
+**Where to print on it** is the other half of that step: a number per edge — **Top**, **Bottom**,
+**Left**, **Right** — holding that much of the label blank on purpose. **Even up the ends** fills the
+bottom one in for you, so the top and bottom borders match on a printer that starts a few
+millimetres in. An even border on all four sides is the stock's own **margin** instead.
+
+## Label stock
+
+![The Label stock section: a note on which measurement is which, and stock rows such as Chemical-Resistant Cryo Labels, Cryogenic Labels, Address, Multipurpose, Return address, Shipping, Library spine and Jewellery, each with its size, border, part number, a Text direction picker, Rename or resize and Hide](./images/label-stock.webp)
+
+A stock is two measurements, and they are **not** interchangeable:
+
+- **Across the print head** — the width the head covers in one pass.
+- **Along the roll** — how far the paper travels for one label.
+
+Getting them the wrong way round is the most common way a label comes out rotated with the text off
+the edge, and nothing can work it out for you. **Rename or resize → These are the wrong way round**
+swaps them in one press, and lining up a roll offers the swap when its measurements look reversed.
+
+**Rename or resize** also holds the roll's **name** (call it what you call it — every picker
+follows), the blank border kept clear of the edge (2 mm by default), and how many labels are on a
+full roll. Editing a built-in stock saves an override, so a future release cannot take your
+measurement back.
+
+**Text direction** belongs to the stock, not the job, and is asked once, here. A label much longer
+than it is wide is a wrap-around label, so its text runs *along the roll* automatically, and the
+picker says which way "automatic" decided.
+
+The catalog ships with the common DYMO part numbers — 30252 address, 30256 shipping, 30323 large
+shipping, 30336 multipurpose, 30330 return address, 30346 library spine, 30299 jewellery — two
+cryogenic stocks, and continuous 2.25″ tape whose length comes from the artwork. **Add a stock** takes
+a name and the two measurements; the part number, labels per roll and margin are optional.
+
+## Settings
+
+![The Settings card: If nothing comes out set to Standard — recommended, Darkness set to Dark — recommended, Print speed set to Slow & dark, and checkboxes for Refuse a label whose stock is not in the roll, Quick labels are UPPERCASE, and Keep an estimate of how many labels are left](./images/settings.webp)
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| **If nothing comes out** | Standard | *Standard* is what everything is tested against. *Compact* adds a compression opcode not every firmware reads. *Bare minimum* also drops roll select (a Twin Turbo loses its second bay), darkness and speed — the last thing to try. |
+| **Darkness** | Dark | How much heat the head puts into each dot. Turn it down if labels smudge or curl. |
+| **Print speed** | Slow & dark | The printer's "barcodes and graphics" mode (300 × 600): darker and more accurate for barcodes and QR codes. *Fast* is the printer's own default and roughly halves the time of a long run. |
+| **Refuse a label whose stock is not in the roll** | On | The stock check. Seeded from the `enforce_stock` option on first run. |
+| **Quick labels are UPPERCASE** | Off | |
+| **Keep an estimate of how many labels are left** | On | Off stops the count entirely. |
+
+<Aside title="Why the margin is 2 mm">
+The print head does not start at the edge of the backing, thermal stock curls at the die cut, and a
+LabelWriter's registration wanders a fraction of a millimetre as the roll unwinds. At 1 mm, text
+reaches the cut every other label.
+</Aside>

@@ -11,39 +11,57 @@ refuses whatever anyone says, and how to take a change back.
 The short version:
 
 - **Reading is never asked about.** Looking at states, history, logs and your YAML is free.
-- **Changing something asks first**, in the terminal and the chat, unless you turn on
-  [Let brAIn act without asking](#let-brain-act-without-asking).
+- **Changing something asks first**, in the terminal and the chat, unless you choose a
+  different [permission level](#three-permission-levels).
 - **Nothing on a schedule can act on your house.** Cards, the morning brief, the weekly
   report and study sessions read only. The things that act all need a press —
-  [Fix it](#fix-it-shows-the-change-first), accepting a proposal — or are off by default
+  [Plan and Apply](#plan-shows-the-change-first), accepting a suggestion — or are off by default
   (overnight self-healing).
 - **A few lines are never crossed**, by anything: your
   [protected entities](#protected-entities), the [tripwire](#the-tripwire), your
   [house rules](#house-rules).
-- **What it changed can be put back** — files with `brain undo`, a fix with **Undo the
-  fix** and **Put them back**.
+- **What it changed can be put back** — files with `brain undo`, a fix with **Undo** and
+  **Restore** on its card.
+
+![⚙ → Permissions: "brAIn asks you first whenever it wants to change something in your house", the three levels Ask first, Act and No limits, a note that the off-limits list blocks brAIn's usual ways of changing the house but not every way, and the Talk it through in chat switch](./images/settings-permissions.webp)
+
+## Three permission levels
+
+**⚙ → Permissions → What brAIn may do without asking** has three levels:
+
+| Level | What it means |
+| --- | --- |
+| **Ask first** (default) | brAIn asks before it changes anything: a light, an automation, a setting or a file. Reading is never asked about. |
+| **Act** | brAIn makes changes on its own in the chat and the terminal, but keeps to your [house rules](#house-rules) and your [protected entities](#protected-entities). This is the *Let brAIn act without asking* switch, below. |
+| **No limits** | brAIn makes any change on its own, everywhere, and your house rules and protected list do not stop it. A plan is applied the moment it is written, and a change you asked for is accepted at once instead of waiting as a draft. Confirmed once in words; stepping back down is never asked about. Edit snapshots stay, so `brain undo` still reverses a file. |
+
+*No limits* is for an owner who wants no restrictions at all. Everything else on this page
+describes *Ask first* and *Act*.
+
+**Talk it through in chat**, under the levels, sends what would become a draft for you to approve
+(something to do later, once or every time, a change to an automation, new scenes) to the
+conversation, which does it there.
 
 ## Let brAIn act without asking
 
 By default the terminal and the chat **ask** before Claude runs a command, edits a file
 or changes something in Home Assistant. Only reading is pre-approved.
 
-One switch stops the asking: **Let brAIn act without asking**. It is on the add-on's
-**Configuration** tab and in the panel under **⚙ → Terminal & chat**, and they are the
-same switch — flip it in either place and the other follows. It is **off** by default.
-(If you set this before 2.11, nothing about your setting changed: the option's key is still
-`dangerously_skip_permissions`, only its label is new.)
+The **Act** level is the switch **Let brAIn act without asking**. It is on the add-on's
+**Configuration** tab (`dangerously_skip_permissions`) and in the panel under **⚙ →
+Permissions**, and they are the same switch — change it in either place and the other follows.
+It is **off** by default.
 
 **It reaches three things:** the classic terminal, the chat, and — in those two — the
 [action gate](#the-action-gate), which stops asking its own model what you meant. It
-never reaches voice, insight cards, automation tasks, study sessions or a Fix it run.
+never reaches voice, insight cards, automation tasks, study sessions or an Apply run.
 Those keep their own rules whatever the switch says.
 
 **No restart.** A new terminal session and the chat's next message pick the change up. A
 chat that is in the middle of an answer finishes it under the old setting first.
 
 :::caution[An open terminal session keeps the setting it started with]
-Reopening the Terminal tab goes back to the same session, so a change reaches the classic
+Reopening the classic terminal goes back to the same session, so a change reaches the classic
 terminal only when that session ends — in both directions. The line under the switch in
 ⚙, and the message after you flip it, say when an open terminal session is still acting
 without asking (or still asking). Type `/exit` in it to start a fresh one under the new
@@ -68,8 +86,8 @@ could not be updated.
 - **brAIn's own deny-list** — the tools no brAIn session may use — still applies.
 - **The action gate's floors and your house rules** still decide. Only its model check
   is skipped.
-- **Discuss** conversations still ask before every change (see
-  [below](#discuss-always-asks)).
+- **A conversation about a card** still asks before it changes Home Assistant (see
+  [below](#a-conversation-about-a-card)).
 - **Edits made with Claude's file tools** can still be undone with `brain undo`.
 
 ### What it does not cover
@@ -103,23 +121,27 @@ If a conversation is waiting on a card while you are looking at a different one,
 in the list says **Needs your OK**, and the chat you are in raises a toast with a button
 that takes you there. See [Chat & Terminal](/brain/terminal/#asking-before-acting).
 
-## Discuss always asks
+## A conversation about a card
 
-**Discuss** on a finding opens a new conversation about it. In that conversation Claude
-can read anything, but every service call, file edit or shell command shows a permission
-card first — **even with Let brAIn act without asking on**. That is a rule the conversation
-starts under, not a sentence in its prompt, and its cards offer neither *Always allow* nor
-*Stop asking…*, because a standing rule is the wrong answer inside a conversation whose
-whole contract is "ask before every change".
+**Ask** on a card opens a new conversation about it. In it Claude can read anything. With the
+switch off, every service call, file edit or shell command shows a permission card first. With
+the switch on, Claude runs whatever it needs to work the problem out (shell commands included)
+without asking, and only changing Home Assistant (a service call or a file edit) still shows a
+card.
 
-When you and Claude agree what to change, it can offer that change as a button. Pressing
-it does not make the change: brAIn plans exactly that change, read-only, and puts the plan
-on the card for you to [Apply](#fix-it-shows-the-change-first). See
-[Findings](/brain/findings/).
+When you and Claude agree what to change, it can offer that change as a button. Pressing it does
+not make the change: brAIn plans exactly that change, read-only, and puts the plan on the card for
+you to [Apply](#plan-shows-the-change-first). See [Needs you](/brain/needs-you/#talk-it-through).
+
+## A purchase is always asked
+
+BRUH Browser's `browser_purchase` is the one action that is asked about at every level short of
+*No limits*: in the chat and the terminal with the switch on or off, and refused where nobody can
+be asked. The items and total must be the cart as it stands. [brAIn and the BRUH apps →](/brain/apps/#bruh-browser)
 
 ## The action gate
 
-Before brAIn acts on your house from the chat, the terminal, an automation task or a fix,
+Before brAIn acts on your house from the chat, the terminal, an automation task or an Apply run,
 a gate checks the action against what you asked for. It looks at three things:
 
 - **your own words** in the conversation;
@@ -137,7 +159,7 @@ It decides in this order, and each step can only make it stricter:
    [protected entities](#protected-entities), and a voice agent's exposure limits. These
    refuse outright, in code.
 2. **Your [house rules](#house-rules)** — only ever tighter.
-3. **A fix's contract** — during a Fix it run, only the service calls and files the plan
+3. **A fix's contract** — during an Apply run, only the service calls and files the plan
    you approved are allowed (see [below](#fix-it-shows-the-change-first)).
 4. **The obvious case** — one light, fan, blind or thermostat in the room you named goes
    straight through, with no model.
@@ -146,6 +168,8 @@ It decides in this order, and each step can only make it stricter:
 6. **A cheap judgement** — anything else is asked of a small, fast model: does this match
    what the person actually said? Its answer is allow, ask or deny, and anything else is
    "ask".
+
+Under *No limits* the gate allows before the floors, with no model.
 
 **Unreachable never means allow.** If the gate cannot be reached, or cannot make up its
 mind, you are asked in the chat or the terminal — and anywhere nobody is watching (an
@@ -160,7 +184,7 @@ model. That also means house rules do not reach those agents.
 `protected_entities` is the line brAIn may not cross. Put the front door lock, the alarm
 and the garage door on it — one entity id per line, or a whole domain like
 `alarm_control_panel.*` — and they can still be **looked at**, but never **acted on**, from
-any face: the terminal, the chat, Fix it, voice, automation tasks, overnight self-healing,
+any face: the terminal, the chat, Apply, voice, automation tasks, overnight self-healing,
 and anything brAIn writes into `automations.yaml` or `scenes.yaml`.
 
 It is enforced where every Home Assistant call brAIn makes passes through, not in a
@@ -188,8 +212,7 @@ the [switch](#let-brain-act-without-asking) is off by default.
 
 ## The tripwire
 
-**⚙ → Advanced → Diagnostics → Changes and the action gate → Make a tripwire entity**
-creates `input_boolean.brain_honeytoken` — a switch you never ask brAIn to touch. Nothing in
+**Run** beside **Make a tripwire entity** in **⚙ → Diagnostics** creates `input_boolean.brain_honeytoken` — a switch you never ask brAIn to touch. Nothing in
 the house uses it, and brAIn is never told about it.
 
 If anything ever tries to act on it, the action is refused before it reaches Home
@@ -199,7 +222,7 @@ is exactly what you want to hear about.
 
 ## House rules
 
-In the same place, **Write house rules** takes up to ten rules in your own words:
+**⚙ → Permissions → House rules** takes up to ten rules in your own words, one per line:
 
 > *Never turn the heating above 23.*
 >
@@ -236,9 +259,12 @@ cover call. See [Voice](/brain/voice/).
 ## Cameras
 
 A camera frame is the most private thing your house holds, so brAIn looks through one on
-its own only through the cameras you tick under **⚙ → Generation defaults → Cameras**. None
-are ticked to begin with.
+its own only through the cameras you tick under **⚙ → Cameras & calendars**. None are ticked
+to begin with. A robot vacuum's floor map is published as a camera too; those are left out unless
+one is already ticked. The same section chooses which calendars brAIn may read.
 
+- **The house, not the people.** Every prompt that may see a frame is told to describe what it
+  shows about the house and never to describe a person.
 - At most **a dozen looks a day** across the house, counted on disk; the list shows how many
   have been used. If brAIn cannot count, it does not look.
 - The Resident looks only to **confirm** a tripped leak, smoke, CO or gas sensor, or a door,
@@ -251,7 +277,7 @@ are ticked to begin with.
 Claude Code runs as its own non-root user, and Home Assistant saves `automations.yaml`,
 `scripts.yaml` and `scenes.yaml` as root, which used to leave them read-only for Claude.
 Other add-ons do the same with their own config. brAIn now hands those files back by
-itself, and Claude is told — in the chat, the terminal and a Fix it run — never to ask you
+itself, and Claude is told — in the chat, the terminal and an Apply run — never to ask you
 for `sudo` or `chown`.
 
 **When it hands files over:**
@@ -286,9 +312,9 @@ brain own -r /config/packages      # a whole folder
 It raises no approval card and needs no `sudo`. If it says the panel is not answering, the
 add-on is not running; `brain doctor` checks that. See [the CLI](/brain/cli/).
 
-## Fix it shows the change first
+## Plan shows the change first
 
-**Fix it** on a finding never changes anything straight away. It buys a **plan**: a
+**Plan** on a card never changes anything. It buys a **plan**: a
 read-only look at the entity, its history and the automation involved, which comes back as
 a list of exact steps. The steps are written out by the code that will carry them out, not
 by Claude, so what you approve is what runs. A change to an automation shows the exact
@@ -303,24 +329,34 @@ run over the last week.
   listed, and nothing else. Any other call is refused during that run, any shell command
   that does more than read is refused, and the one exception is `brain own` on the files
   the plan edits. A step that cannot say what it will touch is not offered at all.
-- **Cancel** leaves the finding as it was and keeps the plan on the card.
+- **Snooze** or **Ignore** leave the plan on the card; reading it again later costs nothing.
 
 After a fix, brAIn looks again after a day, a week and a month. A problem that comes back
 reopens its card; "could not check" is shown as exactly that, never as success.
+
+## What brAIn changes about itself without asking
+
+A few surfaces are brAIn's own, and it changes them without waiting for a press at any level:
+its own page's house layer (`/config/.brain/ui/house.css` and `house.js`), its copy of Morph's
+code, what Morph has learned, its memory and its personality notes. Every such change can be
+undone, and a change to its own page that breaks it is put back by itself the next time the page
+loads. Open brAIn with `?nohouse=1` on the address to skip the house layer for one visit. Your
+house itself still needs whatever your permission level asks for.
 
 ## Putting things back
 
 | What changed | How to put it back |
 | --- | --- |
 | A file Claude edited under `/config` | `brain undo` in the terminal — one edit, or everything from today. `secrets.yaml` is never snapshotted. |
-| A fix's file changes | **Undo the fix** on its card — puts back every file and reloads Home Assistant. |
-| A fix's service calls | **Put them back** on its card — sets each device back to how brAIn recorded it just before the fix, reads it again, and says per device whether it is back. |
-| A finding you ended by mistake | **Undo** in the toast, for a few minutes. |
-| An accepted proposal | **Undo** in the toast, or `brain undo`. |
+| A fix's file changes | **Undo** on its card — puts back every file and reloads Home Assistant. |
+| A fix's service calls | **Restore** under the card's **⋯** — sets each device back to how brAIn recorded it just before the fix, reads it again, and says per device whether it is back. |
+| A card you answered by mistake | **Undo** in the toast, for a few minutes, or **Restore** in Insights → History. |
+| An accepted suggestion | **Undo** in the toast, or `brain undo`. |
+| A name or room tidy | **Undo** on its row in History, for 30 days. |
 
-**Put them back** is a press, never something brAIn does by itself, and it never unlocks a
+**Restore** is a press, never something brAIn does by itself, and it never unlocks a
 lock, disarms an alarm, opens a garage, door or gate, or touches a protected entity — it
-says so for each one it skips. **Undo the fix** lists the service calls rather than
+says so for each one it skips. **Undo** lists the service calls rather than
 reversing them, because undoing a call is acting on your house a second time.
 
 For the house as a whole, use Home Assistant's own backups. brAIn deliberately does not

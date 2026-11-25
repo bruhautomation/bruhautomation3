@@ -1,0 +1,73 @@
+---
+title: Voice & brAIn
+description: How brAIn drives your Bambu Lab printers from its chat, its terminal and voice — the bambu_status, bambu_print, bambu_control, bambu_slice and bambu_design tools — and exactly what a voice assistant may and may not do.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+With [brAIn](/brain/) installed, your printers are something you can just ask about. brAIn
+does not talk to the printers itself: every one of its tools is a call to a `bruh_bambu`
+service, so the add-on holds the one implementation of every action, and an agent's blocked
+services, brAIn's action gate and its protected-entity rules apply exactly as they do to
+anything else in the house. The tools are only offered where the `bruh_bambu` integration is
+set up — a house without BRUH Bambu Studio is offered no 3D printer.
+
+## What to ask
+
+| You say | What brAIn does |
+|---|---|
+| *How long is left on the print?* | Reads the printer's state, progress, time left and layer |
+| *What's loaded in the AMS?* | Reads every tray's colour, material and how much is left |
+| *Pause the printer.* / *Resume it.* | Pauses or resumes the current print |
+| *Turn the printer light on.* / *Print in silent mode.* | Chamber light, speed |
+| *Print the benchy on the X1C.* | Finds the file in `/share/bambu` and prints it — slicing first if it is not sliced |
+| *Print this Printables model* (a link, typed in the chat) | Imports the model and prints it, or lists the files when the page has several |
+| *Design a 4 cm wall hook with two screw holes and print it.* | Starts a part on the Design tab; the conversation prints it once it has built |
+| *Make the coat hook 6 cm long.* | Sends the change to that part's design conversation |
+| *Is the coat hook done?* | Reports whether it has built, its size, brAIn's reply and any print |
+
+A designed part made from the chat or by voice is the same part, with the same versions and
+print, on the [Design tab](/bruh-bambu-studio/design/) afterwards.
+
+## The tools
+
+| Tool | What it covers |
+|---|---|
+| `bambu_status` | Every printer's state (idle, prepare, running, pause, finish, failed, offline), progress, minutes left, layer, temperatures and targets, speed, light and AMS trays, whether Bambu Studio is running and the latest jobs; optionally the files in `/share/bambu`. Read-only |
+| `bambu_print` | `start` a file (or a Printables / `.stl` / `.3mf` link), with `slot`, `material`, `plate`, `use_ams`, `timelapse`; `pause`, `resume`, `stop` the current print |
+| `bambu_control` | `speed`, `light`, `temperature` (nozzle 0–300 °C, bed 0–120 °C; refused while printing), `home`, `gcode` (up to 32 lines; refused while printing) |
+| `bambu_slice` | Slice a file with Bambu Studio's command line into `/share/bambu/sliced` |
+| `bambu_design` | `create` a part, `message` a change, `status` of one part or all, `print` a built part with printer, version, copies, tray and settings |
+
+A printer that is not printing or paused is ready, so brAIn starts a print straight away and
+never asks whether the plate is clear; a busy printer is refused with the reason. Stopping a
+print cannot be undone, so brAIn confirms with you first in the chat.
+
+## What voice may and may not do
+
+A voice assistant gets a narrower set than the chat, because a misheard sentence at a printer
+is filament and hours.
+
+| By voice | |
+|---|---|
+| Check on a print, the AMS, the files | **Yes** |
+| Pause and resume | **Yes** |
+| Change the speed and the chamber light | **Yes** |
+| Set a nozzle or bed temperature | **Yes** (refused while printing, as everywhere) |
+| Start a print **of a file** in `/share/bambu` | **Yes** |
+| Design a part, change it, ask how it is doing, and print it | **Yes**, up to **4 copies**; it never waits on a build — it says the part is being made |
+| **Stop** a print | **No** — it cannot be undone |
+| Send **G-code** or **home** the axes | **No** — G-code is anything at all |
+| **Slice** a file | **No** |
+| **Import a link** (start a print from a URL) | **No** |
+| **Open** a file in Bambu Studio | **No** |
+
+Refused requests are refused with a sentence saying so, and the voice assistant does not look
+for another route. Everything refused by voice still works from brAIn's chat, its terminal, the
+panel and automations. See brAIn's [Voice](/brain/voice/) page for the voice levels themselves.
+
+<Aside type="note" title="The action gate">
+Like every brAIn tool that changes something, `bambu_print`, `bambu_control`, `bambu_slice`
+and `bambu_design` go through brAIn's [action gate](/brain/safety/); asking how a designed part
+is doing (`bambu_design status`) only reads, and is not gated.
+</Aside>

@@ -10,7 +10,169 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="1.15.3" date="August 3, 2026" latest>
+<Release version="1.20.3" date="November 24, 2026" latest>
+<Changes type="changed">
+
+- **Players**: names on the left, each row says Online or Offline, a player on no list is tagged *Player* or *Not whitelisted*, and a line explains that a name starting with `.` is a Bedrock player.
+- **Backups**: every snapshot row has one layout, and a folded run has **Show N** listing each snapshot with its own Restore.
+- **Worlds**: the line under each world names its values (*Survival · Normal difficulty · Normal world*), and Delete is set apart.
+- **Add-ons**: each one says *Up to date* or *Update to X available*, with **Update** only when there is one.
+
+</Changes>
+</Release>
+
+<Release version="1.20.2" date="November 23, 2026">
+<Changes type="fixed">
+
+- WorldEdit and FastAsyncWorldEdit installed together are both marked, with which one to remove. Nothing is removed for you.
+- Backups are grouped by day with older days folded, and runs of identical snapshots fold into one line. Restore asks first, naming the snapshot's time.
+- The tab bar wraps on a phone, and the header's Update says what it updates (*Update Paper*).
+
+</Changes>
+</Release>
+
+<Release version="1.20.1" date="November 18, 2026">
+<Changes type="fixed">
+
+- A plugin, data pack or resource pack put on the server by hand can be removed from the panel and by brAIn.
+
+</Changes>
+</Release>
+
+<Release version="1.20.0" date="November 17, 2026">
+<Changes type="changed">
+
+- **The shared BRUH panel look**: one centred column, every section a heading with its content in a card, one control height and four text sizes.
+
+</Changes>
+</Release>
+
+<Release version="1.19.x">
+
+**BRUH Sight, the companion's thoughts, and maps of your builds.**
+
+<Changes type="added">
+
+- **BRUH Sight** — the add-on builds and installs its own plugin on Paper and Purpur. Where everybody is updates every second; each player comes with what is under their crosshair, what they hold and what they just built; looks, undo snapshots and the spyglass read the live world, unsaved builds included.
+- **The thought bubble** (`companion_thought`) over the companion's allay, which hovers by what it is building; the **journal** book (`give_journal`); and a **boss bar** for long jobs (`companion_bar`) that Bedrock players see too.
+- **`render_maps`** draws finished maps of your builds or an area from the saved world and puts them in a player's inventory, named to hang edge to edge in item frames.
+- **Command blocks drive the house**: `say bruh:signal <name> [data]` fires `bruh_minecraft_signal`. Only an unrenamed command block can fire it.
+- **`set_skin`** through SkinsRestorer, confirmed; **`write_script`**, **`list_scripts`** and **`remove_script`** load Skript scripts and data-pack functions into the running world without a restart.
+- **Long messages in parts**: `1 …`, `2 …`, then `end` sends them to the companion as one request.
+
+</Changes>
+<Changes type="changed">
+
+- Players lists everyone who has joined, is whitelisted, is an operator or is banned, with a menu of the changes that fit; op, ban and kick ask first.
+- Backups say what each snapshot is (scheduled, manual, or before a world change), whether the world changed and how many were on.
+- The header shows Update only when a newer server build is waiting. *Server Properties* is now **Properties**.
+
+</Changes>
+<Changes type="fixed">
+
+- Looking and editing work in the Nether and the End, far from any player, and on Minecraft 26.1's new map layout; an edit that flips a lever updates its redstone.
+- Block checks no longer put *"[Rcon] ok"* in every player's chat, and the add-on keeps one RCON connection instead of flooding the log.
+- A plugin command run from the console or `rcon_command` answers with what the plugin printed.
+- A companion job's progress bar never stays on screen after the job ends.
+
+</Changes>
+</Release>
+
+<Release version="1.18.x">
+<Changes type="added">
+
+- **The world atlas**: the add-on reads the saved world in the background and knows its buildings, the rooms inside them, the roads between them and names from signs. New services `atlas`, `room` and `label_place`.
+- **Shapes for building** in `companion_edit` — tapering lines, ellipsoids, seeded blobs, cylinders and boxes, up to 131,072 blocks an edit, all undoable — and **jobs** that `undo_action` can take back whole.
+- **The spyglass**: a small data pack; looking through any spyglass fires `bruh_minecraft_point` with the block, building and room. Works for Bedrock players.
+- Three-way choice pads with item pictures, a progress line above the hotbar, and which way players face.
+
+</Changes>
+<Changes type="fixed">
+
+- Looking at blocks and undoable edits work on Minecraft 26.1 and later, including LZ4-compressed chunks.
+
+</Changes>
+</Release>
+
+<Release version="1.17.8 – 1.17.9">
+
+**The companion belongs to brAIn.** BRUH Minecraft becomes a set of game events and actions that brAIn — or your own automations — drives. Without brAIn it is simply a server again.
+
+<Changes type="added">
+
+- **Game events**: `bruh_minecraft_chat`, `_join`, `_leave`, `_death`, `_advancement`, `_place` and `_answer`, each saying whether the server checks the account behind the name.
+- **Companion actions anyone can call**: `companion_say`, `companion_appear`, `ask_choice`, `companion_build`, `undo_action`, `set_zone`, `set_companion`, `get_companion` — plus the **trusted edit** (`companion_edit`) and **`look_blocks`** for a grown-up brAIn trusts.
+- The version and a changelog link in the panel's header, and a warning when the server log goes deaf.
+
+</Changes>
+<Changes type="changed">
+
+- Chat with nicknames and ranks is read and matched back to the player. Geyser's settings go into Geyser's own config file, so the sign-in mode and MTU you chose take effect.
+- The companion sensors are named **Companion** and **Building**.
+
+</Changes>
+<Changes type="removed">
+
+- **Breaking:** the add-on's own companion services and the `bruh_minecraft_moment` event, replaced by the services and events above. brAIn takes over the family list and memory once.
+
+</Changes>
+<Changes type="security">
+
+- The add-on still holds the world-side limits in code, whoever asks: only its own allay, quiet chimes to one player, its own builds only into empty space and never in a protected place, a backup before anything large, and Undo for every action.
+
+</Changes>
+</Release>
+
+<Release version="1.17.4 – 1.17.7">
+<Changes type="added">
+
+- **What is going on in the world**: sensors for the world's time, day count and weather, a feed of joins, leaves, deaths, advancements and chat, the last save and backup, and per-player position, game mode and health.
+- **The build log**, with a top-down picture of every finished build, and a **Minecraft world card** for brAIn's Morph dashboard.
+- **Rename a world** — from the panel, a service, or by asking brAIn.
+- A warning when the server's memory would starve the host.
+
+</Changes>
+<Changes type="fixed">
+
+- **Backups contain the world again** — the copy tool was missing from the image, and a backup that cannot copy now says so.
+- A failed update check no longer stops the add-on, and a server killed from outside (usually out of memory) comes back.
+
+</Changes>
+</Release>
+
+<Release version="1.17.0 – 1.17.3">
+<Changes type="changed">
+
+- **One Add-ons tab for everything in the world**: the Plugins and Resource Packs tabs are gone. Every row says whether it is working or waiting on a restart, with a **Restart now** banner.
+- **Server software** on the same tab: the server and Geyser, Floodgate, ViaVersion and ViaBackwards with their versions, **Update everything now**, and **Upgrade this world** to a newer Minecraft (with a backup first).
+- Marked **experimental** in the add-on store; the add-on says when Home Assistant needs a restart, and only then.
+
+</Changes>
+<Changes type="fixed">
+
+- **`LATEST` was stuck on 1.21.11**: year-numbered releases (26.x) count now. An existing world is never moved to a new version on its own.
+- A command the server refuses is an error carrying the server's own sentence, and restarting and stopping from brAIn work.
+- Applying a resource pack uses the server's LAN address, which players' games can reach.
+
+</Changes>
+</Release>
+
+<Release version="1.16.0 – 1.16.1">
+<Changes type="added">
+
+- **The add-on browser.** Search Modrinth for plugins, data packs, server-side mods and resource packs this server can run, and add one in one press — every player gets it, iPads included. Dependencies come along; downloads must come from Modrinth's CDN and match its SHA-512. **Select** several and add them all at once.
+- **Services that say what happened**: every service returns the server's reply, and a refusal is an error. New: `teleport`, `set_gamemode`, `pardon_player`, `get_status` and the add-on browser services. brAIn uses all of them.
+
+</Changes>
+<Changes type="fixed">
+
+- Plugins and multi-type projects such as VeinMiner install as what they are published for.
+- A player name with a newline can no longer reach the console as a second command.
+
+</Changes>
+</Release>
+
+<Release version="1.15.3" date="August 3, 2026">
 <Changes type="changed">
 
 - **The add-on installs from a prebuilt image instead of building on your machine.** `config.yaml` now carries an `image:` key pointing at `ghcr.io/bruhautomation/{arch}-bruh-minecraft-server`, published for both architectures by CI. Installs and updates become a download rather than a container build — on a Raspberry Pi, the difference between minutes of SD-card writes and a pull. No action needed.

@@ -115,6 +115,12 @@ const retiredAppUrls = {
 	'/bruh-insights/how-it-works/': '/brain/insights/',
 	'/bruh-insights/reference/': '/brain/reference/',
 	'/bruh-insights/changelog/': '/brain/archive/bruh-insights-changelog/',
+	// Pages folded into others when the app docs were rebuilt (November 2026).
+	'/bruh-print/labels/': '/bruh-print/designer/',
+	'/brain/findings/': '/brain/needs-you/',
+	'/brain/ideas/': '/brain/insights/',
+	// The add-on's PLUGINS.md links here.
+	'/bruh-minecraft/commands/': '/bruh-minecraft/command-generator/',
 };
 
 const powerToolsPages = [
@@ -371,42 +377,56 @@ export default defineConfig({
 					label: 'Apps',
 					collapsed: true,
 					items: [
+						{ label: 'All Apps', slug: 'apps' },
 						{
 							label: 'brAIn',
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
+								{ label: 'The Four Switches', slug: 'brain/features' },
 								{ label: 'Permissions & Safety', slug: 'brain/safety' },
-								// The panel's own panes, grouped the way the panel's
-								// four tabs group them (Home, Ask, House), in the
-								// order they sit there.
 								{
-									label: 'The Panel',
+									label: 'Morph Dashboard',
 									items: [
-										{ label: 'Findings & To-do', slug: 'brain/findings' },
-										{ label: 'Insights', slug: 'brain/insights' },
-										{ label: 'Ideas', slug: 'brain/ideas' },
-										{ label: 'Proposals', slug: 'brain/proposals' },
-										{ label: 'Chat & Terminal', slug: 'brain/terminal' },
-										{ label: 'Memory & Learning', slug: 'brain/memory' },
-										{ label: 'Activity', slug: 'brain/activity' },
-										{ label: 'Upkeep', slug: 'brain/upkeep' },
+										{ label: 'Overview', slug: 'brain/morph' },
+										{ label: 'Quick Start', slug: 'brain/morph/quickstart' },
+										{ label: 'Using Morph', slug: 'brain/morph/using' },
+										{ label: 'Tell brAIn & Edit', slug: 'brain/morph/tell-brain' },
+										{ label: 'Morph on HA Dashboards', slug: 'brain/morph/home-assistant-dashboards' },
+										{ label: 'How It Learns', slug: 'brain/morph/learning' },
+										{ label: 'Settings & Files', slug: 'brain/morph/settings' },
 									],
 								},
-								// What brAIn works out about this particular house, and
-								// the rules that read it. Deliberately its own group:
-								// these are not panel tabs, they are the measurements
-								// every tab above is expressed against.
 								{
-									label: 'What It Measures',
+									label: 'Using brAIn',
 									items: [
+										{ label: 'Needs You & To Do', slug: 'brain/needs-you' },
+										{ label: 'Insights', slug: 'brain/insights' },
+										{ label: 'Ask (Chat & Terminal)', slug: 'brain/terminal' },
+										{ label: 'Memory & Knowledge', slug: 'brain/memory' },
+										{ label: 'Timeline', slug: 'brain/activity' },
+										{ label: 'Upkeep & the House Book', slug: 'brain/upkeep' },
+										{ label: 'Notifications & Repairs', slug: 'brain/notifications' },
+									],
+								},
+								{
+									label: 'How It Thinks',
+									items: [
+										{ label: 'The Resident', slug: 'brain/resident' },
 										{ label: 'What brAIn Measures', slug: 'brain/measurements' },
 										{ label: 'House Checks', slug: 'brain/checks' },
 										{ label: 'Heating & Climate', slug: 'brain/climate' },
+										{ label: 'Learning', slug: 'brain/learning' },
 										{ label: 'Shadow Runner & Replay', slug: 'brain/replay' },
-										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
+									],
+								},
+								{
+									label: 'Changing the House',
+									items: [
+										{ label: 'Suggestions', slug: 'brain/proposals' },
 										{ label: 'Rules & One-Offs', slug: 'brain/intents' },
 										{ label: 'Scene Designer', slug: 'brain/scenes' },
+										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
 										{ label: 'Overnight Self-Healing', slug: 'brain/self-healing' },
 									],
 								},
@@ -415,8 +435,7 @@ export default defineConfig({
 									items: [
 										{ label: 'Voice Assistant', slug: 'brain/voice' },
 										{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
-										// No panel tab of their own since 2.10: both are
-										// reached by asking, through the same tools.
+										{ label: 'brAIn and the BRUH Apps', slug: 'brain/apps' },
 										{ label: 'ESPHome', slug: 'brain/esphome' },
 										{ label: 'Music Assistant', slug: 'brain/music-assistant' },
 									],
@@ -436,6 +455,7 @@ export default defineConfig({
 										{ label: 'Dashboards', slug: 'brain/power-tools/dashboards' },
 										{ label: 'Users', slug: 'brain/power-tools/users' },
 										{ label: 'Diagnostics & Repairs', slug: 'brain/power-tools/diagnostics-and-repairs' },
+										{ label: 'Backups, Energy, Networks & More', slug: 'brain/power-tools/system' },
 									],
 								},
 								{
@@ -445,12 +465,9 @@ export default defineConfig({
 										{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
 										{ label: 'MCP Tools', slug: 'brain/mcp' },
 										{ label: 'The CLI', slug: 'brain/cli' },
-										// Checking brAIn itself, and the loop that says
-										// whether its prompts are any good. Under the Hood
-										// rather than What It Measures: neither of these
-										// measures the house, they measure the add-on.
 										{ label: 'Deep Check & Rehearsal', slug: 'brain/doctor' },
 										{ label: 'Capture & the Corpus', slug: 'brain/corpus' },
+										{ label: 'Development Loop', slug: 'brain/development-loop' },
 									],
 								},
 								{ label: 'Reference', slug: 'brain/reference' },
@@ -467,29 +484,106 @@ export default defineConfig({
 						},
 						{
 							label: 'BRight',
+							collapsed: true,
 							items: [
 								{ label: 'Overview', slug: 'bright' },
 								{ label: 'Quick Start', slug: 'bright/quickstart' },
+								{ label: 'Light Map, Lab & Calibration', slug: 'bright/light-map' },
+								{ label: 'Effects', slug: 'bright/effects' },
 								{ label: 'How a Show Is Built', slug: 'bright/shows' },
+								{ label: 'Manual Mode', slug: 'bright/manual' },
+								{ label: 'Parties', slug: 'bright/parties' },
+								{ label: 'Reference', slug: 'bright/reference' },
+								{ label: 'Changelog', slug: 'bright/changelog' },
 							],
 						},
 						{
 							label: 'BRUH Print',
+							collapsed: true,
 							items: [
 								{ label: 'Overview', slug: 'bruh-print' },
 								{ label: 'Quick Start', slug: 'bruh-print/quickstart' },
-								{ label: 'Labels, Stock & the Designer', slug: 'bruh-print/labels' },
+								{ label: 'Quick & the Designer', slug: 'bruh-print/designer' },
+								{ label: 'Templates', slug: 'bruh-print/templates' },
+								{ label: 'Rolls, Stock & Twin Turbo', slug: 'bruh-print/rolls' },
+								{ label: 'Dashboard Card', slug: 'bruh-print/card' },
+								{ label: 'Reference', slug: 'bruh-print/reference' },
+								{ label: 'Changelog', slug: 'bruh-print/changelog' },
 							],
 						},
 						{
 							label: 'BRUH Minecraft',
+							collapsed: true,
 							items: [
 								{ label: 'Overview', slug: 'bruh-minecraft' },
 								{ label: 'Quick Start', slug: 'bruh-minecraft/quickstart' },
+								{ label: 'Add-on Browser', slug: 'bruh-minecraft/addons' },
+								{ label: 'Bedrock Players', slug: 'bruh-minecraft/bedrock' },
+								{ label: 'The Companion & BRUH Sight', slug: 'bruh-minecraft/companion' },
+								{ label: 'Worlds & Backups', slug: 'bruh-minecraft/worlds' },
 								{ label: 'Home Assistant Integration', slug: 'bruh-minecraft/home-assistant' },
 								{ label: 'Command Generator', link: '/bruh-minecraft/command-generator/' },
 								{ label: 'Reference', slug: 'bruh-minecraft/reference' },
 								{ label: 'Changelog', slug: 'bruh-minecraft/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Bambu Studio',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-bambu-studio' },
+								{ label: 'Quick Start', slug: 'bruh-bambu-studio/quickstart' },
+								{ label: 'Printing & Jobs', slug: 'bruh-bambu-studio/printing' },
+								{ label: 'Designing Parts with brAIn', slug: 'bruh-bambu-studio/design' },
+								{ label: 'Print Failure Detection', slug: 'bruh-bambu-studio/failure-detection' },
+								{ label: 'The Studio', slug: 'bruh-bambu-studio/studio' },
+								{ label: 'Home Assistant Integration', slug: 'bruh-bambu-studio/home-assistant' },
+								{ label: 'Voice & brAIn', slug: 'bruh-bambu-studio/voice' },
+								{ label: 'Reference', slug: 'bruh-bambu-studio/reference' },
+								{ label: 'Troubleshooting', slug: 'bruh-bambu-studio/troubleshooting' },
+								{ label: 'Changelog', slug: 'bruh-bambu-studio/changelog' },
+							],
+						},
+						{
+							label: 'GardenRX',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'gardenrx' },
+								{ label: 'Quick Start', slug: 'gardenrx/quickstart' },
+								{ label: 'Using GardenRX', slug: 'gardenrx/guide' },
+								{ label: 'Cards, Sensors & Services', slug: 'gardenrx/home-assistant' },
+								{ label: 'Changelog', slug: 'gardenrx/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Task Manager',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-task-manager' },
+								{ label: 'Quick Start', slug: 'bruh-task-manager/quickstart' },
+								{ label: 'Guide & Reference', slug: 'bruh-task-manager/guide' },
+								{ label: 'Changelog', slug: 'bruh-task-manager/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Cooking',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-cooking' },
+								{ label: 'Quick Start', slug: 'bruh-cooking/quickstart' },
+								{ label: 'Cooking with It', slug: 'bruh-cooking/guide' },
+								{ label: 'Entities, Services & Options', slug: 'bruh-cooking/reference' },
+								{ label: 'Changelog', slug: 'bruh-cooking/changelog' },
+							],
+						},
+						{
+							label: 'BRUH Browser',
+							collapsed: true,
+							items: [
+								{ label: 'Overview', slug: 'bruh-browser' },
+								{ label: 'Quick Start', slug: 'bruh-browser/quickstart' },
+								{ label: 'Errands & Purchases', slug: 'bruh-browser/guide' },
+								{ label: 'Changelog', slug: 'bruh-browser/changelog' },
 							],
 						},
 					],

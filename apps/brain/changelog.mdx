@@ -10,7 +10,975 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changelog>
 
-<Release version="2.11.0" date="October 4, 2026" latest>
+<Release version="5.5.1 – 5.5.23" date="November 18 – 24, 2026" latest>
+
+**Findings that ask you to look at something now say Done instead of Yes and No, brAIn stops repeating what you have already told it, and every card speaks in household words.** These patch releases are almost all about the quality of what brAIn tells you: fewer repeats, steps that fit the actual device, and nothing technical left in the sentence.
+
+<Changes type="changed">
+
+- **Done for a check you make yourself.** A finding that asks you to go and look at something offers **Done**, with an optional note of what you found, instead of Yes and No — on Needs you, Insights, Home Assistant's Repairs, phone notifications and Morph's cases. A real yes-or-no question still asks Yes or No (5.5.21, remade in 5.5.23).
+- **Steps that fit the device.** Before saying how to fix something, brAIn looks at the device the reading comes from, what else is on it and its battery, so a door reading that comes from a smart lock's own door sensor gets "recalibrate the lock's door sensor", not a battery swap in a sensor that is not there.
+- **Readings judged against their own normal.** A freezer probe at its usual temperature is no longer reported for being warmer than a generic target; a real rise says how far it is from usual.
+- **"You keep undoing…" names the cause and a fix**: which trigger started the runs you undid ("a double press on the porch switch started 3 of the 4"), and the one condition brAIn put on the [Proposals](/brain/proposals/) tab for you to approve.
+- **An automation triggered by a device you no longer use** is offered a clean-up (take that trigger out, or turn the automation off) instead of being reported as broken. Nothing changes until you apply it.
+- **Stop watching holds across every check**, and Watch again undoes it.
+- **Every finding says how soon it needs you** — Act today, Soon or When convenient — set by what is at stake (food, water, heat and security first), and the list is ordered by it (5.5.9).
+- **The weekly report names the room where most of the measured energy went**, keeping unheated spaces and equipment enclosures apart.
+- **Insight cards are calmer.** An "All fine" card is a headline and one sentence with its figures behind Details; the "A problem needs you" banner only shows while something is urgent; the "All quiet" list names each card by its title.
+- **Timeline and Settings in plain words**: "the dryer is running" rather than a sensor name and raw state, and the Developer section without jargon.
+- **Morph** says past times one way ("yesterday", then "Nov 18, 8:12 PM"), and the rules brAIn builds your own dashboard cards by are stricter (empty tiles hidden, 40-pixel targets, readable labels, every camera named). Morph asks once whether to recheck your cards against new rules.
+
+</Changes>
+<Changes type="fixed">
+
+- **Findings no longer argue with themselves.** brAIn's own reasoning ("this can wait", "you marked the last reports wrong, so…") stays on the decision trail and out of the card; a finding brAIn's first look says needs nothing is set aside in History › Set aside by brAIn, where Restore brings it back. Locks, alarms, leak and smoke sensors, and anything a person has answered, are always shown.
+- **"Not in use" reaches every check.** Saying a device is not in use stands down its Zigbee, health, offline and Z-Wave findings, and "take it out of the automations" lists the automations that mention it and files a plan you Apply. Safety devices are never set aside this way.
+- **Marking brAIn's own reports wrong sets aside only later reports about the same thing**, never every report, and never one about food, water, heat, a door or a lock.
+- **Unheated spaces.** An attic or crawlspace you said nothing heats is not judged as a heated room, its dehumidifier is not reported as stopped, and a heated room you called "uninsulated" keeps its freeze checks. A frost warning ends on its own after the cold night and says how far the low is from freezing.
+- **A broken thermometer you told brAIn about** no longer drives freeze warnings or the heat model; a room only it covered reads as not measured, never as fine.
+- **Impossible service reminders** ("overdue by 12,000 miles") are asked about as the reminder's setting, and one Wrong holds.
+- **A Home Assistant restart is one report**, "Home Assistant did not answer", instead of one per failed read.
+- **While Claude's usage limit has paused brAIn, nothing brAIn starts on its own runs** until the pause ends; your own chats and presses can still try.
+- **Words and lists**: temperatures in the house's own unit, dates in one short style, device lists grouped ("Porch light 1, 2 and 3") and given whole, headlines that say what was measured ("offline on the Zigbee network for two weeks" rather than "struggling"), and brAIn called by the one name you gave it everywhere, including Repairs and To-do.
+- **The house book** reads Home Assistant first (rooms, automations, scripts) and stops asking what it can now answer, while still asking what only you know (which breaker, which key).
+- **Ask's chat list** marks only chats that are answering or waiting on you; History › Ignored says when and why; Knowledge opens on facts about the house.
+- **Phone fixes**: Settings' More and Details, Morph's room chips, chart zoom reset and All lights slider are full-size tap targets.
+- **BRUH Browser**: its status sensor says what the last errand was in a short, safe sentence.
+
+</Changes>
+<Changes type="removed">
+
+- **5.5.22** reverted 5.5.21 while the way it was verified was reviewed; 5.5.23 is that release made again, with three small corrections.
+
+</Changes>
+
+</Release>
+
+<Release version="5.5.0" date="November 17, 2026">
+
+**Morph's page lines up with brAIn's own tabs, so switching tabs no longer moves the page.**
+
+<Changes type="changed">
+
+- **One edge**: 24 pixels (16 on a phone), up to 1400 wide, the same as brAIn's tabs.
+- **One rhythm**: tiles keep a 12-pixel gap at every width, a room's name, tiles and floor heading share one inset, rooms are only as tall as their tiles, and no text is under 12 pixels.
+- **One control size**: buttons and chips are 32, 40 or (on a touch screen) 44 pixels tall; climate's mode and legend chips are one chip.
+- In Edit, the Add card tile matches its neighbours; Morph cards on Home Assistant dashboards fill their cell.
+
+</Changes>
+
+</Release>
+
+<Release version="5.4.0" date="November 17, 2026">
+
+**Every brAIn screen starts and ends on the same edges as the top bar, with one spacing scale and one control height.**
+
+<Changes type="changed">
+
+- **No more sideways jumps** between Cards, Needs you, History and the other tabs: the margin is 24 pixels (16 on a phone), lists and cards fill the page, and sentences are held to a readable length on wide monitors. Needs you shows cards two across on a wide screen.
+- **Even spacing** between cards, sections and inside every box; Needs you and To Do share one heading style.
+- **Text boxes, drop-downs and buttons are one height** (40 pixels, 44 on touch) with one corner radius.
+- The wide top bar begins at 900 pixels; between 640 and 900 it is the two-row bar.
+
+</Changes>
+
+</Release>
+
+<Release version="5.3.1 – 5.3.27" date="November 14 – 17, 2026">
+
+**Settings, Needs you and Ask were rewritten to open on one plain sentence, brAIn learned to rest politely at a usage limit, and Stop watching lets you take a device off its list for good.**
+
+<Changes type="added">
+
+- **Stop watching** a device, sensor or automation from a finding's Ignore: no check looks at it again. Memory › Knowledge › Not watched lists them, each with Watch again. Not offered for smoke, leak, gas, locks, alarms, security or protected devices (5.3.8).
+- **"Stop raising this about _name_"** — a one-press Ignore for a single thing on a single check (5.3.16).
+- **"_name_ doesn't measure the room's air"** when ignoring a temperature report, so a probe in a box or on equipment is left out of the heat model, climate, freeze and frost checks (5.3.17).
+- **A frost warning for outdoor water**: when the hourly forecast low comes within about 2 °C of freezing in the next day, one item names the irrigation, outdoor taps, pool and unheated spaces at risk, with the low and its time. A house whose weather gives only a daily forecast uses each day's low (5.3.12).
+- **Dehumidifiers in the weekly report**: how long each ran, and how long the room stayed damp while it was off.
+- **Lock door sensors**: when a lock's own door sensor and a separate contact on the same door disagree, one finding says so; with the lock locked and the contact closed, bedtime, the house summary and the morning brief treat the door as closed.
+- **BRUH Browser in Home Assistant**: a status sensor and a "waiting on you" binary sensor for automations (5.3.10).
+- **A restart notice for BRUH Cooking** in Repairs when Home Assistant still runs its older code.
+
+</Changes>
+<Changes type="changed">
+
+- **Resting, not broken.** When Claude's usage limit is reached, brAIn says "Resting until 11:20 PM: Claude's usage limit is reached" on the status line, the status sensor and Diagnostics, and picks up again by itself. A limit is no longer read as a sign-out (5.3.4).
+- **Settings opens on plain sentences.** Model & usage says whether brAIn is working or paused and when the session and week reset; Permissions is one scale — **Ask first, Act, No limits** — with nothing about what brAIn may do changed; Notifications opens on the rule in force ("Right now: urgent alerts only"); Diagnostics and Developer say when they last checked.
+- **Needs you uses one count everywhere** ("16 things need you: 7 problems, 2 questions…"), lists everything at risk on a card with Show all, and puts one primary action first, then Respond, Snooze, Ignore.
+- **Ask's chat list** gets short topic titles after the first reply and groups chats by Live, Today, Yesterday, This week and by month; filters sit behind one row on a phone.
+- **A question that is not about the house is answered in Ask** instead of becoming a card on Reports.
+- **Findings lead with one plain sentence**: the title matches the worst fact ("offline for 9 days"), durations read in hours or days, and you are "you", never "the household".
+- **Insight cards open with a verdict against what is normal here** ("Normal, because…" or "Worth a look, because…"), say when a reading was taken, and are not published from a run that read nothing about the house.
+- **Morph's card rules** (which brAIn follows when it builds a card for you) grew: settings read with their unit, empty parts left out, old readings marked old, buttons that carry a status say it whole. Morph asks once to recheck your cards when the rules change, and its tune-ups never suggest removing a card that holds a control.
+- **Timeline**: a Home Assistant restart is one line saying how many devices went unavailable and how many are still offline.
+
+</Changes>
+<Changes type="fixed">
+
+- **What you told brAIn about a device counts for every check**, not only the one you answered; a reason marked "for now", and anything about locks, alarms, smoke, leaks or gas, never quiets a check.
+- **Checks stand down on their own record**: after a run of Wrong answers with none agreed, the unusual-reading, impossible-reading, forecast, conflicting-automation and unavailable-device checks raise a sensor only with stronger evidence. Safety devices and locks are always raised.
+- **Device temperatures** (a printer's nozzle or bed, a computer's processor, a plug's internal sensor) are not judged against room limits, and heat-loss checks use only sensors that read room air.
+- **"Automations whose trigger is not reporting"** no longer raises an automation built to fire when its device goes unavailable.
+- **Morph on a phone**: light group tiles read "13 of 31 · 43%", lock states are never cut, a chart that never moved says "No movement in 24h", thermostat −/+ and mode pills, scene buttons and Coming up's controls are 40-pixel targets, and LEARNED.md lines are never shortened.
+- **The development loop** no longer re-files reports that were already fixed, and its reports alias every first name the house defines (including on people tiles and in the morning brief) before anything leaves the house (5.3.9).
+
+</Changes>
+<Changes type="removed">
+
+- **5.3.25** reverted 5.3.22 after the development loop's own review flagged a step in how it was made; **5.3.26** is the same release made again.
+
+</Changes>
+
+</Release>
+
+<Release version="5.3.0" date="November 14, 2026">
+
+**Morph is calmer and steadier: nothing on the dashboard reorders itself any more, rooms never fold, and the room rail, haptics and pull-to-refresh make it feel like an app.** If you relied on rooms rising to the top or folding, those behaviours are gone; your `dashboard.yaml` order is now the order. See [Morph](/brain/morph/).
+
+<Changes type="added">
+
+- **A room rail down the right edge**, in place of the scroll bar: swipe left to open it, then slide the same finger from room to room, with floors set apart. It also comes to Home Assistant dashboards with `morph: {rail: true}` or `custom:morph-view`.
+- **Haptics** in the Home Assistant app for every action, slide detent and rail notch; **pull to refresh**, with the Morph mark drawing itself in; numbers that roll when they change.
+- **One grid**: every tile and card sits on equal columns (at most 1480 pixels; two half-columns on a phone), a section with one card is just that card, and a room can carry its own faint `icon:`.
+- **Lights and covers**: one slim colour track (whites, then a rainbow dot for the full spectrum), and an **All** slider at the end of an opened light or blind group.
+- **Tap a number or name from a sensor** to open that sensor's own card, saying how recently it updated.
+- **Coming up**: tap an item to open it in place, tap a lane's name to hide it, drag the time axis to zoom; `coming_up_lanes:` gives machines lanes of their own. Charts with many lines get drag-to-zoom and a chip per line.
+- **`sleep_guard: true`** on a room holds what the page would do to it while its sleeper is asleep, and asks first.
+- **Climate cards** can carry `options.actions` buttons on their control row; a group can carry `when:` to show only at certain times.
+- **⚙ › Permissions › Talk it through in chat** (off by default): requests that would become a draft to approve go to the conversation instead.
+- **To Do in Needs you** with a tick box that ticks an item off at once; tap an item to open its whole story and tell brAIn what to do with it.
+
+</Changes>
+<Changes type="changed">
+
+- **Nothing reorders itself**: floors, rooms and cards keep `dashboard.yaml`'s order. **Rooms never fold.**
+- brAIn's cases and To Do live in brAIn's Needs you, no longer on the dashboard.
+- Edit is a quiet pencil under brAIn's header; locking a lock takes a second tap, like opening the garage; a running fan spins faster with its speed.
+- Insight cards draw in Morph's palette.
+
+</Changes>
+<Changes type="removed">
+
+- Morph's own Feed, Settings and Personality pages (they duplicated brAIn's tabs).
+- Habit predictions, "you usually do this now" lines, prediction dots, cards lifted by recent use, folding quiet rooms, the family tablet's still form, door and motion chips in room titles, and the `order` and `fold` view switches on Home Assistant dashboards.
+
+</Changes>
+
+</Release>
+
+<Release version="5.2.1 – 5.2.9" date="November 12 – 14, 2026">
+
+**brAIn can run errands on websites through the new BRUH Browser app, and To Do items read like errands.**
+
+<Changes type="added">
+
+- **BRUH Browser tools** (experimental, amd64): `browser_task` starts an errand in your words and builds the cart without buying, `browser_status` says how it went (every item, fee and the total), `browser_stop` stops one, and `browser_purchase` buys a cart you have heard and approved. Listed only when BRUH Browser is installed. By voice you can start a shopping errand and ask how it went.
+- When an errand stops to ask something (which oat milk, whether to take a substitute), brAIn reads you the question and passes your answer back; by voice it answers only choices that don't change what you spend. brAIn can read your shopping profile and asks what changes before a grocery errand.
+
+</Changes>
+<Changes type="security">
+
+- **A purchase always needs a person.** The action gate asks before every `browser_purchase`, even with *Let brAIn act without asking* or YOLO mode on, and refuses it in any run nobody is watching. The tool also refuses a call whose items or total differ from the cart as it stands.
+
+</Changes>
+<Changes type="changed">
+
+- **⚙ › Model & usage says where brAIn's own work went** in household words (Watching the house, Insight cards, Dashboard requests, Voice, Automations, Memory and learning, Fixes…), with each one's share.
+- **Weak-link findings need evidence**: a faint Bluetooth device must stay faint for two hours and drop out at least twice in two days; Done on a weak-link finding holds until the signal clearly gets worse.
+- **Morph's light group tiles** read one way ("6 of 8 on · avg 50%", "5 off · 1 unavailable"), and an unreachable switch or fan draws no toggle.
+
+</Changes>
+<Changes type="fixed">
+
+- **To Do items made from findings** read as one short headline naming the device and the job ("Replace the battery in the Back door sensor."), with one line under it; Home Assistant's To-do list shows the same.
+- **Chats brAIn opened for you** are titled by what you asked, never by the prompt behind them.
+- **iPhone**: the message box on Ask sits fully above the home indicator, with the app's full screen on or off.
+- With Personality on, message boxes say your assistant's name.
+- Development-loop reports no longer replace everyday words when a device happens to be named "Screen" or "Box".
+
+</Changes>
+
+</Release>
+
+<Release version="5.2.0" date="November 12, 2026">
+
+**brAIn's personality can really grow now: it keeps one paragraph about how it has learned to be in your house, asks you how it should be, and writes the brief, reports and non-urgent notifications in that voice.** See [Features](/brain/features/).
+
+<Changes type="added">
+
+- **"How brAIn is growing"** in ⚙ › Personality: one paragraph, revised overnight from how you talk with it in Ask and how you answer it, with Undo, Edit and Clear. Your own name and personality text are never rewritten.
+- **"Shape brAIn"**: it asks you how it should be, one question at a time, with answers to press or a box to say it your way. Under the question it shows things it really said lately with **More like this**, **Less like this** and **Say it differently**. **Talk it through** opens an interview in Ask; **Take this in now** applies your answers straight away. It never sends a notification about its questions.
+- **The morning brief, weekly report, reports and notifications that can wait** are written in your personality. Facts, numbers and steps are unchanged, and anything urgent stays plain.
+- **A new conversation in Ask knows the last few things brAIn told you**, so "what did you mean this morning?" works.
+- `brain tune "_asked_" "_answer_"` records how you want it to be from the terminal.
+- **Apps brAIn looks at** (⚙ › Developer): a switch and **Look now** for each BRUH app, used by the Walkthrough to try each app the way a person does. brAIn and Morph are on; the others are off until you switch them on.
+
+</Changes>
+<Changes type="changed">
+
+- The nightly reflection reads your recent Ask exchanges (not only titles) on a stronger model, and does not run with the Learning loop off. Ask and voice carry the whole learned paragraph.
+
+</Changes>
+<Changes type="fixed">
+
+- brAIn's personality could not really change before: its reflection saw only conversation titles and its notes barely reached any prompt.
+
+</Changes>
+
+</Release>
+
+<Release version="5.1.1 – 5.1.38" date="November 7 – 12, 2026">
+
+**A long run of fixes to how brAIn listens: a rule you keep marking wrong stands down, a device you said is broken or offline stops being raised, and findings lose their developer strings.** Morph's dashboard got a matching pass for phones and contrast.
+
+<Changes type="added">
+
+- **Quick reasons on Ignore** — "Already know", "Sensor is broken", "Not an issue here" — saved exactly as a typed reason, and read first on the next look at that device. Safety, leak, smoke, lock and security reports offer no shortcut (5.1.8).
+- **Camera pictures from automations**: brAIn's AI Task entity takes attachments, so `ai_task.generate_data` with a camera attachment returns structured data about the image. The camera list and daily count in ⚙ still apply (5.1.1).
+- **Minecraft**: `minecraft_world` takes a `dimension` (Overworld, Nether, End), and skins go through BRUH Minecraft's own service (5.1.16).
+- **Morph's Edit** can put a switch card into its section's title row, and take it out, without asking brAIn (5.1.36).
+
+</Changes>
+<Changes type="changed">
+
+- **brAIn listens when you keep saying it is wrong.** After three Wrong answers in a row on brAIn's own "watching the house" reports, it raises one only when it measured something to back it; a house check you keep marking wrong has its findings set aside in History, where one press brings them back. Safety reports (smoke, leaks, gas, security, locks, alarms) are raised exactly as before, and the hold lifts as soon as you agree with one (5.1.29, 5.1.30).
+- **A device you said was fine offline, or a sensor you said is broken**, is not raised again under any of its entities, not used as evidence, and not built on by the overnight check.
+- **Two automations are "fighting"** only when one undoes the other within seconds of the same trigger, or keeps doing so; "off at eleven" and "on with motion" on the same light are no longer reported.
+- **A low battery you said is known** stays quiet until it drops below 10% and below where you answered; findings say how fast a battery usually drains and roughly when it will run out.
+- A device's low battery is shown on the same card as its weak or dropping connection.
+
+</Changes>
+<Changes type="fixed">
+
+- **Findings and cards in plain words**: no code names, file paths, line numbers, signal strengths in dBm or bare build strings; a long text is cut at the last whole sentence; brAIn's own parts are named as brAIn.
+- **Machines that run in bursts** (a 3D printer, a dishwasher) get one usual range for running and one for idle, so a hot nozzle mid-print is not "far outside its usual range" while a hot bed on an idle printer still is.
+- **Automations waiting on a season, calendar or sensor** are not reported as never having run; a condition that never lets an automation through is named with how many days of history it covers.
+- **"Remove it from the automations"** on a Wrong asks whether to treat the device as no longer in use, listing the automations that use it; nothing changes in Home Assistant.
+- **The Resident's first looks** no longer use up a Sonnet allowance by the early hours, keep what they had not reviewed after a timeout, and hold back a finding that is not news (with the reason kept in History).
+- **Insight cards** are written only from a look at the house, carry one next step when they are not all fine, and fold "nothing happened" into the quiet line.
+- **On an iPhone in the Home Assistant app**, the keyboard no longer hides the chat's message box, and the header stays put below the status bar whether or not full screen is on. The ⤢ full-screen terminal button is gone; nothing folds the header away.
+- **Closing the app while brAIn is answering** no longer counts as a crash; the answer is there when you come back.
+- **Minecraft**: multi-step requests become jobs instead of timing out, and the companion keeps answering after a timeout.
+- **Morph**: unavailable devices say so and when they were last seen instead of showing stale readings; the rooms chart draws every room that has readings; contrast, 16px text in every text box (no iOS zoom), 40-pixel buttons, labelled vacuum and garage buttons, and Morph remembers what you said No to.
+- Shutting brAIn's panel down now stops every background loop cleanly, without writing failed cards for work it cancelled itself.
+
+</Changes>
+<Changes type="removed">
+
+- **5.1.12** reverted the 5.1.10 Settings changes while a timeout was investigated; **5.1.22** brought the three fixes back as text and styling only. **5.1.28** reverted 5.1.27 (the Minecraft companion's notes about chat sessions) after the post-release check coincided with an older problem returning.
+
+</Changes>
+
+</Release>
+
+<Release version="5.1.0" date="November 4, 2026">
+
+**Morph's cards behave like any Home Assistant card — resizable, fully editable in the visual editor — and brAIn can now see and change any dashboard exactly.**
+
+<Changes type="added">
+
+- **Morph cards resize and fill their cell** in a sections view: a light is one row, a reading two, a thermostat two rows full width, a camera three. A taller light becomes a bigger slider; a small card drops its smaller lines instead of being cut off. Holding a card open still makes room, and closing it puts everything back.
+- **Everything about a Morph card is in the visual editor**: icon, tap, hold and double-tap actions, and the card shown when it is opened. Nothing has to be typed as YAML.
+- **brAIn can see any dashboard**, including admin-only ones, signing in as its own system user **brAIn (screenshots)**, which nobody can log in as; nothing on the page can change while the picture is taken. brAIn looks before answering about how a dashboard looks, and again after changing one.
+- **Exact dashboard edits**: a new tool changes one card, size, key or tab by its place without rewriting the rest, with the usual backup and undo; `brain.update_dashboard_info` changes a dashboard's sidebar title, icon, visibility and admin-only setting.
+- **Morph on this tab**, under the brAIn button: the room rail, lifting a room that needs you, and folding quiet rooms on any sections tab, each off until you turn it on.
+- **Morph Light** and **Morph Dark** themes beside **Morph**.
+
+</Changes>
+<Changes type="changed">
+
+- **A converted Morph dashboard is Home Assistant's own sections view**, so adding, moving and resizing sections, cards, badges and columns all work in Home Assistant's editor. A dashboard brought over with 5.0 is changed once, and the change is in its history so Restore can undo it.
+
+</Changes>
+
+</Release>
+
+<Release version="5.0.0" date="November 4, 2026">
+
+**Morph is no longer only a separate page: it is a layer on Home Assistant's own dashboards.** Any dashboard can be put in brAIn's care, Morph's cards are ordinary Lovelace cards with the visual editor, and Morph's themes are Home Assistant themes. See [Morph](/brain/morph/).
+
+<Changes type="security">
+
+**What changes for you**
+
+- **A brAIn button appears on every dashboard for administrators**, at the bottom right. Nothing about a dashboard changes until you press **Let brAIn change it** on that dashboard.
+- **After that, tap any card and tell brAIn what to change**, or tell it about the whole dashboard; the change shows on every open screen at once.
+- **Every version is kept**, including edits made in Home Assistant's own editor, and **History and undo** restores any of them. The dashboard stays Home Assistant's own: built-in and HACS cards, the visual editor, the sidebar and your themes work as before.
+- **HACS cards are changed through their own settings** (and card-mod for looks), never by editing their code, which a HACS update would overwrite. When a change needs code, brAIn makes a card type instead.
+
+**Before you update**
+
+- Your existing Morph page and its `dashboard.yaml` are left exactly as they were. While you still have one, the brAIn button offers to bring it over as a Home Assistant dashboard of its own, **Home**, and says anything that could not come along.
+- Morph remains experimental. Keep your usual dashboards beside it until you are happy.
+
+</Changes>
+<Changes type="added">
+
+- **Morph's cards in Add card**: all 21 as **Morph · …**, each with the visual editor, working on any dashboard and keeping Morph's tap, slide and hold; an opened card has **Details**, Home Assistant's own more-info. Two new cards: **Morph · brAIn's cases** (with a reply line) and **Morph · Ask**.
+- **Card types: built once, used everywhere.** A card brAIn builds can be a card type in Add card, with an editor for what each copy sets; changing the type changes every copy. When you tell brAIn about one copy, it asks whether you mean that one or all of them.
+- **Morph's view**, a new view type beside Masonry and Sections: a room that needs you rises and says why, quiet rooms fold to one line, and on a phone the room rail runs down the right edge. Each behaviour can be switched off.
+- **Morph themes** — **Morph** (light and dark) and **Morph Medium** — in your profile's theme list with no setup, as files brAIn can change.
+
+</Changes>
+
+</Release>
+
+<Release version="4.3.1 – 4.3.3" date="November 4, 2026">
+
+**"Don't remind me" now lasts until something changes, and a rule you mark wrong three times in a row is held back.**
+
+<Changes type="changed">
+
+- **A rule you marked wrong three times in a row is held back**: its next cards go to History › Set aside by brAIn instead of Needs you and your phone, unless brAIn's look finds something new, it gets worse, or you agree with one of its reports. Safety, security, critical cards and protected entities are always shown.
+- **"Don't remind me" on a house check's card lasts until something changes** (it gets worse, names something new, or its reading moves a long way), not just a month. A reason that names a period ("remind me in 3 weeks", "till spring") still gets that period.
+- "Is this fixed now?" after an update says what to try to tell, and is withdrawn after 14 days with no answer.
+
+</Changes>
+<Changes type="fixed">
+
+- **"Stop bringing up…", "quit flagging it"** and similar are read as "don't remind me"; "stop flagging this, it's a bad sensor" is still a Wrong.
+- An automation you marked wrong for never firing is not reported again; an explained automation error on one automation is not raised again.
+- A TV or speaker that drops off the network while switched off is not reported as unreachable; a door's "open for" time is checked against its own history.
+- When the house already holds the answer, or you already said so, brAIn's investigation says so and the card is set aside.
+- The screenshot tool waits for charts to draw and uses touch at phone width.
+
+</Changes>
+
+</Release>
+
+<Release version="4.3.0" date="November 4, 2026">
+
+**brAIn's learning loops, rebuilt so it can improve itself safely with no person in the loop: memory is versioned and undoable, outside facts stay unverified, and one switch controls all of it.**
+
+<Changes type="added">
+
+- **Versioned memory**: every change is checked and kept with its diff (the last 30, `brain memory history`), and `brain memory undo` restores the previous version. A nightly self-check rolls back one version if the newest fails, never over your own edit. See [Memory](/brain/memory/).
+- **Unverified facts**: facts from other add-ons, automations, web pages, files or tool output are marked "(unverified)" and never become core facts until your own words confirm them.
+- **⚙ › Features › Learning loop** says what learning wrote in the last 7 days, per learner.
+- **Development loop**: release health reports after each brAIn and sibling-app release, a "Did the fixes hold?" section in ⚙ › Developer, and an optional stream that saves first looks marked Wrong as test cases.
+- **A `house.css` or `house.js` change that breaks brAIn's page is undone automatically**, and ⚙ › Instructions says why.
+
+</Changes>
+<Changes type="changed">
+
+- **⚙ › Features › Learning loop is the one switch for everything brAIn learns** (the memory hook, voice's `remember_fact`, reflection, presence, Morph's learning, memory clean-up). The `learning` option is only its starting position.
+- **A full memory evicts its lowest-value lines** (unverified first, never yours) instead of stalling, and that can be undone. Memory clean-up removes lines it judged wrong, duplicate or stale on its own, as an undoable version.
+- Old facts and questions are kept as fingerprints so old questions are never asked again.
+
+</Changes>
+<Changes type="fixed">
+
+- The memory extractor no longer files the assistant's own words as yours.
+
+</Changes>
+
+</Release>
+
+<Release version="4.2.1 – 4.2.11" date="November 2 – 4, 2026">
+
+**Update cards can now install a checked update on your press, the Minecraft companion gained progress bars and skins, and health notices a hung loop.**
+
+<Changes type="added">
+
+- **Apply on a checked update**: an update brAIn judged safe has an Apply button that installs it with a backup where the update offers one. Nothing installs without a press. The check now reads the device itself (including a Z-Wave device's configuration) and quotes what it read. See [Upkeep](/brain/upkeep/).
+- **Minecraft jobs**: a boss bar with each running job's name, last step and progress (Bedrock players too), "_name_ status" for running and recent jobs, "_name_ continue" to pick up a partly done job, and a job time limit in ⚙ › Minecraft (15 minutes to 2 hours). The companion can put a skin on a player, and offers a child up to three skins on choice pads.
+- **Health heartbeats**: a hung background loop turns health degraded, as does brAIn not having looked at the house for over an hour.
+- **Walkthrough**, an optional development-loop stream that opens every card and room of the Morph dashboard read-only and files what a person would trip on.
+
+</Changes>
+<Changes type="changed">
+
+- **brAIn keeps looking after its usual model's daily allowance is spent**, stepping down to the light model instead of stopping, and the look queue folds repeats together.
+- **Everyone in the game can see the companion's thought bubble**, not only the person it is working for.
+- A problem you were already told about this week is not pushed again unless it got worse; a run refused by an automatic safety check is tried once more on another model.
+
+</Changes>
+<Changes type="fixed">
+
+- Morph: the story never says every door is locked while one is open, text boxes are 16px (no iOS zoom), empty cards say so, and section labels are readable in every scheme.
+- An update card's full reason can be read under Details, and opening a case or update card by its link works.
+- "Nothing shows in the game" says why in the log (usually BRUH Minecraft updated without a Home Assistant restart).
+
+</Changes>
+<Changes type="removed">
+
+- Morph's Then mode (sliding Coming up into the past).
+
+</Changes>
+
+</Release>
+
+<Release version="4.2.0" date="November 2, 2026">
+
+**The Minecraft companion sees the live game and shows what it is thinking.** Needs BRUH Minecraft 1.19.0 on a Paper or Purpur server.
+
+<Changes type="added">
+
+- **A thought bubble over the companion** says what it is doing right now ("placing 340 blocks for the couch") and how far along each job is; it goes a few seconds after the work ends. Everyone on the family list gets "**_Name_**'s Thoughts", a book with the whole stream. Nothing goes in chat. Switch it off in ⚙ › Minecraft › **Show what it is thinking**.
+- **It narrates the steps of a build** between steps ("the roof first, then the windows").
+
+</Changes>
+<Changes type="changed">
+
+- **It sees the game as it is this second**: where everyone is, the block and creature under the speaker's crosshair, what they hold and carry, and what they just built. "This" means what you are looking at, even without the spyglass.
+
+</Changes>
+
+</Release>
+
+<Release version="4.1.1 – 4.1.2" date="November 2, 2026">
+
+**Fixes from an audit of the development loop, the personality engine and the Minecraft companion.**
+
+<Changes type="fixed">
+
+- Screenshots of the other BRUH apps reach your reports again, and one app's screen report no longer closes another's.
+- What you type into *What do you want to fix?* is never dropped, even signed out or past the day's limit.
+- A section you delete in ⚙ › Personality stays deleted; a growth note that merely mentions a voice no longer changes it; with Personality off, Morph says "brAIn" too; `/config/CLAUDE.md` follows a personality change at once.
+- The Minecraft companion says the server is not answering instead of failing; an automation that messages a player who is not online is not reported as broken; undoing a job counts only what was actually put back.
+- **One assistant, one name**: findings and cards no longer call the same assistant by several names.
+
+</Changes>
+<Changes type="changed">
+
+- BRUH Task Manager is watched by the development loop like the other apps, and the loop is switched on in ⚙ › Features.
+
+</Changes>
+
+</Release>
+
+<Release version="4.1.0" date="November 2, 2026">
+
+**The Minecraft companion, rebuilt around how a family actually plays**: everything said in the game's chat is for it, it can work on several things at once, it knows the world, and anybody can point at something with a spyglass.
+
+<Changes type="added">
+
+- **Every chat line is for the companion** for family members (guests still say its name); it stays quiet when a line needs no answer. Turn this off in ⚙ › Minecraft.
+- **A desk for long requests**: a line is answered within seconds, and anything longer becomes a background job (up to five at once), with progress above the hotbar. "Make it red" reaches the running job, "stop that" stops and undoes it, and each finished job is in History › Changes with its own Undo.
+- **It remembers the conversation** for twenty minutes, and **knows the world**: which building and room each player is in, so "build a couch in this room" is enough. It can name places ("this is the guest room") and find them again.
+- **Organic builds**: trees, foliage, rocks and domes built from shapes, all undoable.
+- **The spyglass**: look at something and say "make this taller", or just look and wait for two or three ideas on picture pads — which is how a child who doesn't type can ask for things.
+
+</Changes>
+<Changes type="changed">
+
+- **Children build too**, and all of it can be undone; bedtime, privacy between children and no control of the house stay as they were. Lines that arrive while the companion is busy are read with the next answer instead of dropped. Stop, start, undo and status need the companion's name.
+
+</Changes>
+<Changes type="security">
+
+- **A displayed name no longer borrows someone's trust.** A chat line belongs to the account that sent it; "Can ask for anything" needs the person's own account. History › Changes says who asked from Minecraft.
+
+</Changes>
+
+</Release>
+
+<Release version="4.0.1 – 4.0.30" date="October 27 – 31, 2026">
+
+**brAIn joins your family in Minecraft, conversations run without limits, the header settles down, and findings stop coming back after you answer them.**
+
+<Changes type="added">
+
+- **brAIn plays Minecraft with your family** (with BRUH Minecraft): it is the companion in the game, under the name you gave it in ⚙ › Personality. It answers in the game's chat, can build, put a question to a child on picture pads, undo, and say hello and goodnight at bedtime. **⚙ › Minecraft** holds the family list (Child or Grown-up), bedtime, limits (0 means no limit), models, and everything it did with **Undo**. The automation that forwarded game chat to a conversation agent is no longer needed (4.0.27 – 4.0.29).
+- **"Can ask for anything", per grown-up** in ⚙ › Minecraft (off for everyone, never for children, only on a server that checks accounts): what they ask in the game is handled like a message to brAIn's chat. A house change follows *Let brAIn act without asking*; off, it waits as a Yes/No question in Needs you and on your phone (4.0.30).
+- **BRUH Cooking tools**: `cooking_status` and `cooking_control` for Breville+ and Sage appliances, listed once the integration is installed. Voice may read, start, stop and continue (4.0.13).
+- **The assistant keeps in touch, gently** (Personality and Learning loop on): at most two notes a night about how to be, and a few small check-ins per person — hard-capped at one a day and three a week per person, 08:00–21:00, never in quiet hours or to someone away. "Not now" and "Less like this" stop it (4.0.22).
+- **Choose what the top bar shows** (⚙ › Personality › Header): the logo, the assistant's name, or your own text and picture (4.0.21). A **Spoken voice** field stores the voice once (4.0.9).
+- **"What brAIn brings to a run"** in Memory › Knowledge: what a conversation, card, voice request or look is given and can look up, read live from the code (4.0.25).
+- **House changes to brAIn's own page**: `house.css` and `house.js` in `/config/.brain/ui/` are layered after brAIn's own and survive updates; `?nohouse=1` turns them off (4.0.10).
+- **A notification receipt**: the send tool says when Home Assistant accepted a notification, and a new `notification_history` tool answers "did it arrive?" (4.0.10). See [Notifications](/brain/notifications/).
+- **One card for devices that keep dropping off the network** — Wi-Fi, Z-Wave and Zigbee together — that updates itself and clears when none remain (4.0.7).
+- **Questions get an answer box** and come one at a time under **Questions for you** (4.0.4).
+
+</Changes>
+<Changes type="changed">
+
+- **No limit on conversations running at once.** Every chat or terminal conversation can work at the same time; when memory runs low, the quietest idle ones sleep and resume when you return. Each device keeps its own conversation (4.0.23).
+- **The chat and the terminal behave the same**: same model, instructions, personality, house summary, tools and protections (4.0.26).
+- **Everything brAIn remembers is in one place**: the memory document and the notes waiting to be filed moved to Memory › Knowledge (4.0.25).
+- **An update asks for a restart only when it needs one**: brAIn fingerprints the integration code Home Assistant actually loaded (4.0.24).
+- **A calmer header**: a clock beside ⚙, a status dot only when something needs doing, one header in Morph's theme with Home, Insights, Ask and Memory inside it, slim beside the Dynamic Island on a phone. Every tab can be renamed in ⚙ › Dashboard › Header tabs (4.0.6 – 4.0.17).
+- **Deep review and Suggested moved to Memory › Knowledge**; insight cards follow the dashboard's look.
+- **"I need to fix this" is a pause, not a rule**: "being repaired" or "unplugged for now" pauses a suggestion for two weeks instead of teaching a correction (4.0.8).
+- Lovelace changes are no longer described as impossible: brAIn explains how a dashboard is changed, with an approval card (4.0.7).
+
+</Changes>
+<Changes type="fixed">
+
+- **Answers stick.** "Don't remind me" is a snooze; a device you said is retired or broken stops getting battery, frozen, offline and impossible-reading cards; a declined emergency playbook stays declined; "it's on my to-do list" on a battery card holds for the month unless it drops a lot further. Smoke and leak sensors are always asked about.
+- **Machines are read by their status**: a dishwasher mid-wash, a machine cooling down, or a dehumidifier waiting for its automation's threshold is not reported as unusual or idle; a reason with a condition ("normal while it is running") keeps the condition.
+- **Cards say whole sentences**, talk to "you" rather than "the homeowner", and move file paths and error codes into Technical details.
+- **A long personality is no longer cut off** at 4,000 characters (it now holds 32,000).
+- **Fewer "502" pages** while brAIn starts, and asking about a card no longer flips back to an empty chat.
+- Cloud account ids are redacted in everything that leaves the house.
+
+</Changes>
+
+</Release>
+
+<Release version="4.0.0" date="October 27, 2026">
+
+**Morph is part of brAIn: one app, one sidebar entry, one login, with the Morph dashboard as brAIn's Home tab.** brAIn and Morph are both still under active development and may be unstable — keep your usual dashboards beside them. See [Morph](/brain/morph/) and [Features](/brain/features/).
+
+<Changes type="security">
+
+**Before you update**
+
+- **If you use the Morph app**, brAIn stops it on its first start, sets it not to start at boot, removes the retired `morph` integration and its entry under Devices & services, and tells you in a notification. It **never uninstalls** the Morph app; do that yourself from Settings › Add-ons once you are happy.
+- **Your dashboard is kept**: the dashboard, its whole history, your cards, your changes to Morph's code and LEARNED.md stay in `/config/morph`.
+- **Morph's own settings start from their defaults once** (theme, hold time, the learning schedule and its scorecard lived in the Morph app's private storage). Set them again in ⚙ › Dashboard.
+- **Restart Home Assistant once** when brAIn asks, so the integration's new panel loads.
+
+**What changes for you**
+
+- **One sidebar entry**, titled with your assistant's name. brAIn hides its older ingress entry while the panel is there, and puts it back by itself if Home Assistant ever starts without the integration.
+- **Somebody who is not an administrator sees the dashboard alone**, as before.
+- **Morph runs inside brAIn's container**, waiting while the dashboard switch is off. Its health port is loopback-only.
+
+</Changes>
+<Changes type="added">
+
+- **⚙ › Features**: four switches, each saying what it does and whether anything leaves the house — **Morph dashboard** (the Home tab), **Personality**, **Learning loop** (brAIn improves itself locally; nothing leaves the house) and **Development loop** (brAIn reports its own faults to your private GitHub repository). Each takes effect at once, with no restart.
+- **The Home tab**: brAIn's sidebar entry opens on your dashboard, with Insights, Ask, Memory and ⚙ in the same header.
+- **⚙ › Dashboard**: Morph's settings inside brAIn — the model for changes, theme and motion, the learning loop's schedule and lessons, the dashboard's history with Undo and Restore, and Rebuild from the house.
+- **Personality is a name everywhere**: with it on, the sidebar, header, every screen and notifications use your household's name for the assistant.
+
+</Changes>
+<Changes type="changed">
+
+- *Development mode* in the Developer section is now **Report everything without asking**, and the development loop's on/off switch moved to ⚙ › Features.
+- Notification links open brAIn's sidebar entry.
+
+</Changes>
+<Changes type="removed">
+
+- **The separate Morph app** (see above), and Morph's own Settings page, brand and ⚙ — those are brAIn's header and ⚙ now.
+
+</Changes>
+
+</Release>
+
+<Release version="3.8.1 – 3.8.26" date="October 22 – 27, 2026">
+
+**brAIn examines every part of Home Assistant and says what it looked at, watches Wi-Fi and the Z-Wave and Zigbee meshes, gains timed actions and Power Tools, and every card now says who acts.**
+
+<Changes type="added">
+
+- **Every area, accounted for.** After each checks pass, every part of Home Assistant — networks, integrations, add-ons, host, backups, recorder, automations, dashboards, energy, presence, HACS, repairs and devices — gets one line: checked and fine, how many findings, could not look and why, or not set up here. New checks cover a repair open for a week, a broken energy dashboard statistic, a phone or GPS tracker silent for a week, an add-on stopped while an integration needs it, HACS updates waiting two weeks and more (3.8.13). See [Checks](/brain/checks/).
+- **Networks**: Wi-Fi through UniFi (a device connected but unresponsive, or dropping off ten times a week, grouped by access point), the Z-Wave and Zigbee meshes read from what the network itself last heard, and an integration audit (failed setups, low-battery warnings, errors repeated more than 100 times a day) (3.8.11).
+- **Timed actions**: "water the garden for 90 minutes" or "in an hour turn on the porch light" runs without an automation; each step can be stopped, and every step is checked like any call — never unlocking, disarming or opening a garage, door or gate (3.8.17).
+- **Power Tools** for what still needed a person: users and groups (the last admin is always protected), backups, statistics fixes previewed by default, integration options and group members, Z-Wave failed-node removal, energy settings, Thread and categories (3.8.14). See [Power Tools](/brain/power-tools/).
+- **History › Changes brAIn made**: every change, newest first, each with Undo or the reason it cannot be put back (3.8.22).
+- **Voice and HomeKit exposure**: brAIn can list and change which entities reach Assist, Alexa, Google Assistant and each HomeKit Bridge (counted against HomeKit's 150). A lock, alarm or garage door is exposed only when you name it (3.8.21).
+- **Respond under every finding**: tell brAIn how to fix it, say it is intentional and why, or ask a question (3.8.7).
+- **The household's personality lives in brAIn** (⚙ › Personality), carried by the chat, terminal and voice (3.8.15).
+- **3D printers**: `bambu_design` designs a part and prints it from the chat, terminal or voice (with BRUH Bambu Studio); a print the printer stopped itself is a card; a heater left hot while idle is reported. Voice may design and start a print, but not stop one, slice, send G-code or import a link.
+- **GardenRX tools** to read the season and log harvests, sprays and notes.
+- **Dehumidifiers that stop while the room is still damp** are reported.
+
+</Changes>
+<Changes type="changed">
+
+- **Every card says who acts**: "brAIn can fix this." with **Go ahead**, "This needs you." with Add to To Do, or "brAIn needs an answer." Repairs, your phone and Morph use the same words and presses.
+- **Scenes you ask for are written straight away** when brAIn may act without asking, named the way your house already names scenes.
+- **After an update, brAIn closes "Is this fixed now?" questions it can answer itself.**
+- **One cause is one row**, a card leads with what it found, and "what to do" holds only the step left for a person.
+
+</Changes>
+<Changes type="fixed">
+
+- **A Home Assistant restart files one row**, "Home Assistant did not answer", instead of about twenty; a part of the house that could not be looked at never reads "checked, nothing wrong".
+- **Hot things working normally** — a printer nozzle, a bed, a computer processor — are not "impossible readings"; a broken probe reading −150° is reported rather than excused as weather.
+- **Credential renewals that are rate-limited back off** instead of retrying all day, and the terminal keeps your full Claude sign-in so Remote Control works.
+- An orphaned headless browser left by a screenshot is closed after five minutes; automations brAIn writes use the current `triggers:` / `conditions:` / `actions:` keys on Home Assistant 2024.10 and later.
+
+</Changes>
+
+</Release>
+
+<Release version="3.8.0" date="October 22, 2026">
+
+**YOLO mode: brAIn with no restrictions at all, off by default.**
+
+<Changes type="added">
+
+- **⚙ › Permissions › YOLO mode** asks once before it turns on. While it is on, the action gate, the MCP server's refusals, the shell guard and every approval prompt stand aside, and fix plans apply as soon as they are written. Turning it off brings every restriction back at once, and edits are still snapshotted so `brain undo` works. See [Safety](/brain/safety/).
+
+</Changes>
+
+</Release>
+
+<Release version="3.7.0" date="October 22, 2026">
+
+**Every instruction brAIn gives Claude is in one place you can read and change, and Ask opens Claude Code's own terminal.**
+
+<Changes type="added">
+
+- **⚙ › Instructions** lists every prompt brAIn sends and every file Claude reads. Open one, change it and **Save**; **Restore** puts brAIn's own back, and **Ask** opens Claude Code on that instruction. Your versions live in `/config/.brain/instructions`.
+- **Right-click, or press and hold, anything in brAIn to ask about it**: a Claude Code window opens quoting what you pressed.
+
+</Changes>
+<Changes type="changed">
+
+- **Ask is Claude Code's own terminal** by default, with your conversations listed beside it. The chat view is still available. See [Terminal](/brain/terminal/).
+
+</Changes>
+
+</Release>
+
+<Release version="3.6.0" date="October 21, 2026">
+
+**Talk to Claude from your phone with Claude Code's own voice mode.**
+
+<Changes type="added">
+
+- **🎤 Talk** on the classic terminal's phone toolbar streams your phone's microphone to Claude Code's built-in `/voice` dictation. It needs Home Assistant over https, microphone permission for Home Assistant, and a Claude account sign-in (voice mode does not work with an API key).
+
+</Changes>
+
+</Release>
+
+<Release version="3.5.0" date="October 20, 2026">
+
+**One brAIn, wherever you type to it.**
+
+<Changes type="changed">
+
+- **With *Let brAIn act without asking* on**, a reply on a phone notification, a reply under a card in Morph and every task Morph hands over get the chat's reach. Off, they read only. Runs nobody typed (cards, overnight checks, the brief, `brain.run_task`) stay read-only either way, and protected entities, house rules and the tripwire hold everywhere.
+
+</Changes>
+
+</Release>
+
+<Release version="3.4.0 – 3.4.3" date="October 19 – 20, 2026">
+
+**brAIn can photograph every BRUH screen — its own, the other apps', Morph and the Lovelace cards — and look at a screen before answering about it.**
+
+<Changes type="added">
+
+- **`screenshot_panel`**: the chat can photograph any screen of brAIn or another BRUH app, Morph's dashboard or a card, with the measured layout problems. Nothing is kept, and it works with the development loop off.
+- The development loop's Screens stream covers every BRUH app, with one audit issue per app per release.
+
+</Changes>
+<Changes type="security">
+
+- **Taking a picture cannot change anything**: every request that is not a read is stopped in the browser, and no WebSocket may open. Redaction reaches inside every card's shadow DOM.
+
+</Changes>
+<Changes type="fixed">
+
+- A device-offline finding leaves the list when the device comes back; Morph's dashboard suggestions can be answered Yes.
+- A washer, dryer or dishwasher drawing power is not "unusual"; a card's opening verdict must match its own evidence.
+- A Deep review falls back to Opus when the account has no usage credits for the larger model.
+
+</Changes>
+
+</Release>
+
+<Release version="3.3.0" date="October 19, 2026">
+
+**brAIn watches the other BRUH apps and can report their bugs.**
+
+<Changes type="added">
+
+- **`bruh_addon_status`** shows every BRUH app's version, state and errors; **`report_bug`** files what brAIn found into your private reports repository. brAIn restarts an app or fixes its options when that is the fix, and never patches an app's code inside its container.
+- An *Other BRUH add-ons* development-loop stream (on once the loop is on, free).
+
+</Changes>
+
+</Release>
+
+<Release version="3.2.0 – 3.2.1" date="October 19, 2026">
+
+**brAIn runs your 3D printers through BRUH Bambu Studio.**
+
+<Changes type="added">
+
+- **`bambu_status`, `bambu_print`, `bambu_control` and `bambu_slice`** reach Bambu Lab printers. `bambu_print` can start from a Printables page or a link to an .stl or .3mf, sliced with Bambu Studio's own profiles. Voice may check on a print, pause, resume and change speed, light and temperatures; unattended runs may only read.
+
+</Changes>
+
+</Release>
+
+<Release version="3.1.0" date="October 19, 2026">
+
+**The development loop asks you whether your own request was fixed, and knows which release fixed what.**
+
+<Changes type="added">
+
+- Once a fix for something you asked about is installed, one question appears: *brAIn x.y.z was meant to fix this. Is it fixed here?* No reopens it with what you type.
+- An optional Judgement stream, fault reports that carry their evidence (redacted and aliased), and panel crashes recorded as faults.
+
+</Changes>
+
+</Release>
+
+<Release version="3.0.1 – 3.0.9" date="October 15 – 19, 2026">
+
+**Answers that cover the whole device, cards that read like a person wrote them, and a usage limit that is no longer mistaken for a sign-out.**
+
+<Changes type="changed">
+
+- **Insight cards are plainer**: no invented measures or units to look up, the house's own clock, one story with the open findings, and a card that only says all is well is one sentence that sorts to the bottom.
+- **Device findings speak household words**, without IP addresses or protocol names.
+- The development loop files only what is new and keeps live reports up to date.
+
+</Changes>
+<Changes type="fixed">
+
+- **An answer about one part of a device covers the device** (a dead battery, "not in use"), never a smoke, leak or safety sensor on it; "that's fine" on a card about several things sticks to each of them.
+- **A 0% battery on a plugged-in device** is not a dead battery; a sensor returning after a restart is not news.
+- **A usage limit is not a sign-out**, and curiosity's daily question is not used up by one.
+- The morning brief leaves out lights labelled "always on"; brAIn's look is told when a scene or automation made a change.
+
+</Changes>
+
+</Release>
+
+<Release version="3.0.0" date="October 15, 2026">
+
+**brAIn becomes the mind behind Morph, the dashboard: everything you do on Morph comes back to brAIn through the same endings as Needs you, your phone and Repairs.** Morph 1.0 needs brAIn 3.0.
+
+<Changes type="security">
+
+**What changes for you**
+
+- **A finding is a conversation.** Type an answer under a card on Morph: "yes" is the card's first answer (a fix is planned, never applied without Apply), "no, it's mains powered" is Ignore with that reason, "later" a snooze, "done" Done, and a question gets an answer. A reply brAIn cannot read is answered with a question, never guessed at.
+- **Morph's presses** — Dismiss, To Do, Snooze, Fix, Apply, Undo and Doesn't apply — reach the same code as the panel's buttons.
+- **Morph's Ask line** drafts a rule, remembers a fact or explains a why, and never guesses between a house change ("make the kitchen warmer") and a dashboard change.
+- **Every finding carries a To Do sentence** naming the thing ("Replace the battery in the hallway motion sensor.").
+
+**Before you update**
+
+- If you use the Morph app, update it to 1.0 together with brAIn 3.0. brAIn's panel port stays unpublished; the two talk through files on the shared config volume.
+
+</Changes>
+<Changes type="changed">
+
+- A To Do item reads as the errand rather than the report, and the diagnostics bundle reports the Morph connection.
+
+</Changes>
+
+</Release>
+
+<Release version="2.18.1 – 2.18.34" date="October 8 – 13, 2026">
+
+**A month of polish driven by brAIn's own development loop: a redesigned Settings, What's new inside the panel, an always-on detector check, and findings written in the house's own words.**
+
+<Changes type="added">
+
+- **A safety check for detectors that are tripped right now**: any smoke, gas, CO or leak detector reading tripped is a critical card that cannot be muted and is announced through quiet hours, even if it tripped while brAIn was down (2.18.13). See [Safety](/brain/safety/).
+- **What's new**: press the version under the logo to read brAIn's release notes in the panel, with the releases since you last read marked (2.18.12).
+- **A Settings search box** that finds any setting by its words (2.18.6), and **Run all tests** at the top of Diagnostics (2.18.1). See [Doctor](/brain/doctor/).
+- **Doesn't apply** beside Yes and No on every question brAIn asks: it closes the question without recording an answer (2.18.26).
+- **No limit** on the usage budget: automatic insights run until Anthropic itself rate-limits, then pause until the reset (2.18.31).
+- **House-book questions answered on the card**, cited to you in memory and the book.
+- **Task progress**: a task brAIn runs for another app reports each step as it goes.
+- **Development loop** (opt-in): a Design review stream, a Screens stream that photographs the panel with every personal detail blacked out or aliased before upload, and Report to brAIn on a card's ⋯.
+
+</Changes>
+<Changes type="changed">
+
+- **⚙ Settings is redesigned**: one list of sections whose rows already say what you most often check, beside the section on a wide screen; one design throughout.
+- **Needs you puts what is broken first**, worst first, in a Problems group, with questions, chores, suggestions and tidy-ups in their own folded groups.
+- **On a finding brAIn can change itself, the main button is Fix**, already holding the suggested change for you to edit before one Apply.
+- **Findings use the house's words**: device names instead of ids, local time, the room as its own sentence, "It usually reads between 19 °C and 21 °C for this hour of the week" instead of a multiple of normal variation.
+- **Insight cards open with one plain verdict**, stand on their own, use local time, and agree with any open finding about the same device.
+- **The chat and the terminal do what they are asked**, editing the automation, script, scene or dashboard directly and saying what changed.
+- **A rule you mostly answer Wrong is held back by brAIn's first look** unless there is fresh evidence; nothing is muted, and safety is never quieted.
+- brAIn speaks of itself as "brAIn", never "I"; the panel's text meets a 4.5:1 contrast ratio in light and dark.
+
+</Changes>
+<Changes type="security">
+
+- Text from a Minecraft server, Modrinth descriptions and music tags reaches a run marked as outside text, so instructions inside one are read as data.
+- `brain ask` runs with read-only tools.
+
+</Changes>
+<Changes type="fixed">
+
+- **Seasonal and weather-driven readings** (humidity across three rooms on a dry day, a sensor that moved with the season) are not reported as faults; a dehumidifier's own room is not "too dry" while it runs.
+- **The overnight repair** no longer reloads an integration whose sign-in was refused, and every repair it makes is in the action ledger. `get_error_log` folds a flooding log and takes `level` and `match` filters.
+- Times on insight cards are the house's own clock (they were off by your UTC offset).
+- Fewer false "unavailable", "frozen" and "battery" cards for disabled phone features, light groups, battery voltages and outside data feeds.
+- A voice command that worked and then said nothing more is answered "Done." instead of a failure.
+
+</Changes>
+
+</Release>
+
+<Release version="2.18.0" date="October 8, 2026">
+
+**The development loop can run on autopilot, and a Design review stream reads what brAIn actually showed your house.**
+
+<Changes type="added">
+
+- **Design review**: one read-only run that files what made brAIn's cards feel repetitive, generic or developer-only.
+- **Autopilot**: every stream on, nothing waiting for Send, higher daily caps; switching it off restores your switches.
+
+</Changes>
+<Changes type="fixed">
+
+- *What do you want to fix?* never loses a request: if the write-up fails, your words are filed as you typed them.
+
+</Changes>
+
+</Release>
+
+<Release version="2.17.1 – 2.17.23" date="October 7 – 8, 2026">
+
+**brAIn's house checks got far fewer false alarms, memory files facts against real things, and the panel says why a finding is still waiting.**
+
+<Changes type="added">
+
+- **A finished 3D print, washer, dryer or dishwasher** that publishes its own status can tell you it is done and waiting, with no power sensor needed.
+- **When you keep marking a rule's findings Wrong, brAIn asks once whether to stop raising them.**
+- House › Reports has a **Schedule** list with each recurring card's cadence and a switch.
+
+</Changes>
+<Changes type="changed">
+
+- **One problem, one finding**: the same thing reported by several insight cards, or by a question and a check, is folded into one.
+- **Facts** that say the same thing replace each other; facts about "right now" expire after two days; brAIn's facts about its own problems lapse after an update.
+- **The development loop** works through every open report and never re-files declined ones; ordinary words are no longer swapped for aliases.
+
+</Changes>
+<Changes type="fixed">
+
+- **Far fewer false findings** from the missing-entity, frozen-sensor, drifting-reading, unusual-reading, battery and "undoing each other" checks: templates, estimates, nominal figures, weather and grid feeds, wall-button presses, step-wise forecasts, 0% placeholder batteries and HomeKit Bridge devices are all handled.
+- **Findings no longer wait hours for a first look**, and a re-report gets a fresh look.
+- **Learning from what you type in the chat and terminal works** on houses that sign in through the panel.
+- Health agrees with the Status sensor after an update, and "Assist healthy" follows whether voice is really answering.
+- Pressing Stop on your own chat, or an add-on restart, is no longer counted as a failure.
+
+</Changes>
+
+</Release>
+
+<Release version="2.17.0" date="October 7, 2026">
+
+**Help develop brAIn: an optional developer feature that files brAIn's faults as issues in a private GitHub repository you own.**
+
+<Changes type="added">
+
+- **Off for everyone, and nothing is expected of you.** Nothing runs or connects until you switch it on in ⚙ › Diagnostics › Developer.
+- **What leaves is aliased**: entity ids, names and rooms are replaced with stable stand-ins and credentials removed; the map back stays on your box. brAIn refuses to send to a public repository, and each report waits for you, with **View** showing exactly what would be sent.
+- **Streams with their own switch and schedule**, daily caps on issues and Claude runs, and `brain devloop` in the terminal.
+
+</Changes>
+
+</Release>
+
+<Release version="2.16.0 – 2.16.1" date="October 6 – 7, 2026">
+
+**brAIn works out what it can before it asks you.**
+
+<Changes type="changed">
+
+- **A finding worth a look is investigated before it reaches you**: brAIn reads the history, logbook and device, then rewrites the card, sets it aside with its reason, or shows it as before if the look could not run. Safety alerts and urgent problems are still shown straight away. See [Findings](/brain/needs-you/).
+- **The investigation no longer asks what it could read itself.** Up to 16 findings a day on the default setting, within your usage budget.
+- **Your list is now To Do**, and every item has Delete.
+- With *Let brAIn act without asking* on, a conversation opened from a card works the problem out without permission cards; only changing Home Assistant still asks.
+
+</Changes>
+<Changes type="added">
+
+- **Tidy-up cards you can correct**: every name-and-room row has Change.
+- **Knowledge › Clean up**: brAIn lists what in its memory looks wrong, duplicated or stale, with reasons; nothing is removed until you tick it. Things you told it are never offered.
+
+</Changes>
+
+</Release>
+
+<Release version="2.15.0 – 2.15.2" date="October 6, 2026">
+
+**Settings becomes a page of its own, Dismiss works everywhere, and the house book documents the house.**
+
+<Changes type="added">
+
+- **⚙ opens Settings as a page**, one section at a time.
+- **Dismiss** on every problem card, phone notification and Repairs entry: the card leaves the list and nothing is recorded, so it returns only if the problem is seen again. **Check again** is on the face of every card a house check raised.
+- **The house book reads *How this house works***, in nine chapters, with **Add info**, **Edit** and **Delete** on every line; what you wrote is kept when the book is rewritten.
+
+</Changes>
+
+</Release>
+
+<Release version="2.14.0 – 2.14.2" date="October 5, 2026">
+
+**Insights · Ask · Memory: the panel opens on what brAIn has found.**
+
+<Changes type="changed">
+
+- **Insights** opens on your insight cards, with **Needs you** and **History** (Restore and Delete on every row) beside them.
+- **Memory › Knowledge** can be browsed by room and device; **Timeline** can be searched and filtered. See [Memory](/brain/memory/).
+- **Ask** gets conversation pills (Chats, Voice, Automation, Cards…) back.
+- A screen-by-screen pass: charts sized to their content, a third column on wide monitors, readable step names, and phone layouts that fit.
+
+</Changes>
+
+</Release>
+
+<Release version="2.13.0 – 2.13.1" date="October 5, 2026">
+
+**The panel, redesigned around three jobs — decide, ask, read — with one card and one set of button words.** Safety behaviour is unchanged.
+
+<Changes type="changed">
+
+- **Three tabs and ⚙ replace eight**, with one queue of cards, Your list and a History drawer; on a phone the tabs move to a bottom bar and every button is a 44px target.
+- **One set of button words**: Plan or Apply, Add to list, Snooze, Ignore.
+- **Every count agrees**: new `sensor.brain_status` and `binary_sensor.brain_needs_you`, and `todo.brain` is your list only.
+
+</Changes>
+<Changes type="security">
+
+- Error messages never carry a traceback to the page, log lines cannot be forged by values off the wire, and entity ids are checked before they go into a URL.
+
+</Changes>
+
+</Release>
+
+<Release version="2.12.0" date="October 5, 2026">
+
+**Fixes from a walkthrough of brAIn on a real house: what was broken, what it got wrong about the data, and what was confusing.**
+
+<Changes type="fixed">
+
+- **The chat** no longer shows background-task notices as your messages, and opening an old chat only shows it.
+- **Text is cut at a word or sentence**, never mid-word.
+- **A usage limit refusing most runs is said**, and scheduled cards really wait while it is on.
+- **History that stops early is not trusted**: one "history is incomplete" finding instead of a row of "silent since…".
+- **One problem, one finding**, a battery in volts is not read as a percentage, and the first look knows which automations use each device.
+- **Activity agrees with the house**, and times read "1:45 PM" in your format.
+
+</Changes>
+<Changes type="changed">
+
+- Every finding card has the same row — Fix it · Add to list · Dismiss · Not a problem — and wide screens lay cards two abreast.
+
+</Changes>
+
+</Release>
+
+<Release version="2.11.1" date="October 4, 2026">
+
+**A session limit no longer reads as brAIn breaking, and the help in ⚙ can be read.**
+
+<Changes type="fixed">
+
+- **The `?` help in Settings opens on top of the dialog.**
+- **"Most Claude runs are failing" counts only failures**: a run your account's session limit refused is the account saying wait.
+
+</Changes>
+<Changes type="changed">
+
+- Capture for the corpus says it is not needed to use brAIn, and a problem report says each thing once.
+
+</Changes>
+
+</Release>
+
+<Release version="2.11.0" date="October 4, 2026">
 
 **A leak, smoke or gas alarm now reaches you whatever brAIn is doing; voice, the chat and the terminal are scoped far more tightly; Fix it shows the exact change before it makes it; and a new Upkeep tab keeps names, updates and the house book in order.** This is the largest release brAIn has had. The groups below follow the add-on's own release notes; start with the first one, which lists what you may need to do after updating.
 
@@ -133,7 +1101,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="changed">
 
-- **Discuss opens a new conversation** beside the one you were in, instead of stopping it, and **asks before it changes anything** — every acting tool shows a permission card. A change you agree on becomes a plan on the card, with Apply and Undo. See [Findings](/brain/findings/).
+- **Discuss opens a new conversation** beside the one you were in, instead of stopping it, and **asks before it changes anything** — every acting tool shows a permission card. A change you agree on becomes a plan on the card, with Apply and Undo. See [Findings](/brain/needs-you/).
 - **A fix's report is on its card**, and a proposal's card carries its replay, before-and-after and trial grade. Questions get their own band near the top, and Dismiss on a question puts it to sleep for real.
 - **The chat knows the house before you tell it** (open cases, health, the house's rhythm, and the facts about what you mention), and the terminal's context file now carries an area map and the measurement tools. See [Terminal](/brain/terminal/).
 
@@ -294,7 +1262,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="added">
 
-- **Minecraft, labels and light shows, by asking.** Eleven new tools drive BRUH Minecraft, BRUH Print and BRight through their own Home Assistant services: "teleport Emma to Dad", "put Steve in creative", "make it day", "who's on?", "print a label that says chili", "start the Friday party on the den speaker". Spoken names are matched against who is online, and a name that could be two people is asked about rather than guessed.
+- **Minecraft, labels and light shows, by asking.** Eleven new tools drive BRUH Minecraft, BRUH Print and BRight through their own Home Assistant services: "teleport Sam to Alex", "put Alex in creative", "make it day", "who's on?", "print a label that says chili", "start the Friday party on the den speaker". Spoken names are matched against who is online, and a name that could be two people is asked about rather than guessed.
 - **Playing is not administering.** A voice agent set to **Voice assistant** may play but not administer: op, ban, kick, the whitelist, a raw console command, stopping the server and installing server add-ons need **Whole house** or **Full admin**, and that holds through `call_service` too. Voice prints at most 10 labels at once. Every call goes through `call_service`, so an agent's Blocked services and `protected_entities` apply; scheduled runs may read the three status tools and nothing else.
 
 </Changes>
@@ -337,7 +1305,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="changed">
 
-- **This site is rewritten for 2.8**: new pages for [Ideas](/brain/ideas/), [ESPHome](/brain/esphome/) and [Music Assistant](/brain/music-assistant/), a rewritten [Insights](/brain/insights/) page covering Refine and Share, a rewritten [Findings](/brain/findings/) page, fresh screenshots throughout, and this changelog brought up to date from 1.47.
+- **This site is rewritten for 2.8**: new pages for [Ideas](/brain/insights/), [ESPHome](/brain/esphome/) and [Music Assistant](/brain/music-assistant/), a rewritten [Insights](/brain/insights/) page covering Refine and Share, a rewritten [Findings](/brain/needs-you/) page, fresh screenshots throughout, and this changelog brought up to date from 1.47.
 - **The in-panel Help tab** describes the four tabs and the answers every card now takes, where a few sections still named the older buttons.
 
 </Changes>
@@ -439,7 +1407,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 <Changes type="changed">
 
 - **A chore no longer renders on the feed.** A finding moved to the to-do list came back beside the real findings as *Broken · Device check · battery is low* over *Done · Remove* — a card that read as a finding with no way onto the to-do list, which is what was reported. The feed now lists problems, suggestions and guesses only; what you have accepted lives on the **To-do** tab with its own count, and the feed's badge stops counting it. Every finding on the feed still offers its way onto the list, its fixed ending and its dismiss.
-- **The pane is called [Findings](/brain/findings/).** The Home group's first tab was itself labelled *Home*; it is *Findings* now (Home → Findings), and the docs follow.
+- **The pane is called [Findings](/brain/needs-you/).** The Home group's first tab was itself labelled *Home*; it is *Findings* now (Home → Findings), and the docs follow.
 
 </Changes>
 </Release>
@@ -474,7 +1442,7 @@ Onboarding studies a home once and proposes a card set, and that was the only mo
 
 <Changes type="added">
 
-- **[Home → Ideas](/brain/ideas/): the cards brAIn thinks this house is missing.** A page of proposals, separate from Insights on purpose: an idea costs nothing until you take it, where a card costs a run every refresh interval for ever. That split is what lets the page be generous. Each idea says three things — what the card would be called, **why this house** (the rooms, meters and numbers it actually found), and **what it would answer** every run. Take one and it becomes an ordinary card on Insights; say "not for this house" and it is never suggested again.
+- **[Home → Ideas](/brain/insights/): the cards brAIn thinks this house is missing.** A page of proposals, separate from Insights on purpose: an idea costs nothing until you take it, where a card costs a run every refresh interval for ever. That split is what lets the page be generous. Each idea says three things — what the card would be called, **why this house** (the rooms, meters and numbers it actually found), and **what it would answer** every run. Take one and it becomes an ordinary card on Insights; say "not for this house" and it is never suggested again.
 - **Press "Suggest ideas"** whenever you want one now. It skips the usage budget, the same promise every by-hand run makes.
 - **A weekly pass** tops the page up on its own, past every gate the scheduler already keeps (insights off, no credential, paused, budget spent).
 - **Nothing is proposed twice**: a card this home already has, however it came to have one, and every idea already answered are both consulted on every pass.
@@ -549,7 +1517,7 @@ Onboarding studies a home once and proposes a card set, and that was the only mo
 </Changes>
 <Changes type="changed">
 
-- **The Home feed.** The [Findings](/brain/findings/) tab is called Home and renders cases: the kind, the severity, the confidence and stakes in words, the claim, the evidence, what *Do it* would do and the consent each step needs, and the three endings inline. Anything live that no case covers is still shown beneath, because a case list that could not be read must not render a house with problems as a house with none. The foot says what the day cost: looked, investigated, changed, watching. The badge counts open cases, one derivation for the tab and `/api/status`.
+- **The Home feed.** The [Findings](/brain/needs-you/) tab is called Home and renders cases: the kind, the severity, the confidence and stakes in words, the claim, the evidence, what *Do it* would do and the consent each step needs, and the three endings inline. Anything live that no case covers is still shown beneath, because a case list that could not be read must not render a house with problems as a house with none. The foot says what the day cost: looked, investigated, changed, watching. The badge counts open cases, one derivation for the tab and `/api/status`.
 - **Triage is retired into the first look** — a filed row the look ignores is held with its reason and still carries *Raise it anyway* — and its per-day cap now counts first looks.
 
 </Changes>
@@ -716,7 +1684,7 @@ So there is a step between filing and surfacing. After each checks pass, one Cla
 <Changes type="added">
 
 - **What it elevates carries the reason** on the card: *brAIn checked — its own month of statistics really does drift upward, and no other freezer here does.*
-- **What it holds back goes to a new "Looked at" filter** on the [Findings](/brain/findings/) tab, which appears only once something is in it. Every row there says what was checked, opens **the conversation brAIn had about it**, and carries one button that puts it back on the work list.
+- **What it holds back goes to a new "Looked at" filter** on the [Findings](/brain/needs-you/) tab, which appears only once something is in it. Every row there says what was checked, opens **the conversation brAIn had about it**, and carries one button that puts it back on the work list.
 - **Held is held, not deleted.** The row stays, so the next pass does not file the same thing again, and it clears itself when the check stops reporting it — exactly as an open one does.
 - **Silence always surfaces.** Not signed in, automatic runs paused, the usage budget spent, the run failed or unreadable, more arriving at once than one look can cover: the finding is on the list saying *Not checked first*, and why. "I could not look" and "it is not real" are different things, and only the second may keep a problem off your screen.
 - **One run per pass, not one per finding**, capped — and a pass that filed nothing new spends nothing at all.
@@ -1331,7 +2299,7 @@ Everything else on that map is still proposed.
 
 <Release version="1.38.0" date="September 4, 2026">
 
-**The work list where people already are.** The [Findings](/brain/findings/) tab is behind ingress, so a critical finding was a panel somebody had to open.
+**The work list where people already are.** The [Findings](/brain/needs-you/) tab is behind ingress, so a critical finding was a panel somebody had to open.
 
 <Changes type="added">
 
@@ -1513,7 +2481,7 @@ Everything else on that map is still proposed.
 - **They run on a timer, on the Findings tab's Run-checks button, and as `brain check`** — and what they find rides into the analyst's prompt block with everything else, so Claude's job on the automations card becomes judgement rather than discovery.
 - **The first forecast.** A line through sixty days of a battery's statistics files "… battery is running down" three weeks out, with the days left in the detail — a finding with a date on it, rather than a threshold that fires the day before it dies.
 - **A finding a check no longer reports leaves the list on its own** — removed, not settled, so it can come back if the problem does. Only checks that actually *ran* may clear anything: a check whose data could not be fetched said nothing, and nothing is not "the problem went away".
-- **A producer scorecard.** Every ending on the [Findings](/brain/findings/) tab is a label, and nothing added them up because the settled ledger recorded the ending and not who raised it. A line under the filters now says how right each producer has been, once it has enough endings to mean something.
+- **A producer scorecard.** Every ending on the [Findings](/brain/needs-you/) tab is a label, and nothing added them up because the settled ledger recorded the ending and not who raised it. A line under the filters now says how right each producer has been, once it has enough endings to mean something.
 - **A run journal**, one line per Claude run of any kind and per checks pass, with a fixed outcome vocabulary — fallbacks included, because a fallback nobody counts is a fallback read as the real thing. Prompts and replies are never written.
 - **Diagnostics, three ways**: an endpoint, a mirror the integration reads so the standard **Download diagnostics** button produces something, and `brain report`, which writes it beside `brain doctor --json` and the log tail as one redacted archive — for a bug report that arrives with evidence rather than prose.
 - **`protected_entities`** — a list of entity ids or `domain.*` patterns brAIn may never act on, from any face. Enforced in the MCP server's one chokepoint, so it covers every control tool and every direct service call; a protected entity can still be looked at. A call aimed at an area or device that *contains* one is refused, and labels and floors are refused outright while the list is non-empty.
@@ -2290,7 +3258,7 @@ Everything else on that map is still proposed.
 
 <Changes type="added">
 
-- **A [Findings](/brain/findings/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
+- **A [Findings](/brain/needs-you/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
 - **✦ Fix it** sends Claude to make the change in your actual Home Assistant: confirm the problem is still real, find the cause rather than the symptom, make the smallest change that resolves it, verify it took, and report exactly what it touched. Bounded hard — one finding per run, never deletes what it didn't create, never restarts Home Assistant, never touches secrets, and nothing runs until you press it.
 - **Not a problem** dismisses a finding permanently, and the dismissal is fed into every future analysis. If the garage freezer is *supposed* to sit at -30°C, one press ends that conversation for good. Anything needing hands is marked **needs you** rather than offered a fix, and **✓ I did it** closes those.
 - **A second verb in the ask bar.** Start a line with "learn about…" or "study…" and brAIn runs a study session instead of drawing a card, digging through the registry, history and long-term statistics for that corner of the house. It was previously reachable only from the terminal, which meant nobody ran one.
