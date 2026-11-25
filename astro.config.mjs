@@ -117,6 +117,8 @@ const retiredAppUrls = {
 	'/bruh-insights/changelog/': '/brain/archive/bruh-insights-changelog/',
 	// Pages folded into others when the app docs were rebuilt (November 2026).
 	'/bruh-print/labels/': '/bruh-print/designer/',
+	'/brain/findings/': '/brain/needs-you/',
+	'/brain/ideas/': '/brain/insights/',
 	// The add-on's PLUGINS.md links here.
 	'/bruh-minecraft/commands/': '/bruh-minecraft/command-generator/',
 };
@@ -381,37 +383,50 @@ export default defineConfig({
 							items: [
 								{ label: 'Overview', slug: 'brain' },
 								{ label: 'Quick Start', slug: 'brain/quickstart' },
+								{ label: 'The Four Switches', slug: 'brain/features' },
 								{ label: 'Permissions & Safety', slug: 'brain/safety' },
-								// The panel's own panes, grouped the way the panel's
-								// four tabs group them (Home, Ask, House), in the
-								// order they sit there.
 								{
-									label: 'The Panel',
+									label: 'Morph Dashboard',
 									items: [
-										{ label: 'Findings & To-do', slug: 'brain/findings' },
-										{ label: 'Insights', slug: 'brain/insights' },
-										{ label: 'Ideas', slug: 'brain/ideas' },
-										{ label: 'Proposals', slug: 'brain/proposals' },
-										{ label: 'Chat & Terminal', slug: 'brain/terminal' },
-										{ label: 'Memory & Learning', slug: 'brain/memory' },
-										{ label: 'Activity', slug: 'brain/activity' },
-										{ label: 'Upkeep', slug: 'brain/upkeep' },
+										{ label: 'Overview', slug: 'brain/morph' },
+										{ label: 'Quick Start', slug: 'brain/morph/quickstart' },
+										{ label: 'Using Morph', slug: 'brain/morph/using' },
+										{ label: 'Tell brAIn & Edit', slug: 'brain/morph/tell-brain' },
+										{ label: 'Morph on HA Dashboards', slug: 'brain/morph/home-assistant-dashboards' },
+										{ label: 'How It Learns', slug: 'brain/morph/learning' },
+										{ label: 'Settings & Files', slug: 'brain/morph/settings' },
 									],
 								},
-								// What brAIn works out about this particular house, and
-								// the rules that read it. Deliberately its own group:
-								// these are not panel tabs, they are the measurements
-								// every tab above is expressed against.
 								{
-									label: 'What It Measures',
+									label: 'Using brAIn',
 									items: [
+										{ label: 'Needs You & To Do', slug: 'brain/needs-you' },
+										{ label: 'Insights', slug: 'brain/insights' },
+										{ label: 'Ask (Chat & Terminal)', slug: 'brain/terminal' },
+										{ label: 'Memory & Knowledge', slug: 'brain/memory' },
+										{ label: 'Timeline', slug: 'brain/activity' },
+										{ label: 'Upkeep & the House Book', slug: 'brain/upkeep' },
+										{ label: 'Notifications & Repairs', slug: 'brain/notifications' },
+									],
+								},
+								{
+									label: 'How It Thinks',
+									items: [
+										{ label: 'The Resident', slug: 'brain/resident' },
 										{ label: 'What brAIn Measures', slug: 'brain/measurements' },
 										{ label: 'House Checks', slug: 'brain/checks' },
 										{ label: 'Heating & Climate', slug: 'brain/climate' },
+										{ label: 'Learning', slug: 'brain/learning' },
 										{ label: 'Shadow Runner & Replay', slug: 'brain/replay' },
-										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
+									],
+								},
+								{
+									label: 'Changing the House',
+									items: [
+										{ label: 'Suggestions', slug: 'brain/proposals' },
 										{ label: 'Rules & One-Offs', slug: 'brain/intents' },
 										{ label: 'Scene Designer', slug: 'brain/scenes' },
+										{ label: 'Emergency Playbooks', slug: 'brain/playbooks' },
 										{ label: 'Overnight Self-Healing', slug: 'brain/self-healing' },
 									],
 								},
@@ -420,8 +435,7 @@ export default defineConfig({
 									items: [
 										{ label: 'Voice Assistant', slug: 'brain/voice' },
 										{ label: 'Automations & Insight Jobs', slug: 'brain/automations' },
-										// No panel tab of their own since 2.10: both are
-										// reached by asking, through the same tools.
+										{ label: 'brAIn and the BRUH Apps', slug: 'brain/apps' },
 										{ label: 'ESPHome', slug: 'brain/esphome' },
 										{ label: 'Music Assistant', slug: 'brain/music-assistant' },
 									],
@@ -441,6 +455,7 @@ export default defineConfig({
 										{ label: 'Dashboards', slug: 'brain/power-tools/dashboards' },
 										{ label: 'Users', slug: 'brain/power-tools/users' },
 										{ label: 'Diagnostics & Repairs', slug: 'brain/power-tools/diagnostics-and-repairs' },
+										{ label: 'Backups, Energy, Networks & More', slug: 'brain/power-tools/system' },
 									],
 								},
 								{
@@ -450,12 +465,9 @@ export default defineConfig({
 										{ label: 'How brAIn Controls HA', slug: 'brain/how-brain-controls-ha' },
 										{ label: 'MCP Tools', slug: 'brain/mcp' },
 										{ label: 'The CLI', slug: 'brain/cli' },
-										// Checking brAIn itself, and the loop that says
-										// whether its prompts are any good. Under the Hood
-										// rather than What It Measures: neither of these
-										// measures the house, they measure the add-on.
 										{ label: 'Deep Check & Rehearsal', slug: 'brain/doctor' },
 										{ label: 'Capture & the Corpus', slug: 'brain/corpus' },
+										{ label: 'Development Loop', slug: 'brain/development-loop' },
 									],
 								},
 								{ label: 'Reference', slug: 'brain/reference' },

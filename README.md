@@ -25,9 +25,10 @@ bruhautomation3/
 │       ├── cad/             # Fusion 360 sources and STEP exports
 │       └── preview/         # meshes generated from the CAD, so parts that were
 │                            #   never exported to STL are still previewable
-├── apps/                    # Home Assistant add-on docs
-│   ├── brain/               # → /brain/
-│   └── bruh-minecraft/      # → /bruh-minecraft/
+├── apps/                    # Home Assistant app docs, one folder per app
+│   ├── brain/               # → /brain/  (Morph is brain/morph/ → /brain/morph/)
+│   ├── bright/  bruh-print/  bruh-minecraft/  bruh-bambu-studio/
+│   └── gardenrx/  bruh-task-manager/  bruh-cooking/  bruh-browser/
 └── site/                    # the website that renders all of the above
     ├── pages/               # landing page, command generator
     ├── components/          # StlViewer, ThemeToggle, changelog/*
@@ -59,6 +60,16 @@ the couch beyond the printer. Both live in a project's `README.md` frontmatter,
 so re-categorising is a one-line edit that never moves a file or changes a URL.
 
 Project URLs are flat and permanent: `/projects/<folder>/`.
+
+## Apps
+
+Each Home Assistant app has a folder under `apps/` (published at `/<app>/`), a
+group in the sidebar in `astro.config.mjs`, and an entry in `APP_LIST` in
+`site/catalog.mjs`, which feeds the landing page's apps section, the
+[`/apps/`](https://bruhautomation.com/apps/) hub and the front-page count.
+Screenshots come from the add-ons' demo panels in
+[BRUH-HA-Apps](https://github.com/bruhautomation/BRUH-HA-Apps) (`tests/manual/`),
+never from a real house.
 
 ## Getting Started
 

@@ -875,7 +875,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="changed">
 
-- **A finding worth a look is investigated before it reaches you**: brAIn reads the history, logbook and device, then rewrites the card, sets it aside with its reason, or shows it as before if the look could not run. Safety alerts and urgent problems are still shown straight away. See [Findings](/brain/findings/).
+- **A finding worth a look is investigated before it reaches you**: brAIn reads the history, logbook and device, then rewrites the card, sets it aside with its reason, or shows it as before if the look could not run. Safety alerts and urgent problems are still shown straight away. See [Findings](/brain/needs-you/).
 - **The investigation no longer asks what it could read itself.** Up to 16 findings a day on the default setting, within your usage budget.
 - **Your list is now To Do**, and every item has Delete.
 - With *Let brAIn act without asking* on, a conversation opened from a card works the problem out without permission cards; only changing Home Assistant still asks.
@@ -1101,7 +1101,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="changed">
 
-- **Discuss opens a new conversation** beside the one you were in, instead of stopping it, and **asks before it changes anything** — every acting tool shows a permission card. A change you agree on becomes a plan on the card, with Apply and Undo. See [Findings](/brain/findings/).
+- **Discuss opens a new conversation** beside the one you were in, instead of stopping it, and **asks before it changes anything** — every acting tool shows a permission card. A change you agree on becomes a plan on the card, with Apply and Undo. See [Findings](/brain/needs-you/).
 - **A fix's report is on its card**, and a proposal's card carries its replay, before-and-after and trial grade. Questions get their own band near the top, and Dismiss on a question puts it to sleep for real.
 - **The chat knows the house before you tell it** (open cases, health, the house's rhythm, and the facts about what you mention), and the terminal's context file now carries an area map and the measurement tools. See [Terminal](/brain/terminal/).
 
@@ -1262,7 +1262,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="added">
 
-- **Minecraft, labels and light shows, by asking.** Eleven new tools drive BRUH Minecraft, BRUH Print and BRight through their own Home Assistant services: "teleport Emma to Dad", "put Steve in creative", "make it day", "who's on?", "print a label that says chili", "start the Friday party on the den speaker". Spoken names are matched against who is online, and a name that could be two people is asked about rather than guessed.
+- **Minecraft, labels and light shows, by asking.** Eleven new tools drive BRUH Minecraft, BRUH Print and BRight through their own Home Assistant services: "teleport Sam to Alex", "put Alex in creative", "make it day", "who's on?", "print a label that says chili", "start the Friday party on the den speaker". Spoken names are matched against who is online, and a name that could be two people is asked about rather than guessed.
 - **Playing is not administering.** A voice agent set to **Voice assistant** may play but not administer: op, ban, kick, the whitelist, a raw console command, stopping the server and installing server add-ons need **Whole house** or **Full admin**, and that holds through `call_service` too. Voice prints at most 10 labels at once. Every call goes through `call_service`, so an agent's Blocked services and `protected_entities` apply; scheduled runs may read the three status tools and nothing else.
 
 </Changes>
@@ -1305,7 +1305,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 
 <Changes type="changed">
 
-- **This site is rewritten for 2.8**: new pages for [Ideas](/brain/ideas/), [ESPHome](/brain/esphome/) and [Music Assistant](/brain/music-assistant/), a rewritten [Insights](/brain/insights/) page covering Refine and Share, a rewritten [Findings](/brain/findings/) page, fresh screenshots throughout, and this changelog brought up to date from 1.47.
+- **This site is rewritten for 2.8**: new pages for [Ideas](/brain/insights/), [ESPHome](/brain/esphome/) and [Music Assistant](/brain/music-assistant/), a rewritten [Insights](/brain/insights/) page covering Refine and Share, a rewritten [Findings](/brain/needs-you/) page, fresh screenshots throughout, and this changelog brought up to date from 1.47.
 - **The in-panel Help tab** describes the four tabs and the answers every card now takes, where a few sections still named the older buttons.
 
 </Changes>
@@ -1407,7 +1407,7 @@ import Changes from '../../site/components/changelog/Changes.astro';
 <Changes type="changed">
 
 - **A chore no longer renders on the feed.** A finding moved to the to-do list came back beside the real findings as *Broken · Device check · battery is low* over *Done · Remove* — a card that read as a finding with no way onto the to-do list, which is what was reported. The feed now lists problems, suggestions and guesses only; what you have accepted lives on the **To-do** tab with its own count, and the feed's badge stops counting it. Every finding on the feed still offers its way onto the list, its fixed ending and its dismiss.
-- **The pane is called [Findings](/brain/findings/).** The Home group's first tab was itself labelled *Home*; it is *Findings* now (Home → Findings), and the docs follow.
+- **The pane is called [Findings](/brain/needs-you/).** The Home group's first tab was itself labelled *Home*; it is *Findings* now (Home → Findings), and the docs follow.
 
 </Changes>
 </Release>
@@ -1442,7 +1442,7 @@ Onboarding studies a home once and proposes a card set, and that was the only mo
 
 <Changes type="added">
 
-- **[Home → Ideas](/brain/ideas/): the cards brAIn thinks this house is missing.** A page of proposals, separate from Insights on purpose: an idea costs nothing until you take it, where a card costs a run every refresh interval for ever. That split is what lets the page be generous. Each idea says three things — what the card would be called, **why this house** (the rooms, meters and numbers it actually found), and **what it would answer** every run. Take one and it becomes an ordinary card on Insights; say "not for this house" and it is never suggested again.
+- **[Home → Ideas](/brain/insights/): the cards brAIn thinks this house is missing.** A page of proposals, separate from Insights on purpose: an idea costs nothing until you take it, where a card costs a run every refresh interval for ever. That split is what lets the page be generous. Each idea says three things — what the card would be called, **why this house** (the rooms, meters and numbers it actually found), and **what it would answer** every run. Take one and it becomes an ordinary card on Insights; say "not for this house" and it is never suggested again.
 - **Press "Suggest ideas"** whenever you want one now. It skips the usage budget, the same promise every by-hand run makes.
 - **A weekly pass** tops the page up on its own, past every gate the scheduler already keeps (insights off, no credential, paused, budget spent).
 - **Nothing is proposed twice**: a card this home already has, however it came to have one, and every idea already answered are both consulted on every pass.
@@ -1517,7 +1517,7 @@ Onboarding studies a home once and proposes a card set, and that was the only mo
 </Changes>
 <Changes type="changed">
 
-- **The Home feed.** The [Findings](/brain/findings/) tab is called Home and renders cases: the kind, the severity, the confidence and stakes in words, the claim, the evidence, what *Do it* would do and the consent each step needs, and the three endings inline. Anything live that no case covers is still shown beneath, because a case list that could not be read must not render a house with problems as a house with none. The foot says what the day cost: looked, investigated, changed, watching. The badge counts open cases, one derivation for the tab and `/api/status`.
+- **The Home feed.** The [Findings](/brain/needs-you/) tab is called Home and renders cases: the kind, the severity, the confidence and stakes in words, the claim, the evidence, what *Do it* would do and the consent each step needs, and the three endings inline. Anything live that no case covers is still shown beneath, because a case list that could not be read must not render a house with problems as a house with none. The foot says what the day cost: looked, investigated, changed, watching. The badge counts open cases, one derivation for the tab and `/api/status`.
 - **Triage is retired into the first look** — a filed row the look ignores is held with its reason and still carries *Raise it anyway* — and its per-day cap now counts first looks.
 
 </Changes>
@@ -1684,7 +1684,7 @@ So there is a step between filing and surfacing. After each checks pass, one Cla
 <Changes type="added">
 
 - **What it elevates carries the reason** on the card: *brAIn checked — its own month of statistics really does drift upward, and no other freezer here does.*
-- **What it holds back goes to a new "Looked at" filter** on the [Findings](/brain/findings/) tab, which appears only once something is in it. Every row there says what was checked, opens **the conversation brAIn had about it**, and carries one button that puts it back on the work list.
+- **What it holds back goes to a new "Looked at" filter** on the [Findings](/brain/needs-you/) tab, which appears only once something is in it. Every row there says what was checked, opens **the conversation brAIn had about it**, and carries one button that puts it back on the work list.
 - **Held is held, not deleted.** The row stays, so the next pass does not file the same thing again, and it clears itself when the check stops reporting it — exactly as an open one does.
 - **Silence always surfaces.** Not signed in, automatic runs paused, the usage budget spent, the run failed or unreadable, more arriving at once than one look can cover: the finding is on the list saying *Not checked first*, and why. "I could not look" and "it is not real" are different things, and only the second may keep a problem off your screen.
 - **One run per pass, not one per finding**, capped — and a pass that filed nothing new spends nothing at all.
@@ -2299,7 +2299,7 @@ Everything else on that map is still proposed.
 
 <Release version="1.38.0" date="September 4, 2026">
 
-**The work list where people already are.** The [Findings](/brain/findings/) tab is behind ingress, so a critical finding was a panel somebody had to open.
+**The work list where people already are.** The [Findings](/brain/needs-you/) tab is behind ingress, so a critical finding was a panel somebody had to open.
 
 <Changes type="added">
 
@@ -2481,7 +2481,7 @@ Everything else on that map is still proposed.
 - **They run on a timer, on the Findings tab's Run-checks button, and as `brain check`** — and what they find rides into the analyst's prompt block with everything else, so Claude's job on the automations card becomes judgement rather than discovery.
 - **The first forecast.** A line through sixty days of a battery's statistics files "… battery is running down" three weeks out, with the days left in the detail — a finding with a date on it, rather than a threshold that fires the day before it dies.
 - **A finding a check no longer reports leaves the list on its own** — removed, not settled, so it can come back if the problem does. Only checks that actually *ran* may clear anything: a check whose data could not be fetched said nothing, and nothing is not "the problem went away".
-- **A producer scorecard.** Every ending on the [Findings](/brain/findings/) tab is a label, and nothing added them up because the settled ledger recorded the ending and not who raised it. A line under the filters now says how right each producer has been, once it has enough endings to mean something.
+- **A producer scorecard.** Every ending on the [Findings](/brain/needs-you/) tab is a label, and nothing added them up because the settled ledger recorded the ending and not who raised it. A line under the filters now says how right each producer has been, once it has enough endings to mean something.
 - **A run journal**, one line per Claude run of any kind and per checks pass, with a fixed outcome vocabulary — fallbacks included, because a fallback nobody counts is a fallback read as the real thing. Prompts and replies are never written.
 - **Diagnostics, three ways**: an endpoint, a mirror the integration reads so the standard **Download diagnostics** button produces something, and `brain report`, which writes it beside `brain doctor --json` and the log tail as one redacted archive — for a bug report that arrives with evidence rather than prose.
 - **`protected_entities`** — a list of entity ids or `domain.*` patterns brAIn may never act on, from any face. Enforced in the MCP server's one chokepoint, so it covers every control tool and every direct service call; a protected entity can still be looked at. A call aimed at an area or device that *contains* one is refused, and labels and floors are refused outright while the list is non-empty.
@@ -3258,7 +3258,7 @@ Everything else on that map is still proposed.
 
 <Changes type="added">
 
-- **A [Findings](/brain/findings/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
+- **A [Findings](/brain/needs-you/) tab, and it is a work list.** A battery that died. A sensor that has read the same value for six days. A device stuck unavailable. An automation whose trigger entity was renamed, so it can never fire again. Insight runs and study sessions both file them, and the same problem in different words is recognised and dropped, so a given problem is reported exactly once.
 - **✦ Fix it** sends Claude to make the change in your actual Home Assistant: confirm the problem is still real, find the cause rather than the symptom, make the smallest change that resolves it, verify it took, and report exactly what it touched. Bounded hard — one finding per run, never deletes what it didn't create, never restarts Home Assistant, never touches secrets, and nothing runs until you press it.
 - **Not a problem** dismisses a finding permanently, and the dismissal is fed into every future analysis. If the garage freezer is *supposed* to sit at -30°C, one press ends that conversation for good. Anything needing hands is marked **needs you** rather than offered a fix, and **✓ I did it** closes those.
 - **A second verb in the ask bar.** Start a line with "learn about…" or "study…" and brAIn runs a study session instead of drawing a card, digging through the registry, history and long-term statistics for that corner of the house. It was previously reachable only from the terminal, which meant nobody ran one.
