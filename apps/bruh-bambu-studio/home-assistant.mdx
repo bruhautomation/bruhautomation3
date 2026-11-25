@@ -1,0 +1,233 @@
+---
+title: Home Assistant integration
+description: The bruh_bambu integration — a device per Bambu Lab printer with a camera and sensors, failure-detection entities, 23 services that answer with the result, the print alert event, and the printer card for Lovelace and Morph.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The add-on deploys a companion integration, **`bruh_bambu`**, and keeps it up to date (the
+`enable_ha_integration` option, on by default). The add-on is the one thing that talks to your
+printers; the integration is Home Assistant's window onto it.
+
+## Setting it up
+
+Home Assistant loads an integration only when it starts, so **restart Home Assistant once**
+after installing the add-on. The Printers tab (and **Settings › Home Assistant**) show a banner
+with a **Restart Home Assistant** button, and Home Assistant raises a notification. After the
+restart the add-on sets the integration up by itself; it is under **Settings → Devices &
+services → BRUH Bambu Studio**, with a device per printer.
+
+An add-on update asks for another restart only when the integration's code changed. The
+dashboard card follows its own file, so a card-only change needs nothing more than a page
+reload.
+
+## Entities
+
+Each printer is a device named after the printer. With a printer called *Workshop X1C*:
+
+| Entity | What it is |
+|---|---|
+| `camera.workshop_x1c_camera` | The printer's own camera, live over your network |
+| `sensor.workshop_x1c_status` | The printer's own word — `idle`, `prepare`, `running`, `pause`, `finish`, `failed` — or `offline` when it is not reporting. Everything else is in its attributes: the stage, the AMS units, the tray in use, the spool holder, the fans and the HMS codes |
+| `sensor.workshop_x1c_stage` | What it is doing inside that state: levelling, heating, changing filament… |
+| `sensor.workshop_x1c_progress` | Progress, % |
+| `sensor.workshop_x1c_time_left` | Time left |
+| `sensor.workshop_x1c_nozzle_temperature` | Nozzle temperature |
+| `sensor.workshop_x1c_bed_temperature` | Bed temperature |
+
+### Failure detection entities
+
+With [print failure detection](/bruh-bambu-studio/failure-detection/) on, the device also has:
+
+| Entity | What it is |
+|---|---|
+| `sensor.workshop_x1c_failure_detection` | `off`, `idle`, `watching`, `looking`, `basic`, `warning`, `failure`, `covered`, `dark`, `frozen` or `no_camera`, with the last look, the next one and any open alert as attributes |
+| `binary_sensor.workshop_x1c_print_problem` | On while an alert is open; `level` says `warning` or `failure` |
+| `binary_sensor.workshop_x1c_plate_clear` | The plate has been seen clear after a finish (works with detection off too) |
+| `binary_sensor.workshop_x1c_camera_covered` | The lens is covered |
+| `camera.workshop_x1c_last_print_check` | The frame brAIn last judged |
+
+<Aside type="note">
+Entity ids follow your printer's name and Home Assistant's usual rules, so check yours under the
+device page; the ones above are examples.
+</Aside>
+
+## Services
+
+`printer` can be left out when there is only one printer; with two or more it is the printer's
+name or serial number. **Every service answers with the add-on's reply, and a refusal** (*"Workshop
+X1C is already printing"*) **is raised with its reason**, so it shows in the automation trace
+rather than failing silently.
+
+<Tabs>
+<TabItem label="Printing">
+
+| Service | What it does |
+|---|---|
+| `bruh_bambu.print_file` | Print a file from `/share/bambu` — sliced first if needed. `slot` / `material` / `colour` choose the filament for a bare model; `plate`, `use_ams`, `ams_mapping`, `timelapse`, `bed_leveling`, `flow_cali`, `vibration_cali`, `layer_inspect`, `plate_type`, `speed`, `copies` and `settings` are the [print options](/bruh-bambu-studio/printing/#print-options) |
+| `bruh_bambu.slice_file` | Slice a project or model (`plate`, `machine`, `process`, `filaments`, `arrange`, `orient`) |
+| `bruh_bambu.pause_print` | Pause the current print |
+| `bruh_bambu.resume_print` | Resume it |
+| `bruh_bambu.stop_print` | Stop it |
+| `bruh_bambu.import_url` | Import a model from a Printables page or a file link; answers with the new files' paths |
+| `bruh_bambu.open_in_studio` | Open a file in the sidebar's Bambu Studio |
+
+</TabItem>
+<TabItem label="Printer control">
+
+| Service | What it does |
+|---|---|
+| `bruh_bambu.set_speed` | `silent`, `standard`, `sport` or `ludicrous` |
+| `bruh_bambu.set_light` | Chamber light on or off |
+| `bruh_bambu.set_temperature` | Nozzle (up to 300 °C) or bed (up to 120 °C) target; refused while printing |
+| `bruh_bambu.send_gcode` | Up to 32 lines of G-code; refused while printing |
+| `bruh_bambu.refresh` | Ask a printer for a full report now |
+| `bruh_bambu.reconnect` | Drop the connection to a printer and open a new one |
+
+</TabItem>
+<TabItem label="Reading">
+
+| Service | What it does |
+|---|---|
+| `bruh_bambu.get_status` | Every printer's state, progress, time left, temperatures, speed, light and AMS, whether Bambu Studio is installed and running, and the latest jobs |
+| `bruh_bambu.list_files` | The files in `/share/bambu`, which are sliced, their plates, print time and weight, and the slicer profiles |
+| `bruh_bambu.printer_files` | What is on a printer's own storage |
+| `bruh_bambu.find_printers` | The Bambu Lab printers on the network (or `subnet`), and which are added already |
+
+</TabItem>
+<TabItem label="Design (needs brAIn)">
+
+| Service | What it does |
+|---|---|
+| `bruh_bambu.design_part` | Describe a part (`description`, optional `name`) and brAIn designs it — or name a `part` and say what to change in `message`. Answers as soon as brAIn has started, with the part's id and name |
+| `bruh_bambu.design_status` | A part's latest version, whether brAIn is still on it, its last reply, whether it built and any print of it; every part when none is named |
+| `bruh_bambu.print_part` | Print a designed part — the Design tab's Slice and print — with `printer`, `version`, `copies`, `slot`, `timelapse` and `settings` |
+
+The three design services answer with data only (use `response_variable:`), and a part is named
+by its id or its name.
+
+</TabItem>
+<TabItem label="Failure detection">
+
+| Service | What it does |
+|---|---|
+| `bruh_bambu.check_print` | Have brAIn look at the print now (detection on, the camera able to see) |
+| `bruh_bambu.print_alert_action` | Answer an alert: `ignore`, `pause`, `resume` (a false alarm), `stop`; or `plate_clear` / `plate_occupied`. `alert` names the alert, so an old answer is refused |
+| `bruh_bambu.set_failure_detection` | Turn detection on or off for a printer, and set `mode` (pause or warn), `sensitivity` (low, medium, high), `light`, `plate` and the `notify` service alerts go to |
+
+</TabItem>
+</Tabs>
+
+## The print alert event
+
+Every warning and failure fires **`bruh_bambu_print_alert`** with:
+
+| Field | |
+|---|---|
+| `printer` | The printer's id |
+| `printer_name` | Its name |
+| `alert` | The alert's id (pass it to `print_alert_action`) |
+| `level` | `warning` or `failure` |
+| `problem` | What brAIn saw |
+| `summary` | One line for a person |
+| `paused` | Whether the printer was paused |
+
+## The printer card
+
+The add-on installs one card in two places.
+
+**Lovelace.** Add *BRUH Bambu printers* from the card picker (`install_lovelace_card`, on by
+default):
+
+```yaml
+type: custom:bruh-bambu-card
+# With no options it shows every printer. To show one:
+entity: sensor.workshop_x1c_status
+# Trim it:
+show_camera: false
+show_ams: false
+show_controls: false
+show_detection: false
+```
+
+`entities:` takes a list of status sensors to show several.
+
+**Morph.** With [Morph](/brain/morph/) in use, the same card is put in `/config/morph/cards`
+(`install_morph_card`) and is used as `type: custom:morph-bambu-printer`, in Morph's own look.
+Morph picks it up within two minutes.
+
+Each printer on the card is its name and state on one line, the camera, the progress with the
+time left and the finish time, failure detection's line — or, during an alert, what brAIn saw
+with **Ignore** and **Pause** (or **Resume** and **Stop**) — the temperatures and **Pause** /
+**Resume**. Stop (press twice), the speed, the chamber light, **Refresh**, **Reconnect** and the
+AMS trays are behind the printer's **⋯**, which opens in the card.
+
+## Automation examples
+
+### Flash a light when a print has a problem
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.workshop_x1c_print_problem
+    to: "on"
+actions:
+  - action: light.turn_on
+    target: { entity_id: light.office }
+    data: { flash: long }
+```
+
+### Tell me when the print is done
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.workshop_x1c_status
+    to: finish
+actions:
+  - action: notify.mobile_app_alex_phone
+    data:
+      title: Print finished
+      message: "{{ state_attr('sensor.workshop_x1c_status', 'printer_name') }} is done."
+```
+
+### Print a file at a set time
+
+```yaml
+triggers:
+  - trigger: time
+    at: "06:00:00"
+conditions:
+  - condition: state
+    entity_id: sensor.workshop_x1c_status
+    state: idle
+actions:
+  - action: bruh_bambu.print_file
+    data:
+      file: imports/rotor.stl
+      printer: Workshop X1C
+      plate_type: textured_pei
+      copies: 4
+      settings:
+        layer_height: 0.16
+        walls: 4
+        print_sequence: by object
+```
+
+### Designing from an automation
+
+```yaml
+actions:
+  - action: bruh_bambu.design_part
+    data:
+      description: >-
+        A wall hook 4 cm long for a coat, two screw holes,
+        and print it on the Workshop X1C
+      name: Coat hook
+    response_variable: started
+```
+
+Designing takes minutes, so `design_part` answers as soon as brAIn has started, with the part's
+id and name in the response. Put the print in
+the description, as above, and the design conversation prints the part itself once it has built.
+Or ask `bruh_bambu.design_status` until the version has built, then call `bruh_bambu.print_part`.

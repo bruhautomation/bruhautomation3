@@ -71,11 +71,98 @@ export const CATEGORIES = [
 	},
 ];
 
+/**
+ * Every Home Assistant app in the BRUH-HA-Apps repository, in the order the
+ * site shows them: brAIn first (the others plug into it), then the stable
+ * apps, then the experimental ones. The landing page, the /apps/ hub and the
+ * front-page count all read this list, so adding an app is one entry here
+ * plus its docs folder under `apps/`.
+ *
+ * `icon` is the add-on's own icon.png, resized into site/public/images/apps/.
+ */
+export const APP_LIST = [
+	{
+		slug: 'brain',
+		name: 'brAIn',
+		tagline: 'Give your house a mind.',
+		blurb:
+			'Claude with the full run of Home Assistant — a dashboard that lays itself out by what matters now, a Resident that notices and investigates, one memory that learns your house, voice, chat and a real terminal.',
+		tags: ['AI', 'Dashboard', 'Voice'],
+	},
+	{
+		slug: 'bright',
+		name: 'BRight',
+		tagline: 'Light shows that listen.',
+		blurb:
+			'Analyses your music once, choreographs LIFX bulbs over the LAN plus switch-driven party lights, and keeps the show in sync with the speaker.',
+		tags: ['Lighting', 'Music'],
+	},
+	{
+		slug: 'bruh-print',
+		name: 'BRUH Print',
+		tagline: 'Labels from anywhere in the house.',
+		blurb:
+			'A DYMO LabelWriter driver and full label designer in the sidebar, fill-in-the-blank templates, Twin Turbo roll selection and a Lovelace card.',
+		tags: ['Printing', 'Organisation'],
+	},
+	{
+		slug: 'bruh-minecraft',
+		name: 'BRUH Minecraft',
+		tagline: 'A server the whole family can run.',
+		blurb:
+			'Minecraft Java Edition with Bedrock cross-play, git-versioned worlds, a Modrinth add-on browser, an in-game brAIn companion and deep Home Assistant integration.',
+		tags: ['Games', 'Family'],
+	},
+	{
+		slug: 'bruh-bambu-studio',
+		name: 'BRUH Bambu Studio',
+		tagline: 'Describe it. See it. Print it.',
+		blurb:
+			'Bambu Studio in your sidebar and Bambu Lab printers over the LAN — design a part with brAIn, slice, upload, start and watch prints from Home Assistant.',
+		tags: ['3D printing', 'Maker'],
+	},
+	{
+		slug: 'gardenrx',
+		name: 'GardenRX',
+		tagline: 'The right spray, on the right day.',
+		blurb:
+			'A spray decision engine for a home orchard and garden — crops, growth stages, weather, treatments, tank mixes, inventory and harvests — with dashboard cards.',
+		tags: ['Garden', 'Planning'],
+	},
+	{
+		slug: 'bruh-task-manager',
+		name: 'BRUH Task Manager',
+		tagline: 'What is my Home Assistant doing?',
+		blurb:
+			'CPU, memory, network and disk app by app — and, if you choose, process by process — with restart, stop and a runaway-app sensor.',
+		tags: ['System', 'Experimental'],
+		experimental: true,
+	},
+	{
+		slug: 'bruh-cooking',
+		name: 'BRUH Cooking',
+		tagline: 'Dinner, on cue.',
+		blurb:
+			'Breville+ and Sage appliances — Joule sous vide, Joule Turbo and the Joule Oven Air Fryer Pro — in Home Assistant and brAIn, with a panel that draws each one.',
+		tags: ['Kitchen', 'Experimental'],
+		experimental: true,
+	},
+	{
+		slug: 'bruh-browser',
+		name: 'BRUH Browser',
+		tagline: "brAIn's hands on the web.",
+		blurb:
+			'A real Chrome with Claude in Chrome, so brAIn can run errands on websites — and stop for your approval before anything is bought.',
+		tags: ['AI', 'Experimental'],
+		experimental: true,
+	},
+].map((app) => ({ ...app, href: `/${app.slug}/`, icon: `/images/apps/${app.slug}.webp` }));
+
 /** The add-ons. Not a project category, but it sits beside them in the nav. */
 export const APPS = {
 	id: 'apps',
 	label: 'Apps',
-	blurb: 'Home Assistant add-ons — brAIn and BRUH Minecraft.',
+	blurb: `${APP_LIST.length} Home Assistant apps — brAIn, Morph, BRight, BRUH Print, Minecraft, Bambu Studio and more.`,
 	icon: `<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>`,
 };
 

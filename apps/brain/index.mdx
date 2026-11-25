@@ -1,9 +1,9 @@
 ---
 title: brAIn
-description: Your house already has nerves. Now give it a brAIn. A Home Assistant add-on that runs Claude Code inside HA, sees your whole system, can change any of it, and builds a permanent memory of your house.
+description: brAIn is a Home Assistant add-on that runs Claude inside your house. It sees and can change all of Home Assistant, watches for what is wrong, explains what happened, remembers how your home works and draws its own dashboard, from one sidebar entry and one Claude login.
 template: splash
 hero:
-  tagline: "Your house already has nerves. Now give it a brAIn. Claude plus a suite of new tools hands it the keys. Stop programming your house — let it think."
+  tagline: "Your house already has nerves. Now give it a brAIn. Claude with the run of Home Assistant: it notices, investigates, explains, remembers and fixes, and it asks before it touches anything."
   # The full wordmark, not the icon: at hero size there is room for it, and
   # the mark only reads as "brAIn" when the gable is doing its job as the A.
   # Its B/R/N flip between ink and paper, so it needs both grounds.
@@ -14,6 +14,10 @@ hero:
     - text: Quick Start
       link: /brain/quickstart/
       icon: right-arrow
+    - text: The four switches
+      link: /brain/features/
+      icon: setting
+      variant: minimal
     - text: Configuration Reference
       link: /brain/reference/
       icon: open-book
@@ -22,263 +26,264 @@ hero:
       link: /brain/changelog/
       icon: list-format
       variant: minimal
-    - text: GitHub
-      link: https://github.com/bruhautomation/BRUH-HA-Apps
-      icon: external
-      variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard, Aside, Badge } from '@astrojs/starlight/components';
+
+<Badge text="Version 5.5" variant="note" /> <Badge text="Experimental" variant="caution" />
 
 ## What it is
 
-A Home Assistant add-on that runs **Claude Code** and a suite of tools inside HA, which
-builds a permanent memory of your house.
+brAIn is a Home Assistant add-on that runs **Claude Code** inside your house, with a suite
+of tools built for Home Assistant and a memory that grows the longer it lives there.
 
-It sees the whole system — every entity, device, area, floor, dashboard, helper and
-automation — and it can change any of it. Explain a broken automation. Fix it. Write a new
-one. Remember why, next time.
+It sees all of Home Assistant: every entity, device, area, floor, dashboard, helper and
+automation. It can change any of it. It also watches the house on its own. It notices
+when something goes wrong, works out whether it matters before it bothers you, explains
+what happened and why, and keeps a plain-language record of how your home works.
 
-That memory isn't a black box. Open it, read it, edit it, correct it. An insights panel
-shows what it knows about your house and what it's done there — in the sidebar, or embedded
-straight into your dashboards.
+Everything comes in through **one sidebar entry and one Claude login**. Your Claude **Pro**
+or **Max** subscription pays for it, or you can use an API key. There is no brAIn
+subscription.
 
-Reach it however you want: as your conversation agent, through a full-featured chat
-interface, or from native Claude Code. Your automations can call it too — which means your
-house can ask for help before you notice anything's wrong.
+![brAIn's sidebar entry in the dark theme, with Personality on and the assistant named Juniper: the Morph UI, Insights, Ask and Memory tabs, a "Good night." greeting with a sentence about what the house is doing, an "Ask or tell the house…" line, a timeline with a 3D print in progress, and the Kitchen and Living Room with their lights, speaker and TV](./images/overview-home-dark.webp)
 
-One install, one sidebar panel, one login. Runs on the Claude **Pro** or **Max**
-subscription — or your own API key.
+## The panel
 
-![The brAIn Insights tab: an ask bar across the top, tag filters, and two insight cards — "Why did the hallway light come on at 3 am?" with a trace timeline, and "Downstairs dries 15 min before it cools" with humidity and temperature charts](./images/panel-insights.webp)
+brAIn's sidebar entry opens on up to four tabs, with ⚙ Settings in the top bar. On a phone
+the tabs move to a bar along the bottom.
+
+| Tab | What's there |
+| --- | --- |
+| **Morph UI** (Home) | The [Morph dashboard](/brain/morph/), brAIn's face: a dashboard laid out by what matters in the house right now, which brAIn designs and edits with you. Shown while **Morph dashboard** is on in [⚙ › Features](/brain/features/). Every tab's name and icon can be changed in ⚙ › Dashboard. |
+| **Insights** | **Cards**: your [insight cards](/brain/insights/), each an answer with the numbers and a chart. **Needs you**: [every decision waiting on you](/brain/needs-you/) as one kind of card, with **To Do** under it. **History**: what you've already answered, each with **Restore**. |
+| **Ask** | [Claude Code](/brain/terminal/) as a chat that reflows to a phone, or as a real terminal. Several conversations stay open at once. |
+| **Memory** | **Knowledge**: [every fact brAIn holds](/brain/memory/), by room and device, each deletable. **Timeline**: [what the house is doing now and what caused each change](/brain/activity/). **House book**: [how this house works](/brain/upkeep/#the-house-book), chapter by chapter. |
+
+![The brAIn panel's Insights tab: Cards, Needs you and History along the top, and insight cards such as "Why did the hallway light come on at 3 am?" with the automation trace that explains it, and "Downstairs dries 15 min before it cools" with humidity and temperature charts](./images/panel-insights.webp)
+
+⚙ holds Features, Account, Model & usage, Permissions, Notifications, Cameras & calendars,
+Personality, Instructions, Diagnostics, Developer and the built-in Guide. The full
+documentation ships inside the add-on and works with no internet.
 
 <CardGrid>
-  <Card title="It runs Home Assistant" icon="setting">
-    Not just "turn on a light" — **[69 admin services](/brain/power-tools/)** reach the
-    parts of HA that normally live behind the Settings UI, plus **89 native tools** and a
-    real shell in `/config`. [What it can reach →](/brain/how-brain-controls-ha/)
+  <Card title="It notices, and works out whether it matters" icon="magnifier">
+    Free house checks and Home Assistant's own event bus raise signals. A cheap first look
+    decides which deserve a thought, and an investigation reads the history before you
+    ever see a card. [The Resident →](/brain/resident/)
   </Card>
-  <Card title="It finds what's broken" icon="magnifier">
-    A dying battery, a sensor that stopped reporting three weeks ago, an automation
-    whose trigger can never fire. Press **Fix it** and it shows exactly what it would
-    change; press **Apply** and it does — with an **Undo** on the card.
-    [Findings →](/brain/findings/)
-  </Card>
-  <Card title="It remembers your house" icon="open-book">
-    One plain-markdown document of durable facts — nicknames, rhythms, the devices
-    that are *meant* to behave oddly. Everything brAIn does reads it, and
-    `brain memory export` carries it to new hardware — no starting over.
-    [Memory →](/brain/memory/)
-  </Card>
-  <Card title="It explains your house" icon="star">
-    Ask anything and get a card: the answer, the numbers and a chart. **Refine** it
-    in a sentence, **Share** it as a picture or onto a dashboard.
-    [Insights →](/brain/insights/)
+  <Card title="One list of what needs you" icon="list-format">
+    Problems, questions, suggestions and tidy-ups are one kind of card with one row of
+    presses: **Plan**, **Add to To Do**, **Snooze**, **Ignore**. The same answers work in
+    Home Assistant's Repairs and on your phone. [Needs you →](/brain/needs-you/)
   </Card>
   <Card title="It tells you about a leak, whatever else is going on" icon="warning">
-    A tripped leak, smoke, CO or gas sensor is a critical card and a phone alert the
-    moment it trips — through quiet hours, with reminders, without waiting for any AI,
-    a sign-in or a usage budget. [Permissions & Safety →](/brain/safety/)
+    A tripped leak, smoke, CO or gas sensor goes to your phone the moment it trips, through
+    quiet hours, with reminders, and without waiting for any AI, a sign-in or a usage budget.
+    [Notifications →](/brain/notifications/)
   </Card>
-  <Card title="It keeps the house in order" icon="list-format">
-    Tidy names and rooms as one table you approve and can undo, an answer to *"should I
-    update tonight?"* that quotes its evidence, an overnight check that names the cause,
-    and a house book you can share. [Upkeep →](/brain/upkeep/)
+  <Card title="It explains your house" icon="star">
+    Ask anything and get a card: the answer first, the numbers it rests on, and a chart
+    drawn for your data, refreshed on a schedule you set. Ask *why* something happened
+    and it answers in words, with what it read. [Insights →](/brain/insights/)
   </Card>
-  <Card title="It runs your devices and your other add-ons" icon="rocket">
-    Edit, validate and flash ESPHome devices, clear out stale Music Assistant
-    speakers, and drive BRUH Minecraft, BRUH Print and BRight — *"put Steve in
-    creative"*, *"print a label that says chili"* — all by asking.
-    [ESPHome →](/brain/esphome/) · [Music Assistant →](/brain/music-assistant/)
+  <Card title="It runs Home Assistant" icon="setting">
+    **115 tools** for reading and controlling, **91 admin services** for the parts of HA
+    that live behind the Settings screens, and a real shell in `/config`.
+    [How brAIn controls HA →](/brain/how-brain-controls-ha/)
   </Card>
-  <Card title="It talks, in a voice you choose" icon="comment-alt">
-    Pick brAIn in **Settings → Voice assistants**. Give it a personality, or run
-    several agents with different names — and each chooses its own reach, from only
-    what you expose to Assist up to everything. [Voice →](/brain/voice/)
+  <Card title="It remembers your house" icon="open-book">
+    Nicknames, rhythms and the devices that are *meant* to behave oddly, learned from
+    conversations and from your answers, and read by every part of brAIn.
+    [Memory →](/brain/memory/)
   </Card>
-  <Card title="It has a terminal" icon="laptop">
-    The real Claude Code CLI with your `/config` in front of it, as a chat or as a
-    true terminal — one button between them. Several conversations stay open at
-    once and switching stops nothing, so one left mid-answer is finished when you
-    come back. Permission asks arrive as cards in the chat — or turn on **Let brAIn
-    act without asking** and it stops asking — and it never asks you to `chown` a
-    file. [Terminal →](/brain/terminal/)
+  <Card title="It measures what normal is here" icon="document">
+    What each sensor usually reads at this hour of this week, when the house gets up, which
+    doors are normally open, how fast rooms lose heat, all worked out overnight with no Claude
+    run. [Measurements →](/brain/measurements/)
+  </Card>
+  <Card title="It has a face" icon="laptop">
+    The [Morph dashboard](/brain/morph/) puts what matters right now at the top and says
+    why. Hold anything and tell brAIn what to change. Since 5.0 it also works on Home
+    Assistant's own dashboards.
+  </Card>
+  <Card title="It talks" icon="comment-alt">
+    Pick brAIn as your Assist conversation agent. Each agent has its own name, model and
+    reach, from only what you expose up to full admin. [Voice →](/brain/voice/)
+  </Card>
+  <Card title="It drives your other BRUH apps" icon="rocket">
+    Print a label, start a 3D print, run a light show, start the sous vide, log a harvest,
+    build a grocery cart: all by asking. [brAIn and the BRUH apps →](/brain/apps/)
   </Card>
   <Card title="It works from automations" icon="puzzle">
-    `brain.run_task` for background jobs, scheduled insight reports rendered to
-    sensors, and events your automations can trigger on.
+    `brain.ask` returns an answer as data an automation can branch on, `brain.run_task`
+    runs a job in the background, and events fire for every new case.
     [Automations →](/brain/automations/)
   </Card>
   <Card title="It can be undone" icon="seti:config">
-    Every file brAIn writes to is snapshotted first — the automation an accepted
-    proposal adds included. **`brain undo`** lists the edits in plain English and puts
-    one back. [The CLI →](/brain/cli/)
+    Every file brAIn writes is snapshotted first, a fix carries **Undo** on its card, and
+    `brain undo` lists every edit in plain English. [Permissions & Safety →](/brain/safety/)
   </Card>
 </CardGrid>
 
-## It administers your setup
+## Use cases
 
-Most AI integrations can turn on a light. brAIn runs the installation. It reaches Home
-Assistant three ways at once — native tools for reading and controlling, admin services
-for the registry, and a shell for everything that is still a YAML file.
+These are things brAIn does today, on an ordinary house.
 
-- **Organisation** — create, rename and delete areas, floors and labels; set icons and
-  voice aliases; move devices and entities between them. *"Put every upstairs room on a
-  floor called Upstairs and rename the Shellys to what they actually control."*
-- **Devices and entities** — rename either, change an `entity_id`, hide, unhide, enable,
-  disable. Find references to things that no longer exist and clean them up — dry-run
-  first, so you see the list before anything goes.
-- **What a device shows as** — a contact sensor as a door, a cover as a garage door, a
-  smart plug running a fan or a lamp as a fan or a light, a sensor in °F with one decimal.
-  [Show as →](/brain/power-tools/entities/#what-a-device-shows-as)
-- **Dashboards** — read, create, rewrite, restore a previous version. It can build a
-  dashboard from a sentence.
-- **Automations, scripts and scenes** — it edits the YAML, validates it, reloads the
-  domain, then reads the **traces** to see whether the thing actually fired and why it
-  didn't. That last part is what makes *"write me an automation"* work on the second try
-  instead of never.
-- **The house's own record** — history and long-term statistics, the logbook, the error
-  log, your other add-ons, weather, camera snapshots it can actually *see*, and every
-  service any integration exposes.
+### A leak at 3 am
 
-**Nothing is create-only.** Everything that can be created can be renamed and deleted,
-and every attribute a `create_` service accepts has a service that changes it later.
+The washing machine's leak sensor trips at 03:12. No model is asked first: brAIn files a
+**critical** card naming the sensor and the time and sends it to your phone straight away,
+through quiet hours. Nobody answers, so it asks again an hour later, then four hours later,
+then twelve. If the sensor dries out the card says so and the reminders stop, but the card
+stays until you answer it, because the water still came from somewhere. If you ticked the
+utility room's camera, the investigation afterwards may look through it to confirm. None of
+this needs a Claude sign-in, a usage budget or automatic runs to be on.
+[Notifications →](/brain/notifications/)
 
-## It fixes what it finds
+### "Why did the hallway light come on at 3 am?"
 
-A **finding** is something wrong with your house, filed by brAIn on its own while it was
-looking at something else. Each one carries the evidence — the entity, the number, the
-day it started — and what would resolve it.
+Ask it in **Ask**, or in the *Ask or tell the house* line on the Morph dashboard. brAIn reads
+the logbook and the automation's trace and answers in words: the night-bathroom automation
+fired on landing motion and never set a brightness, so the light came back at its last
+evening value. Say *"fix it"* and it edits the automation, validates the YAML, reloads, and
+tells you that `brain undo` puts the old file back. **Save as report** turns the answer into
+an insight card.
 
-![The Findings tab, headed "What's waiting on you", with a "Back door battery has reported nothing since 26 July" card and a "Two loft sensors never rejoined after the Zigbee channel change" card, each with the evidence, a "How you'd fix it" box, and the buttons Add to list, Dismiss and Not a problem](./images/panel-findings.webp)
+![The Ask tab in chat mode: the question "The hallway light came on at 3am again. Find out why and fix it.", a collapsed "Worked through 6 steps", and brAIn's answer explaining the missing brightness and the fix it made](./images/panel-chat.webp)
 
-Every card takes the same row of answers: **Fix it** (where software can — brAIn shows you
-exactly what it will change and changes nothing until you press **Apply**, and the card
-keeps an **Undo** afterwards), **Add to list**, **Dismiss**
-for "not now", and **Not a problem** for "you've got this wrong" — with a box for why,
-which is the half that teaches. *"That sensor always reads on, it's not stuck"* becomes a
-standing fact about your house, so the next run doesn't make the same mistake in new words.
+### The freezer door nobody closed
 
-Findings reach you without the panel open too: in Home Assistant's **Repairs**, as the
-`todo.brain_system_brain` to-do list, as `sensor.brain_findings_open_findings`, and — with
-**one option** set (`findings_notify_service`) — as phone notifications with the same
-answer buttons and a **Reply**.
+At the hour your house usually settles, brAIn checks every door, window, lock, cover and
+garage against how much of that hour each one is normally open, measured from a month of
+your own history. The garage freezer's door is open at 23:30 and it never is. You get one
+row before bed, not one per door. The slow failure is covered too: a freezer drifting a few
+degrees warmer over weeks never looks unusual on any single day, so brAIn also fits a trend
+through the month and tells you when a reading has been walking one way.
+[Measurements →](/brain/measurements/)
 
-## It writes what you ask for, in a sentence
+### A dead battery, handled from the lock screen
 
-Some of the things on the [Proposals](/brain/proposals/) tab start with you rather than
-with a pattern it found:
+The back door sensor has reported nothing since Tuesday. A house check files it, the
+Resident looks at its history before you see it, and the card says what it found. On your
+phone the notification carries **Add to To Do**, **Snooze** and **Ignore**, plus a **Reply**
+box. Type *"I already replaced it"* and it is marked fixed. Type *"why does this matter?"*
+and brAIn answers in the next notification. The same card is in Home Assistant's Repairs.
+[Needs you →](/brain/needs-you/)
 
-- **[A rule in a sentence](/brain/intents/)** — *"whenever the front door opens after dark,
-  turn the hall light on"*. brAIn drafts the automation, **replays it over the last month**,
-  grades it against what you actually did, and offers it with the case in one line — *would
-  have fired 9 times; you'd already done the same yourself on 4*. **Try it for a week** first
-  if you like.
-- **[One-offs](/brain/intents/)** — *"turn the porch light off when the guests leave"*. An
-  ordinary automation that **runs once and switches itself off**, left in your automations
-  saying it fired until you press Remove.
-- **[Four scenes for a room](/brain/scenes/)** — morning, day, evening and night, composed
-  from what each bulb in that room can actually be told, shown as swatches before you say yes.
-  Accept them and brAIn offers the schedule that moves between them, using the times it has
-  measured for when your house gets up and settles.
+### Asking out loud
 
-## It tells you about a leak, whatever else is going on
+*"Is anyone still in the garage?"*, *"Turn the lounge down for a film"*, *"Print three
+freezer labels for bolognese"*, *"Remember that we call the office lamp the beacon."*
+brAIn answers Assist from a pool of pre-warmed workers with your memory and an area map
+already loaded. The default agent reaches only what you expose to Assist.
+[Voice →](/brain/voice/)
 
-A tripped **leak, smoke, carbon monoxide or gas** sensor is filed as a critical card naming
-the sensor and the time, and sent to your phone straight away — through quiet hours, with
-reminders behind it — without waiting for any AI to look at it, and without needing a Claude
-sign-in, the automatic switch or any usage budget. With no notification service set, it lands
-in Home Assistant's own notifications. Every trip is its own alert. [Permissions &
-Safety →](/brain/safety/)
+### Automations that ask brAIn
 
-## It acts, twice, and only because you said so
+An automation can hand brAIn a question and get the answer back as data:
 
-Everything above reports or proposes. Two things change the house, and both are decisions you
-make once, in advance:
+```yaml
+action: brain.ask
+data:
+  question: Is anything in the house drawing more than usual right now?
+  schema:
+    type: object
+    properties:
+      unusual: {type: boolean}
+      why: {type: string}
+    required: [unusual, why]
+response_variable: answer
+# answer.data.unusual is a boolean you can put in a condition
+```
 
-- **[Emergency playbooks](/brain/playbooks/)** — the automation you would want on a bad night:
-  smoke or CO, a water leak, a freeze with the heating stopped. brAIn writes it from your own
-  registries, lists every entity it would touch on the card, and **Home Assistant runs it, not
-  brAIn** — only once you have accepted it. Rehearse it to see what it would do, against the
-  house right now, changing nothing. No playbook ever unlocks a door or disarms an alarm.
-- **[Overnight self-healing](/brain/self-healing/)** — **off by default**. Switched on, it
-  does three dull things while you are asleep and nothing else: starts an add-on that was set
-  to run at boot, pings a dead Z-Wave node, reloads an integration that failed to set up. Once
-  a night, inside your quiet hours, three at most, never on a protected entity, and no Claude
-  run anywhere on that path. The morning brief says what it did and whether it stuck.
+It is read-only unless you say otherwise. Home Assistant's own **Suggest with AI** buttons
+and `ai_task.generate_data` can be answered by brAIn too.
+[Automations →](/brain/automations/)
 
-## It learns, and everything reads what it learned
+### A rule in one sentence
 
-Memory is one markdown document you can open and edit. brAIn writes to it from
-conversations, insight runs and background study sessions — and voice, insights and the
-terminal all read it. Tell the voice assistant something and the cards know it.
+*"Whenever the front door opens after dark, turn the hall light on."* brAIn drafts the
+automation, replays it over the last month of your recorder, and offers it with the case
+in one line: it would have fired nine times, and you'd already done the same yourself on
+four. Try it for a week first if you like. [Rules & one-offs →](/brain/intents/)
 
-![House → Knowledge: a "Teach it something" box and the memory document "What I know about this home", with sections on the household, the house, and devices and their quirks](./images/panel-memory.webp)
+### A house that grew by accident
 
-When brAIn believes something it can't confirm, it says so as a **guess** you answer with
-one tap — *"The garage fridge is meant to run 24/7 — right?"* Three open at a time, never
-more. Guesses sit at the top of the **Findings** tab, because "is this broken?" and "have
-I got this right?" are the same job — a question only you can answer — and one list should
-hold everything waiting on you. **Yes** files it as a fact; **No** records a dead end that
-is never revisited.
+*"Every light in the basement should be in a Basement area on a Lower Floor, and rename the
+Sonoff switches to what they actually control."* brAIn does the whole sweep through Home
+Assistant's own registries: areas, floors, labels, names, aliases, what a device shows as.
+[Power Tools →](/brain/power-tools/)
 
-## It works from the sofa
+## It learns, and you can see what it learned
 
-The panel is one ingress page with four tabs — **Home**, **Ask**, **House** and **Help** —
-built for a phone as seriously as a desktop: every target is at least 44px, cards
-rearrange themselves for a narrow screen, and the terminal folds the chrome away when the
-keyboard comes up.
+brAIn's memory is not a black box. **Memory → Knowledge** lists every fact it holds, by room
+and device, each with who taught it and a bin beside it. When it believes something it
+cannot confirm, it asks one yes/no question on Needs you. Every **Ignore** with a reason
+becomes a correction, so the same non-problem is never raised at you twice in new words.
 
-![The brAIn panel on a phone in dark mode: the usage pill and settings on top, the four tabs named beneath their icons, the Home panes on a strip below, and an insight card whose title has a row of its own under its buttons](./images/panel-phone.webp)
+![Memory → Knowledge: a list of rooms and devices on the left, and facts such as "The fridge sits at 3–4 °C; above 6 °C for an hour means the door was left open" with a bin beside each, and a Teach box under them](./images/panel-memory.webp)
 
-## Built for Home Assistant
+Four switches in [⚙ › Features](/brain/features/) decide how far it goes: the **Morph
+dashboard**, **Personality** (a name and voice you choose, everywhere), the **Learning
+loop** (brAIn improving itself on this house, with nothing leaving it) and the
+**Development loop** (reporting its own faults, redacted, to a private GitHub repository
+you own). [Learning →](/brain/learning/)
 
-What makes this different from running Claude Code on a regular machine:
+## brAIn and the other BRUH apps
 
-- **Your Claude subscription covers it** — OAuth sign-in, so Pro/Max includes your
-  usage; an API key works too. One login covers the panel, the terminal, voice,
-  insights and memory.
-- **[89 purpose-built MCP tools](/brain/mcp/)** — live states, device control, cameras,
-  history and statistics, registries, dashboards, live automation traces, templates, logs,
-  reloads, what a device shows as, what brAIn has measured about your house, ESPHome, Music
-  Assistant, BRUH Minecraft, BRUH Print and BRight.
-- **Auto-generated context** — every boot regenerates `/config/CLAUDE.md`, a snapshot of
-  your install that Claude reads at the start of each session.
-- **Usage-limit sensors** — the same session and weekly utilisation as claude.ai, as HA
-  sensors with reset times, plus a budget that pauses *scheduled* work before it eats
-  your week. Manual presses are never blocked.
-- **Safe by default** — a voice agent reaches only what you expose to Assist unless you
-  widen it, and new agents start with the administration services blocked; the terminal
-  and the chat ask before acting unless you say otherwise, behind an action gate that
-  decides from your own words; protected entities hold on every face; a non-root sandbox behind an AppArmor profile
-  (**6/6** on the add-on store's security rating); the terminal port ships
-  unpublished *and* password-protected; `backup_exclude` keeps the Claude
-  credential out of HA backups; `secrets.yaml` is never snapshotted and never
-  edited.
-- **Two CLI commands, not fourteen** — `brain` for its own faculties, `ha` for Home
-  Assistant chores. [The CLI](/brain/cli/).
-- **It can be checked, on your house** — `brain doctor` is free and answers whether the
-  plumbing is connected; [`--deep`](/brain/doctor/) walks every face of the add-on with one
-  real round trip each, and `--rehearse` plants a couple of defects here, scores the checks
-  and the analyst against them, and takes everything back out. Neither ever runs on a timer.
+With another BRUH app installed, brAIn gets that app's tools in the chat, the terminal,
+automation tasks and voice. There is nothing to set up.
 
-## What it doesn't do
+<CardGrid>
+  <LinkCard title="BRUH Bambu Studio" description="Printer status, start and control prints, slice, and design a part from a sentence." href="/bruh-bambu-studio/" />
+  <LinkCard title="BRUH Cooking" description="Joule and Breville+ appliances: what each is doing, and start a cook by name." href="/bruh-cooking/" />
+  <LinkCard title="BRUH Browser" description="Web errands such as a grocery cart. A purchase is always a second step you approve." href="/bruh-browser/" />
+  <LinkCard title="GardenRX" description="This season's harvest, spray intervals still running, and logging a pick or a spray." href="/gardenrx/" />
+  <LinkCard title="BRight" description="Start a party or one track's light show, and stop it with a scene." href="/bright/" />
+  <LinkCard title="BRUH Print" description="Print a label in words or from a template on the stock that is loaded." href="/bruh-print/" />
+  <LinkCard title="BRUH Minecraft" description="Teleport, game modes, items, weather, add-ons, and a companion that plays with the family." href="/bruh-minecraft/" />
+  <LinkCard title="BRUH Task Manager" description="Per-app CPU and memory, and a runaway-app sensor brAIn reads like any entity." href="/bruh-task-manager/" />
+</CardGrid>
 
-brAIn can't *add* an integration (config flows are interactive, so it walks you to the right
-screen and you click — removing one it can do), never touches credentials, and doesn't back up your
-configuration — Home Assistant's own backups already do that. What it keeps is an edit
-journal of the files *it* touched — the automation an accepted
-[proposal](/brain/proposals/) writes included — so `brain undo` can put one back. The full scorecard:
-[what brAIn can and can't reach](/brain/how-brain-controls-ha/#what-brain-can-and-cant-reach).
+The full list of tools, and what a voice agent may and may not do with each:
+[brAIn and the BRUH apps →](/brain/apps/)
 
-:::caution[Back up Home Assistant first — somewhere that isn't this machine]
-brAIn edits your real configuration: automations, dashboards, helpers, entities. It is
-built to be careful, it snapshots files before it changes them, and `brain undo` puts them
-back — but none of that is a backup you can restore from if something goes wrong.
-**Settings → System → Backups**, then copy it off the device: a backup that only exists on
-the machine you are changing is the one you cannot use when that machine is the problem.
-:::
+## Where your data goes
 
-**[Quick Start →](/brain/quickstart/)** — add the repo, install (a prebuilt-image pull,
-not a local build — a download, not minutes of compiling), restart HA once, sign in, press
-**Start learning**. About five minutes, plus a few minutes of study in the background.
+- **Everything runs in your Home Assistant.** The add-on, its memory, its measurements and
+  its stores live on your machine, under `/config/.brain/` and the add-on's own storage.
+- **Claude runs go to Anthropic**, under your own account, as with any use of Claude Code:
+  the prompt, and what brAIn read from your house to answer it. Many things cost no Claude
+  run at all: the house checks, the measurements, safety alerts and overnight self-healing.
+- **The development loop is the only thing that sends anything elsewhere.** It is off by
+  default, it sends to a **private** GitHub repository you own, and names, rooms and entity
+  ids are replaced with aliases first. [Development loop →](/brain/development-loop/)
+- **Your Claude credential is kept out of Home Assistant backups.** Sharing the login with
+  the other BRUH apps is a switch, off by default, and the panel says what it costs.
+- **Cameras are off until you tick one**, and brAIn looks through a ticked camera on its own
+  at most a dozen times a day. [Permissions & Safety →](/brain/safety/#cameras)
+
+## What you need
+
+- **Home Assistant OS** or **Supervised**: add-ons need the Supervisor. Home Assistant
+  2023.6 or later; some features need newer releases (the To-do list 2023.11, AI Task 2025.7).
+- A **64-bit host**: `amd64` or `aarch64`. A Raspberry Pi 4 or 5 is fine.
+- About **1 GB of free memory** beyond Home Assistant's own.
+- An **Anthropic account**. A Claude **Pro** or **Max** subscription is the most economical,
+  and is what the usage-limit sensors read. An API key works too.
+
+<Aside type="caution" title="Back up Home Assistant first, somewhere that isn't this machine">
+brAIn edits your real configuration: automations, dashboards, helpers, entities. It
+snapshots files before it changes them and `brain undo` puts them back, but that is not a
+backup you can restore from. **Settings → System → Backups**, then copy it off the device.
+</Aside>
+
+<Aside type="note" title="Experimental">
+brAIn is actively developed and changes often, above all the Morph dashboard. Keep your own
+dashboards and automations working beside it.
+</Aside>
+
+**[Quick Start →](/brain/quickstart/)**: add the repository, install (a prebuilt image, not a
+local build), restart Home Assistant once, sign in, and press **Start learning**. About five
+minutes, plus a few minutes of study in the background.

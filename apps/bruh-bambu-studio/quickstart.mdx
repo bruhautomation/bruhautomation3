@@ -1,0 +1,120 @@
+---
+title: Quick Start
+description: Install BRUH Bambu Studio, let it download Bambu Studio, restart Home Assistant once, add your Bambu Lab printer with its access code, and start your first print.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+From nothing to a print started from Home Assistant in about ten minutes, most of it the
+slicer downloading.
+
+## Before you start
+
+- **An amd64 (x86-64) Home Assistant machine** running Home Assistant OS or Supervised,
+  2024.7.0 or newer. The add-on is **amd64 only**: Bambu Lab publishes Bambu Studio for Linux
+  as an x86-64 AppImage and nothing else, so it does not install on a Raspberry Pi.
+- **Your printer's access code.** It is on the printer's screen in its network settings
+  (*LAN Only*, or *WLAN* on the A1 and P1).
+- **LAN-only mode and Developer mode** on the printer. On recent firmware a printer only
+  accepts commands from anything other than Bambu's own apps with both switched on. Without
+  them it still reports its status, but a command comes back with *"The printer did not
+  confirm it"*.
+- **A fixed address for the printer** in your router is a good idea, so it does not move.
+
+## Install
+
+<Steps>
+
+1. **Add the repository.** In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ →
+   Repositories**, then paste:
+
+   ```text title="Repository URL"
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+2. **Install BRUH Bambu Studio** from the store and press **Start**. The defaults are right
+   for almost everyone; the [options reference](/bruh-bambu-studio/reference/) lists them all.
+
+3. **Let it download Bambu Studio.** Open **Bambu Studio** in the sidebar. The first start
+   downloads Bambu Studio (about 220 MB) from Bambu Lab's GitHub releases and unpacks it into
+   the add-on's own storage; the **Studio** tab shows *Downloading…* with a percentage, then
+   *Unpacking…*. Later starts use the copy already there.
+
+4. **Restart Home Assistant once.** Home Assistant loads the add-on's `bruh_bambu` integration
+   only when it starts, so until then there are no sensors, no camera, no services and no
+   dashboard card. The **Printers** tab shows a banner with a **Restart Home Assistant**
+   button, and Home Assistant raises a notification too. After the restart the add-on sets the
+   integration up by itself — it appears under **Settings → Devices & services**, with a device
+   per printer.
+
+</Steps>
+
+<Aside type="tip">
+An add-on update asks for another restart only when the integration's code actually changed.
+A version-only update, or a change to the dashboard card alone, needs nothing more than a page
+reload.
+</Aside>
+
+## Add a printer
+
+<Steps>
+
+1. **Open Settings › Printers** in the panel (an empty **Printers** tab sends you there).
+   **Find printers** runs by itself the first time and lists every Bambu Lab printer on the
+   network Home Assistant is on, with its model, serial number and address.
+
+2. **Press Add** beside your printer. Only the **access code** is left to type.
+
+3. **Save.** The panel waits for the printer to answer and says whether it did. The printer's
+   card appears on the **Printers** tab with its camera, temperatures and AMS trays.
+
+4. **Set its model** if the panel did not fill it in. The model decides which of Bambu Studio's
+   own profiles a print is sliced with — never the words in the name you gave the printer.
+
+</Steps>
+
+**How the scan works.** It connects to port 8883 on each address and reads the certificate the
+printer answers with (Bambu Lab's own, named for the printer's serial), so it finds printers
+without broadcasts reaching the add-on and without an access code. It covers each of Home
+Assistant's networks up to a /22 (a wider one is narrowed to the /24 Home Assistant is in) and
+takes a few seconds. *Search a different network* looks somewhere else — a separate IoT
+network such as `192.168.2.0/24`.
+
+**By hand.** Open *Add a printer by hand* and give its **IP address** (Network on the printer's
+screen), its **serial number** (Settings → Device) and its **access code**.
+
+**When the printer moves.** A printer that is already added but answers at a new address
+offers **Update address**, which keeps its access code.
+
+<Aside type="note" title="Access codes stay out of backups">
+Access codes are stored apart from everything else and are **left out of Home Assistant
+backups**, which are unencrypted unless you opt in. After restoring a backup, add each code
+again. The access code also changes whenever LAN mode is switched off and on.
+</Aside>
+
+## Your first print
+
+<Steps>
+
+1. **Put a model in the library.** Any of these works:
+   - **Upload** on the **Files** tab;
+   - copy it into `/share/bambu` over Samba or with the File Editor;
+   - paste a **Printables** model page or a direct link to an `.stl`, `.3mf`, `.step`, `.obj`
+     or `.amf` into the import box at the top of **Files** and press **Import**.
+
+2. **Press Print** on its row. Choose the printer and — for a bare model such as an STL — the
+   AMS tray (or the external spool) it prints from. Adjust any
+   [print option](/bruh-bambu-studio/printing/#print-options) you like, or leave them as Bambu
+   Studio's profile has them.
+
+3. **Watch it.** The **Printers** tab shows the stage (levelling, heating…), a progress ring,
+   the time left and the clock time it finishes, and the camera.
+
+</Steps>
+
+That's it. From here:
+
+- [Printing & Jobs](/bruh-bambu-studio/printing/) — the library, imports, slicing, every print option and the printer card.
+- [Design with brAIn](/bruh-bambu-studio/design/) — describe a part and print it.
+- [Failure detection](/bruh-bambu-studio/failure-detection/) — get told, and paused, when a print fails.
+- [Home Assistant](/bruh-bambu-studio/home-assistant/) — entities, services and the dashboard card.
