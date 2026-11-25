@@ -20,8 +20,11 @@ ever runs on its own.
 | **`brain doctor --deep`** | Does each face work end to end, right now? | about **five Claude turns** |
 | **`brain doctor --rehearse`** | Do the checks and the analyst find a defect planted in *this* house? | **one analyst run** |
 
-All three are also in the panel: **⚙ Settings → Diagnostics**, where the free report is
-already rendered and the two costed ones are buttons under it.
+All three are also in the panel. **⚙ → Diagnostics** shows the free report (*Right now*), and
+**Run all tests** (the **Test brAIn** button) runs the deep check: every self-test, read as
+"6 of 6 passed · 2 skipped", one row per test with the reason in plain words. A test that could
+not run, because one before it failed or a switch it needs is off, is *skipped*, never failed.
+The rehearsal is in **⚙ → Developer**.
 
 ## `brain doctor --deep`
 
@@ -93,7 +96,7 @@ brain doctor --deep           # each line as it lands
 brain doctor --deep --json    # the whole object, for a script
 ```
 
-Or **⚙ Settings → Diagnostics → Run deep check**, which fills the stage list in as it goes.
+Or **⚙ → Diagnostics → Run all tests**, which fills the list in as it goes.
 
 The last run's verdict — when, what it was, and which stage broke, never the transcript —
 rides in the diagnostics payload, so `brain report` and Home Assistant's own **Download
@@ -212,12 +215,12 @@ brain doctor --rehearse --json     # the whole object
 brain doctor --sweep               # take out anything a rehearsal left behind
 ```
 
-Or **⚙ Settings → Diagnostics → Rehearse…**.
+Or the rehearsal in **⚙ → Developer**.
 
 ## Where the verdicts show up
 
-- **⚙ Settings → Diagnostics** — the free report, then the two buttons, each with the date
-  and verdict of its own last run.
+- **⚙ → Diagnostics** and **⚙ → Developer** — the free report, Run all tests and the
+  rehearsal, each with the date and verdict of its own last run.
 - **`/api/diagnostics`** — when the last deep run was, what it decided and which stage broke;
   the last rehearsal's scores and cleanup line. Never a transcript, never a prompt.
 - **`brain report`** — writes that payload, `brain doctor --json` and the tail of the add-on

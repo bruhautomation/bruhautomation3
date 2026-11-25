@@ -1,5 +1,5 @@
 ---
-title: Memory & Learning
+title: Memory & Knowledge
 description: How brAIn builds long-term memory about your home — what it learns, where it lives, how guesses get settled, and how to view, edit, or erase any of it.
 ---
 
@@ -7,7 +7,7 @@ brAIn keeps one small, human-readable document about your home at `/config/.brai
 
 The whole design answers one question: **what, exactly, has it learned?** If you can't point at a line and say "it knows that", it isn't memory.
 
-![Memory → Knowledge, scrolled to "What it remembers": a "Teach it something" box with Add, Edit markdown and Export buttons, and the memory document "What I know about this home" with sections on the household, the house, and devices and their quirks](./images/panel-memory.webp)
+![Memory → Knowledge: "Everything brAIn believes about this house", a list of rooms and devices on the left with a count beside each, and facts on the right such as "Bins go out on Thursday evenings" and "The back door sensor runs on a CR2032 that lasts about three months", each with a bin, then a "Tell brAIn about the house…" box with Teach, and the Suggested reports and Tools folds](./images/panel-memory.webp)
 
 ## What ends up in it
 
@@ -36,7 +36,7 @@ otherwise have to repeat in every request.
 | `inbox/` | `/config/.brain/memory/` | No — a **queue**. Candidate facts waiting to be folded in. |
 | Hypotheses | `/config/.brain/memory/` | No — a **queue**. Open guesses awaiting a yes/no. |
 | Change log | `/config/.brain/memory/` | No — an **audit trail**, so you can see what changed and undo it. |
-| Facts | Knowledge tab | An **index** underneath the document — the same knowledge one fact at a time, with who taught it. It follows the document; see [below](#the-facts-underneath). |
+| Facts | Memory → Knowledge | An **index** underneath the document — the same knowledge one fact at a time, with who taught it. It follows the document; see [below](#the-facts-underneath). |
 
 Only the queues are ever written to directly. **Nothing writes `memory.md` except the consolidator**, which folds the inbox in once a day (or early when 20+ facts are pending), deduping, resolving contradictions newest-wins, and enforcing the size cap. One writer means no races, and it means the document stays a document rather than an append-only log.
 
@@ -60,26 +60,25 @@ last line. An answer over the size cap is retried once with the measured excess 
 names `memory_max_kb`.
 :::
 
-## The Knowledge tab
+## Memory → Knowledge
 
-**Memory → Knowledge** opens with this morning's brief and the seven things brAIn measures
-(see [Measurements](/brain/measurements/)), then three short lines saying how the next three
-sections differ — because all three hold "things brAIn has learned":
+**Memory → Knowledge** is everything brAIn believes about this house, one fact at a time. Pick a
+room or a device to see what it knows about it (a list beside the facts on a wide screen, a
+picker on a phone), and delete anything that's wrong with the bin beside it.
 
-| Section | What it is |
-| --- | --- |
-| **Memory document** | brAIn's written summary of your home, editable in place. Correcting it here is how you stop brAIn saying something. |
-| **Waiting to be filed** | The queue: things learned and not yet folded into the document. **File into memory now** files them. |
-| **Facts brAIn has learned** | The same knowledge one fact at a time, each tagged with the device, room or person it's about, who taught it and when. |
+- **Search** the facts (a device's friendly name works), filter by kind (**Rooms**, **Devices**,
+  **House**), by **Taught by** (anyone, you, a conversation, voice…) and sort newest first.
+- **Tell brAIn about the house…** with **Teach** files what you type straight in.
+- **Clean up** has brAIn read its whole memory and remove what is wrong, duplicated or stale.
+- **Suggested reports** lists [insight cards brAIn thinks you're missing](/brain/insights/#where-cards-come-from),
+  with **Run** for a fresh look.
+- **Tools** holds the memory document itself (**What brAIn has written down**, with **Edit**,
+  **Export** and what is waiting to be filed), **What brAIn brings to a run**, and the
+  [deep review](/brain/insights/#beyond-cards-the-weekly-report-and-a-deep-review).
 
-The facts list shows **every** fact, not a few per device. Search it (a device's friendly
-name works), narrow it with the chips — the house, rooms, devices, people, and **Rules you
-set**, which are the checks you told brAIn to stop raising — filter by who taught it, sort it
-newest first, oldest first, most certain first or grouped by what it's about, and page
-through with **Show more**. **See the run** on a fact opens the conversation that taught it,
-and **✕** forgets it.
-
-The **Deep review** button is here too — see [Insights](/brain/insights/#beyond-cards-the-weekly-report-and-a-deep-review).
+Nothing on Knowledge waits on you, so it has no badge. What brAIn has *measured* (when the house
+wakes, what is normal here and the rest) is in ⚙ → Diagnostics → Measurements; see
+[Measurements](/brain/measurements/).
 
 ## How it learns
 
@@ -152,8 +151,8 @@ Earlier versions asked open-ended questions, which piled up unanswered and left 
 
 > *"The garage fridge is meant to run 24/7 — right?"*
 
-Two taps settle it, on [Needs you](/brain/needs-you/) — open guesses ride in the same
-list as findings, just under the high-stakes problems, because both are questions only the
+Two taps settle it, on [Needs you](/brain/needs-you/) under **Questions for you** — open
+guesses ride in the same list as problems, because both are questions only the
 person living there can answer, and one badge counts everything waiting on a decision. **Memory → Knowledge** has no badge,
 because nothing on it waits on you: the queue files itself, and the document is there to
 read.
@@ -162,7 +161,7 @@ read.
 - **✕ No** records a dead end that is never revisited, in any wording — and offers the same
   optional one-sentence reason box a wrong finding does, because "no" usually means brAIn
   has misread something worth explaining.
-- **Dismiss** puts it to sleep: it stays open but leaves every screen and stops counting
+- **Snooze** puts it to sleep: it stays open but leaves every screen and stops counting
   against the limit below, so brAIn can ask something else meanwhile. Its fortnight starts
   again when it comes back.
 
@@ -190,8 +189,8 @@ already worked out is kept and offered, at no cost, as soon as a slot frees.
 
 ## Viewing, editing, undoing
 
-**Memory → Knowledge** shows the document formatted, with **✎ Edit markdown** for the raw file
-and a **Teach it something** box that merges a new fact straight in. Everything there is
+**Memory → Knowledge → Tools → What brAIn has written down** shows the document, with **Edit**
+for the raw file, and the **Teach** box files a new fact straight in. Everything there is
 also on the command line:
 
 ```bash
@@ -225,7 +224,7 @@ They're separate journals, and neither can touch the other's.
 `brain memory export` writes one JSON file carrying everything brAIn has learned: the memory
 document, the [findings](/brain/needs-you/) work list, the settled answers and the facts
 store — including the rules your *Ignore* presses made, so the checks you told "not
-here" stay quiet on the new install. **Memory → Knowledge**'s **⬇ Export** button downloads the same file
+here" stay quiet on the new install. **Export** under Memory → Knowledge → Tools downloads the same file
 (`GET /api/memory/export`).
 
 Import is CLI-only, and it is a **migration, not a sync**: ledgers merge with your existing
@@ -251,6 +250,6 @@ data:
 
 ## Kill switches
 
-- `learning: false` — the master switch. Stops the reflection pass, what the terminal and chat teach, the consolidator, and study sessions. Existing memory is left untouched and still used.
+- **⚙ › Features › Learning loop** — the master switch. Off stops the reflection pass, what the terminal and chat teach, and the rest of [learning](/brain/learning/). Existing memory is left untouched and still used. (The `learning` option is only where the switch starts.)
 - `memory_injection: false` — keep learning, stop splicing memory into voice prompts.
 - `brain memory clear --confirm` — forget everything learned so far.

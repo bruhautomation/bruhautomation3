@@ -12,10 +12,10 @@ brAIn does the opposite. Once a night it measures what **your** house normally d
 every rule it raises is expressed against that measurement. Nothing here costs a Claude
 turn — it is arithmetic over history Home Assistant already keeps.
 
-**Memory → Knowledge** shows every measurement and where it has got to — ready, collecting
+**⚙ → Diagnostics → Measurements** shows every measurement and where it has got to — ready, collecting
 (with the date it will be ready), stale, or not available here and why:
 
-![Memory → Knowledge, "What brAIn has measured": When the house wakes, What is normal here, How rooms hold heat, Doors and windows, and Machines — each with a one-line status, a state pill such as "not started" or "not available", and the card that arrives when the measurement lands](./images/panel-knowledge.webp)
+![⚙ → Diagnostics → Measurements on a fresh install: When the house wakes, What is normal here, How rooms hold heat, Doors and windows, Machines and Habits, each with a one-line status, a "not started" pill, and the card that arrives when the measurement lands](./images/panel-knowledge.webp)
 
 ## What gets measured
 
@@ -44,8 +44,7 @@ works.
 The nightly pass reads at most **400 sensors**. Only sensors whose readings vary, and that
 are not settings-page sensors (signal strength, uptime), take one of those places — so a big
 house's upstairs thermometers and water flow are not crowded out by energy totals that could
-never have a baseline anyway. If the limit still leaves some out, the Knowledge tab and
-⚙ → Diagnostics say how many.
+never have a baseline anyway. If the limit still leaves some out, ⚙ → Diagnostics says how many.
 
 ## Spread is a median, not an average
 
@@ -132,7 +131,7 @@ answer** to how long its quiet phases last.
 The "running" level is read from the times the machine is **actually running**, not from the
 whole ten days, so a washer or dryer used a few times a week is recognised. On a house with
 more power sensors than the nightly limit, washers, dryers and dishwashers are measured
-first, and the Knowledge tab says how many sensors were left out.
+first, and ⚙ → Diagnostics says how many sensors were left out.
 
 :::caution[It cannot see that you emptied it]
 An empty machine and a full one draw exactly the same watts. So the chore ends the way any
