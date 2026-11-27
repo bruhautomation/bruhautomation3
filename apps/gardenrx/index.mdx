@@ -1,6 +1,6 @@
 ---
 title: GardenRX
-description: A spray decision engine for a home orchard and garden, inside Home Assistant. Crops and their season, a spray window from the forecast, a tank-mix planner built from real product labels, pre-harvest intervals, stock and harvests — with dashboard cards and services.
+description: A spray decision engine for a home orchard and garden, inside Home Assistant. A spray window from the forecast, a tank-mix planner built from product labels, pre-harvest intervals, stock and harvests, with dashboard cards and services.
 template: splash
 hero:
   tagline: Knows what stage every tree is at, what the label allows, when the weather will let you spray, and when the fruit is safe to pick. Your orchard's spray record, in the Home Assistant sidebar.
@@ -22,150 +22,113 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Experimental">
-GardenRX is marked **experimental** in the add-on store. It is in daily use and changes
-often; keep Home Assistant backups (your garden's data is in them) and read the
-[changelog](/gardenrx/changelog/) when you update.
-</Aside>
-
-## What it is
-
-GardenRX is BRUH's own garden app — a full web app, not a dashboard of helpers — packaged as
-a Home Assistant add-on. It opens in the sidebar through ingress, behind Home Assistant's
-own login, and keeps everything in one SQLite file inside the add-on, so your orchard's
-whole history is in every Home Assistant backup and there is no database server to run.
-
-It answers the questions a home fruit grower asks every week of the season: *Is anything
-due? Can I spray today, or will it rain, blow or freeze? What goes in the tank, how much,
-and does it mix? Which trees can't be picked yet? Am I running out of anything?* — and it
-records the answers: every spray, every pick, every bottle.
+GardenRX tells you what needs spraying, when the weather allows it, what goes in the tank
+and when the fruit is safe to pick. It keeps the record of every spray, pick and bottle in
+your Home Assistant sidebar.
 
 ![GardenRX's Today page on a computer: an "All crops protected" banner with the temperature and wind, a "While the garden rests" list with a freeze warning, the apples and pears in post-harvest, blueberries dormant with bud break expected in late February, the last spray and the last pick, and a queued copper spray with its coverage](./images/today.webp)
 
-## Highlights
+<Aside type="caution" title="Experimental">
+GardenRX changes often. Keep Home Assistant backups (your garden's data is in them) and
+read the [changelog](/gardenrx/changelog/) when you update.
+</Aside>
 
-<CardGrid>
-  <Card title="A season that follows the calendar" icon="seti:clock">
-    Every crop group has a phenology calendar — dormant, silver tip, bud break, bloom,
-    petal fall, green fruit, harvest, post-harvest. Each variety's stage follows the date
-    and your hemisphere, and a stage you set by hand gives way once its season is over.
-  </Card>
-  <Card title="A spray window you can trust" icon="sun">
-    An hour-by-hour **3-day spray window** from the forecast for your house's location:
-    green when it is calm, dry and in range, amber for caution, red with the reason
-    ("below 40°", "wind", "rain"). It never calls the dark a good time to spray.
-  </Card>
-  <Card title="A tank-mix planner built from labels" icon="list-format">
-    Tick the crops; GardenRX recommends a mix from what their labels allow, works out
-    how much of each product goes in **your** tank, the cost, the PPE — and checks the
-    mix against rotation, pollinator, temperature and compatibility rules.
-  </Card>
-  <Card title="Pre-harvest intervals, never hidden" icon="warning">
-    Every spray starts the label's pre-harvest clock for the crops it touched. Today,
-    the Harvest page and the dashboard card say which crops can't be picked yet, and
-    the date they clear.
-  </Card>
-  <Card title="A real product catalog" icon="open-book">
-    256 home-garden and orchard products ship with the add-on: active ingredients and
-    their FRAC/IRAC groups, signal word, re-entry interval, rain-fastness, cover interval,
-    temperature range, bee toxicity, PPE and first aid, and the crops each is labelled for.
-  </Card>
-  <Card title="Harvests, valued" icon="star">
-    Log picks by weight or count. Each crop's $/lb turns the season into a value, minus
-    what the sprays cost, with a running chart and a breakdown by crop and variety.
-  </Card>
-</CardGrid>
+## What you can do
 
-## Use cases
+### Know what needs doing
 
-**Saturday morning, coffee in hand.** You open GardenRX on your phone. Today says the
-peaches are at petal fall and the fungicide cover on the apples ran out two days ago. The
-banner names the next good window — *"Spray 3–7 pm"* — because the morning is too windy.
-You tick Apples and Peaches on the Spray page, get a two-product mix with the exact
-ounces for your 4-gallon sprayer and a note that one product is toxic to bees during bloom,
-and press **Queue This Spray**. At 3 pm you spray, tap **Log Spray**, and what you used
-comes out of stock by itself.
+| You | GardenRX |
+|---|---|
+| Open **Today** | One line says it: *All crops protected*, a spray that is due, or *Hold off* with the reason and the next good window. |
+| Look under **Needs attention** | Crops whose fungicide or insecticide cover has run out, and crops ready to pick. Tap one to plan its spray. |
+| Open it in winter | *While the garden rests* shows a freeze warning, when each crop usually wakes, the last spray and the last pick. |
+| Open **Crops** | Every crop's growth stage follows the calendar and your hemisphere, from dormant through bloom to post-harvest. |
 
-**"Can I pick the peaches?"** Ask your voice assistant, or glance at the spray card on the
-kitchen dashboard: *Peaches · 4 days (from Sep 29)*. The pre-harvest interval is counted
-from the last spray that touched them, using that product's label.
+### Pick the hour to spray
 
-**A pick logged from the porch.** A dashboard button calls `gardenrx.log_harvest` with
-"Apples, Honeycrisp, 6.5 lb". The Harvest page and the season total update, and brAIn
-remembers how the apples have done this year the next time you ask it.
+| You | GardenRX |
+|---|---|
+| Open **Weather** | A **3-day spray window** rates every daylight hour *Good to spray*, *Caution* or *Hold*, with the reason ("below 40°", "wind", "rain"). |
+| Read the banner | It names the next opening, such as *"Next opening: tomorrow 5–6 pm"*. It never calls the dark a good time to spray. |
+| Scroll down | The 7-day forecast, rainfall for the week and the last 30 days, and watering advice. |
 
-**The reorder you'd have forgotten.** The *Treatments running low* sensor turns 1 when the
-captan drops to 20% of the bag. An automation puts it on your shopping list in March,
-not the morning you need it.
+![The Weather page: Next opening tomorrow 5–6 pm, current conditions 33° and partly cloudy, the 3-day spray window grid with today greyed out, Wednesday mostly on hold for cold and wind with one green hour, Thursday on hold for wind and rain, and a 7-day forecast with rain totals](./images/weather.webp)
 
-**Winter.** Out of season, Today shows what matters while the garden rests — a frost
-warning when a freeze is forecast, when each crop usually wakes and what to do then, the
-last spray and the last pick — and stops giving watering tips while nothing is growing.
+### Plan a tank mix from the labels
 
-## The app
+| You | GardenRX |
+|---|---|
+| Tick crops on **Spray** | Recommends a mix from the products labelled for those crops, using your own stock first. |
+| Read the mix | The amount of each product for **your** tank ("Add 4.3 fl oz to 4 gal tank"), the cost and the PPE. |
+| Try a mix the label forbids | It is blocked, with the rule: insecticides during bloom, incompatible products, sulfur in heat, high wind. Rotation and weather risks show as warnings. |
+| Press **Queue This Spray**, then **Log Spray** once you have sprayed | The spray goes into the history, the pre-harvest clock starts, and what you used comes out of stock. |
 
-<CardGrid>
-  <Card title="Today">What is due, the next spray window, crops in a pre-harvest interval, queued sprays, and in winter what to do while the garden rests.</Card>
-  <Card title="Crops">Every crop and variety, its stage and season, its spray coverage, $/lb, and the diseases and pests to watch for.</Card>
-  <Card title="Garden">A map of your beds and trees. Each place keeps its own dated notes.</Card>
-  <Card title="Harvest">Season total, value, spray cost and net; a running chart; value by crop and variety; every pick.</Card>
-  <Card title="Spray">The tank-mix planner, queued sprays and the full spray history.</Card>
-  <Card title="Products">The label catalog, and your stock with a level bar for every bottle and bag.</Card>
-  <Card title="Weather">Current conditions, the 3-day spray window, the 7-day forecast, rainfall and watering advice.</Card>
-</CardGrid>
+![The Spray page's Plan a mix tab with Apples and Peaches ticked: their coverage status, and a recommended mix of Bonide Captan 50W (FRAC M4) and Thuricide BT (IRAC 11A) with rate sliders, "Add 4.3 fl oz to 4 gal tank", a cost of $7.78, the PPE list, and a Queue This Spray button](./images/tank-mix.webp)
 
-Every screen works on a phone — the sidebar becomes a seven-item bottom bar — and in light
-and dark themes. [A tour of every screen →](/gardenrx/guide/)
+### Pick safely and count the harvest
 
-## In Home Assistant
+| You | GardenRX |
+|---|---|
+| Wonder if the peaches can be picked | Today, Harvest and the spray card name every crop inside a **pre-harvest interval**, with the days left and the date it clears. |
+| Log a pick by weight or count | The season total, its value at each crop's $/lb, the spray cost and the net update. |
+| Open **Harvest** | A running chart of the season's value and a breakdown by crop and variety. |
 
-The add-on installs a `gardenrx` integration that brings the garden onto the rest of the
-house:
+![The Harvest page: a Season total of 67.4 lb worth $240.25, spray cost $9.89 and net $230.36, a cumulative value chart from June to October, and Value by Crop with apples split into Honeycrisp, Enterprise and Liberty](./images/harvest.webp)
 
-- **Six sensors** — this year's harvest and its value, the last spray, queued sprays,
-  crops in a pre-harvest interval, and treatments running low.
-- **Twelve services** — log a harvest or a spray, queue a spray and mark it done, adjust
-  stock, add crops and varieties, leave a note on a bed or tree, read harvests back. Each
-  answers with what it did, so voice assistants, scripts and brAIn get a real reply.
-- **Three dashboard cards** — harvest, sprays and stock — loaded on every dashboard with
-  no resource to add, plus a Morph flavour drawn in Morph's own style.
+### Look up a label and keep stock
+
+| You | GardenRX |
+|---|---|
+| Search **Products** | 256 home-garden and orchard products: active ingredients with FRAC/IRAC groups, signal word, re-entry interval, rain-fast time, temperature range, bee toxicity, PPE, first aid, and the crops each is labelled for. |
+| Add what you own to **Your stock** | A level bar for every bottle and bag. Anything at 20% or less turns red. |
+| Draw your beds and trees on **Garden** | A map of the garden, with dated notes on any place. |
+
+### Use it from Home Assistant
+
+| You | GardenRX |
+|---|---|
+| Add a card to a dashboard | Three cards: sprays, harvest and stock. No resource to add. |
+| Press **Mark sprayed** or **Log harvest** on a card | The app's record updates, the same as doing it in the app. |
+| Call `gardenrx.log_harvest` from a button or script | The pick is logged and the service answers with what it did. Twelve services cover sprays, the queue, stock, crops, varieties and notes. |
+| Automate on the *Treatments running low* sensor | A reminder to reorder before the morning you need it. Six sensors in all. |
 
 ![The three GardenRX dashboard cards in Home Assistant's light theme: Last spray (3 days ago, a "Don't harvest yet" chip for peaches and a queued copper spray with Mark sprayed and Remove), Harvest 2026 (86.4 lb worth $248.60, bars by crop, a Log a harvest form and recent picks), and Stock (two products running low, red bars for captan and horticultural oil)](./images/cards-light.webp)
 
-[Sensors, services, cards and automation examples →](/gardenrx/home-assistant/)
+### Use it with brAIn
 
-## With brAIn
+GardenRX works without [brAIn](/brain/). With it:
 
-GardenRX does not need [brAIn](/brain/), but they are better together:
-
-- brAIn reads the harvest sensor on every pass and **remembers each crop's season** as a
-  fact — weight, picks, value, last pick — so "how have the tomatoes done this year?" has
-  an answer without a lookup, and an insight about the garden starts from what was picked.
-- brAIn can call the same `gardenrx.*` services as an automation: *"log four and a half
-  pounds of Liberty apples"*, *"I just sprayed copper on the peaches"*.
-- With brAIn's Morph dashboard on, the add-on copies its cards into Morph
-  (`custom:morph-gardenrx-harvest`, `-spray`, `-inventory`).
-- brAIn's development loop watches GardenRX's state and log, so a fault in it can be
-  reported and fixed like one in brAIn.
+| You | brAIn |
+|---|---|
+| Ask *"how have the tomatoes done this year?"* | Answers from what it remembers of each crop's season: weight, picks, value and last pick. |
+| Say *"log four and a half pounds of Liberty apples"* or *"I just sprayed copper on the peaches"* | Calls the same `gardenrx.*` services an automation would. |
+| Turn on the Morph dashboard | The three cards appear in Morph, drawn in Morph's style. |
+| Do nothing | brAIn's development loop watches GardenRX's state and log, so a fault can be reported and fixed. |
 
 ## What you need
 
-- **Home Assistant OS or Supervised** (add-ons need the Supervisor), Home Assistant
-  2024.1 or newer.
-- **A 64-bit machine** — `amd64` or `aarch64` (Raspberry Pi 4/5 and up). The add-on
-  installs a prebuilt image, so nothing is compiled on your box.
-- **Your location set in Home Assistant** (Settings → System → General), for the forecast
-  and the season. The forecast comes from Open-Meteo over the internet.
+| | |
+|---|---|
+| **Home Assistant** | OS or Supervised, 2024.1 or newer |
+| **Machine** | 64-bit: `amd64` or `aarch64` (Raspberry Pi 4/5 and up) |
+| **Location** | Set under **Settings → System → General**. The forecast and the season use it. |
+| **Internet** | The forecast comes from Open-Meteo |
+
+Your data stays in one file inside the app and is part of every Home Assistant backup.
+Every screen works on a phone and in light, medium and dark themes.
+
+## Where to go next
 
 <CardGrid>
-  <LinkCard title="Quick Start" description="Install, add the integration, add your first crops." href="/gardenrx/quickstart/" />
+  <LinkCard title="Quick Start" description="Install, add the integration, plan your first spray." href="/gardenrx/quickstart/" />
+  <LinkCard title="Using GardenRX" description="Every screen, task by task." href="/gardenrx/guide/" />
+  <LinkCard title="Cards, Sensors & Services" description="Card options, every service, automation recipes." href="/gardenrx/home-assistant/" />
   <LinkCard title="Changelog" description="What changed in each release." href="/gardenrx/changelog/" />
 </CardGrid>
 
 <Aside type="note" title="A decision aid, not a label">
-GardenRX's catalog and rules are built from product labels and published guidance, and
-it is careful to say what it does not know. The label on the product in your hand is the
-law: read it before every spray.
+GardenRX's catalog and rules are built from product labels and published guidance. The
+label on the product in your hand is the law. Read it before every spray.
 </Aside>
