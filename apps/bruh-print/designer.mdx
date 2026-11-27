@@ -1,88 +1,99 @@
 ---
 title: Quick & the Designer
-description: How BRUH Print fits one word as large as it will go, how the label designer works — snapping, the printable canvas, barcodes, QR codes, fonts and rotation — and the label document format behind both.
+description: Print a word as large as the label allows from the Quick tab, or lay out text, barcodes, QR codes, boxes and lines in the designer. Includes the label document format.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-## Quick — type it, print it
+The **Quick** tab prints a word as large as the label allows. The **Design** tab lays out text,
+barcodes, QR codes, boxes and lines.
 
-The Quick tab is three things in order: what to say, the picture, then **Print**. On a phone the
-preview sits on the same screen you are typing on.
+## Print a quick label
 
 <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;align-items:start">
 
-![The Quick tab on a desktop: the text box, the Label, copies, font fold with a label picker, copies, a font sample reading Aa Bb 0123 in Sans Bold, UPPERCASE, Open in designer and Save as template, and the Print card with its Prints on line](./images/quick.webp)
+![The Quick tab on a desktop: Spare keys in the text box, the Label, copies, font fold open with the label picker, copies, a font sample and UPPERCASE, the Print button with its Prints on line, and the preview with the two words stacked on two lines](./images/quick.webp)
 
-![The Quick tab on a phone: the roll chip at the top, the tabs, the text box, the preview, the Print button and the Prints on line, with Label, copies, font folded below](./images/quick-phone.webp)
+![The Quick tab on a phone: the roll chip, the tabs, Spare keys in the text box, the preview directly under it, Print, the Prints on line and the Label, copies, font fold](./images/quick-phone.webp)
 
 </div>
 
-**The autofit is the product.** It does not just pick a size — it tries **every way of breaking
-your words across lines** and keeps the arrangement whose letters come out biggest. *Spare keys*
-is biggest on two lines; *Attic* is biggest on one. Line breaks you type are honoured.
+Type what the label should say, check the preview, press **Print**.
 
-Text is fitted by its **ink**, not the font's box: the font reserves room for ascenders and
-descenders a given word may not have, and fitting to that is how a word ends up touching one edge
-while filling half its height. BRUH Print measures the letters actually drawn, and keeps a 2 mm
-border clear of every edge (a LabelWriter's registration wanders a fraction of a millimetre as the
-roll unwinds).
+- **The biggest letters win.** BRUH Print tries every way of breaking your words across lines and
+  keeps the arrangement that comes out largest. *Spare keys* goes on two lines, *Attic* on one.
+- **Your own line breaks are kept.**
+- **Text stays 2 mm clear of every edge**, and is fitted to the letters actually drawn.
 
-Under **Label, copies, font**: the label (only rolls that are actually loaded are offered), copies,
-the font (each choice drawn by the label renderer itself), **UPPERCASE**, **Open in designer** and
-**Save as template**. **Prints on** names the roll text goes to; with two rolls loaded it offers
-**Use the right roll** (or left) to move text there, and that one choice is shared with the dashboard card and the
-`bruh_print.choose_label` service, so they always agree.
+### Quick options
 
-## The designer
+Open **Label, copies, font** to change them.
 
-![The Design tab: the add strip with Text, Barcode, QR code, Box and Line, the label picker showing a 2.25" × 1.25" label, Label setup, an empty canvas, the properties pane, and Copies, Save as template and Print](./images/design.webp)
-
-Everything under the canvas is the server's own render — the same renderer that packs the
-printer's bytes — so what is on screen is what comes out.
-
-**The canvas *is* the printable area.** The stock's margin, any band your printer cannot reach on
-that roll, the dot columns a 2.25″ label loses to a 2.24″ print head, and any edge you asked to
-keep clear all come off before the canvas is drawn. Everything you can see prints.
-
-- **The bar** is the add strip (**Text**, **Barcode**, **QR code**, **Box**, **Line**), the label
-  you are on (its name with its size under it), and **⋯ Label setup** — the label's name, which
-  way its text runs, and whether boxes line up as you drag.
-- **Boxes line up as you drag.** Edges and centres catch on the printable area, on other boxes
-  and on a 1 mm grid, with a thin line drawn at whatever they caught. Turn it off with **Line boxes
-  up as I drag** in Label setup.
-- **Text re-fits while you drag** a text box's corner.
-- **Nothing can be placed off the label.** Dragging, resizing, typing, nudging and turning all
-  clamp to the printable area.
-- **The properties pane** has **Left / Top / Width / Height** in millimetres, then **Across**
-  (left, centre, right, fill), **Down** (top, middle, bottom, fill) and **Nudge 1 mm** arrows.
-  **⟳ Rotate**, **Duplicate** and **Delete** act on the selected box; rotate turns text and
-  barcodes a quarter at a time.
-- **A box that cannot be drawn is outlined in red** — a barcode too narrow for its data, a QR code
-  with nowhere to go, a fixed text size that clips — with a note under the label. The label still
-  prints.
-
-### Element types
-
-| Type | What it does |
+| Control | What it does |
 | --- | --- |
-| `text` | Auto-fits at size 0 ("as large as fits its box"). Wraps on spaces, then mid-word. A fixed size that does not fit is noted and clipped, never silently shrunk. |
-| `barcode` | Code 128 (sets B and C), with the human-readable text underneath by default. |
-| `qr` | Error correction L, M, Q or H (default M). Always square. |
-| `box` | Outline or filled, with an optional corner radius. |
-| `line` | A rule; its direction follows whichever dimension is larger. |
+| **Label** | Which loaded label to print on. Only rolls in the printer are listed. |
+| **Copies** | How many. More than 10 asks you to confirm. |
+| **Font** | Sans, Sans Condensed, Serif or Monospace, each in regular and bold. Every choice is drawn as a sample. |
+| **UPPERCASE** | Capitalises this label |
+| **Open in designer** | Carries the label into the Design tab |
+| **Save as template** | Saves it for the Templates tab, the card and automations |
+
+With two rolls loaded, the **Prints on** line under the Print button names the roll and offers
+**Use the right roll** (or left). The dashboard card and `bruh_print.choose_label` share that
+choice.
+
+## Design a label
+
+![The Design tab: the add strip with Text, Barcode, QR code, Box and Line, the label picker and Label setup, a canvas holding a contents text box, a Filled date line and a QR code, and the properties pane with Left, Top, Width, Height, Across, Down, Nudge 1 mm, Text and Font](./images/design.webp)
+
+The canvas is the printable area, and the picture on it is the same render the printer gets.
+Everything you can see prints.
+
+| To do this | Do this |
+| --- | --- |
+| Add something | Press **Text**, **Barcode**, **QR code**, **Box** or **Line** |
+| Change the label | Use the label picker on the bar. It lists the loaded rolls. |
+| Move or resize | Drag the box or its corner handle. Text re-fits as you drag. |
+| Place it exactly | Type **Left**, **Top**, **Width** and **Height** in millimetres |
+| Align it | **Across**: left, centre, right or fill. **Down**: top, middle, bottom or fill. |
+| Move it 1 mm | The **Nudge 1 mm** arrows |
+| Turn it a quarter turn | **⟳ Rotate**, for text and barcodes |
+| Copy or remove it | **Duplicate** or **Delete** |
+| Name the label, or turn snapping off | **⋯ Label setup**, then **Name** or **Line boxes up as I drag** |
+| Print or keep it | **Copies** and **Print**, or **Save as template** |
+
+Three things the canvas does for you:
+
+- **Boxes line up as you drag.** Edges and centres catch on the printable area, on other boxes and
+  on a 1 mm grid. A thin line shows what they caught.
+- **Nothing can leave the label.** Dragging, resizing, typing a number, nudging and rotating all
+  stop at the printable area.
+- **A box that cannot be drawn is outlined in red**, with a note under the label saying why. The
+  label still prints.
+
+### What you can put on a label
+
+| Element | Options | Notes |
+| --- | --- | --- |
+| **Text** | Font, height, align, vertical, wrap, line spacing, **Reverse** (white on black) | Height 0 means as large as fits the box. Text wraps on spaces, then mid-word. A fixed height that does not fit is clipped and noted, never shrunk. |
+| **Barcode** | Data, show the text, text font and height, quiet zone | Code 128. Digits pack two per symbol. The readable text prints underneath by default. |
+| **QR code** | Data, error correction L, M, Q or H (default M), quiet zone | Always square |
+| **Box** | Line width, filled, corner radius | An outline or a filled block |
+| **Line** | Thickness | Runs along whichever side of its box is longer |
+
+Write `{{name}}` in a text, a barcode's data or a QR code's data to make a
+[template](/bruh-print/templates/) field.
 
 <Aside title="Barcodes are never scaled down to fit">
-A barcode's bars have to be a whole number of printer dots wide. At 1.4 dots each bar rounds on
-its own, five equal bars come out 1, 1, 2, 1, 2 dots, and a scanner reads the wrong widths. So a
-symbol that cannot fit at one whole dot per module is **reported**, never drawn smaller. The same
-rule holds for QR codes.
+Each bar and QR module is a whole number of printer dots, because fractional bars do not scan. A
+code that cannot fit at one dot per module is reported with a note. Make the box bigger or the
+data shorter.
 </Aside>
 
 ## The label document
 
-The JSON the designer produces, `bruh_print.print_label` takes and templates store. Measurements
-are millimetres from the top-left of the drawable area.
+The designer produces this JSON, templates store it, and `bruh_print.print_label` prints it.
+Measurements are millimetres from the top-left of the printable area.
 
 ```json
 {
@@ -105,8 +116,22 @@ are millimetres from the top-left of the drawable area.
 }
 ```
 
-- `rotate` turns the design canvas: at 90 or 270 you lay a narrow wrap-around label out as a long
-  strip. A **new** label takes the stock's own text direction; a **saved** label keeps the
-  direction it was drawn at.
-- An element's own `rotate` turns that box's contents within the label.
-- `size_mm: 0` on text means "as large as fits its box".
+| Key | Meaning |
+| --- | --- |
+| `stock` | The stock id the label is for, shown on the Printer tab |
+| `rotate` | Turns the whole canvas. At 90 or 270 a narrow wrap-around label is laid out as a long strip. A new label takes its stock's text direction. A saved label keeps the direction it was drawn at. |
+| `elements[].type` | `text`, `barcode`, `qr`, `box` or `line` |
+| `x_mm`, `y_mm`, `w_mm`, `h_mm` | The element's box |
+| `props.rotate` | Turns one text or barcode inside its box: 0, 90, 180 or 270 |
+| `props.size_mm` | Text height. `0` means as large as fits the box. |
+
+| Type | `props` |
+| --- | --- |
+| `text` | `text`, `font`, `size_mm`, `align` (`left`, `center`, `right`), `valign` (`top`, `middle`, `bottom`), `wrap`, `line_spacing`, `rotate`, `invert` |
+| `barcode` | `data`, `hri` (show the text), `hri_font`, `hri_mm`, `quiet`, `rotate` |
+| `qr` | `data`, `ec` (`L`, `M`, `Q`, `H`), `border` |
+| `box` | `stroke_mm`, `fill`, `radius_mm` |
+| `line` | `stroke_mm` |
+
+Font keys are `sans`, `sans-bold`, `sans-condensed`, `sans-condensed-bold`, `serif`, `serif-bold`,
+`mono` and `mono-bold`.

@@ -31,14 +31,14 @@ The CLI covers files and workflow. The live home belongs to the [MCP tools](/bra
 | Command | What it does | Claude runs |
 |---------|--------------|-------------|
 | `brain memory <action>` | The [home memory](/brain/memory/). [Actions below](#brain-memory-actions) | none (`consolidate` uses one) |
-| `brain findings <action>` | The [findings](/brain/needs-you/) work list. [Actions below](#brain-findings-actions) | `fix` and `apply` |
+| `brain findings <action>` | The [findings](/brain/needs-you/) work list. [Actions below](#brain-findings-actions) | `fix`, and `apply` when a step needs working out |
 | `brain learn [topic]` | Run a study session, on a topic or on whatever has gone stalest | one session |
 | `brain ask "<question>"` | One question about your home, answered as text | one |
 | `brain undo [n]` | List the files Claude edited and [revert one](#undo). `--all-today` reverts today's | none |
 | `brain own [-r] <path…>` | [Make a file Claude cannot write writable again](#files-claude-cannot-write-brain-own). `-r` does a whole folder | none |
 | `brain check` | Run the [house checks](/brain/checks/) now. `list` prints the catalog and when each last ran; `--json` the raw result | none |
 | `brain why [ask]` | What brAIn is curious about (why somebody does something by hand) and what it has worked out. `ask` asks the next question now | `ask`: one |
-| `brain weekly [send]` | The week's numbers and the last report sent. `send` writes and sends this week's now, and moves the next one a week out | `send`: one |
+| `brain weekly [send]` | The week's numbers and the last report sent. `send` writes and sends this week's now, and moves the next one a week out | `send`: yes |
 | `brain doctor` | Checks the whole stack (MCP, sign-in, listeners, worker pool, memory, panel, daemons, disk) and prints PASS/FAIL with a fix hint per part. `--json` for one object | none |
 | `brain doctor --deep` | [One real round trip through every face](/brain/doctor/#brain-doctor---deep) | about five |
 | `brain doctor --rehearse` | [Plant test defects, score the checks and the analyst, clean up](/brain/doctor/#brain-doctor---rehearse). Asks first; `--yes` skips the question | one |
