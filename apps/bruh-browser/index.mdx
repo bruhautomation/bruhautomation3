@@ -1,9 +1,9 @@
 ---
 title: BRUH Browser
-description: brAIn's hands on the web. A real Google Chrome with Anthropic's Claude in Chrome extension, in your Home Assistant sidebar, so brAIn can run errands on websites — a grocery cart first — and never buy anything you have not approved.
+description: brAIn's hands on the web. A real Google Chrome with Anthropic's Claude in Chrome extension, in your Home Assistant sidebar, so brAIn can run errands on websites. It builds a cart and never buys anything you have not approved.
 template: splash
 hero:
-  tagline: "\"Add my usual order plus oat milk.\" brAIn builds the cart in a real browser you can watch — and stops at the checkout until you say buy."
+  tagline: "\"Add my usual order plus oat milk.\" brAIn builds the cart in a real browser you can watch, and stops at the checkout until you say buy."
   actions:
     - text: Quick Start
       link: /bruh-browser/quickstart/
@@ -22,100 +22,78 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Experimental · requires brAIn · amd64 only">
-Running Claude in Chrome inside a container, driven by Claude Code from a script, is a path
-Anthropic's documentation does not cover. BRUH Browser is built to fail loudly and say which
-setup step to redo, but the first real run on your machine may still find something that
-needs a fix — brAIn's development loop can report it.
-</Aside>
-
-## What it is
-
-**This app exists for [brAIn](/brain/).** It runs a real Google Chrome, with Anthropic's
-**Claude in Chrome** extension, on a virtual screen inside Home Assistant — so that brAIn can
-do things on websites for you. On its own it does nothing useful: brAIn sends the errands,
-and this app carries them out where you can watch, one at a time, in the sidebar.
+BRUH Browser lets [brAIn](/brain/) do things on websites for you. It runs a real Google
+Chrome, signed in as you, in the Home Assistant sidebar. brAIn sends an errand, and you
+watch it happen, one at a time.
 
 ![A finished errand on the BRUH Browser page: "Add my usual groceries plus oat milk to the cart at Walmart", marked Cart only — no purchase, from brAIn, in this app's Chrome, 41 steps. The report says blueberries were out of stock and one oat milk was swapped for another; the cart lists each item with quantity and price, delivery, tax and a 64.37 USD total, the substitution and the item left out, and a green box saying nothing has been bought, with Buy this and Don't buy](./images/cart.webp)
 
+<Aside type="caution" title="Experimental · requires brAIn · amd64 only">
+Running Claude in Chrome inside a container, driven from a script, is a path Anthropic's
+documentation does not cover. BRUH Browser fails loudly and says which setup step to redo,
+but the first real run on your machine may still find something that needs a fix.
+</Aside>
+
+## What you can do
+
+### Shop
+
+| You say or do | What happens |
+|---|---|
+| *"Add my usual Walmart order plus oat milk."* | Chrome opens the store and fills the cart from your shopping profile and the store's buy-again list. It stops on the review page. |
+| Wait | brAIn tells you: *"The cart is ready: 64.37 with delivery tomorrow 8–9 am. Blueberries were out of stock."* |
+| *"Buy it"*, in brAIn's chat or terminal | brAIn shows an approval card with the store, items and total. After you approve, a second errand places the order. |
+| Press **Buy this** under the cart, then confirm the total | The same second errand places the order. |
+| Press **Don't buy** | That cart can never be bought. |
+
+### Answer it when it needs you
+
+| It stops because | You do |
+|---|---|
+| Two products fit, or one is out of stock | Press the option you want, type something else, or tell brAIn *"use the frozen ones"*. |
+| The store wants a login, a code or a CAPTCHA | Do it in the live browser on the page, then press **I've done it, carry on**. |
+| You change your mind | Press **Stop this errand**. |
+
+![An errand waiting: "Order the usual from Walmart for delivery tomorrow morning". An orange box reads It's asking you — "Blueberries are out of stock. Which should I add instead?" — notes that the answer changes what is spent and nothing is bought until you approve the finished cart, and offers three buttons (raspberries, frozen blueberries, leave them out), a box to tell it what to do instead with Send, and Stop this errand](./images/asking.webp)
+
+### Teach it your usual
+
+| You say or do | What happens |
+|---|---|
+| *"Look at my old Walmart orders and learn what I usually buy."* | An order-history errand saves a shopping profile for that store: items, sizes, how often, brands you prefer, things to avoid. |
+| Press **Remove** beside an item | It stays out of the profile, even when a later errand sees it again. |
+
+### Look things up
+
+| You say | What happens |
+|---|---|
+| *"Find the cheapest 1 kg spool of white PETG."* | An errand searches, reads the results and reports back. No cart, no purchase. |
+
 ## It never buys without your yes
 
-An errand **builds the cart and stops** on the store's review page. brAIn reads you every
-item, quantity, price, fee, the delivery slot and the total. Only when you say *"buy it"*
-does brAIn ask you to approve the purchase — an approval card with the cart in front of you
-— or you press **Buy this** under the cart on this app's page. Only then does a **second
-errand** re-read the checkout and place the order, and only if the cart still matches what
-you approved, within 30 minutes of it being built. **Voice can build a cart and ask how it
-went; it cannot buy.**
+- **A purchase is always a second errand.** The first builds the cart and stops. The second runs only after a person has seen that cart and approved it.
+- **The approval is checked every time.** It must name this cart, built under 30 minutes ago, never approved before, with the same total to the cent.
+- **Voice cannot buy.** Voice can start a cart errand, ask how it went, and answer a choice that isn't about money.
+- **Nothing is bought on another computer.** Purchases run only in this app's own Chrome.
+- **It never types a password or card number**, changes account, address or payment settings, accepts new terms or subscriptions, or follows instructions written on a web page.
 
-## Highlights
-
-<CardGrid>
-  <Card title="A real browser, signed in as you" icon="laptop">
-    Google Chrome with your shop sessions, on a screen in the sidebar. Sign in to your
-    stores once, the way you would on your own computer. It never types a password.
-  </Card>
-  <Card title="Errands you can watch" icon="rocket">
-    The page shows what the errand is doing now, the live browser under it, and the
-    report and cart when it's done. **Stop this errand** ends it any time.
-  </Card>
-  <Card title="It asks — with real choices" icon="comment-alt">
-    *"Blueberries are out of stock. Which should I add instead?"* — a button per option,
-    a box to say something else, and you can answer from brAIn's chat too.
-  </Card>
-  <Card title="Your usual, learned" icon="list-format">
-    Ask brAIn to read your past orders at a store, and it saves a shopping profile — what
-    you usually buy, sizes, how often, brands you prefer — so "my usual" means yours.
-  </Card>
-  <Card title="Two locks on spending" icon="seti:lock">
-    An approval the add-on checks (this cart, under 30 minutes old, used once, its exact
-    total), and a spending guard that refuses "Place order"-type clicks in any errand
-    without one.
-  </Card>
-  <Card title="Your sessions stay home" icon="approve-check">
-    The browser profile is left out of Home Assistant backups. The screen answers only
-    through Home Assistant's sidebar, for admins; remote debugging is off by policy.
-  </Card>
-</CardGrid>
-
-## Use cases
-
-**The weekly shop, by voice.** *"Hey, add my usual Walmart order plus oat milk."* brAIn
-starts an errand; Chrome opens the store, works from your shopping profile and the store's
-buy-again list, and fills the cart. Twenty minutes later brAIn tells you: *"The cart is
-ready: 64.37 with delivery tomorrow 8–9 am. Blueberries were out of stock."* At
-your desk you open the cart, read it, and say *"buy it"* — brAIn shows the approval card
-with the items and total, you approve, and a second errand places the order.
-
-**A substitution, asked properly.** Mid-errand it stops: two products both fit, or one is
-out of stock. The page — and brAIn — shows the choices with their prices. *"Use the frozen
-ones."* It carries on.
-
-**A login only you can do.** The store wants a one-time code. The errand stops and points
-you at the live browser; you type the code, press **I've done it, carry on**, and it picks up
-where it stopped.
-
-**Price checks and research.** *"Find the cheapest 1 kg spool of white PETG."* An errand
-searches, reads the results and reports back — no cart, no purchase.
-
-**"What do I usually buy?"** *"Look at my old orders and learn what I usually buy."* An
-order-history errand reads what the store shows and saves a profile you can review and
-prune on the page.
+The [full list of limits](/bruh-browser/guide/#what-it-will-not-do) is in the guide.
 
 ## What you need
 
-- **[brAIn](/brain/)**, installed and running. BRUH Browser refuses to start without it.
-- **A paid Claude plan** — Pro, Max, Team or Enterprise. Claude in Chrome does not work with
-  an API key.
-- **Two one-time sign-ins with the same Claude account**: the Claude extension in the
-  browser, and Claude Code inside this app.
-- **An amd64 (x86-64) machine.** Google publishes Chrome for Linux on x86-64 only, so there
-  is no Raspberry Pi version.
-- Home Assistant 2024.7 or newer.
+| | |
+|---|---|
+| **[brAIn](/brain/)** | Installed and running. BRUH Browser refuses to start without it. |
+| **A paid Claude plan** | Pro, Max, Team or Enterprise. Claude in Chrome does not work with an API key. |
+| **Two one-time sign-ins** | The Claude extension in the browser and Claude Code inside this app, with the same Claude account |
+| **Machine** | amd64 (x86-64) only. Google publishes Chrome for Linux on x86-64 only, so there is no Raspberry Pi version. |
+| **Home Assistant** | 2024.7 or newer |
+
+## Next
 
 <CardGrid>
   <LinkCard title="Quick Start" description="Install, the five setup steps, your first errand." href="/bruh-browser/quickstart/" />
-  <LinkCard title="Errands & Purchases" description="How errands run, answering them, buying, profiles, browsers, options, privacy and brAIn's tools." href="/bruh-browser/guide/" />
+  <LinkCard title="Errands & Purchases" description="Answering errands, buying, the spending gate, profiles, browsers, options, privacy and brAIn's tools." href="/bruh-browser/guide/" />
 </CardGrid>

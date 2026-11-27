@@ -1,184 +1,182 @@
 ---
 title: The CLI
-description: Two commands, brain and ha — memory, learning, undo and diagnostics on one side; Home Assistant reloads, logs, entities and services on the other.
+description: Two commands in the terminal. brain covers memory, findings, learning, undo and diagnostics. ha covers Home Assistant logs, reloads, entities, services and add-ons.
 ---
 
-The terminal ships **two commands**, split by what they act on:
-
-- **`brain`** — brAIn's own faculties: memory, findings, learning, undo, file ownership,
-  diagnostics.
-- **`ha`** — Home Assistant operations: logs, reloads, entities, services, add-ons.
-
-The split exists so that *"which log?"* is never a question anyone has to ask. `brain help` and `ha help` list everything; typing a subcommand into the wrong dispatcher tells you which one it belongs to rather than failing quietly.
-
-These cover the **file-and-workflow side** that live APIs don't; the live home belongs to the [MCP tools](/brain/mcp/), and admin changes to [Power Tools](/brain/power-tools/) — see [how the layers fit](/brain/how-brain-controls-ha/).
-
-## `brain` — its own faculties
-
-| Command | What it does |
-|---------|--------------|
-| `brain memory <action>` | The [home memory](/brain/memory/): `add`, `list`, `forget`, `edit`, `inbox`, `hypotheses` (alias `guesses`), `confirm`, `reject`, `log` (`--show <n>` prints one entry in full), `undo`, `consolidate`, `clear`, `export`, `import` |
-| `brain findings <action>` | The [findings](/brain/needs-you/) work list: `list` (default), `fix <id>`, `done <id> ["note"]`, `wrong <id> ["note"]`, `ack <id>`, `snooze <id> [hour\|tomorrow\|week\|month\|now]` |
-| `brain learn [topic]` | Run a study session. With a topic, on that topic; without one, on whatever has gone stalest |
-| `brain ask "<question>"` | One-shot question about your home, answered as text |
-| `brain undo [n]` | List the files Claude edited, in plain English, and revert one |
-| `brain own [-r] <path…>` | [Make a file Claude cannot write writable again](#files-claude-cannot-write-brain-own) — usually one Home Assistant saved as root. `-r` does a whole folder. Raises no approval card and needs no `sudo` |
-| `brain why [ask]` | What brAIn is curious about — why somebody here does something by hand — and what it has worked out. `ask` asks the next question now, which spends one Claude run |
-| `brain doctor` | **Run this first when anything misbehaves** — drives the whole stack end-to-end (MCP, auth, listeners, worker pool, memory) and prints PASS/FAIL with a fix hint per part. Free: it never calls Claude. `--json` gives the same verdict as one object |
-| `brain doctor --deep` | [Every face of brAIn, one real round trip each](/brain/doctor/#brain-doctor---deep) — a plain Claude run, the analyst's tools, a chat turn, an automation task, Assist, memory, findings and one real fix. Spends about five Claude turns; only ever runs when you ask |
-| `brain doctor --rehearse` | [Plant a few defects named `brain_test_*`](/brain/doctor/#brain-doctor---rehearse), run the checks and the analyst against them, score both, then remove everything. Asks first, and says exactly what it would create. `--yes` skips the question |
-| `brain doctor --sweep` | Take out anything named `brain_test_*` a rehearsal left behind. Creates nothing and spends nothing |
-| `brain eval outcomes` | How the Resident's judgement has held up: what it decided and what you did next, per producer and per entity, and how its stated confidence held. Free. `--nightly` runs the nightly grading pass now |
-| `brain eval first_look` | Replay captured first looks against today's prompt and report how often they agree with what you did. Spends real Claude runs, capped (`--days`, `--max-tokens`, `--max-batches`); changes nothing |
-| `brain check` | Run the [house checks](/brain/checks/) now, through the panel's API — `list` for the catalog and when each last ran. No Claude run, no tokens |
-| `brain weekly [send]` | The week's numbers and the last report sent; `send` writes and sends this week's now |
-| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report — also listed under **⚙ → Diagnostics → Report a problem** (`--no-names` to hash entity ids) |
-| `brain devloop status\|run [stream]\|look "<what to fix>"` | The [development loop](/brain/development-loop/): its state, run one stream now, or file *What do you want to fix?* |
-| `brain tune "<asked>" "<answered>"` | Record something you settled with the assistant about how it should be (used by ⚙ › Personality's *Talk it through*) |
-| `brain login [--status\|--share]` | Sign in to Claude, and share that login with the other BRUH add-ons. The same command as `ha login` — the credential is brAIn's, and this is where people look for it |
-| `brain help` | The full list |
+The terminal has two commands. **`brain`** is for brAIn's own faculties, **`ha`** is for Home Assistant operations.
 
 ```bash
+brain doctor                       # free health check; run it first when anything misbehaves
 brain memory add "We call the office lamp the beacon"
-brain memory hypotheses            # pending guesses awaiting a yes/no
-brain memory confirm "the garage fridge runs 24/7"
 brain findings done 2 "replaced the battery myself"
-brain learn energy
-brain undo --all-today             # revert everything Claude changed today
-brain own /config/scenes.yaml      # hand a root-saved file back to Claude
-brain doctor                       # free, and the one to run first
-brain doctor --deep                # every face, one real round trip each
-brain doctor --rehearse            # plant defects here, score, clean up
-brain eval outcomes                # what the Resident decided, and what you did next
+brain undo                         # list what Claude edited, then revert one
+ha log errors -f                   # follow Home Assistant's errors
+ha reload automations
 ```
 
-`brain findings` goes through the panel's own API, never the store files — so a CLI ending
-writes the same memory line, settled key and undo token the tab's buttons write. `brain
-doctor`'s coverage roughly doubled across 1.25.0 and 1.27.0: it now also proves the panel
-and chat API are answering, the terminal's password gate is actually on, the Claude CLI
-itself runs, the three background daemons are alive, the run-sources ledger is
-claude-owned, no crashed consolidation pass is still holding its lock, disk space, and how
-stale the usage reading is — and it reads `/api/health`'s daemon roll-call and compares it
-against its own view. Since 1.47 it also warns if a rehearsal left anything named
-`brain_test_*` behind, and names the command that removes it.
+You rarely need to type these. In the [Terminal](/brain/terminal/), typing `brain` or `ha` opens a palette of every subcommand, and Claude runs the right one when you ask *"reload automations"* or *"what did you learn last week?"*.
 
-**The three doctors cost three different amounts**, and only the first is free:
+A subcommand typed into the wrong command tells you where it lives:
+
+```text
+$ ha undo
+'undo' is a brAIn faculty, not a Home Assistant operation.
+Run: brain undo
+```
+
+The CLI covers files and workflow. The live home belongs to the [MCP tools](/brain/mcp/) and admin changes to [Power Tools](/brain/power-tools/) ([how the layers fit](/brain/how-brain-controls-ha/)).
+
+## `brain` commands
+
+| Command | What it does | Claude runs |
+|---------|--------------|-------------|
+| `brain memory <action>` | The [home memory](/brain/memory/). [Actions below](#brain-memory-actions) | none (`consolidate` uses one) |
+| `brain findings <action>` | The [findings](/brain/needs-you/) work list. [Actions below](#brain-findings-actions) | `fix` and `apply` |
+| `brain learn [topic]` | Run a study session, on a topic or on whatever has gone stalest | one session |
+| `brain ask "<question>"` | One question about your home, answered as text | one |
+| `brain undo [n]` | List the files Claude edited and [revert one](#undo). `--all-today` reverts today's | none |
+| `brain own [-r] <path…>` | [Make a file Claude cannot write writable again](#files-claude-cannot-write-brain-own). `-r` does a whole folder | none |
+| `brain check` | Run the [house checks](/brain/checks/) now. `list` prints the catalog and when each last ran; `--json` the raw result | none |
+| `brain why [ask]` | What brAIn is curious about (why somebody does something by hand) and what it has worked out. `ask` asks the next question now | `ask`: one |
+| `brain weekly [send]` | The week's numbers and the last report sent. `send` writes and sends this week's now, and moves the next one a week out | `send`: one |
+| `brain doctor` | Checks the whole stack (MCP, sign-in, listeners, worker pool, memory, panel, daemons, disk) and prints PASS/FAIL with a fix hint per part. `--json` for one object | none |
+| `brain doctor --deep` | [One real round trip through every face](/brain/doctor/#brain-doctor---deep) | about five |
+| `brain doctor --rehearse` | [Plant test defects, score the checks and the analyst, clean up](/brain/doctor/#brain-doctor---rehearse). Asks first; `--yes` skips the question | one |
+| `brain doctor --sweep` | Remove anything named `brain_test_*` a rehearsal left behind | none |
+| `brain eval outcomes` | How the Resident's judgement held up: what it decided and what you did next, per producer and entity. `--nightly` runs the nightly grading pass now | none |
+| `brain eval first_look` | Replay captured first looks against today's prompt and report agreement with what you did. Changes nothing. Caps: `--days` (14), `--max-tokens` (60000), `--max-batches` (20) | capped |
+| `brain report` | Write one redacted text file to `/share/brain/reports/` for a bug report. `--no-names` hashes entity ids | none |
+| `brain devloop [status\|run [stream]\|look "<what to fix>"]` | The [development loop](/brain/development-loop/): its state, run one stream now, or file *What do you want to fix?* | `look`: one |
+| `brain tune "<asked>" "<answered>"` | Record something you settled about how the assistant should be. Listed in ⚙ › Personality, where you can remove it | none |
+| `brain login [--status\|--share]` | Sign in to Claude and share the login with the other BRUH apps. Same command as `ha login` | none |
+| `brain help` | The full list | none |
+
+### `brain memory` actions
+
+| Action | What it does |
+|---|---|
+| `add "<fact>"` | Teach it something |
+| `list` | Print the memory document |
+| `edit` | Open it in `$EDITOR` |
+| `forget "<text>"` | Queue a line for removal |
+| `inbox` | Facts waiting to be filed |
+| `consolidate` | File the inbox now |
+| `hypotheses` (alias `guesses`) | Guesses waiting for your yes or no |
+| `confirm "<text>"` / `reject "<text>" [why]` | Answer a guess. A reason after a reject teaches |
+| `log [n]` | What it learned recently (default 10). `--show <n>` prints one entry in full |
+| `history [n]` | Every kept version of the document |
+| `undo` / `undo <n>` | Go back one version, or revert change n from the log |
+| `clear --confirm` | Reset the document. A `.bak` is kept |
+| `export [file]` / `import <file>` | Everything learned as one portable file, and back in. `--replace-memory` overwrites the document |
+
+### `brain findings` actions
+
+The number is the one `brain findings` prints. Each ending goes through the panel, so it writes the same memory line and undo as the button.
+
+| Action | What it does |
+|---|---|
+| `list` (default) | Open findings and guesses waiting |
+| `fix <id>` | Ask what fixing it would change. Changes nothing |
+| `apply <id>` | Make the planned change. The only action that changes the house |
+| `cancel <id>` | Do not apply. The plan stays on the card |
+| `undo <id>` | Put back the files a fix changed. Service calls are listed, not reversed |
+| `done <id> ["note"]` | You fixed it yourself |
+| `wrong <id> ["note"]` | Not a problem here. Never raised again |
+| `ack <id>` | Acknowledge an automated fix |
+| `snooze <id> [hour\|tomorrow\|week\|month\|now]` | Hide it for a while |
+
+### The three doctors
 
 | | What it answers | What it spends |
 | --- | --- | --- |
-| `brain doctor` | Is the plumbing connected? | nothing |
+| `brain doctor` | Is everything connected? | nothing |
 | `brain doctor --deep` | Does each face work end to end, right now? | about five Claude turns |
-| `brain doctor --rehearse` | Do the checks and the analyst find a defect planted in *this* house? | one analyst run |
+| `brain doctor --rehearse` | Do the checks and the analyst find a defect planted in this house? | one analyst run |
 
-Neither costed one ever runs on a timer, and both are also in the panel: **Run all tests** in **⚙ → Diagnostics**, and the rehearsal in
-**⚙ → Developer**. The full walk-through: [Deep Check & Rehearsal](/brain/doctor/).
+The two that spend never run on a timer. Both are also in the panel: **Run all tests** in ⚙ → Diagnostics, and **Rehearse the house checks** in ⚙ → Developer. Details: [Deep Check & Rehearsal](/brain/doctor/).
 
-## `ha` — Home Assistant operations
+## `ha` commands
 
 | Command | What it does |
 |---------|--------------|
-| `ha log [core\|supervisor\|host\|addon <name>\|errors\|all]` | Tail HA logs. `-f` to follow, `-n N` for line count |
-| `ha reload <target>` | Reload HA config: `automations`, `scripts`, `scenes`, `groups`, every helper domain (`input_booleans`, `input_numbers`, `input_selects`, `input_texts`, `input_datetimes`, `timers`, `counters`), `core`, `all` — or `check` to validate without reloading. Singular forms work too |
-| `ha check [path]` | Validate YAML before reloading (alias: `ha yaml`) |
-| `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session (failed every time until 1.26.0 — the dispatcher ignored the script's shebang) |
-| `ha entity <action> <id>` | Get/set entity states: `get`, `set`, `list`, `search` |
-| `ha service call <domain>.<service>` | Call any HA service from the shell |
-| `ha addon <action> <slug>` | Manage add-ons: `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
-| `ha notify "msg"` | Send a persistent or mobile push notification |
-| `ha share <action>` | Cross-add-on file sync via `/share`: `push`, `pull`, `ls` |
-| `ha login [--status]` | Sign in to Claude from the shell, and share that login with the other BRUH add-ons — the same command as `brain login`. `--status` reports every store |
+| `ha log [core\|supervisor\|host\|addon <name>\|errors\|all]` | Tail Home Assistant logs. `-f` follows, `-n N` sets the line count |
+| `ha reload <target>` | Reload config: `automations`, `scripts`, `scenes`, `groups`, `input_booleans`, `input_numbers`, `input_selects`, `input_texts`, `input_datetimes`, `timers`, `counters`, `core`, `all`. `check` validates without reloading. Singular forms work too |
+| `ha check [path]` | Validate YAML syntax for a file or folder (default `/config`). `--ha` asks Home Assistant to check the config; `--all` does both. Alias: `ha yaml` |
+| `ha context` | Regenerate `/config/CLAUDE.md`, the [context file](/brain/mcp/#generated-context) Claude reads each session |
+| `ha entity <action>` | `get <id>`, `set <id> <state>`, `list [domain]`, `search <pattern>` |
+| `ha service call <domain>.<service>` | Call any service. `--data '{…}'` passes data, `--response` returns the service's response data. `ha service list [domain]` lists services |
+| `ha addon <action> <slug>` | `list`, `info`, `restart`, `stop`, `start`, `logs`, `options` |
+| `ha notify "msg"` | A persistent notification, or a phone push with `--target <name>\|all`. `--title` sets the title |
+| `ha share <action>` | Copy files through `/share` for other add-ons: `push <src> <dest>`, `pull <src> <dest>`, `ls [path]`. Credential-shaped files are refused unless `--force` |
+| `ha login [--status]` | Same command as `brain login`. `--status` reports every credential store |
 | `ha help` | The full list |
 
-:::note[If `ha` is already taken]
-If some other `ha` command is ever present on `PATH` inside the container, brAIn installs its own as **`hass`** instead rather than shadowing it. The startup log says so when this happens.
-:::
+If another `ha` command is already on `PATH` inside the container, brAIn installs its own as **`hass`** and says so in the startup log.
 
-## Also on `PATH`
+One more command is on `PATH`:
 
 | Command | What it does |
 |---------|--------------|
-| `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts (`list`, `remove` too) |
+| `persist-install apk\|pip <pkgs>` | Install packages that survive add-on restarts. Also `list` and `remove` |
+
+## Undo
+
+```bash
+brain undo                    # list what Claude edited, newest first
+brain undo 3                  # put edit #3 back, byte for byte
+brain undo --all-today        # revert everything Claude changed today
+```
+
+```text title="brain undo"
+Claude's recent edits to /config:
+
+   1  Nov 27 14:22  modified  /config/automations.yaml
+   2  Nov 27 14:19  modified  /config/scripts.yaml
+   3  Nov 27 09:41  created   /config/packages/energy.yaml
+
+Revert one with: brain undo <n>
+```
+
+Before a file under `/config` is written, the previous version is snapshotted. Reverting restores the file exactly as it was. Undoing an edit that created a file removes the file.
+
+| | |
+|---|---|
+| **Covered** | Edits made with Claude's file tools, notebook edits included. Writes the panel makes with no Claude run: an accepted [proposal](/brain/proposals/#saying-yes-and-taking-it-back) appended to `automations.yaml`, four [scenes](/brain/scenes/) appended to `scenes.yaml`, one automation changed by a [condition proposal](/brain/proposals/#the-condition-it-is-missing), and a [one-off's](/brain/intents/) **Remove**. |
+| **Not covered** | Files outside `/config`. `secrets.yaml`, which is never snapshotted. Changes a shell command made (a redirect, a script). |
+| **Kept for** | `edit_journal_days` (default 14). |
+
+Service calls a **Plan** made are put back with **Restore** on its card ([Permissions & Safety](/brain/safety/#putting-things-back)). A failed snapshot never blocks an edit.
+
+This is not a backup. Home Assistant's own backups version your whole configuration; the edit journal covers only the files brAIn touched. See [Reference](/brain/reference/#undo).
 
 ## Files Claude cannot write: `brain own`
-
-Claude Code runs as its own non-root user, and Home Assistant saves `automations.yaml`,
-`scripts.yaml` and `scenes.yaml` as root, which can leave them read-only for Claude. Other
-add-ons do the same with their own config. Since 2.11 brAIn hands those files back by
-itself — at startup, right before Claude edits a file it cannot write or runs a shell command
-that names one, and about once a minute for the top-level YAML the editors rewrite and each
-add-on's folder under `/addon_configs`. Claude is told never to ask you for `sudo` or
-`chown`.
-
-`brain own` is the same hand-over on demand, for anything the hooks can't see — typically a
-command writing to a path held in a variable:
 
 ```bash
 brain own /config/scenes.yaml /config/scripts.yaml
 brain own -r /config/packages        # a whole folder
 ```
 
-It works under `/config`, and under `/addon_configs`, `/share`, `/media` and `/addons` while
-the add-on's access option for each is on. It makes the file writable for Claude as well as
-handing it over, so a file somebody made read-only works too. It never touches anything
-outside those folders, `.storage`, `.cloud`, brAIn's own credentials, `secrets.yaml`, the
-recorder database or a file with other hard links; a symbolic link is answered for the file
-it points at, which has to pass the same checks. It raises no approval card. If it says the
-panel is not answering, the add-on isn't running — `brain doctor` checks that. More in
-[Permissions & Safety](/brain/safety/#brain-never-asks-you-to-chown).
+Claude Code runs as a non-root user. Home Assistant saves `automations.yaml`, `scripts.yaml` and `scenes.yaml` as root, and other add-ons do the same with their config, which can leave those files read-only for Claude.
 
-## Undo
+brAIn hands them back by itself:
 
-Before Claude writes to any file under `/config`, the previous version is snapshotted —
-notebook edits included, since 1.26.0. Only `/config` is journalled, and **`secrets.yaml` is
-never snapshotted**. Snapshots are kept for `edit_journal_days` (default 14).
+- at startup;
+- right before Claude edits a file it cannot write, or runs a shell command that names one;
+- about once a minute for the top-level YAML the editors rewrite and each add-on's folder under `/addon_configs`.
 
-Since 1.44.0 the journal also covers the writes that happen without a Claude run at all:
-accepting a [proposal](/brain/proposals/#saying-yes-and-taking-it-back) appends an automation
-to `automations.yaml`, and it is snapshotted first, in the same line shape, so `brain undo`
-puts it back exactly as it puts back an edit.
+`brain own` does the same on demand, for what those hooks cannot see, such as a command writing to a path held in a variable. It raises no approval card and needs no `sudo`. Claude is told never to ask you for `sudo` or `chown`.
 
-1.46.0 added two more shapes of that write and both are journalled the same way — four
-[scenes](/brain/scenes/) appended to `scenes.yaml`, and a **single entry changed or cut out of
-`automations.yaml`** in place, which is what a
-[condition proposal](/brain/proposals/#the-condition-it-is-missing) and a
-[one-off's](/brain/intents/) **Remove** do. The snapshot is the whole file either way, so
-`brain undo` restores the bytes you had rather than reversing an edit after the fact.
+| | |
+|---|---|
+| **Works under** | `/config`, and `/addon_configs`, `/share`, `/media` and `/addons` while the add-on's access option for each is on |
+| **Never touches** | Anything outside those folders, `.storage`, `.cloud`, brAIn's own credentials, `secrets.yaml`, the recorder database, or a file with other hard links |
+| **Symbolic links** | Answered for the file the link points at, which must pass the same checks |
 
-```bash
-brain undo                    # list what Claude edited, newest first, in plain English
-brain undo 3                  # put edit #3 back, byte for byte
-brain undo --all-today        # revert everything Claude changed today
-```
+If it says the panel is not answering, the add-on is not running; `brain doctor` checks that. More in [Permissions & Safety](/brain/safety/#brain-never-asks-you-to-chown).
 
-```text title="brain undo"
- 1  14:22  automations.yaml       modified   (added brightness to the hallway action)
- 2  14:19  scripts.yaml           modified
- 3  09:41  packages/energy.yaml   created
-```
+## Slash commands in the terminal
 
-The hook that takes the snapshot can never block an edit: if it fails for any reason it exits
-quietly and Claude carries on. A journal that stops you working is worse than no journal.
+In the [Terminal](/brain/terminal/) tab, `/` lists Claude Code's own commands, including anything you put in `/config/.claude/commands`. Two worth knowing:
 
-What it covers is edits made with Claude's **file tools**. A change made by a shell command
-— a redirect, a script — reaches no journal, which is one reason the terminal and the chat
-[ask before acting](/brain/terminal/#asking-before-acting) by default. The service calls a
-**Plan** made are put back with **Restore** on its card instead; see
-[Permissions & Safety](/brain/safety/#putting-things-back).
-
-This is **not a backup system**. brAIn doesn't version your configuration — Home Assistant's
-own backups do that job, whole-system and restorable. The edit journal only covers files
-brAIn itself touched. See [Reference](/brain/reference/#undo).
-
-## In the terminal, they're a palette
-
-You don't have to remember any of this. In the [Terminal](/brain/terminal/) tab, typing
-`brain` or `ha` opens a palette of every subcommand your install actually has — read from
-what the dispatchers print, so it can't go stale — and `/` lists Claude Code's own commands,
-including anything you've dropped in `/config/.claude/commands`.
-
-Two of those are worth knowing: **`/learn [topic]`** starts a study session you can watch and
-correct mid-flight, and **`/memory`** shows what it knows right now.
-
-## Everything is brAIn-usable
-
-The generated context lists both dispatchers, so *"reload automations"*, *"check the logs for zigbee errors"*, or *"what did you learn last week?"* resolve to the right command without you naming it.
+- **`/learn [topic]`** starts a study session you can watch and correct as it runs.
+- **`/memory`** shows what brAIn knows right now.

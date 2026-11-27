@@ -1,21 +1,26 @@
 ---
 title: Quick Start
-description: Install BRUH Browser, complete its five one-time setup steps (the Claude extension, two sign-ins with the same Claude account, acting without asking, and a test), sign in to your shops, and run a first errand through brAIn.
+description: Install BRUH Browser, complete its five one-time setup steps, sign in to your shops, and run a first errand through brAIn.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Before you start">
-You need **brAIn** installed and running, a **paid Claude plan** (Pro, Max, Team or
-Enterprise — an API key does not work with Claude in Chrome), and an **amd64** machine.
+Install the app, finish five one-time setup steps, sign in to your shops, and ask brAIn for
+a first cart.
+
+## Before you start
+
+<Aside type="caution" title="You need">
+**brAIn** installed and running, a **paid Claude plan** (Pro, Max, Team or Enterprise; an API
+key does not work with Claude in Chrome), and an **amd64** machine.
 </Aside>
 
 ## Install
 
 <Steps>
 
-1. **Add the repository** (already there if you installed brAIn): **Settings → Add-ons →
-   Add-on Store → ⋮ → Repositories**:
+1. **Add the repository.** If you installed brAIn, it is already there. Otherwise go to
+   **Settings → Add-ons → Add-on Store → ⋮ → Repositories** and add:
 
    ```text title="Repository URL"
    https://github.com/bruhautomation/BRUH-HA-Apps
@@ -24,64 +29,71 @@ Enterprise — an API key does not work with Claude in Chrome), and an **amd64**
 2. **Install BRUH Browser** and press **Start**. It checks that brAIn is installed and
    refuses to start without it.
 
-3. **Open Browser** in the sidebar (admin-only). The page shows the setup steps above the
-   live browser.
+3. **Open Browser** in the sidebar. It is admin-only. The page shows the setup steps above
+   the live browser.
 
 </Steps>
 
 ## Set up, once
 
-![The Set up, once card: a note that both sign-ins must be the same Claude account and a paid plan is needed, then five steps with their live state — 1 Install the Claude extension (Done), 2 Sign the extension in to claude.ai (Not yet, with Open claude.ai), 3 Sign Claude Code in (Not yet, with Open the sign-in window), 4 Let it act without asking (Not proved yet, with Open the extension's site permissions and Run the Test), 5 Test (Not yet, with Run the Test) — and a line saying Chrome runs without its own sandbox and the add-on's AppArmor profile confines it instead](./images/setup.webp)
+Each step shows its real state, read from the browser and Claude Code.
 
-Each step shows its **real state**, read from the browser and Claude Code — never a flag a
-button set.
+![The Set up, once card: a note that both sign-ins must be the same Claude account and a paid plan is needed, then five steps with their live state — 1 Install the Claude extension (Done), 2 Sign the extension in to claude.ai (Not yet, with Open claude.ai), 3 Sign Claude Code in (Not yet, with Open the sign-in window), 4 Let it act without asking (Not proved yet, with Open the extension's site permissions and Run the Test), 5 Test (Not yet, with Run the Test) — and a line saying Chrome runs without its own sandbox and the add-on's AppArmor profile confines it instead](./images/setup.webp)
 
 <Steps>
 
-1. **Install the Claude extension.** Chrome installs it by itself through its managed policy,
-   usually within a minute of first starting. If the step still says *Not yet*, press **Open
-   the Web Store page** and add it.
+1. **Install the Claude extension.** Chrome installs it by itself, usually within a minute
+   of first starting. If the step still says *Not yet*, press **Open the Web Store page**
+   and add it.
 
-2. **Sign the extension in to claude.ai.** Press **Open claude.ai**, sign in in the browser
-   below, then click the puzzle-piece icon in Chrome's toolbar, open Claude and sign in there
-   if it asks. Nothing outside the extension can read whether it is signed in, so this step
-   turns *Done* when the Test passes.
+2. **Sign the extension in to claude.ai.** Press **Open claude.ai** and sign in in the
+   browser below. Then click the puzzle-piece icon in Chrome's toolbar, open Claude, and
+   sign in there if it asks. This step turns *Done* when the Test passes.
 
-3. **Sign Claude Code in.** Press **Open the sign-in window**: a terminal opens on the
-   browser's screen running Claude Code. Choose your Claude account (or type `/login`); the
+3. **Sign Claude Code in.** Press **Open the sign-in window**. A terminal opens on the
+   browser's screen running Claude Code. Choose your Claude account, or type `/login`. The
    sign-in page opens in the same Chrome. Use the **same Claude account** as in step 2.
 
-4. **Let it act without asking.** Every errand tells the extension in this Chrome to act
-   without asking first, because nobody is there to answer it. If the extension still asks,
-   open its side panel in the live browser (the Claude icon in Chrome's toolbar, or the
-   puzzle-piece icon, then Claude), answer with **Allow**, and choose the answer that keeps
-   allowing the site if it offers one. **Open the extension's site permissions** shows the
-   sites it may act on. The Test proves this step.
+4. **Let it act without asking.** Errands tell the extension to act without asking first,
+   because nobody is there to answer. If the extension still asks, open its side panel in
+   the live browser (the Claude icon in Chrome's toolbar), answer **Allow**, and choose the
+   answer that keeps allowing the site if it offers one. **Open the extension's site
+   permissions** shows the sites it may act on.
 
-5. **Run the Test.** It opens example.com and reads its heading — a harmless check that
-   Claude Code can drive this Chrome and that the extension acts without asking. The
-   terminal from step 3 closes by itself.
+5. **Run the Test.** It opens example.com and reads its heading. That proves Claude Code can
+   drive this Chrome and that the extension acts without asking. The terminal from step 3
+   closes by itself.
 
 </Steps>
 
 ## Sign in to your shops
 
-In the live browser on the page, sign in to the stores you want brAIn to use, the way you
-would on your own computer. BRUH Browser never types a password: when a site asks for one
-during an errand, the errand stops and says so.
+In the live browser on the page, sign in to the stores you want brAIn to use, as you would
+on your own computer.
 
-## Your first errand
+BRUH Browser never types a password. When a site asks for one during an errand, the errand
+stops and says so.
 
-Ask brAIn, in chat or by voice:
+## Run your first errand
 
-> *"Add a sourdough loaf and a dozen eggs to my Walmart cart."*
+<Steps>
 
-Watch it on the page. When the cart is ready, brAIn reads it to you. Say *"buy it"* to get
-the approval card — or press **Don't buy**, and that cart can never be bought.
+1. Ask brAIn, in chat or by voice: *"Add a sourdough loaf and a dozen eggs to my Walmart
+   cart."*
+
+2. Watch it on the page. When the cart is ready, brAIn reads it to you.
+
+3. Say *"buy it"* in brAIn's chat to get the approval card. Or press **Don't buy**, and that
+   cart can never be bought.
+
+</Steps>
 
 <Aside type="tip">
 Teach it your usual order first: *"Look at my old Walmart orders and learn what I usually
 buy."* Later, *"add my usual Walmart order"* starts from that profile.
 </Aside>
 
-[How errands, questions and purchases work →](/bruh-browser/guide/)
+## Next
+
+[Errands & Purchases](/bruh-browser/guide/) covers answering an errand, buying, the spending
+gate, shopping profiles, options and troubleshooting.
