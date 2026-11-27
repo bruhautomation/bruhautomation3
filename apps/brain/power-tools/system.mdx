@@ -1,25 +1,81 @@
 ---
 title: Backups, Energy, Networks & More
-description: The brain services for backups, long-term statistics and the energy dashboard, Z-Wave and Thread, Home Assistant's addresses, categories, integration options, group helpers, user roles and dashboard settings.
+description: Ask brAIn to manage backups, fix long-term statistics and the energy dashboard, look after Z-Wave and Thread, and change addresses, categories, integration options, group members, user roles and dashboard settings.
 sidebar:
   order: 12
 ---
 
-These Power Tools reach the parts of Home Assistant that sit furthest behind the Settings
-screens. Like every Power Tool they are **admin-only**, a voice agent at the *Voice assistant*
-level cannot use them, and most **preview by default**: set `dry_run: false` to make the change.
-Ask in brAIn's chat (*"prune the backups older than a month but keep the newest three"*) or call
-them from an automation.
+Ask brAIn for the jobs that sit furthest behind the Settings screens: backups, energy history, Z-Wave, Thread, addresses, categories and options.
 
-## Backups
+## Ask brAIn
+
+```text
+Prune the backups older than a month but keep the newest three.
+The gas meter jumped by a million yesterday. Take the spike out.
+Remove the dead Z-Wave node in the garage.
+Which accounts haven't signed in for 90 days?
+Put all the heating automations in a Heating category.
+Add the new lamp to the Lounge lights group.
+```
+
+Most of these **preview by default**. brAIn shows you what would change, then makes the change when you say so. In YAML, pass `dry_run: false`.
+
+## What brAIn can do
+
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
+
+### Backups
 
 | Service | What it does | Fields |
 | --- | --- | --- |
-| `brain.list_backups` | Every backup Home Assistant knows, newest first: name, date, size, where it is kept, and whether it was automatic, partial or password-protected. Home Assistant 2025.1 or later. | — |
-| `brain.create_backup` | Make a backup now: full, or partial on Home Assistant OS and Supervised. Waits until it is made. | `partial`, `name`, `password`, `homeassistant`, `addons`, `folders` |
-| `brain.delete_backups` | Delete the backups a filter picks (by id, age, name or kind), keeping the newest few if asked. A call with no filter, or one that would leave no backup at all, is refused. | `backup_id`, `older_than_days`, `name_contains`, `kind`, `keep_newest`, `dry_run` |
+| `brain.list_backups` | List every backup, newest first: name, date, size, where it is kept, and whether it is automatic, partial or password-protected. Needs Home Assistant 2025.1 or later. | none |
+| `brain.create_backup` | Make a backup now and wait until it is done. Full, or `partial` on Home Assistant OS and Supervised. `name`, `password` and the partial choices need the Supervisor. | `partial`, `name`, `password`, `homeassistant`, `addons[]`, `folders[]` |
+| `brain.delete_backups` | Delete the backups a filter picks, by id, age, name or `kind` (`automatic`, `manual`, `full`, `partial`). `keep_newest` spares the newest few. **Previews by default.** A call with no filter, or one that would leave no backup, is refused. | `backup_id[]`, `older_than_days`, `name_contains`, `kind`, `keep_newest`, `dry_run` |
 
-```yaml
+### Statistics and the energy dashboard
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.adjust_statistic_sum` | Add an amount to a meter's long-term sum from one hour onward, to fix a wrong reading. A negative amount takes it away. **Previews by default.** | `statistic_id`\*, `start_time`\*, `adjustment`\*, `unit`, `dry_run` |
+| `brain.heal_statistic_spikes` | Take out the hours where a meter's sum jumped absurdly: a counter glitch near 2^30, a sum that fell, or a change over `max_hourly_change`. Looks back `days` (default 30). **Previews by default.** | `statistic_id`\*, `max_hourly_change`, `days`, `dry_run` |
+| `brain.clear_orphaned_statistics` | Delete the statistics kept for entities that no longer exist. External statistics are never touched. **Previews by default.** | `statistic_id[]`, `dry_run` |
+| `brain.get_energy_prefs` | Read the energy dashboard's sources (grid, solar, battery, gas, water) and individual devices. | none |
+| `brain.save_energy_prefs` | Replace its sources and/or devices. Each list you give replaces the whole list, and every statistic named must be one the recorder keeps. **Previews by default.** | `energy_sources`, `device_consumption`, `device_consumption_water`, `dry_run` |
+
+### Z-Wave, Thread and addresses
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.zwave_remove_failed_node` | Remove a Z-Wave node the controller has marked dead, as **Remove failed device** does. A node that is not dead is refused. Name it by `device_id` or `entity_id`. **Previews by default.** | `device_id`, `entity_id`, `dry_run` |
+| `brain.zwave_rebuild_node_routes` | Ask the controller to rebuild one node's routes, and say whether it worked. | `device_id`, `entity_id` |
+| `brain.list_thread_datasets` | List the Thread networks Home Assistant knows: name, channel and which is preferred. The network key is never returned. | none |
+| `brain.set_preferred_thread_dataset` | Choose the network new Thread devices join. | `dataset_id`\* |
+| `brain.set_core_urls` | Set the internal and/or external address Home Assistant is reached at. An empty value clears it. Each is a scheme, a host and an optional port, with no path. | `internal_url`, `external_url`, `dry_run` |
+
+### Categories
+
+Categories group the automation, script, scene and helper lists. `scope` is `automation`, `script`, `scene` or `helpers`.
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_category` | Create a category. Returns its `category_id`. | `scope`\*, `name`\*, `icon` |
+| `brain.update_category` | Rename a category or change its icon. | `scope`\*, `category_id`\*, `name`, `icon` |
+| `brain.delete_category` | Delete a category. What was in it is left uncategorised, and listed. | `scope`\*, `category_id`\*, `dry_run` |
+| `brain.set_entity_category` | Put automations, scripts, scenes or helpers in a category. Leave `category_id` empty to take them out. | `entity_id[]`\*, `scope`\*, `category_id` |
+
+### Integrations, groups, users and dashboards
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.set_integration_options` | Change an integration's options through its own **Configure** form. Only the fields you name change. `dry_run: true` lists the fields the form asks for. A form with more than one step, or a menu, is refused with what it asked for. | `config_entry_id`\*, `options`, `dry_run` |
+| `brain.set_group_members` | Set (`entities`), add to or take from the members of a group helper made in the UI. Members must be the group's kind. Returns the members before and after. | `entity_id`\*, `entities[]`, `add[]`, `remove[]`, `dry_run` |
+| `brain.list_users` | List every user with their groups, whether they are active, local-only or a system user, and when each sign-in was last used. `unused_for_days` marks the unused ones. Token values are never returned. | `include_system`, `unused_for_days` |
+| `brain.set_user_group` | Make a user `admin`, `user` or `read_only`. The owner, system users and the last administrator are refused. | `user_id`\*, `group`\*, `dry_run` |
+| `brain.update_dashboard_info` | Change a dashboard's sidebar title and icon, whether it shows in the sidebar, and whether only admins see it. Returns the settings before and after. | `url_path`\*, `title`, `icon`, `show_in_sidebar`, `require_admin`, `dry_run` |
+
+## Examples
+
+```yaml title="Prune old backups, keep the newest three"
 action: brain.delete_backups
 data:
   older_than_days: 30
@@ -27,49 +83,19 @@ data:
   dry_run: false
 ```
 
-## Statistics and the energy dashboard
+```yaml title="Preview a spike repair"
+action: brain.heal_statistic_spikes
+data:
+  statistic_id: sensor.gas_meter
+  max_hourly_change: 50
+response_variable: spikes   # nothing changes until dry_run is false
+```
 
-Fix the energy dashboard's history the way the Statistics screen does. Each shows what it would
-change first.
+```yaml title="Find accounts nobody uses"
+action: brain.list_users
+data:
+  unused_for_days: 90
+response_variable: users
+```
 
-| Service | What it does | Fields |
-| --- | --- | --- |
-| `brain.adjust_statistic_sum` | Add an amount to a meter's long-term sum from one hour onward, to fix a wrong reading. | `statistic_id`, `start_time`, `adjustment`, `unit`, `dry_run` |
-| `brain.heal_statistic_spikes` | Take out the hours where a meter's sum jumped absurdly: a counter glitch near 2^30, a sum that fell, or a change over the bound you give. | `statistic_id`, `max_hourly_change`, `days`, `dry_run` |
-| `brain.clear_orphaned_statistics` | Delete the statistics the recorder keeps for entities that no longer exist. External statistics are never touched. | `statistic_id`, `dry_run` |
-| `brain.get_energy_prefs` | The energy dashboard's sources (grid, solar, battery, gas, water) and individual devices. | — |
-| `brain.save_energy_prefs` | Replace its sources and/or devices. Every statistic named must be one the recorder keeps; a list given replaces the whole list. | `energy_sources`, `device_consumption`, `device_consumption_water`, `dry_run` |
-
-## Z-Wave, Thread and Home Assistant's addresses
-
-| Service | What it does | Fields |
-| --- | --- | --- |
-| `brain.zwave_remove_failed_node` | Remove a Z-Wave node the controller has marked dead, as the device page's *Remove failed device* does. A node that is not dead is refused. | `device_id` or `entity_id`, `dry_run` |
-| `brain.zwave_rebuild_node_routes` | Ask the controller to rebuild one node's routes, and say whether it worked. | `device_id` or `entity_id` |
-| `brain.list_thread_datasets` | The Thread networks Home Assistant knows, with name, channel and which is preferred. The network key is never returned. | — |
-| `brain.set_preferred_thread_dataset` | Make one the preferred network new Thread devices join. | `dataset_id` |
-| `brain.set_core_urls` | Set the internal and/or external address Home Assistant is reached at. Empty clears it. | `internal_url`, `external_url`, `dry_run` |
-
-## Categories
-
-The categories on the automation, script, scene and helper lists.
-
-| Service | What it does | Fields |
-| --- | --- | --- |
-| `brain.create_category` | Make a category. Returns its `category_id`. | `scope`, `name`, `icon` |
-| `brain.update_category` | Rename it or change its icon. | `scope`, `category_id`, `name`, `icon` |
-| `brain.delete_category` | Delete it. What was in it is left uncategorised, and listed. | `scope`, `category_id`, `dry_run` |
-| `brain.set_entity_category` | Put automations, scripts, scenes or helpers in a category, or take them out by leaving it empty. | `entity_id`, `scope`, `category_id` |
-
-## Integrations, groups, users and dashboards
-
-| Service | What it does | Fields |
-| --- | --- | --- |
-| `brain.set_integration_options` | Change an integration's options through its own **Configure** form. Only the fields named change; a form of more than one step, or a menu, is refused with what it asked for. | `config_entry_id`, `options`, `dry_run` |
-| `brain.set_group_members` | Set, add to or take from the members of a group helper made in the UI. Members must be the group's kind. Returns the members before and after. | `entity_id`, `entities`, `add`, `remove`, `dry_run` |
-| `brain.list_users` | Every user with their groups, whether they are active, local-only or a system user, and when each of their sign-ins was last used, so an unused account can be shown to be unused. | `include_system`, `unused_for_days` |
-| `brain.set_user_group` | Make a user an administrator, an ordinary user or read-only. The owner, system users and the last administrator are refused. | `user_id`, `group`, `dry_run` |
-| `brain.update_dashboard_info` | A storage dashboard's own settings: sidebar title and icon, whether it shows in the sidebar, whether only admins can see it. | `url_path`, `title`, `icon`, `show_in_sidebar`, `require_admin`, `dry_run` |
-
-See also: [Users](/brain/power-tools/users/), [Dashboards](/brain/power-tools/dashboards/),
-[Helpers](/brain/power-tools/helpers/), and [Devices & Integrations](/brain/power-tools/devices-and-integrations/).
+See also [Users](/brain/power-tools/users/), [Dashboards](/brain/power-tools/dashboards/), [Helpers](/brain/power-tools/helpers/) and [Devices & Integrations](/brain/power-tools/devices-and-integrations/).

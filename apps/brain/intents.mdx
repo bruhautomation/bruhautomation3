@@ -1,90 +1,34 @@
 ---
 title: Rules & One-Offs, in a Sentence
-description: Say what you want your house to do, in a sentence. A standing rule is drafted, replayed over the last month and graded against what you did before it's offered; a one-off runs once and switches itself off.
+description: Say what you want your house to do, in a sentence. A standing rule is drafted and replayed over your last month before it is offered. A one-off runs once and switches itself off.
 ---
 
-Say what you want your house to do, in plain English — in the *Ask or tell the house* line on
-the [Morph dashboard](/brain/morph/), in a phone Reply, to a voice assistant, or with the
-`brain.intent` service. brAIn works out whether you mean **a rule** (every time) or **a
-one-off** (next time), writes the automation, and puts it on **Insights → Needs you**. Nothing
-runs until you say yes, unless you chose *Act* or *No limits* in ⚙ → Permissions, where a rule
-you asked for is accepted at once.
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-In the [Ask](/brain/terminal/) chat, brAIn edits automations directly and says what changed;
-for a new standing rule it can replay it over your history first, the same way.
+Say what you want your house to do, in a sentence. brAIn writes the automation, checks it
+against your own history, and puts it on **Insights → Needs you** for you to **Apply**.
 
-## A rule, in a sentence
+![A Suggestion card titled "Whenever the front door opens after dark, turn the hall light on". It reads "You asked for this: … brAIn read that as: When the front door opens between sunset and sunrise, turn on the Hall light." Under Details, Replay: "Over the last 30 days it would have fired 9 times: 5 in the last 14 days, you had already done the same on 4, you did the opposite on 1." Presses: Apply, Snooze, Ignore](./images/act-rule.webp)
 
-> *"Whenever the front door opens after dark, turn the hall light on."*
->
-> *"Always turn the heating down when nobody is home."*
+| You say | brAIn makes | It runs |
+| --- | --- | --- |
+| *"Whenever the front door opens after dark, turn the hall light on."* | A **rule** | Every time |
+| *"Always turn the heating down when nobody is home."* | A **rule** | Every time |
+| *"Turn the porch light off when the guests leave."* | A **one-off** | Once, then switches itself off |
+| *"Tell me when the tumble dryer finishes."* | A **one-off** | Once, then switches itself off |
 
-Claude reads your house — searching only; it can't change anything — and drafts the
-automation. Then, **before you see it**, brAIn simulates it against your own history:
+A sentence about now and later, such as *"water the garden for 90 minutes"*, is neither.
+brAIn runs it itself as a timed action and writes no automation. See
+[`timed_action`](/brain/mcp/).
 
-1. **A replay of the last month** says how often the trigger would have fired.
-2. **The last fortnight of those firings is graded against what you did yourself** — did you
-   already do the same thing by hand, or the opposite?
+## Where to say it
 
-So the proposal arrives with its case in one sentence:
-
-```text title="A rule, on Needs you"
-You said:    "Whenever the front door opens after dark, turn the hall light on."
-Understood:  When the front door opens between sunset and sunrise, turn on the
-             Hall light.
-
-Over the last 30 days it would have fired 9 times: 5 in the last 14 days,
-you had already done the same on 4, you did the opposite on 1.
-
-[ Make the change ]  [ Try it for a week ]  [ Dismiss ]  [ No thanks ]
-```
-
-- **Make the change** writes it into `automations.yaml`, reloads, and checks Home Assistant really
-  created it. `brain undo` puts the file back.
-- **Try it for a week** runs it in [shadow](/brain/replay/) first: nothing is switched on,
-  and the card reports how it would have behaved.
-
-The card shows **your sentence and what brAIn understood** side by side, because when a
-rule is wrong the useful thing to know is which half was misread. Once accepted, the
-automation's description quotes the sentence you asked with (*Asked for in brAIn: "…" —
-accepted on …*), so in six months the file still says why it is there.
-
-A rule can be written **either way round** on a second trigger: ignored while the first run
-is still going, or restarting it. *"Turn the light off ten minutes after the last motion"*
-needs the second — another motion should start the ten minutes again — and brAIn now writes
-it that way. Running several copies at once is still refused.
-
-Rules built from Home Assistant 2026.7's new editor triggers — "When a light turns on", "When
-a door opens" — [replay](/brain/replay/#the-new-editors-triggers) like any other, so they get
-the same simulated case.
-
-brAIn refuses — on the card, never silently — a sentence it can't do properly: a trigger it
-can't replay (a webhook, a device trigger, one aimed at a whole area), a sentence that names nothing it could act on,
-and anything that would touch a [protected entity](/brain/reference/).
-
-## One-offs
-
-> *"Turn the porch light off when the guests leave."*
->
-> *"Tell me when the tumble dryer finishes."*
-
-These are the sentences people already try to say to their house, and no automation fits
-them. An automation is a **standing rule**; this is a thing to do **next time**. Building one
-by hand means writing a rule, remembering it exists, and going back to delete it — which is
-why nobody does, and why the houses that try end up with a folder of automations nobody dares
-turn off.
-
-## Two ways to say one
-
-**A sentence** in Morph's *Ask or tell the house* line or a phone Reply. One that *opens* with a
-moment goes here instead of being answered as a question: *when…*, *whenever…*, *once…*, *as soon as…*, *the next time…*,
-*next time…*, *tell me when…*, *let me know when…*, *remind me when…*
-
-It is matched on the opening word for a reason. *"Tell me when the freezer is unusual"* is an
-intent; *"What happens when the freezer warms up"* is a question about your house, and the
-difference between them is which word the sentence starts with.
-
-**`brain.intent`**, the service, which is how a voice command or an automation reaches it:
+| Where | How |
+| --- | --- |
+| **Morph** | The *Ask or tell the house* line on the [Morph dashboard](/brain/morph/). |
+| **Your phone** | **Reply** on a brAIn notification. |
+| **Voice** | Say it to a [voice assistant](/brain/voice/). |
+| **An automation or script** | The `brain.intent` service. |
 
 ```yaml
 action: brain.intent
@@ -92,129 +36,126 @@ data:
   sentence: Turn the porch light off when the front door has been shut for ten minutes
 ```
 
-Both write the same small request file on the shared volume, and the panel drains it every
-fifteen seconds — so the expensive half has one implementation and one place to be wrong.
-Neither waits for an answer: the sentence has to be searched against your house, which is far
-longer than a service call or a voice command should block.
+None of these waits for the answer. brAIn has to search your house first, so the card
+appears on Needs you shortly after. A sentence is cut at 300 characters.
 
-Anything past 300 characters is a specification rather than a sentence, and is cut there.
+In the [Ask](/brain/terminal/) chat, brAIn edits automations directly and says what changed.
+For a new standing rule it can replay it over your history first, the same way.
 
-## What happens to the sentence
+When brAIn cannot read the sentence itself, the opening words decide. *When…*, *whenever…*,
+*once…*, *as soon as…*, *the next time…*, *tell me when…*, *let me know when…*, *remind me
+when…*, *every time…*, *always…* and *from now on…* mark an instruction. *"When did the
+boiler last run?"* is still a question.
 
-Claude reads your house with **reading tools only** — it can search for the entity your
-sentence names and it cannot act on it — and answers with one automation. What comes back is
-checked before it becomes anything, and then it lands on Needs you as a [suggestion](/brain/proposals/), a
-card carrying three things: **your own sentence**, **what brAIn understood**, and a
-[replay](/brain/replay/) of how often that trigger would have fired over the last 30 days.
+## Ask for a rule
 
-Those first two are deliberately kept apart. Which half was misread is the only thing worth
-knowing when it is wrong, and one paragraph blending the two cannot say.
+<Steps>
 
-:::note[The replay is a sanity check, not evidence that you want it]
-Everywhere else on Needs you, a replay is the argument: *this is how often the thing
-brAIn is suggesting would have happened*. For a one-off it is not that. You already said you
-want it — the replay is the only check there is on a **trigger that has never fired**, and it
-is there so you can see brAIn read the right thing before it goes into your file.
-:::
+1. Say the rule: *"Whenever the front door opens after dark, turn the hall light on."*
+2. brAIn drafts the automation. It can search your house to find what you named. It cannot
+   change anything.
+3. Before you see it, brAIn simulates it twice. A replay of the last 30 days counts how
+   often it would have fired. The last 14 days of those firings are graded against what you
+   did by hand.
+4. The card arrives with your sentence, what brAIn understood, and the result in one line:
+   *Over the last 30 days it would have fired 9 times: 5 in the last 14 days, you had
+   already done the same on 4, you did the opposite on 1.*
+5. Press **Apply**, or **⋯ → Run** to [try it for a week](/brain/proposals/#try-it-for-a-week-first)
+   first.
 
-Nothing runs until you press **Enable it**.
+</Steps>
 
-## What gets written
+Your sentence and brAIn's reading sit side by side, so when a rule is wrong you can see
+which half was misread. **Ignore** it and ask again in different words.
 
-An ordinary automation, in your `automations.yaml`, with `mode: single` and **one extra
-action nobody asked the model for**: `automation.turn_off` pointed at itself.
+**Apply** writes the rule to `automations.yaml`, reloads, and checks Home Assistant created
+it. The toast offers **Undo**, and `brain undo` works later. The automation's description
+quotes your sentence (*Asked for in brAIn: "…" — accepted on …*), so the file still says
+why it is there. The full path is on
+[Suggestions](/brain/proposals/#saying-yes-and-taking-it-back).
 
-It switches off **whatever entity Home Assistant registered it as**, rather than a name
-brAIn guessed — on a house that already had an automation with the same name, a guess
-pointed at the other one, and the one-off went on firing for ever. Accepting also reads back
-the entity Home Assistant actually registered.
+Two details of how rules are written:
 
-So Home Assistant does the running. There is no listener inside the add-on to keep alive
-across a restart, no timer to survive an update, and nothing left *doing* anything once it has
-fired. Its description quotes your own sentence, because in six months that is the only
-thing in the file that says why the automation is there.
+- A rule like *"turn the light off ten minutes after the last motion"* restarts its ten
+  minutes on a second motion. A rule that would run several copies of itself at once is
+  refused.
+- Rules that use Home Assistant's newer editor triggers, such as *When a door opens*,
+  [replay](/brain/replay/) like any other.
 
-The write goes down the same path as any other accept —
-[written, reloaded, verified, reverted if it did not take](/brain/proposals/#saying-yes-and-taking-it-back),
-snapshotted into the edit journal first, with an Undo on the toast.
+<Aside type="caution" title="When a rule is applied without a card">
+With *Act* or *No limits* set in ⚙ → Permissions, a rule you typed is applied at once.
+It goes through the same checks and gets the same Undo. If it cannot be applied, it stays
+a card with the reason on it. See [Permissions & safety](/brain/safety/).
+</Aside>
 
-## Armed, fired, removed
+## Ask for a one-off
 
-Once it is written the card moves off the proposals list and sits above it with a pill:
+<Steps>
 
-| | What the card says |
+1. Say it: *"Turn the porch light off when the guests leave."*
+2. A card arrives with your sentence, what brAIn understood, and a replay of how often that
+   trigger would have fired over the last 30 days. Here the replay is a check that brAIn
+   read the right trigger. It is not evidence that you want it.
+3. Press **Apply**. Nothing runs before that.
+4. The card moves to **Set to run once** at the bottom of Needs you, marked **Armed**.
+
+</Steps>
+
+![The Set to run once group on Needs you with three cards: "Turn the porch light off when the guests leave" marked Armed, with You asked and brAIn understood under Details and a Delete button; "Tell me when the tumble dryer finishes" marked It fired, reading "It fired at 9:02 PM and switched itself off. It is still in your automations until you remove it."; and a card marked Not armed with the reason and a Done button](./images/act-oneoffs.webp)
+
+What gets written is an ordinary automation in your `automations.yaml`. Its last action
+switches the automation itself off, so Home Assistant does the running and nothing in brAIn
+has to stay alive for it. Its name is your sentence.
+
+Cards under **Set to run once** are waiting on the house, not on you, so the badge never
+counts them.
+
+| Pill | What the card says | Press |
+| --- | --- | --- |
+| **Armed** | *Armed and waiting. It runs once, then switches itself off.* | **Delete** |
+| **Armed**, **Waiting a fortnight** | *It has been waiting a fortnight and has never fired. Remove it if what you were waiting for already happened.* | **Delete** |
+| **It fired** | When it fired, and that it is still in your automations until you remove it. | **Delete** |
+| **Not armed** | A sentence brAIn will not arm, and why. | **Done** |
+
+brAIn learns that a one-off fired from the automation's own `last_triggered`, on the next
+[house-checks pass](/brain/checks/). Switching it off by hand does not count as firing.
+
+## Remove a one-off
+
+Nothing removes a one-off for you. Not when it fires, and not after a fortnight.
+
+<Steps>
+
+1. Press **Delete** on the card and confirm.
+2. brAIn cuts that one entry out of `automations.yaml`, reloads, and checks the automation
+   and its registry entry are gone.
+3. The toast says *Removed it from your automations* and offers **Undo**, which puts the
+   automation and the card back.
+
+</Steps>
+
+If any step fails, the file is put back and the card says which step. The rest of your file
+is not reformatted.
+
+## What brAIn will not write
+
+A refusal is a card, never a silent drop. For a one-off it sits under **Set to run once**
+marked **Not armed**, and **Done** clears it.
+
+| Refusal | Why |
 | --- | --- |
-| **Armed** | *Armed and waiting. It runs once, then switches itself off.* |
-| **It fired** | The time it fired, and that it is still in your automations. |
-| **Not armed** | A sentence brAIn will not arm, and why. The press is **Dismiss**. |
+| **A one-off that sounds like a standing rule**, or the reverse | The card shows what brAIn understood, so you can ask again the right way round. |
+| **A trigger that cannot be replayed** | A webhook, a device trigger, or one aimed at a whole area. Without a replay there is nothing to check a new trigger against. `time`, `state`, `numeric_state`, `template` and the newer editor's triggers can be [replayed](/brain/replay/). |
+| **The sentence named nothing brAIn could act on** | The automation would do nothing. |
+| **It touches a protected entity** | Anything in `protected_entities`. See [Permissions & safety](/brain/safety/). |
+| **Six one-offs are already armed** | Delete one and ask again. |
+| **No automation could be worked out**, or what you named was not found | The card says what brAIn looked for. |
 
-brAIn learns that it fired from the automation's own **`last_triggered`**, checked on every
-[house-checks pass](/brain/checks/) — not from the automation being switched off, because you
-switching it off by hand is not it having fired. The stamp has to be *after* you accepted it,
-so an automation that happens to share a slug with one that ran last month does not read as
-done the moment it is armed. An entity Core has no state for is left exactly as it is: *I
-could not look* and *it has not happened* are different answers.
-
-### Nothing removes it for you
-
-Not when it fires, not after a fortnight, not ever. **Remove** is a press.
-
-An automation that vanished from your file while you were not looking is a file you cannot
-trust, and that is a much larger cost than a line on a tab. So a fired one-off stays in your
-automations, saying it fired, until you say otherwise.
-
-One that has been **armed a fortnight without firing** is *labelled*, not deleted — the card
-changes to *"it has been waiting a fortnight and has never fired. Remove it if what you were
-waiting for already happened."* That is almost always what a fortnight of silence means, and
-the answer to it is a sentence with a button on it rather than a file that changed while
-nobody was watching.
-
-Pressing **Remove** makes the same four claims the accept made, in reverse: the entry is cut
-out of `automations.yaml`, Home Assistant reloads, the entity is gone from Core — its registry
-entry too, so no "unavailable" automation is left behind — and only then does the row leave
-the list. Any of them failing puts the file back and tells you which.
-The toast carries an Undo that puts the automation, the reload and the row back together.
-
-:::note[Your file is not reformatted to take one out]
-Removing an entry is a **byte splice**, exactly as
-[editing one](/brain/how-brain-controls-ha/#three-things-happen-without-claude) is: the bytes
-of that one entry go, and every other byte in the file — your ordering, your comments, your
-quoting — is identical afterwards.
-:::
-
-## What brAIn will not arm, and why it tells you
-
-A refusal is a **card on the tab**, never a log line. Somebody typed a sentence and is waiting
-for an answer, and *"brAIn will not do this, and here is why"* is one. Each one is answered by
-**Dismiss**.
-
-- **It sounds like a standing rule.** *"Turn the porch light on at sunset"* is something that
-  should keep happening, and it is a good thing to want — it just belongs on the ordinary path,
-  where it gets a replay, a trial week and a report. The card shows what brAIn understood
-  alongside your sentence, so you can see which half it misread and correct it rather than
-  wonder.
-- **The trigger cannot be replayed.** `time`, `state`, `numeric_state` and `template`
-  triggers, and the new editor's purpose-specific ones, can be
-  [replayed](/brain/replay/) against your recorded history. A `webhook` or a `device` trigger
-  would give you a card with no number on it and nothing to read but the model's own
-  restatement of itself.
-- **The sentence named nothing brAIn could act on.** An automation that names no entity does
-  nothing, and one that does nothing is indistinguishable from one that has not fired yet.
-- **It touches a protected entity.** Anything in the add-on's `protected_entities` option.
-  Asked here as well as at the writer, because a card offering something brAIn will refuse to
-  write is a wasted no.
-- **You already have six armed.** A list of things about to happen is only useful while it is
-  short. Remove one and ask again.
-- **brAIn could not work out an automation from the sentence at all**, or could not find what
-  it named — with what it looked for on the card.
-
-Only the five most recent refusals are kept, and they are pruned among *themselves* — a run of
-sentences brAIn cannot use never pushes the armed ones off the tab.
+Only the five most recent refusals are kept. They never push armed one-offs off the list.
 
 ## Where to see it
 
-- **Needs you**, above the suggestions — a one-off is waiting on the *house*, where a
-  proposal is waiting on you. That is also why the badge never counts them.
-- **⚙ Diagnostics** carries how many are armed, fired, refused, overdue and still queued, plus
-  the cap and the fortnight. An empty tab reads the same whether nobody has asked for one or
-  every ask was refused.
+| Where | What |
+| --- | --- |
+| **Insights → Needs you** | A drafted rule or one-off under **Chores and suggestions**. Armed, fired and refused one-offs under **Set to run once**. |
+| **⚙ → Diagnostics** | How many one-offs are armed, fired, refused, overdue and still queued, with the cap and the fortnight. |

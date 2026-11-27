@@ -1,229 +1,226 @@
 ---
 title: Errands & Purchases
-description: How BRUH Browser runs brAIn's errands — the queue, answering its questions, the cart and Buy this, the spending gate, shopping profiles, which Chrome is used, what it will never do, options, privacy and security, brAIn's tools and troubleshooting.
+description: Run errands through brAIn with BRUH Browser. Watch and answer an errand, review a cart and buy it, the spending gate, shopping profiles, which Chrome is used, what it will never do, options, privacy, brAIn's tools and troubleshooting.
 ---
 
-import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-## How an errand runs
-
-brAIn starts an errand with the words you said. **One runs at a time** and up to **three
-wait** behind it (a fourth is refused with a sentence). The page shows the errand above the
-live browser: what it is doing now and how many steps it has taken, and when it finishes,
-its report and the cart.
+Ask brAIn for something on a website, watch the errand run in the sidebar, answer it when it
+needs you, and approve a cart before anything is bought.
 
 ![An errand in progress: "Find the cheapest 1 kg spool of white PETG", Cart only — no purchase, from brAIn, just now, 4 steps, a spinner reading "Reading the search results" and a red Stop button](./images/running.webp)
 
-- An errand that runs out of steps (**Most steps per errand**, 80 by default) stops and asks
-  whether to carry on.
-- One still running after **Longest errand** (30 minutes by default) is stopped and
-  reported.
-- An errand that was running when the add-on stopped is marked failed with a sentence on the
-  next start — never re-run unasked.
-- The last 40 errands are kept, under **Recent errands**.
-- It never stops to ask permission for ordinary steps — searching, opening pages, filling the
-  cart. That is the errand you gave it.
+## Run an errand
 
-## When it needs you
+Ask brAIn in chat, in the terminal or by voice:
 
-It stops, says what it needs, and gives you a way to answer:
+> *"Add my usual Walmart order plus oat milk."*
+> *"Find the cheapest 1 kg spool of white PETG."*
 
-- **A choice** — two products that both fit, a substitute, a delivery slot: a button per
-  option, or type what it should do instead. A yes-or-no question has **Yes** and **No**.
-- **Something in the browser** — a login, a CAPTCHA, a "verify it's you" code, a pop-up: do
-  it in the live browser on this page, then press **I've done it, carry on**.
-- **The Claude extension is asking** for permission in its own side panel: the page says so
-  and how to open it (setup step 4).
+The **Browser** page shows the errand above the live browser: what it is doing now, how many
+steps it has taken, and its report and cart when it finishes. Press **Stop this errand** to
+end it at any time. Nothing already in a cart is removed.
+
+An errand does not ask permission for ordinary steps such as searching, opening pages and
+filling the cart.
+
+| Limit | What happens |
+|---|---|
+| One errand runs at a time | Up to **three** wait behind it. A fourth is refused with a sentence. |
+| **Most steps per errand** (80 by default) | The errand stops and asks whether to carry on. |
+| **Longest errand** (30 minutes by default) | The errand is stopped and reported. |
+| The app stopped mid-errand | The errand is marked failed on the next start. It is never re-run unasked. |
+| History | The last 40 errands are kept under **Recent errands**. |
+
+## Answer it when it needs you
+
+The errand stops, says what it needs, and gives you a way to answer.
 
 ![An errand waiting: "Order the usual from Walmart for delivery tomorrow morning". An orange box reads It's asking you — "Blueberries are out of stock. Which should I add instead?" — notes that the answer changes what is spent and nothing is bought until you approve the finished cart, and offers three buttons (raspberries, frozen blueberries, leave them out), a box to tell it what to do instead with Send, and Stop this errand](./images/asking.webp)
 
-You can also answer in brAIn's chat (*"tell it to use the frozen ones"*), or **by voice for a
-choice that doesn't change what you spend**. A question about money — or an answer that
-mentions paying, ordering, a price or a total — is refused by voice. Logins, CAPTCHAs and
-codes are always done by a person, in the browser.
+| It needs | You do |
+|---|---|
+| **A choice**: two products that fit, a substitute, a delivery slot | Press the option, or type what it should do instead. A yes-or-no question has **Yes** and **No**. |
+| **Something in the browser**: a login, a CAPTCHA, a "verify it's you" code, a pop-up | Do it in the live browser on the page, then press **I've done it, carry on**. |
+| **The Claude extension is asking** for permission in its side panel | Open the side panel and allow it. The page says how (setup step 4). |
 
-**Stop this errand** ends it at any time; nothing already in a cart is removed.
+| Where you answer | What is allowed |
+|---|---|
+| The page | Everything |
+| brAIn's chat or terminal (*"tell it to use the frozen ones"*) | Choices. Not logins, CAPTCHAs or codes. A person does those in the browser. |
+| Voice | Only a choice that doesn't change what you spend. A question about money, or an answer that mentions paying, ordering, a price or a total, is refused. |
 
-## The cart and buying
+## Review the cart and buy
 
 When the cart is ready, the page shows the **store**, **every item** with its quantity and
-price, the **fees**, the **delivery slot** and the **total**, anything **substituted** or
-**left out**, and two buttons:
+price, the **fees**, the **delivery slot**, the **total**, and anything **substituted** or
+**left out**.
 
-- **Buy this** asks once more with the total (*"Buy for 64.37 USD?"*). The order is then placed
-  by a **second errand**, only if the checkout still matches, and only within **30 minutes**
-  of the cart being built.
-- **Don't buy** means that cart can **never** be bought — here or through brAIn.
+![A finished errand: "Add my usual groceries plus oat milk to the cart at Walmart", Cart only — no purchase. The cart lists each item with quantity and price, delivery, tax and a 64.37 USD total, the substitution and the item left out, and a green box saying nothing has been bought, with Buy this and Don't buy](./images/cart.webp)
 
-Through brAIn, *"buy it"* raises brAIn's approval card with the store, items and total in
-front of you. That card is the one rule brAIn's YOLO mode does not lift: **a purchase is
-always asked about in chat or the terminal, and refused everywhere else** — insight runs,
-checks, voice.
+You have three ways to end it:
+
+- **Say *"buy it"* to brAIn**, in chat or the terminal. brAIn shows its approval card with
+  the store, items and total. Approve it and the order is placed.
+- **Press Buy this** on the page. It asks once more with the total. Press again to place
+  the order.
+
+  ![The buy box after the first press: "Press again to buy this cart for 64.37 USD. The order is placed only if the checkout still shows these items and this total", with a red Buy for 64.37 USD? button and Not now](./images/buy-confirm.webp)
+
+- **Press Don't buy.** That cart can **never** be bought, on the page or through brAIn.
+
+Either way the order is placed by a **second errand**. It re-reads the checkout and buys
+only if it still matches what you approved. If a price, a fee or an item changed, it stops
+and tells you.
+
+<Aside type="caution" title="A purchase is always asked about">
+brAIn's approval card for a purchase is the one rule its YOLO mode does not lift. A purchase
+is asked about in chat or the terminal, and refused everywhere else: insight runs, checks
+and voice.
+</Aside>
 
 ### The spending gate
 
-A purchase errand is refused unless its approval checks out, every time:
+A purchase errand is refused unless its approval passes every check, every time.
 
-1. It names a **cart errand of this add-on** that finished with items and a total;
-2. that cart finished **under 30 minutes ago**;
-3. it has **never been approved before** (an approval is used once);
-4. the approved **total matches to the cent** (or within **Price change allowed at
-   purchase**, 0% by default);
-5. it runs in **this app's own Chrome** — nothing is ever bought on another computer.
+| Check | Rule |
+|---|---|
+| The cart | A **cart errand of this app** that finished with items and a total |
+| Age | The cart finished **under 30 minutes ago** |
+| Once | The cart has **never been approved before** |
+| Total | The approved total **matches to the cent**, or within **Price change allowed at purchase** (0% by default) |
+| Declined | You have not pressed **Don't buy** on it |
+| Browser | It runs in **this app's own Chrome**. Nothing is bought on another computer. |
 
-The purchase errand's instructions are built from that cart, not from anyone's words, and
-name the items and the most it may cost. If the checkout has changed — a price, a fee, an
-item — it stops and tells you instead.
+The purchase errand's instructions are built from that cart, not from anyone's words. They
+name the items and the most it may cost.
 
 <Aside type="note" title="The spending guard is a net, not a guarantee">
-Besides your approval, every errand runs with a check that refuses a click on anything
-labelled "Place order", "Buy now", "Pay" and the like when the errand has no approved
-purchase. A site can label its button any way it likes, and a click at a screen position
-names nothing, so the guard is a second line. The first is that no errand is ever told it may
-buy without your yes.
+Every errand also runs with a check that refuses a click on anything labelled "Place order",
+"Buy now", "Pay" and the like when the errand has no approved purchase. A site can label its
+button any way it likes, so this guard is the second line. The first is that no errand is
+told it may buy without your yes.
 </Aside>
 
 ## What it will not do
 
+- Place an order **without your approval**.
 - Type or reveal a **password** or **card number**.
 - Change **account, address or payment** settings.
 - Accept new **terms, subscriptions, memberships or trials**.
 - Add a **tip** or a **protection plan** nobody asked for.
-- Follow **instructions written on a web page** — page text is content, never orders.
-- Place an order **without your approval**.
-- Run JavaScript in a signed-in page or upload files — errands have no use for either.
+- Follow **instructions written on a web page**. Page text is content, never orders.
+- Run JavaScript in a signed-in page, or upload files.
 
-## Your shopping profile
+## Teach it what you usually buy
 
-Ask brAIn to look at your old orders at a store — *"look at my old Walmart orders and learn
-what I usually buy"* — and an **order-history errand** reads what the store's order history
-shows and saves a profile for that store:
+Ask brAIn: *"Look at my old Walmart orders and learn what I usually buy."* An
+**order-history errand** reads the store's order history and saves a profile for that store.
 
-- the **items** you buy (the name as the store shows it, size, usual quantity, how often,
-  when last bought);
-- **brands** you prefer;
-- things to **avoid**, when your history shows them.
+![The Your shopping profile card for Walmart: 3 items updated an hour ago — oat milk (Planet Oat, unsweetened, usually 2, about every 7 days, last bought 2026-11-10), bananas, eggs — then Brands you prefer (Planet Oat, Great Value) and Things to avoid (Anything with peanuts), each with a Remove button, and Clear profile](./images/profile.webp)
 
-It is never guessed, and only an errand brAIn starts for that purpose saves one — an ordinary
-shopping errand never changes it. Running another order-history errand adds to it and
-updates what changed.
+| The profile holds | |
+|---|---|
+| **Items** | The name as the store shows it, size, usual quantity, how often, when last bought |
+| **Brands you prefer** | |
+| **Things to avoid** | When your history shows them |
 
-**How it is used.** A later cart errand for that store starts from it: "add my usual" means
-your profile first and the store's own buy-again list second. An errand gets a profile only
-when it **names that store** ("add my usual Walmart order"). When you don't name one, brAIn
-asks first ("your usual Walmart order?") and uses it only if you say yes — "my usual from
-Costco" never gets your Walmart one. brAIn tells you what it knows and asks what changed
-before it starts.
+| You do | What happens |
+|---|---|
+| *"Add my usual Walmart order."* | The cart errand starts from your Walmart profile first and the store's buy-again list second. brAIn tells you what it knows and asks what changed before it starts. |
+| *"Add my usual"*, with no store | brAIn asks first (*"your usual Walmart order?"*) and uses the profile only if you say yes. |
+| Run another order-history errand | It adds to the profile and updates what changed. |
+| Press **Remove** beside an item, brand or thing to avoid | It stays out, even when the next order-history errand sees it again. |
+| Press **Clear profile** twice | The whole store is forgotten. |
 
-**You are in charge.** The page shows every store's profile. **Remove** beside an item, a
-brand or a thing to avoid keeps it out, even when the next order-history errand sees it
-again; **Clear profile** forgets the whole store (press twice). Only you can do this, on this
-page.
+Rules the profile follows:
 
-**It is never an approval.** Everything in a profile came from a web page, so it is kept as
-plain, typed data — each name tidied and shortened, each quantity a number, each date a date
-— and handed to an errand only as a list of things you have bought before. Nothing in a
-product name can read as permission to buy.
+- **Only an order-history errand saves one.** An ordinary shopping errand never changes it,
+  and nothing in it is guessed.
+- **One store's profile never reaches another store's errand.** "My usual from Costco" never
+  gets your Walmart one.
+- **Only you can remove or clear**, on the page.
+- **It is never an approval.** A profile is handed to an errand as a list of things you have
+  bought before. Nothing in a product name can read as permission to buy.
+- **It is in Home Assistant backups**, like your errand history. It holds what you buy, not
+  passwords. It goes nowhere except into a later errand for that store, and to brAIn when it
+  asks.
 
-**Where it lives.** In this app's own storage, and it **is** included in Home Assistant
-backups (like your errand history), so a restore keeps it. It holds what you buy, not
-passwords. It is sent nowhere but into a later errand for that store, and to brAIn when it
-asks.
+## Choose which browser runs an errand
 
-## Which browser
-
-Your Claude account may have the Claude extension in more than one Chrome — this app's, and
+Your Claude account may have the Claude extension in more than one Chrome: this app's, and
 perhaps the one on your laptop. The page lists them under **Browsers this account has
-connected**, marks this app's own, and lets you choose the default.
+connected**.
 
-- **Errands use this app's own Chrome** unless you pick another, or tell brAIn to use another
-  for an errand. It never quietly falls back to another computer: if this app's Chrome isn't
-  connected, or the page can't tell which browser is its own, the errand stops and asks which
-  to use. If the page says it can't tell, press **This is the BRUH Browser** on the right one.
-- **brAIn asks** which browser to use when more than one is connected and you haven't said,
-  can remember your answer as the default, and says which browser it used.
-- **On another computer**, the extension keeps asking its own person before it acts, and
-  **nothing is ever bought there**.
+![The Browsers this account has connected card: Chrome on homeassistant (Linux), marked This app's Chrome and Default, and Chrome on MacBook Pro named "Work" (macOS) with a Use by default button, a note that errands use this app's own Chrome unless you or brAIn pick another, and Check again](./images/browsers.webp)
+
+| Situation | What happens |
+|---|---|
+| You haven't chosen | Errands use this app's own Chrome. |
+| You press **Use by default** on another, or tell brAIn to use another for an errand | That errand runs there. The extension on that computer keeps asking its own person before it acts, and **nothing is ever bought there**. |
+| More than one is connected and you haven't said | brAIn asks which, can remember your answer as the default, and says which browser it used. |
+| This app's Chrome isn't connected, or the page can't tell which is its own | The errand stops and asks which to use. It never quietly falls back to another computer. Press **This is the BRUH Browser** on the right one. |
 
 ## Options
 
 | Option | Default | What it does |
 |---|---|---|
-| **Claude model** (`model`) | `sonnet` | The model an errand runs on: `sonnet`, `opus` or `haiku`. A shopping errand is many small steps, which Sonnet does well and quickly; Opus is slower and uses more of your plan; Haiku slips more on busy shop pages. |
+| **Claude model** (`model`) | `sonnet` | The model an errand runs on: `sonnet`, `opus` or `haiku`. Sonnet handles the many small steps of a shopping errand quickly. Opus is slower and uses more of your plan. Haiku slips more on busy shop pages. |
 | **Most steps per errand** (`max_turns`) | `80` | 10–300. How many steps one errand may take before it stops and asks you to continue. A weekly grocery order is often 40 to 80. |
 | **Longest errand** (`task_timeout_minutes`) | `30` | 5–180 minutes. An errand still running after this long is stopped and reported. |
-| **Price change allowed at purchase** (`purchase_tolerance_percent`) | `0` | 0–20%. How far an approved cart's total may move before the order is placed. 0 means exactly the approved total; otherwise the errand stops and tells you. |
+| **Price change allowed at purchase** (`purchase_tolerance_percent`) | `0` | 0–20%. How far an approved cart's total may move before the order is placed. 0 means exactly the approved total. Beyond the limit the errand stops and tells you. |
 | **Screen size** (`screen_resolution`) | `1366x900` | The virtual screen Chrome draws on. |
-| **Log level** (`log_level`) | `info` | How much the add-on writes to its log. |
+| **Log level** (`log_level`) | `info` | How much the app writes to its log. |
 
 ## Privacy and security
 
-- **Your errands use your Claude plan** and send the pages the browser reads to Anthropic, as
-  Claude in Chrome always does.
-- **The browser profile holds your shop sessions and both Claude sign-ins.** It lives in this
-  app's own storage and is **left out of Home Assistant backups** on purpose (backups are
-  unencrypted unless you opt in): after restoring a backup, sign in again.
-- **Only you can see the browser.** The page is admin-only, and the screen is reachable
-  through Home Assistant's sidebar and nothing else. brAIn reaches only the errand API, with a
-  token this app writes to `/config/.bruh_browser/api_token`. **Buy this**, **Don't buy**, **I've
-  done it** and **This is the BRUH Browser** are pressed only on this page.
-- **Chrome runs without its own sandbox** when the container can't give it one (normally the
-  case for an app); the app's container, an unprivileged user and its AppArmor profile are
-  then the boundary. The setup card says which is in force.
-- **Remote debugging is off** by Chrome policy, browser sync and browser sign-in are
-  disabled, and the extension is force-installed by policy.
+| | |
+|---|---|
+| **What leaves the house** | Errands use your Claude plan and send the pages the browser reads to Anthropic, as Claude in Chrome always does. |
+| **The browser profile** | Holds your shop sessions and both Claude sign-ins. It is **left out of Home Assistant backups** on purpose. After restoring a backup, sign in again. |
+| **Who can see the browser** | Admins, through Home Assistant's sidebar and nothing else. |
+| **What brAIn can reach** | Only the errand API, with a token this app writes to `/config/.bruh_browser/api_token`. **Buy this**, **Don't buy**, **I've done it** and **This is the BRUH Browser** are pressed only on the page. |
+| **Chrome's sandbox** | Chrome runs without its own sandbox when the container can't give it one, which is normal for an app. The container, an unprivileged user and the AppArmor profile are then the boundary. The setup card says which is in force. |
+| **Chrome policy** | Remote debugging is off, browser sync and browser sign-in are disabled, and the extension is force-installed. |
 
 ## brAIn's tools
+
+brAIn lists these only when this app is installed.
 
 | Tool | What it does | Who may use it |
 |---|---|---|
 | `browser_task` | Start an errand, optionally in a named browser, optionally an order-history errand. It never buys. | Chat, terminal, voice |
-| `browser_status` | How it went, the cart, the question it is waiting on; with `browsers` the connected browsers; with `profiles` your shopping profiles. A long report comes back whole, or in parts with an `offset`. | Everyone, including unattended runs |
-| `browser_answer` | Pass on your answer to its question. | Chat, terminal; voice only for a choice that isn't about money |
+| `browser_status` | How it went, the cart, the question it is waiting on. With `browsers`, the connected browsers. With `profiles`, your shopping profiles. A long report comes back whole, or in parts with an `offset`. | Everyone, including unattended runs |
+| `browser_answer` | Pass on your answer to its question. | Chat, terminal. Voice only for a choice that isn't about money. |
 | `browser_stop` | Stop an errand. | Chat, terminal |
-| `browser_purchase` | Buy a cart you approved — always behind brAIn's approval card. | Chat and terminal only, always asked |
+| `browser_purchase` | Buy a cart you approved, always behind brAIn's approval card. | Chat and terminal only, always asked |
 
-They are listed only when this app is installed. Everything a web page said — the report,
-questions, item names — reaches brAIn marked as untrusted. brAIn's `sensor.bruh_browser_status`
-says what the last errand was (a shopping cart, a purchase, order history, a setup test), the
-store, and one sentence about how it ended — never item names, the total, or anything the
-errand read.
+Everything a web page said (the report, questions, item names) reaches brAIn marked as
+untrusted.
+
+brAIn's `sensor.bruh_browser_status` says what the last errand was (a shopping cart, a
+purchase, order history, a setup test), the store, and one sentence about how it ended. It
+never holds item names, the total, or anything the errand read.
 
 ## Troubleshooting
 
-Every failure ends an errand with a sentence on the page and in `browser_status`, and where a
-setup step is to blame, a **Show setup step N** button.
+Every failure ends an errand with a sentence on the page and in `browser_status`. Where a
+setup step is to blame, there is a **Show setup step N** button.
 
-<CardGrid>
-  <Card title='"Browser extension is not connected"'>
-    Redo steps 1 and 2: the extension installed, and signed in to claude.ai.
-  </Card>
-  <Card title="No Chrome tools in the run">
-    Step 3: Claude Code isn't signed in with a paid plan — or an API key is set, which keeps
-    Chrome off.
-  </Card>
-  <Card title='"The extension is waiting for someone to allow it"'>
-    Step 4: open the extension's side panel in the live browser, answer **Allow**, and keep
-    allowing the site. Then run the Test.
-  </Card>
-  <Card title="It asks which browser to use">
-    This app's Chrome isn't connected, or it can't tell which is its own. Press **This is
-    the BRUH Browser** on the right one under Browsers this account has connected.
-  </Card>
-  <Card title="Shops signed out after a restore">
-    The browser profile isn't in backups, on purpose. Sign in again.
-  </Card>
-  <Card title="An errand stopped at a sign-in">
-    It never types passwords. Sign in in the live browser and press **I've done it, carry
-    on**.
-  </Card>
-</CardGrid>
+| Symptom | What to do |
+|---|---|
+| "Browser extension is not connected" | Redo setup steps 1 and 2: the extension installed, and signed in to claude.ai. |
+| No Chrome tools in the run | Step 3: Claude Code isn't signed in with a paid plan, or an API key is set, which keeps Chrome off. |
+| "The extension is waiting for someone to allow it" | Step 4: open the extension's side panel in the live browser, answer **Allow**, and keep allowing the site. Then run the Test. |
+| It asks which browser to use | This app's Chrome isn't connected, or it can't tell which is its own. Press **This is the BRUH Browser** on the right one under **Browsers this account has connected**. |
+| Shops signed out after a restore | The browser profile isn't in backups, on purpose. Sign in again. |
+| An errand stopped at a sign-in | It never types passwords. Sign in in the live browser and press **I've done it, carry on**. |
 
 <Aside type="caution" title="What hasn't been proven on a real house yet">
-Everything new was driven against a stand-in for Claude Code, not a real extension. The
-parts most likely to need a fix on first contact are whether Claude Code's print mode drives a
-Chrome on a virtual screen in a container at all, the extension connecting from a container,
-the extension honouring "act without asking" from a script, and brAIn's approval card
-appearing for a purchase in every chat mode. None of them fails silently: if brAIn's approval
-can't be shown, a purchase is refused, not made.
+The app was driven against a stand-in for Claude Code, not a real extension. The parts most
+likely to need a fix on first contact are: Claude Code's print mode driving a Chrome on a
+virtual screen in a container, the extension connecting from a container, the extension
+honouring "act without asking" from a script, and brAIn's approval card appearing for a
+purchase in every chat mode. None of them fails silently. If brAIn's approval can't be
+shown, a purchase is refused, not made.
 </Aside>

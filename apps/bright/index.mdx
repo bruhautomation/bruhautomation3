@@ -1,9 +1,9 @@
 ---
 title: BRight
-description: A music-driven light show director for Home Assistant. BRight listens to your music once, choreographs your LIFX bulbs and switch-driven party lights, and keeps the whole show in sync with the speaker that is actually playing.
+description: A music-driven light show director for Home Assistant. BRight analyses your music once, writes a light show for your LIFX bulbs and party lights, and keeps it in sync with the speaker.
 template: splash
 hero:
-  tagline: Point it at a folder of music and a speaker. It hears each track once, writes a light show for your room, and runs it on the beat — or hands you the room to play live from your phone.
+  tagline: Point it at a folder of music and a speaker. It writes a light show for your room and runs it on the beat. Or it hands you the room to play live from your phone.
   actions:
     - text: Quick Start
       link: /bright/quickstart/
@@ -22,123 +22,118 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+
+BRight turns the lights you already own into a lighting rig for music. It analyses each track
+once, compiles a show for your room, plays the track on a Home Assistant speaker, and lands the
+lights on the beat by measuring how late that speaker really is.
+
+![A show open in BRight's editor: the room on a floor plan with each light glowing its colour at the scrubbed moment, the song's waveform, chord, melody and drum lanes, four scene blocks named arrive, roll, lift and land, one colour strip per light, a bar per effect, and a play button with a scrub bar](./images/show-editor.webp)
 
 <Aside type="caution" title="Experimental">
-BRight is being built in the open and is marked **experimental** in the add-on store. The whole
-chain works end to end, but behaviour still changes between releases. Restarting it is always
-safe: shows and analysis are regenerable, and nothing it does touches your Home Assistant
-configuration.
+BRight is marked **experimental** in the app store and behaviour still changes between releases.
+Restarting it is always safe: shows and analysis can be rebuilt, and it never changes your Home
+Assistant configuration.
 </Aside>
 
-## What it is
+## What you can do
 
-A Home Assistant add-on that turns the lights you already own into a lighting rig for music.
-BRight analyses each track **once** — the beat grid, sections and drops, the chords, the melody,
-which drum each accent was, and synced lyrics where they exist — and compiles a **show**: a
-timeline of effects sent straight to your LIFX bulbs over the LAN, plus on/off cues for party
-lights and lasers on any Home Assistant switch.
+### Run a party
 
-Then it plays the track through a Home Assistant media player and runs the show against a clock
-anchored to how long *your* speaker actually takes to start. The lights land on the beat instead
-of two seconds behind an AirPlay buffer.
+| You do | What happens |
+| --- | --- |
+| Say *"start party mode"* (an automation, or [brAIn](/brain/)) | Every analysed song plays on your speaker, each with its own show. The next song's show is written while this one plays. |
+| Tick songs on the **Party** tab and press **🎉 Play** | They play in the order you ticked them. A song with no show yet gets one on the fly. |
+| Press **Save as a set**, then say *"start saturday night"* | A saved set starts by name from the panel, an automation or voice. |
+| Pick a scene under **When it stops** | Stopping calls your **Good night** scene instead of putting the room back as it was. |
+| Tap **±25 ms** or **🎤 Sync by ear** while it plays | The lights shift onto the beat. **Keep this trim** saves it for that speaker. |
 
-![BRight's Light Map: nine lights placed on a floor-plan grid — sofa lamps, a kitchen bar, hall downlights, a mantel candle, a stair strip and party lights — each labelled with its name, with the Add lights controls underneath](./images/light-map.webp)
+![The Party tab with three songs ticked in play order, a Play 3 shows button, a speaker picker, When it stops, Shuffle, a Which show picker per song, and two saved sets with Start, Load and Delete](./images/party.webp)
 
-<CardGrid>
-  <Card title="Analysed once, played many times" icon="seti:audio">
-    A track's analysis and its compiled show are files. Play it again tomorrow and nothing is
-    recomputed — at show time the engine is just a clock and a cue list.
-  </Card>
-  <Card title="The bulb keeps time" icon="random">
-    A beat pulse is one packet that tells the bulb to run a waveform for eight beats, not hundreds
-    of packets a second. Shows stay locked even on a busy Wi-Fi network.
-  </Card>
-  <Card title="Measured, not guessed" icon="approve-check">
-    Your phone's microphone hears a click track from the speaker and BRight works out its real
-    delay. A Chromecast, an AirPlay speaker and a wired output each get their own number.
-  </Card>
-  <Card title="Editable all the way down" icon="pencil">
-    Every show is a script of *effects* — chases, builds, strobes, a melody running across the
-    room. Claude writes it, the built-in choreographer writes it, or you do. Same file either way.
-  </Card>
-  <Card title="Play it live" icon="rocket">
-    The Manual tab turns your light map into an instrument: tap bulbs on the beat, record loops in
-    bars, hit DROP and FLASH. It all locks to the song's own grid.
-  </Card>
-  <Card title="It tells you when it can't" icon="warning">
-    A speaker that never started, a media folder Home Assistant will not serve, a Chromecast that
-    cannot resolve `homeassistant.local` — each is a named step in one check, not a dark room.
-  </Card>
-</CardGrid>
+### Give one song a designed show
 
-## Use cases
+| You do | What happens |
+| --- | --- |
+| Press **▶ Play** beside a song on the **Shows** tab | The song plays on your speaker with its lights. |
+| Tap the song's name | Its show opens as a picture: your room, the song, and every effect as a row. Play it on screen without lighting the house. |
+| Press **Edit**, **+ Effect** or **✕** on an effect row | The preview follows at once. **Save & compile** checks the show before it replaces the old one. |
+| Type *"the chorus needs more movement, warmer verses"* and press **✍ Revise with Claude** | Claude rewrites the show from your notes. |
+| Open **Versions of this show** | Every compile, revision and edit is kept. **Play this one** brings an old version back. |
+| Edit the show's JSON file under `/config/.bright/shows/` | **Reload from file** or `bright.import_show` makes it the live show. |
 
-**A party in one sentence.** Friday night, guests arriving. You say *"start party mode"* to your
-voice assistant. Your Saturday-night set starts on the living-room speaker, every track with its
-own show; the next song's show is written in the background while this one plays. At 1am,
-*"stop the party"* calls your **Good night** scene instead of putting the party colours back.
+### Build your own effects
 
-**A song that deserves a show.** You love one track and want it to look designed. Compile it,
-watch it on the Shows tab without lighting the house, then type *"the chorus needs more movement,
-warmer verses"* and press **Revise with Claude**. Every version is kept, so the evening you spent
-tuning it is never lost to a rewrite.
+| You do | What happens |
+| --- | --- |
+| Type *"bounce a warm pulse between the two window lamps"* and press **Write it** | Claude fills in an effect for your room, naming your lights. |
+| Pick one of 22 effect types, tick the lights, choose how it travels | The effect owns only the lights you ticked. Everything else keeps doing what the show was doing. |
+| Press **Preview**, then **Run it on the lights** | You see it on your floor plan, then on the real bulbs with no music. |
+| Press **Save this effect** | It appears in the Manual rack, in Claude's brief, and in any show by name. |
 
-**The kitchen gets its own effect.** In the Effects tab you write *"bounce a warm pulse between the
-two window lamps"*. Claude builds the effect for your room, you preview it on the floor plan, keep
-it as a preset, and drop it into the chorus of three shows. Everything you did not select keeps
-doing what the show was already doing.
+![The Effects tab's Preview card: a chase lighting one lamp on the floor plan, a strip with one row per light showing the chase stepping across four lamps, the cost line reading 192 cues and a peak of 4 per second against a budget of 18, and two saved effects](./images/effects-preview.webp)
 
-**You are the lighting desk.** A friend is DJing from their own phone. You start a Manual session
-with no song, tap **TAP** four times to set the tempo, record a four-bar loop on the sofa lamps,
-and save DROP for the moment the bass comes back in.
+### Play the lights live
 
-**Movie night, but louder.** An automation starts a single track's show when the credits roll,
-using `bright.start_show`, and puts the room back exactly as it was afterwards.
+| You do | What happens |
+| --- | --- |
+| Open **Manual** on your phone and press **▶ Start** | Your light map becomes an instrument. Tap a bulb and that bulb plays. |
+| Press **TAP** four times | The transport locks to music playing from anywhere. Or start on an analysed song and it follows that song's own beat. |
+| Press **● REC** and play a figure | It loops in whole bars, in time. Stack more loops, mute them, overdub them. |
+| Hit **DROP** or **FLASH** | The whole room goes black, or pulses white and comes back. |
+| Tap an effect in the rack | Stab, Strobe, Sparkle, Chase and the rest fire on the bulbs you last tapped. |
 
-**Ask brAIn.** With [brAIn](/brain/) installed: *"start the Friday party on the den speaker"*,
-*"play the show for this song"*, *"stop the lights and put the bedtime scene on"*. brAIn also
-writes the Claude-directed shows — BRight needs no Claude login of its own.
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:1rem;align-items:start">
+
+![Manual on a phone in a running session: 121 BPM, bar 5 beat 2, a tapped chip, TAP and downbeat buttons, the light map with three lamps ringed by a loop's colour, loop length and snap choices, REC, one loop tile, and the DROP and FLASH pads above the effect rack](./images/manual-phone.webp)
+
+![Manual on a desktop in a running session: the transport, the light map, two one-bar loop tiles, the DROP and FLASH pads, and the rack of Stab, Strobe, Sparkle, Chase, Rainbow, Colour cycle, Colour drift, Colour swell, Sweep and two saved effects](./images/manual.webp)
+
+</div>
+
+### Set up the room once
+
+| You do | What happens |
+| --- | --- |
+| Press **Discover bulbs** in the **Lab** | BRight finds every LIFX bulb on the LAN and measures how fast each one answers. |
+| Drag lights onto the **Light Map** and give each a role and a zone | Shows are written for your room: sweeps cross it, candles stay calm, the kitchen can have its own effect. |
+| Press **Play clicks & listen** on **Calibrate**, phone in hand | BRight measures your speaker's delay, so a two-second AirPlay buffer no longer puts the lights early. |
+| Press **Test playback** | BRight follows a test sound all the way to the speaker and names the step that broke. |
+| Run **Test mode** in the Lab | One bulb pulses on the beat and flashes on drops. If that is in time, shows will be. |
+
+### Automate it and ask for it
+
+| You do | What happens |
+| --- | --- |
+| Call `bright.start_show` when the credits roll | One track's show runs, and the room goes back to how it was afterwards. |
+| Call `bright.start_party`, `bright.party_mode` or `bright.stop_show` | Start a saved set, start everything, or stop and restore (or call a scene). |
+| Show a Stop button only while `sensor.bright_show_status` is `active` | Your dashboard offers Stop exactly when BRight does. |
+| Ask brAIn *"start the Friday party on the den speaker"* or *"stop the lights and put the bedtime scene on"* | brAIn drives BRight through the same services. |
+
+A service that cannot do what you asked fails with the reason, so a typo shows in the automation
+trace instead of leaving a dark room.
 
 ## What you need
 
 | | |
 |---|---|
-| **Home Assistant** | 2023.6 or newer, with the add-on store (Home Assistant OS or Supervised), on an `aarch64` or `amd64` machine |
-| **Music** | Audio files under Home Assistant's `/media` folder — mp3, m4a, aac, flac, ogg, opus or wav |
+| **Home Assistant** | 2023.6 or newer with the app store (Home Assistant OS or Supervised), on `aarch64` or `amd64` |
+| **Music** | Audio files under Home Assistant's `/media` folder: mp3, m4a, aac, flac, ogg, opus or wav |
 | **A speaker** | Any `media_player` Home Assistant can send media to: Chromecast/Google, AirPlay, Sonos, DLNA, a wired output |
 | **Lights** | LIFX bulbs on the same LAN (driven directly over UDP), and/or party lights and lasers on any Home Assistant `switch` or `light` |
-| **Optional** | [brAIn](/brain/), which lets Claude design the choreography. Without it the built-in algorithmic director always compiles a show |
+| **Optional** | [brAIn](/brain/), so Claude can write shows and effects. BRight needs no Claude login of its own |
 
-BRight works with no LIFX bulbs at all (the party-light channel still runs), and with no brAIn.
+BRight works with no LIFX bulbs (party lights still run) and with no brAIn (the built-in director
+always compiles a show). Music must be under `/media`, because that is the only folder Home
+Assistant will serve to a speaker.
 
-<Aside title="Why /media?">
-A show plays its track by handing the speaker a media-source link, and Home Assistant only serves
-those for files under its media folder. A folder anywhere else would analyse perfectly and never
-play a note — so every music folder must be under `/media`.
-</Aside>
-
-## The tabs, in the order they want to happen
-
-| Tab | What it is for |
-| --- | --- |
-| **Lab** | Discover bulbs, check how fast each one answers, measure a switch's latency, and run **Test mode** — a song with every ticked bulb pulsing on the beat |
-| **Light Map** | Place each light on a floor plan and give it a role and a zone — the cast list every show is written for |
-| **Effects** | Build, describe, preview and save effects by hand |
-| **Library** | Pick the folders to scan and analyse the music |
-| **Shows** | Compile, watch, edit and revise one show per track |
-| **Manual** | Play the lights yourself, live, locked to the beat |
-| **Calibrate** | Test playback, then measure each speaker's delay with your phone |
-| **Party** | Tick songs, pick a speaker, press Play — and save sets to start by name |
-
-Two steps are the ones people skip and then wonder why the lights are early: the **Light Map**
-and **Calibrate**.
+## Where to go next
 
 <CardGrid>
   <LinkCard title="Quick Start" href="/bright/quickstart/" description="From install to a room full of lights following a song." />
-  <LinkCard title="Light Map, Lab & Calibration" href="/bright/light-map/" description="Roles, zones, bulb checks, Test mode and speaker delay." />
+  <LinkCard title="Light Map, Lab & Calibration" href="/bright/light-map/" description="Find bulbs, place them, give them roles and zones, and measure your speaker." />
   <LinkCard title="Effects" href="/bright/effects/" description="All 22 effects, how they travel through the room, and the preview." />
-  <LinkCard title="How a Show Is Built" href="/bright/shows/" description="What BRight hears, the four layers, and the visual show editor." />
+  <LinkCard title="How a Show Is Built" href="/bright/shows/" description="Play, edit, revise and version a show, and what BRight hears in a song." />
   <LinkCard title="Manual Mode" href="/bright/manual/" description="Loops, DROP, FLASH and the effect rack, from your phone." />
-  <LinkCard title="Parties" href="/bright/parties/" description="Sets, saved parties, end scenes and live sync trim." />
+  <LinkCard title="Parties" href="/bright/parties/" description="Sets, saved sets, end scenes and live sync trim." />
+  <LinkCard title="Reference" href="/bright/reference/" description="Options, services, the sensor, files and troubleshooting." />
 </CardGrid>

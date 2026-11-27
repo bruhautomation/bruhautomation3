@@ -1,43 +1,53 @@
 ---
 title: Templates
-description: BRUH Print templates are saved labels with blanks — fill them in on the panel, on a dashboard card, from brAIn, or from an automation, print numbered runs, and let dates fill themselves in.
+description: Save a label with blanks, then fill it in on the panel, on a dashboard card, from brAIn or from an automation. Print numbered runs, let dates fill themselves in, and reprint from History.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-A template is a saved label with holes in it. Automations, the dashboard card and brAIn print
-templates by name.
+A template is a saved label with blanks. You fill them in on the panel, on the dashboard card,
+through brAIn or from an automation, and it prints on the label it was made for.
 
-![The Templates tab: a Freezer bag template card with one field, and its pane on the right with the name automations use, a What is in it box, Copies, Print, Edit design and Delete, a preview of a narrow wrap-around label, and the note Still empty: contents. Printing will refuse until they are filled in](./images/templates.webp)
+![The Templates tab: Moving box, Pantry jar and Freezer bag cards, with Pantry jar open on the right, its Contents and Link boxes filled in, Copies, Print, Edit design and Delete, and a preview showing Basmati rice, Filled 2026-11-27 and a QR code](./images/templates.webp)
 
-## Making one
+## Make a template
 
-Write `{{field}}` anywhere in a text, a barcode's data or a QR code's data, then **Save as
-template** from the Quick tab or the designer. `{{contents}}` becomes a box called *contents* on the
-form.
+<Steps>
 
-- **The fields come from the label itself**, never from a list you declare. Delete a placeholder
-  and it stops being asked for.
-- **`{{date}}`, `{{time}}` and `{{datetime}}` fill themselves in** at print time.
-- **The template remembers its stock.** It prints on the label it was made for, and BRUH Print
-  knows which bay holds that label — no roll to choose, ever.
+1. On the **Quick** or **Design** tab, write `{{contents}}` where the blank goes. A blank works in
+   a text, a barcode's data or a QR code's data.
+2. Press **Save as template** and give it a name. Automations and the card use that name.
+3. Open the **Templates** tab. The template has a box called *contents*.
 
-## Numbers and numbered runs
+</Steps>
 
-A template with no fields of its own whose text holds **one number** — *Box 3*, or *Drawer 2*
-beside a QR code of `2` — takes that number as a field called `number`. `fields: {number: 29}`
-prints *Box 29*; leaving it out prints the number it was saved with. Two different numbers (*Box 3
-of 12*) are left alone — write `{{field}}` for the one you mean.
+| You write | You get |
+| --- | --- |
+| `{{anything}}` | A box with that name on the form |
+| `{{date}}`, `{{time}}`, `{{datetime}}` | Filled in at print time, as `2026-11-27`, `14:05` and `2026-11-27 14:05` |
+| One number and no blanks, such as *Box 3* | A field called `number` |
 
-On the panel, a numbered template prints a **run**: **From** and **To** replace the Number box, and
-a line says *"Prints 28–52, 25 labels"* before anything prints. History shows the run as one row.
+The form always matches the label. Delete a placeholder and its box goes away. Two different
+numbers on one label (*Box 3 of 12*) are left alone, so write `{{field}}` for the one you mean.
 
-## Printing from the panel
+## Print a template
 
-Open the template, fill in its boxes, choose copies and press **Print**. With one template, the tab
-opens straight into it. An empty field **warns** here — somebody is looking at the preview.
+Open it on the **Templates** tab, fill in the boxes, set **Copies** and press **Print**. The
+preview updates as you type. With only one template saved, the tab opens straight into it.
 
-## Printing from an automation
+While a box is empty, a note under the preview names it, and **Print** is refused until you fill
+it in. **Edit design** opens the label in the designer, and **Delete** removes the template.
+
+## Print a numbered run
+
+![The Moving box template open on the Templates tab with From set to 1 and To set to 25, the line Prints 1–25, 25 labels, and a preview reading Box 1](./images/templates-run.webp)
+
+A numbered template shows **From** and **To**. Enter 1 and 25, and the panel says *Prints 1–25,
+25 labels* before anything prints. Leave **To** empty to print one label.
+
+A run of more than 10 labels asks you to confirm. History shows the run as one row.
+
+## Print from an automation
 
 ```yaml
 action: bruh_print.print_template
@@ -48,30 +58,40 @@ data:
   copies: 2
 ```
 
-- Through the service an **empty field refuses** the print — an automation about to print fifty
-  labels with a hole in them is exactly what should stop.
-- A field the template does not have does not stop the print: the answer carries a note naming it
-  and the fields the template takes, so a stale automation keeps working and is still told.
-- The template name is not case-sensitive.
+| Situation | What happens |
+| --- | --- |
+| A field is empty | The print is refused, with the missing field named |
+| You send a field the template does not have | It prints, and the answer carries a note naming that field and the ones the template takes |
+| A numbered template, no `number` sent | It prints the number it was saved with. `fields: {number: 29}` prints *Box 29*. |
+| The name's capitals differ | It still matches. Template names are not case-sensitive. |
+| The template's label is not in the printer | The print is refused, naming both stocks |
 
-<Aside title="No expression language, on purpose">
-Substitution is plain string replacement. A template that could evaluate expressions could be made
-to evaluate something else by whoever sends the automation's data, and the value of an expression
-language on a label is close to nothing against that.
+You never name a roll. The template remembers its label, and BRUH Print knows which roll holds it.
+
+<Aside title="Fields are plain text">
+A field's value is dropped into the label exactly as sent. Templates have no expression language,
+so do any calculation in the automation, as in the example above.
 </Aside>
 
-## From the dashboard and from brAIn
+## Print from the dashboard or by voice
 
-- The [dashboard card](/bruh-print/card/) can be a form for one template (`mode: template`), or
-  list every saved template as a button (`show_templates: true`).
-- [brAIn](/brain/) reads the templates and their fields with `label_printer_status` before it
-  prints, so *"print three freezer-bag labels for bolognese"* names a template that exists.
+- The [dashboard card](/bruh-print/card/) can be a form for one template (`mode: template`) or a
+  button per saved template (`show_templates: true`).
+- [brAIn](/brain/) reads the templates and their fields before it prints. *"Print three
+  freezer-bag labels for bolognese"* uses the template that exists.
 
-## History
+## Print something again
 
-Every print lands in **History** with a thumbnail drawn from its label, the date, how many and which
-roll. Prints of the same label fold into one row (*"3 prints, last Nov 21"*); a run keeps its own
-row. **Print again** says how many it will print, and **Edit** opens the label in the designer.
-`bruh_print.reprint` does the same from an automation.
+![The History tab: rows for Spare keys with 2 prints, a Moving box run of 5 labels with Print all 5 again, Pantry jar, Chili from the Freezer bag template, Spare batteries with Print these 2 again, and Attic, each with a thumbnail, the date, the roll and Edit](./images/history.webp)
 
-![History: one row with a thumbnail of a printed label, its title, the date, 2 labels on the left roll, Print these 2 again and Edit, and Clear the history](./images/history.webp)
+Every print lands on the **History** tab with a thumbnail, the date, the count and the roll.
+
+| To do this | Do this |
+| --- | --- |
+| Print it again | Press the button on its row. It says how many it will print: **Print this again**, **Print these 2 again** or **Print all 5 again**. |
+| Change it first | **Edit** opens the label in the designer |
+| Reprint from an automation | `bruh_print.reprint`, with an `entry` or with none for the most recent |
+| Empty the list | **Clear the history** |
+
+Repeat prints of one label fold into a single row (*2 prints, last Nov 27*). A numbered run keeps
+its own row.

@@ -1,9 +1,9 @@
 ---
 title: BRUH Bambu Studio
-description: Bambu Studio in your Home Assistant sidebar and your Bambu Lab printers under Home Assistant's control — slice, print, watch the camera, catch failed prints, and design parts with brAIn, all over your own network.
+description: Bambu Studio in your Home Assistant sidebar and your Bambu Lab printers under Home Assistant's control. Slice, print, watch the camera, catch failed prints and design parts with brAIn, all over your own network.
 template: splash
 hero:
-  tagline: Bambu Lab's own slicer in your sidebar, every Bambu printer on your network in Home Assistant, and — with brAIn — parts you describe in a sentence, designed, shown in 3D and printed.
+  tagline: Bambu Lab's own slicer in your sidebar, every Bambu printer on your network in Home Assistant, and, with brAIn, parts you describe in a sentence, designed, shown in 3D and printed.
   image:
     file: ./bruh-bambu-studio-icon.png
   actions:
@@ -20,7 +20,7 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
 
 <Aside type="caution" title="Experimental">
 BRUH Bambu Studio works on the printers it has been tried on, but it is new. Keep Bambu
@@ -28,107 +28,87 @@ Handy or the printer's own screen within reach the first few times you start a p
 Home Assistant.
 </Aside>
 
-## What it is
+BRUH Bambu Studio puts Bambu Lab's own slicer in your Home Assistant sidebar and connects
+your Bambu Lab printers to Home Assistant over your network. You slice, print, watch and
+automate from one panel, and nothing goes through Bambu's cloud.
 
 ![The Printers tab: a printer card with its camera, a progress ring with time left, temperatures, the AMS trays as spools, and failure detection showing a paused print with what brAIn saw beside what the print should look like](./images/printer-card.webp)
 
+## What you can do
 
-A Home Assistant add-on with two halves that meet in one panel.
+### Print
 
-**The real slicer.** Bambu Lab's own Linux build of Bambu Studio, downloaded on first start,
-running on a virtual screen inside the add-on and shown in the Home Assistant sidebar — with
-a mouse on a computer, or with remote-desktop style touch controls on a phone.
+| You do | What happens |
+|---|---|
+| Drop an STL, STEP or 3MF into `/share/bambu`, or press **Upload** | It appears on the **Files** tab with a picture and a **Slice & print** button |
+| Paste a Printables link and press **Import** | Every model file on the page lands in `/share/bambu/imports/` |
+| Press **Slice & print**, pick the printer and the AMS tray | The model is sliced with Bambu Studio's own profiles for that printer, uploaded and started |
+| Change layer height, walls, infill, supports, copies or the build plate in the dialog | The print uses them. Empty fields keep Bambu Studio's profile |
+| Open the **Studio** tab | The real Bambu Studio, with a mouse on a computer or touch controls on a phone |
 
-**Your printers, owned by Home Assistant.** Every Bambu Lab printer on your network, found by
-a scan and added with nothing but its LAN access code. The add-on keeps the connection
-(MQTT on port 8883, FTPS on port 990) and turns it into a panel, sensors, a camera, a
-dashboard card and a set of `bruh_bambu.*` services. A print never touches Bambu's cloud: the
-slice runs in the add-on, the file goes to the printer over FTPS, and the print starts over
-MQTT.
+![The Files tab: the import box, search, and each file with its format, whether it is sliced, the print time and grams, and a Slice & print or Print button](./images/files.webp)
 
-And when [brAIn](/brain/) is installed, a **Design** tab appears: describe a part, watch it
-take shape in a 3D view in the colours it will print in, measure it, change it in
-conversation, and say *print it*.
+[Printing & Jobs →](/bruh-bambu-studio/printing/) · [The Studio →](/bruh-bambu-studio/studio/)
 
-<CardGrid>
-  <Card title="Bambu Studio in the sidebar" icon="laptop">
-    The slicer you already know, kept on the add-on's storage and started again if its
-    window closes. Open a file from the library straight into it. [The Studio →](/bruh-bambu-studio/studio/)
-  </Card>
-  <Card title="Print from anywhere" icon="rocket">
-    Drop an STL, STEP or 3MF into `/share/bambu`, or paste a Printables link, and press
-    **Print**. Anything unsliced is sliced first with Bambu Studio's own command line and its
-    own profiles for that printer. [Printing →](/bruh-bambu-studio/printing/)
-  </Card>
-  <Card title="Design parts with brAIn" icon="pencil">
-    A parametric CadQuery part from a sentence, every change kept as a version, a 3D view with
-    snapping measurements, and Auto print that picks the printer and the AMS tray for every
-    colour. [Design →](/bruh-bambu-studio/design/)
-  </Card>
-  <Card title="Print failure detection" icon="warning">
-    brAIn looks at the camera at the moments the print's own G-code says it is most likely to
-    fail, warns you, and pauses a print that has clearly failed. [Failure detection →](/bruh-bambu-studio/failure-detection/)
-  </Card>
-  <Card title="A real Home Assistant citizen" icon="puzzle">
-    A device per printer with a camera and sensors, 23 services that answer with the result
-    and raise with the reason, an alert event, and a printer card for Lovelace and Morph.
-    [Home Assistant →](/bruh-bambu-studio/home-assistant/)
-  </Card>
-  <Card title="Voice that knows its limits" icon="comment">
-    "How long is left on the print?" and "design me a wall hook and print it" work by voice.
-    Stopping a print, raw G-code and slicing do not. [Voice & brAIn →](/bruh-bambu-studio/voice/)
-  </Card>
-</CardGrid>
+### Watch and control
 
-## Use cases
+| You do | What happens |
+|---|---|
+| Open the **Printers** tab, on a computer or a phone | Live camera, stage, progress ring, time left, finish time, temperatures and AMS trays |
+| Press **Pause**, **Resume** or **Stop**, or change the speed | The printer does it. Stop takes two presses |
+| Add the *BRUH Bambu printers* card to a dashboard | The same camera, progress and controls in Lovelace or Morph |
+| Take the finished part off the plate | The card says *Ready* by itself, so an automation knows the next print can start |
 
-**"I need a hook for the 20 mm rail in the garage."** Open **Design**, press **New part** and
-say exactly that. brAIn picks sensible defaults, says what it assumed, and asks only what it
-cannot guess — the rail's thickness, how much the hook has to hold — as buttons you can tap.
-A few minutes later the hook is in the 3D view. Tap **Measure** and pick the two inside faces of
-the jaw: the gap, square to the face, with its X, Y and Z legs listed underneath. Say *make the hook end 10 mm
-longer and print two*. brAIn builds version 2, chooses the idle printer and the tray loaded
-with the closest colour, tells you the plan, and starts it. The conversation shows the sliced
-time and grams, then the moment the print begins.
+### Catch failed prints
 
-**"Is it done yet?" from the sofa.** The printer card on your dashboard shows the camera, a
-progress ring, the time left and the clock time it finishes. Ask your voice assistant "how
-long is left on the print?" and it reads the same figures back.
+| You do | What happens |
+|---|---|
+| Switch on **Failure detection** on a printer | brAIn looks at the camera at the moments the print is most likely to fail |
+| Nothing. A corner lifts and the part comes loose | The printer is paused and your phone gets the picture, with **Resume — not a failure** and **Stop print** on the notification |
+| Leave the chamber dark or cover the lens | The card says it cannot see, and offers **Turn the light on** |
 
-**Start a print from your phone, then watch it.** A model someone shared on Printables: paste
-the page's link into **Files**, every model file on it lands in `/share/bambu/imports/`. Press
-**Print**, pick the printer and the tray, and the camera on the **Printers** tab shows the
-first layer going down — on your phone, from anywhere Home Assistant reaches.
+[Failure detection →](/bruh-bambu-studio/failure-detection/)
 
-**Get told when a print fails.** Switch on failure detection and choose your phone under
-**Alerts go to**. Forty minutes into an overnight print, a corner lifts and the part comes
-loose. At the next planned look brAIn sees spaghetti where the part should be, pauses the
-printer, and your phone gets the frame it judged with **Resume — not a failure** and **Stop
-print** right on the notification.
+### Design parts with brAIn
 
-**Know the plate is clear without walking to the printer.** After a finish, the add-on
-watches the plate for up to twelve hours. Take the part off and the card says *Ready* by
-itself — so an automation, or brAIn, knows the next print can start.
+| You say | What happens |
+|---|---|
+| *A wall hook for my headphones, 30 mm wide, with the tip in green.* | brAIn designs it and shows it in a 3D view, in the colours it will print in |
+| *Make the arm 10 mm longer.* | A new version. The old one is kept |
+| *Print two.* | brAIn picks the idle printer and the tray for each colour, says its plan and starts the print |
 
-**Flash the office light when something goes wrong.** Every alert turns on a
-`binary_sensor.<printer>_print_problem` and fires a `bruh_bambu_print_alert` event. Trigger
-anything you like from it. [Examples →](/bruh-bambu-studio/home-assistant/#automation-examples)
+![The Design tab: the parts list, a two-colour headphone hook in the 3D view with view buttons and Measure, and the conversation with brAIn beside it](./images/design.webp)
+
+[Design with brAIn →](/bruh-bambu-studio/design/)
+
+### Automate and ask
+
+| You do | What happens |
+|---|---|
+| Trigger on `binary_sensor.<printer>_print_problem` | Flash a light, or anything else, when a print has a problem |
+| Call `bruh_bambu.print_file` at 06:00 | A print starts on a schedule. A refusal says why in the automation trace |
+| Ask a voice assistant *how long is left on the print?* | It reads the progress and time left |
+| Say *design me a wall hook and print it* | brAIn designs it and prints it once it has built |
+
+Voice has limits on purpose. It can start a print of a file and design a part. It cannot
+stop a print, slice, send G-code, import a link or open Bambu Studio.
+
+[Home Assistant →](/bruh-bambu-studio/home-assistant/) · [Voice & brAIn →](/bruh-bambu-studio/voice/)
 
 ## What you need
 
-- **Home Assistant OS or Supervised** on an **amd64 (x86-64)** machine, Home Assistant
-  2024.7.0 or newer. Bambu Lab publishes Bambu Studio for Linux only as an x86-64 AppImage, so
-  the add-on does not install on a Raspberry Pi or another ARM box.
-- **Room for the slicer:** the first start downloads about 220 MB from Bambu Lab's GitHub
-  releases.
-- **One or more Bambu Lab printers** on a network Home Assistant can reach (X1, P1, A1 and
-  A1 mini, P2S and H2 series), with their **access code**. Recent firmware also wants
-  **LAN-only mode** and **Developer mode** on before it accepts commands from anything but
-  Bambu's own apps.
-- **Optionally, [brAIn](/brain/)** with its Automation integration on, for the Design tab,
-  brAIn's looks in failure detection, and chat and voice control.
+| | |
+|---|---|
+| **Home Assistant** | Home Assistant OS or Supervised, 2024.7.0 or newer |
+| **Machine** | **amd64 (x86-64) only.** Bambu Lab publishes Bambu Studio for Linux only as an x86-64 AppImage, so it does not install on a Raspberry Pi or another ARM machine |
+| **Download** | About 220 MB from Bambu Lab's GitHub releases on first start |
+| **Printers** | One or more Bambu Lab printers Home Assistant can reach (X1, P1, A1 and A1 mini, P2S, H2 series), each with its **access code** |
+| **Printer settings** | On recent firmware, **LAN-only mode** and **Developer mode** on |
+| **Optional** | [brAIn](/brain/) with its Automation integration on, for the Design tab, brAIn's looks in failure detection, and chat and voice control |
 
 <CardGrid>
   <LinkCard title="Quick Start" description="Install, restart once, add a printer, print." href="/bruh-bambu-studio/quickstart/" />
-  <LinkCard title="Options reference" description="Every option, its default, and what it does." href="/bruh-bambu-studio/reference/" />
+  <LinkCard title="Printing & Jobs" description="The library, imports, print options and the printer card." href="/bruh-bambu-studio/printing/" />
+  <LinkCard title="Design with brAIn" description="Describe a part, measure it, change it, print it." href="/bruh-bambu-studio/design/" />
+  <LinkCard title="Reference" description="Every option, port, folder and supported printer." href="/bruh-bambu-studio/reference/" />
 </CardGrid>

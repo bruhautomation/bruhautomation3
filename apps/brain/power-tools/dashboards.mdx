@@ -1,58 +1,60 @@
 ---
 title: Dashboards
-description: Edit and restore Lovelace dashboards through supervised service calls with automatic backups.
+description: Ask brAIn to create, edit, restore, reset and delete Home Assistant dashboards, with a backup before every change, and to register custom-card resources.
 sidebar:
   order: 9
 ---
 
-Claude edits dashboards through a fetch-modify-save flow instead of touching `.storage` files: read the config with the `get_dashboard` MCP tool (`list_dashboards` enumerates them), change the JSON, and save the complete object back with `update_dashboard`.
+Ask brAIn to build or change a Home Assistant dashboard. Every change is backed up first, so one sentence puts it back.
 
-Every update automatically backs up the previous configuration first (the last 20 per dashboard are kept), and `restore_dashboard` undoes a bad edit with one call.
+## Ask brAIn
 
-:::note[A YAML-mode dashboard is edited, just not through here]
-These services edit the registry, so a dashboard defined in YAML isn't something they can reach — they decline with an error naming the file. brAIn then does the obvious thing: it opens that file in the [terminal](/brain/terminal/), edits it, validates it and reloads Lovelace. Both routes end with your dashboard changed, and both are covered by `brain undo`.
-:::
+```text
+Make a simple Guest dashboard with just the lights and the thermostat.
+Add a card for the new kitchen light to my Lights dashboard.
+That dashboard change was worse. Put it back how it was.
+Install the Mushroom cards and redo my overview with them.
+Wipe the guest dashboard back to the auto-generated one.
+Delete the old tablet dashboard.
+```
 
-## Create dashboard
+brAIn reads the dashboard, changes it, and saves the whole configuration back. It never edits `.storage` files.
 
-`brain.create_dashboard`
+## What brAIn can do
 
-Create a new storage-mode dashboard. The URL path must contain a hyphen (e.g. lovelace-lights). Returns the new dashboard's url_path and id as response data.
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url_path` | text | yes | URL path for the dashboard; must contain a hyphen. |
-| `title` | text | yes | Sidebar title. |
-| `icon` | icon | no | Sidebar icon. |
-| `show_in_sidebar` | boolean | no | Show the dashboard in the sidebar (default on). |
-| `require_admin` | boolean | no | Only admins can see this dashboard. |
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_dashboard` | Create a dashboard. `url_path` must contain a hyphen, such as `lovelace-lights`. `show_in_sidebar` defaults to on and `require_admin` to off. Returns the `url_path` and id. | `url_path`\*, `title`\*, `icon`, `show_in_sidebar`, `require_admin` |
+| `brain.update_dashboard` | Replace a dashboard's configuration, or one view with `view_index` (0-based). The previous configuration is backed up first and the backup name is returned. `dry_run: true` reports the target and a change summary. | `config`\*, `url_path`\*, `take_control`, `view_index`, `dry_run` |
+| `brain.restore_dashboard` | Restore a dashboard from a backup. Uses the most recent one unless you name a `backup`. Leave `url_path` out for the default dashboard. | `url_path`, `backup` |
+| `brain.reset_dashboard_config` | Back up and delete a dashboard's saved configuration, so it goes back to auto-generated. The dashboard stays in the sidebar. `dry_run: true` reports the view count that would go. | `url_path`\*, `dry_run` |
+| `brain.delete_dashboard` | Delete a dashboard. Its configuration is backed up first and the backup name is returned. `dry_run: true` shows what would go. | `url_path`\*, `dry_run` |
+| `brain.add_dashboard_resource` | Register a custom card's JavaScript module or stylesheet, such as `/hacsfiles/...` or `/local/...`. `res_type` is `module` (default), `css`, `js` or `html`. Returns the resource id. A duplicate URL is refused. | `url`\*, `res_type` |
+| `brain.remove_dashboard_resource` | Remove a registered resource by its URL. | `url`\* |
 
-```yaml
-service: brain.create_dashboard
+To change a dashboard's sidebar title, icon or visibility, use [`update_dashboard_info`](/brain/power-tools/system/#integrations-groups-users-and-dashboards).
+
+## Good to know
+
+- **Backups.** The last 20 backups per dashboard are kept. To recover a deleted dashboard, create it again and restore.
+- **The default dashboard.** `update_dashboard` and `reset_dashboard_config` need `url_path`, and the default dashboard is the literal `default`. It is never targeted by leaving the field out.
+- **Auto-generated dashboards.** Saving onto a dashboard that was never saved needs `take_control: true`, because you then manage it by hand. `reset_dashboard_config` reverts that.
+- **YAML dashboards.** These services decline a dashboard defined in YAML and name the file. brAIn then edits that file in the [terminal](/brain/terminal/), validates it and reloads. `brain undo` covers both routes.
+
+## Examples
+
+```yaml title="Create a dashboard"
+action: brain.create_dashboard
 data:
   url_path: lovelace-guest
   title: Guest
   icon: mdi:account-heart
 ```
 
-> 🗣️ *"Make a simple Guest dashboard with just the lights and the thermostat."*
-
-## Update dashboard
-
-`brain.update_dashboard`
-
-Replace a storage-mode dashboard's configuration — or, with `view_index`, a single view. The previous configuration is automatically backed up first (last 20 kept per dashboard) and the backup name is returned as response data, so any edit can be undone with restore_dashboard. A YAML-mode dashboard is declined here and edited as a file instead. Saving onto a never-saved (auto-generated) dashboard requires `take_control: true`, because that takes permanent manual control of it — `reset_dashboard_config` reverts it.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `config` | object | yes | The full dashboard configuration object including the complete views list — or, when `view_index` is set, a single view object. |
-| `url_path` | text | yes | The dashboard's URL path (e.g. lovelace-lights), or the literal `default` for the default dashboard. Required on purpose: the default dashboard can only be targeted deliberately, never by accidental omission. |
-| `take_control` | boolean | no | Confirm saving onto a never-saved (auto-generated) dashboard. |
-| `view_index` | number | no | Replace only this view (0-based); `config` must then be a single view object. |
-| `dry_run` | boolean | no | Only report the resolved target and a change summary — nothing is written. |
-
-```yaml
-service: brain.update_dashboard
+```yaml title="Save a configuration"
+action: brain.update_dashboard
 data:
   url_path: lovelace-lights
   config:
@@ -61,101 +63,18 @@ data:
         cards:
           - type: light
             entity: light.kitchen_ceiling
+response_variable: saved   # carries the backup name
 ```
 
-> 🗣️ *"Add a card for the new kitchen light to my Lights dashboard."*
-
-## Restore dashboard
-
-`brain.restore_dashboard`
-
-Restore a storage-mode dashboard from a backup made by update_dashboard. Restores the most recent backup unless a specific backup name is given.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url_path` | text | no | The dashboard's URL path. Omit for the default dashboard. |
-| `backup` | text | no | A specific backup file name from a previous update_dashboard response. Omit for the most recent. |
-
-```yaml
-# Undo the last edit
-service: brain.restore_dashboard
+```yaml title="Undo the last edit"
+action: brain.restore_dashboard
 data:
   url_path: lovelace-lights
 ```
 
-> 🗣️ *"That dashboard change was worse — put it back how it was."*
-
-## Reset dashboard config
-
-`brain.reset_dashboard_config`
-
-Delete a dashboard's **stored** configuration — after backing it up — reverting it to auto-generated. The dashboard itself stays registered and in the sidebar; only its saved config goes (`delete_dashboard` is what removes the registration). This is the sanctioned way to clear a dashboard config — the gap that used to push callers toward raw `lovelace/config` websocket commands, which are off-limits — and `restore_dashboard` brings the config back from the backup if you regret it.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url_path` | text | yes | The dashboard's URL path, or the literal `default` for the default dashboard. |
-| `dry_run` | boolean | no | Only report what would be reset (the stored config's view count) — nothing is changed. Default off. |
-
-```yaml
-service: brain.reset_dashboard_config
-data:
-  url_path: lovelace-guest
-```
-
-> 🗣️ *"Wipe the guest dashboard back to the auto-generated one."*
-
-## Delete dashboard
-
-`brain.delete_dashboard`
-
-Delete a storage-mode dashboard. Its configuration is backed up first (same backup store as update_dashboard) and the backup name is returned as response data, so a deletion can be recovered by recreating the dashboard and restoring.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url_path` | text | yes | The dashboard's URL path. |
-
-```yaml
-service: brain.delete_dashboard
-data:
-  url_path: lovelace-old-tablet
-```
-
-> 🗣️ *"Delete the old tablet dashboard — we don't use it anymore."*
-
-## Add dashboard resource
-
-`brain.add_dashboard_resource`
-
-Register a dashboard resource — the JavaScript module or stylesheet of a custom card (e.g. /hacsfiles/... or /local/...). Returns the resource id as response data. Duplicate URLs are refused.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url` | text | yes | Resource URL. |
-| `res_type` | select | no | Resource type (default module). |
-
-```yaml
-service: brain.add_dashboard_resource
+```yaml title="Register a custom card"
+action: brain.add_dashboard_resource
 data:
   url: /local/community/mushroom/mushroom.js
   res_type: module
 ```
-
-> 🗣️ *"Install the Mushroom cards and redo my overview with them."*
-
-## Remove dashboard resource
-
-`brain.remove_dashboard_resource`
-
-Remove a registered dashboard resource by its URL.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url` | text | yes | The URL of the resource to remove. |
-
-```yaml
-service: brain.remove_dashboard_resource
-data:
-  url: /local/old-card.js
-```
-
-> 🗣️ *"Remove that custom card module I stopped using."*

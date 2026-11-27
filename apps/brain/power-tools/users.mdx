@@ -1,92 +1,58 @@
 ---
 title: Users
-description: Enable and disable Home Assistant user accounts — with lockout protection — using brain services.
+description: Ask brAIn to create, delete, enable and disable Home Assistant user accounts, with guards that keep the owner and the last administrator in.
 sidebar:
   order: 10
 ---
 
-Enable or disable Home Assistant user accounts on a schedule or condition: house-sitter logins, rental-guest accounts, kids' accounts after bedtime.
+import { Aside } from '@astrojs/starlight/components';
 
-You cannot lock yourself out: `disable_user` refuses owner accounts and system-generated users, so no automation, prompt, or typo can take the owner's access away.
+Ask brAIn to make a login for a guest, switch it off when they leave, and remove it later.
 
-Find `user_id` values with the MCP `get_registry` tool (`users`) from the terminal, or in **Settings → People**.
+## Ask brAIn
 
-## Create user
+```text
+Set up a login for the babysitter. No admin rights.
+Disable the account we made for the house sitter.
+Re-enable the babysitter's account.
+The house sitter's gone. Delete their account entirely.
+```
 
-`brain.create_user`
+An automation can call the same services, for example to disable the kids' accounts after bedtime.
 
-Create a Home Assistant user account, optionally with a local username/password login (they must be provided together; password minimum 8 characters). Returns the new user_id as response data.
+## What brAIn can do
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | Display name of the new user. |
-| `username` | text | no | Login username. Requires password. |
-| `password` | text | no | Login password (min 8 characters). Requires username. |
-| `admin` | boolean | no | Give the user admin rights (default off). |
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-```yaml
-service: brain.create_user
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_user` | Create a user account. `username` and `password` go together, and the password needs at least 8 characters. `admin` defaults to off. Returns the new `user_id`. | `name`\*, `username`, `password`, `admin` |
+| `brain.enable_user` | Re-enable disabled accounts. Returns the users enabled. | `user_id[]`\* |
+| `brain.disable_user` | Disable accounts. | `user_id[]`\* |
+| `brain.delete_user` | Delete accounts and their credentials. `dry_run: true` lists what would go. | `user_id[]`\*, `dry_run` |
+
+To list users and when each last signed in, or to change a user's role, see [`list_users` and `set_user_group`](/brain/power-tools/system/#integrations-groups-users-and-dashboards).
+
+<Aside type="tip" title="You cannot lock yourself out">
+`disable_user` and `delete_user` refuse the owner, system-generated users and the last remaining administrator.
+</Aside>
+
+Find a `user_id` by asking brAIn, or with `brain.list_users`. brAIn confirms with you before it disables or deletes a user. New voice agents start with `brain.*` blocked, so a voice agent cannot create a login unless you allow it.
+
+## Examples
+
+```yaml title="A login with no admin rights"
+action: brain.create_user
 data:
   name: Babysitter
   username: babysitter
   password: "correct-horse-battery"
+response_variable: user   # user.user_id
 ```
 
-> 🗣️ *"Set up a login for the babysitter — no admin rights."*
-
-## Delete user
-
-`brain.delete_user`
-
-Delete one or more Home Assistant user accounts and their credentials. Owner accounts and system-generated users are protected and cannot be deleted.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `user_id` | text (list) | yes | IDs of the users to delete. |
-
-```yaml
-service: brain.delete_user
+```yaml title="Disable an account"
+action: brain.disable_user
 data:
   user_id:
     - 1234567890abcdef
 ```
-
-> 🗣️ *"The house sitter's gone — delete their account entirely."*
-
-## Enable user
-
-`brain.enable_user`
-
-Re-enable one or more disabled Home Assistant user accounts.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `user_id` | text (list) | yes | IDs of the users to enable. |
-
-```yaml
-service: brain.enable_user
-data:
-  user_id:
-    - 1234567890abcdef
-```
-
-> 🗣️ *"Re-enable the babysitter's account."*
-
-## Disable user
-
-`brain.disable_user`
-
-Disable one or more Home Assistant user accounts. Owner accounts and system-generated users are protected and cannot be disabled.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `user_id` | text (list) | yes | IDs of the users to disable. |
-
-```yaml
-service: brain.disable_user
-data:
-  user_id:
-    - 1234567890abcdef
-```
-
-> 🗣️ *"Disable the account we made for the house sitter."*

@@ -1,183 +1,85 @@
 ---
 title: Zones & Persons
-description: Create, update, and delete zones, manage persons, and attach or detach their device trackers with brain services.
+description: Ask brAIn to create, move, resize and delete zones, and to add, rename and remove persons and their device trackers.
 sidebar:
   order: 7
 ---
 
-Location plumbing: zones define the places your automations care about, and persons tie the humans of the house to the devices that reveal where they are. Both are normally UI-only — these services open them to Claude and automations.
+Ask brAIn to set up the places your automations care about and the people whose phones say where they are.
 
-The `zone.home` zone set in `configuration.yaml` isn't editable — that's a Home Assistant rule, and these services respect it.
+## Ask brAIn
 
-## Create zone
-
-`brain.create_zone`
-
-Create a new zone for location tracking.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | Name of the new zone. |
-| `latitude` | number | yes | Latitude of the zone center. |
-| `longitude` | number | yes | Longitude of the zone center. |
-| `radius` | number | no | Radius of the zone in meters (default 100). |
-| `icon` | icon | no | Icon for the zone. |
-| `passive` | boolean | no | Passive zones are only used for automations, not shown on the map. |
-
-```yaml
-service: brain.create_zone
-data:
-  name: Gym
-  latitude: 52.3702
-  longitude: 4.8952
-  radius: 150
-  icon: mdi:dumbbell
+```text
+Create a zone for the gym so automations know when I'm there.
+The gym zone keeps missing me in the parking lot. Make it bigger.
+Add Alex to the house and track them with their phone.
+Alex goes by Alexandra now. Rename them.
+Stop tracking Alex's old phone.
+Remove the old roommate from presence tracking.
 ```
 
-> 🗣️ *"Create a zone for the gym so automations know when I'm there."*
+## What brAIn can do
 
-## Update zone
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-`brain.update_zone`
+### Zones
 
-Move, resize, rename, or restyle an editable zone. Only the fields you pass are changed.
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_zone` | Create a zone. `radius` is in meters and defaults to 100. A `passive` zone is used by automations only and is not shown on the map. | `name`\*, `latitude`\*, `longitude`\*, `radius`, `icon`, `passive` |
+| `brain.update_zone` | Move, resize, rename or restyle a zone. Only the fields you pass change. | `entity_id`\*, `name`, `latitude`, `longitude`, `radius`, `icon`, `passive` |
+| `brain.delete_zone` | Delete zones that were made in the UI. `dry_run: true` lists what would go. | `entity_id[]`\*, `dry_run` |
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity | yes | The zone to update. |
-| `name` | text | no | New name. |
-| `latitude` | number | no | New latitude of the zone center. |
-| `longitude` | number | no | New longitude of the zone center. |
-| `radius` | number | no | New radius in meters. |
-| `icon` | icon | no | New icon. |
-| `passive` | boolean | no | Passive zones are only used for automations. |
+### Persons
 
-```yaml
-service: brain.update_zone
-data:
-  entity_id: zone.gym
-  radius: 250
+Name the person by `entity_id` (`person.alex`), `person_id`, or `person` (their name, not case-sensitive).
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_person` | Create a person, optionally linked to a Home Assistant user and with device trackers. Returns the person's id. | `name`\*, `user_id`, `device_tracker[]` |
+| `brain.rename_person` | Rename a person. | `entity_id`, `person_id`, `person`, `name`\* |
+| `brain.add_device_tracker_to_person` | Attach device trackers to a person. Returns what was added and the person's trackers now. | `entity_id`, `person_id`, `person`, `device_tracker[]`\* |
+| `brain.remove_device_tracker_from_person` | Detach device trackers. Returns what was removed, anything named that the person did not have, and the trackers now. | `entity_id`, `person_id`, `person`, `device_tracker[]`\* |
+| `brain.delete_person` | Delete a person. `dry_run: true` shows the person and their trackers first. | `entity_id`, `person_id`, `person`, `dry_run` |
+
+## Good to know
+
+- These services change zones and persons made in the UI. Ones defined in YAML are refused, and brAIn edits the file instead.
+- `zone.home`, when it is set in `configuration.yaml`, cannot be edited. That is a Home Assistant rule.
+
+## Examples
+
+```yaml title="Create a zone, then widen it"
+- action: brain.create_zone
+  data:
+    name: Gym
+    latitude: 52.3702
+    longitude: 4.8952
+    radius: 150
+    icon: mdi:dumbbell
+- action: brain.update_zone
+  data:
+    entity_id: zone.gym
+    radius: 250
 ```
 
-> 🗣️ *"The gym zone keeps missing me in the parking lot — make it bigger."*
-
-## Delete zone
-
-`brain.delete_zone`
-
-Delete one or more UI-created zones.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity (list) | yes | Zone entities to delete. |
-
-```yaml
-service: brain.delete_zone
-data:
-  entity_id:
-    - zone.gym
-```
-
-> 🗣️ *"Delete the gym zone."*
-
-## Create person
-
-`brain.create_person`
-
-Create a person, optionally linked to a Home Assistant user and with initial device trackers. Returns the person's id as response data.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | The person's name. |
-| `user_id` | text | no | Home Assistant user to link (from get_registry users). |
-| `device_tracker` | entity (list) | no | Initial device trackers for presence. |
-
-```yaml
-service: brain.create_person
+```yaml title="Add a person with their phone"
+action: brain.create_person
 data:
   name: Alex
   device_tracker:
     - device_tracker.alex_phone
 ```
 
-> 🗣️ *"Add Alex to the house and track them with their phone."*
-
-## Delete person
-
-`brain.delete_person`
-
-Delete a UI-created person. YAML-defined persons are refused.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity | yes | The person entity to delete. |
-
-```yaml
-service: brain.delete_person
-data:
-  entity_id: person.old_roommate
+```yaml title="Swap a person's phone"
+- action: brain.add_device_tracker_to_person
+  data:
+    person: Alex
+    device_tracker:
+      - device_tracker.alex_new_phone
+- action: brain.remove_device_tracker_from_person
+  data:
+    person: Alex
+    device_tracker:
+      - device_tracker.old_phone
 ```
-
-> 🗣️ *"Remove the old roommate from presence tracking."*
-
-## Rename person
-
-`brain.rename_person`
-
-Rename a person. Only people created in the UI can be renamed; YAML-defined ones are refused.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity | yes | The person entity. |
-| `name` | text | yes | The new name. |
-
-```yaml
-service: brain.rename_person
-data:
-  entity_id: person.alex
-  name: Alexandra
-```
-
-> 🗣️ *"Alex goes by Alexandra now — rename them."*
-
-## Add device tracker to person
-
-`brain.add_device_tracker_to_person`
-
-Attach one or more device trackers to a person for presence detection.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity | yes | The person entity. |
-| `device_tracker` | entity (list) | yes | Device trackers to attach. |
-
-```yaml
-service: brain.add_device_tracker_to_person
-data:
-  entity_id: person.alex
-  device_tracker:
-    - device_tracker.alex_phone
-```
-
-> 🗣️ *"Track Alex with their new phone."*
-
-## Remove device tracker from person
-
-`brain.remove_device_tracker_from_person`
-
-Detach one or more device trackers from a person.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity | yes | The person entity. |
-| `device_tracker` | entity (list) | yes | Device trackers to detach. |
-
-```yaml
-service: brain.remove_device_tracker_from_person
-data:
-  entity_id: person.alex
-  device_tracker:
-    - device_tracker.old_phone
-```
-
-> 🗣️ *"Stop tracking Alex's old phone."*

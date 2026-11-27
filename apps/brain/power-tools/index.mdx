@@ -1,116 +1,124 @@
 ---
 title: Power Tools
-description: 91 admin services that let Claude — and your automations — safely manage areas, floors, labels, entities, what a device shows as, devices, integrations, zones, users, and more.
+description: 91 admin services that let brAIn, and your automations, manage areas, floors, labels, entities, devices, integrations, helpers, zones, users, dashboards, backups and more by asking.
 sidebar:
   order: 1
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**BRUH Power Tools** are 91 admin services, registered by the brAIn integration under the `brain.*` domain, that manage the parts of Home Assistant which normally require clicking through Settings: areas, floors, labels, entities (including what a device shows as), devices, integrations, helpers, zones, persons, users, blueprints, statistics, dashboards, and repair issues.
+Power Tools are 91 `brain.*` services that do the jobs you normally click through **Settings** for. Ask brAIn in a sentence, or call them from your own automations.
 
-They exist for one reason: **so nothing ever has to touch `/config/.storage` by hand.** Every call is validated before anything changes, requires admin rights, and runs through Home Assistant's own registry APIs. Claude uses them when you ask it to reorganize your home; your automations and scripts can use them too — every service shows up in **Developer Tools → Actions** with full field pickers.
+![brAIn's Ask tab: a request to move every hallway light into the Hallway area and label everything battery-powered, the four steps brAIn took (Get registry, then three brain.* service calls), and its summary of what changed](../images/connect-power-tools-chat.webp)
 
-## What this unlocks
+## What you can ask
 
-All of these work by voice, in the terminal, or in a `run_task` prompt:
+These work in the chat, the terminal, a `brain.run_task` prompt, and by voice with an agent set to **Whole house** or **Full admin**.
 
-- *"Rename all the `shelly_1pm_xxxx` lights to what they actually are."*
-- *"Create a Guest Room area, put these three devices in it, and add 'spare room' as a voice alias."*
-- *"Label everything battery-powered, then show me the ones under 20%."*
-- *"Which automations reference entities that don't exist anymore?"*
-- *"Import this blueprint from the forum and set it up for the hallway."*
-- *"Backfill the gas meter history from this CSV."*
-- *"Build me a manual heating override — a target slider and an on/off toggle — and the automation that uses them."*
-- *"Make a Guest dashboard with just the lights and the thermostat, and a login for the babysitter."*
-- *"Install the Mushroom cards and redo my overview with them."*
-- *"The bedroom fan is on a smart plug — make it show up as a fan, and show the back door sensor as a door."*
-
-Each service page below shows a 🗣️ line: a natural-language phrasing that works anywhere Claude listens.
+| Ask | What happens |
+| --- | --- |
+| *"Rename all the `shelly_1pm_xxxx` lights to what they actually are."* | Friendly names and entity IDs are fixed, then brAIn checks nothing still points at the old ones. |
+| *"Create a Guest Room area, put these three devices in it, and add 'spare room' as a voice alias."* | The area exists, the devices are in it, and voice knows both names. |
+| *"Label everything battery-powered, then show me the ones under 20%."* | A new label on every battery device, and a list. |
+| *"Which automations reference entities that don't exist anymore?"* | A report of every broken reference. Nothing is changed. |
+| *"Import this blueprint from the forum and set it up for the hallway."* | The blueprint is imported and an automation is made from it. |
+| *"Backfill the gas meter history from this CSV."* | A preview of the rows, then the import when you say so. |
+| *"Build me a manual heating override: a target slider and an on/off toggle."* | Two helpers and the automation that uses them. |
+| *"Make a Guest dashboard with just the lights and the thermostat, and a login for the babysitter."* | A new dashboard and a non-admin account. |
+| *"The bedroom fan is on a smart plug. Make it show up as a fan."* | A fan entity takes the plug's place in dashboards and voice. |
+| *"Prune the backups older than a month but keep the newest three."* | A preview of what would go, then the delete. |
 
 ## The catalog
 
+Each page opens with example requests, then lists every service with its fields.
+
 <CardGrid>
   <Card title="Areas & Floors" icon="puzzle">
-    15 services: create, delete, rename, icons, voice aliases, floor levels, and device/entity assignment.
-    [Reference →](/brain/power-tools/areas-and-floors/)
+    15 services. Create, rename and delete rooms and floors, set icons and voice aliases, and move devices and entities.
+    [Open →](/brain/power-tools/areas-and-floors/)
   </Card>
   <Card title="Labels" icon="seti:notebook">
-    6 services: create, rename, restyle, and delete labels; apply or remove them on entities, devices, and areas **in one call**.
-    [Reference →](/brain/power-tools/labels/)
+    6 services. Create, rename, restyle and delete labels, and apply them to entities, devices and areas in one call.
+    [Open →](/brain/power-tools/labels/)
   </Card>
   <Card title="Entities" icon="pencil">
-    13 services: rename, change entity IDs, enable/disable, hide/unhide, voice aliases and icons, clean up orphaned registry entries (dry-run by default) — and change what a device **shows as**: a contact sensor as a door, a smart plug as a fan or a light, a sensor's decimals and unit.
-    [Reference →](/brain/power-tools/entities/)
+    13 services. Rename, change entity IDs, enable, disable, hide, set aliases and icons, clear orphans, and change what a device shows as.
+    [Open →](/brain/power-tools/entities/)
   </Card>
   <Card title="Devices & Integrations" icon="setting">
-    9 services: rename and enable/disable devices (with parent-hub cascade); enable, disable, reload, or remove integrations; delete devices and sweep out orphaned ones.
-    [Reference →](/brain/power-tools/devices-and-integrations/)
+    9 services. Rename, enable, disable and delete devices. Reload, enable, disable and remove integrations.
+    [Open →](/brain/power-tools/devices-and-integrations/)
   </Card>
   <Card title="Helpers" icon="seti:config">
-    2 services: create and delete all 8 helper types — toggles, sliders, selects, timers, schedules — so an automation and its helpers arrive together.
-    [Reference →](/brain/power-tools/helpers/)
+    2 services. Create and delete all 8 helper types: toggles, sliders, selects, text, dates, counters, timers and schedules.
+    [Open →](/brain/power-tools/helpers/)
   </Card>
   <Card title="Zones & Persons" icon="star">
-    8 services: create, move, and delete zones; create, rename, and delete persons and manage their device trackers.
-    [Reference →](/brain/power-tools/zones-and-persons/)
+    8 services. Create, move and delete zones. Add, rename and remove persons and their device trackers.
+    [Open →](/brain/power-tools/zones-and-persons/)
   </Card>
   <Card title="Blueprints & Statistics" icon="download">
-    2 services: import blueprints from URLs; import or backfill long-term statistics.
-    [Reference →](/brain/power-tools/blueprints-and-statistics/)
+    2 services. Import a blueprint from a link. Import or backfill long-term statistics.
+    [Open →](/brain/power-tools/blueprints-and-statistics/)
   </Card>
   <Card title="Dashboards" icon="laptop">
-    7 services: create, edit, restore, reset to auto-generated, and delete dashboards — automatic backup before every change — and register custom-card resources.
-    [Reference →](/brain/power-tools/dashboards/)
+    7 services. Create, edit, restore, reset and delete dashboards with a backup before every change, and register custom cards.
+    [Open →](/brain/power-tools/dashboards/)
   </Card>
   <Card title="Users" icon="approve-check">
-    4 services: create, delete, enable, and disable accounts — with a guard that makes locking yourself out impossible.
-    [Reference →](/brain/power-tools/users/)
+    4 services. Create, delete, enable and disable accounts, with a guard against locking yourself out.
+    [Open →](/brain/power-tools/users/)
   </Card>
   <Card title="Diagnostics & Repairs" icon="magnifier">
-    3 services: find references to dead entities; raise and clear custom repair issues.
-    [Reference →](/brain/power-tools/diagnostics-and-repairs/)
+    3 services. Find references to dead entities. Raise and clear repair issues.
+    [Open →](/brain/power-tools/diagnostics-and-repairs/)
   </Card>
   <Card title="Backups, Energy, Networks & More" icon="rocket">
-    22 services: backups, long-term statistics and the energy dashboard, Z-Wave and Thread, Home Assistant's addresses, categories, integration options, group members, user roles and dashboard settings.
-    [Reference →](/brain/power-tools/system/)
+    22 services. Backups, statistics and the energy dashboard, Z-Wave and Thread, addresses, categories, integration options, group members, user roles and dashboard settings.
+    [Open →](/brain/power-tools/system/)
   </Card>
 </CardGrid>
 
-**Nothing is create-only.** Every attribute a `create_*` service accepts has a service that changes it later, and every registry object that can be created can also be renamed and deleted — so a label created with `create_label` can be renamed, recoloured, and removed again without ever touching `.storage`. And an `update_*` writes only the fields you name — pass just `color` and the icon and description stay exactly as they were.
+## Use them from an automation
 
-## The safety model
+Every Power Tool is a normal Home Assistant service. It appears under **Developer tools → Actions** with field pickers, and runs with no brAIn conversation involved.
 
-Power Tools are powerful by design, so the guardrails are built into the services themselves — not left to whoever calls them:
+```yaml
+# Flag it in Repairs when the washer finishes but nobody empties it
+- action: brain.create_repair_issue
+  data:
+    title: "Washing machine done"
+    description: "Cycle finished over 2 hours ago and the door hasn't opened."
+    severity: warning
+    issue_id: washer_forgotten
+```
 
-| Guardrail | What it means |
-|-----------|---------------|
-| **Admin-gated** | Calls from non-admin HA users are rejected. Claude, automations, and scripts run as admin. New voice agents start with `brain.*` ticked in their Blocked services, and a *Voice assistant*-level agent cannot reach them at all. |
-| **Validated first** | Every referenced area/floor/label/device/entity/integration id is checked **before** any change is applied. A typo fails loudly; it never half-applies. |
-| **Dry-run defaults** | Both sweeps — `delete_orphaned_entities` and `delete_orphaned_devices` — only *report* unless you explicitly pass `dry_run: false`. `find_orphaned_references` never changes anything, ever. The targeted deletes (`delete_device`, `delete_integration`, `delete_label`, `delete_floor`, `delete_person`), `disable_integration` and `stop_showing_switch_as` also accept `dry_run`, but act by default: you named the thing, so it's not a sweep. |
-| **Safety sensors stay safety sensors** | `set_device_class` refuses to take a smoke, gas, carbon monoxide or leak sensor out of that type without `confirm_safety: true`, because brAIn's [safety alerts](/brain/safety/) go by it. |
-| **Protected entities hold** | Called from the chat or the terminal, every Power Tool passes the same checks as any other change: your protected entities are refused, and a switch shown as something else is protected if either half of the pair is. |
-| **Lockout-proof** | `disable_user` refuses owner accounts and system-generated users. |
-| **Response data** | Creation services return the new id (`area_id`, `floor_id`, `label_id`, …) so multi-step workflows chain without guessing. |
-| **Namespaced** | Everything lives under `brain.*` — no core services are overridden, and running [Spook](https://github.com/frenck/spook) alongside is perfectly fine. |
+Services that create something return its id (`area_id`, `floor_id`, `label_id`, and so on) as response data, so steps chain with `response_variable`. An `update_*` service writes only the fields you name. Everything you can create, you can also rename and delete.
 
-And the human stays in charge: Claude's generated context instructs it to **confirm with you before disabling devices, integrations, or users, and before deleting anything non-trivial**.
+## Safety
 
-## How Claude uses them
+| Rule | What it means |
+| --- | --- |
+| **Admin only** | A call from a non-admin Home Assistant user is rejected. Automations and scripts run as the system. |
+| **Voice is limited** | A **Voice assistant** level agent cannot reach Power Tools at all. Every new agent starts with `brain.*` ticked in its **Blocked services**. |
+| **Checked first** | Every area, floor, label, device, entity and integration id is checked before anything changes. A typo fails with an error and nothing is half-applied. |
+| **Previews** | The sweeps and bulk changes only report until you pass `dry_run: false`: `delete_orphaned_entities`, `delete_orphaned_devices`, `import_statistics`, `delete_backups`, `adjust_statistic_sum`, `heal_statistic_spikes`, `clear_orphaned_statistics`, `save_energy_prefs` and `zwave_remove_failed_node`. Targeted deletes act by default and accept `dry_run: true`. `find_orphaned_references` never changes anything. |
+| **brAIn asks first** | brAIn confirms with you before it disables a device, integration or user, and before it deletes anything that matters. |
+| **Protected entities hold** | From the chat and the terminal, a Power Tool passes the same checks as any other change. Your [protected entities](/brain/safety/) are refused. |
+| **Safety sensors stay safety sensors** | `set_device_class` refuses to take a smoke, gas, carbon monoxide or leak sensor out of that type without `confirm_safety: true`. |
+| **No lockout** | `disable_user`, `delete_user` and `set_user_group` refuse the owner, system users and the last administrator. |
 
-In the terminal, Claude pairs Power Tools with two MCP tools:
+## What Power Tools do not do
 
-1. **`get_registry`** — read-only listings of areas, floors, labels, devices, entities, integrations, and users, with exactly the ids the services need. The safe replacement for reading `.storage` files.
-2. **`call_service`** — invokes the `brain.*` service, with `return_response` to capture returned ids and reports.
+- **Add an integration.** Setup forms are interactive, so brAIn takes you to the screen and you click. It can remove one.
+- **Touch credentials or sign-in internals.**
+- **Edit objects defined in YAML.** A YAML dashboard, helper or person is not in the registry, so the service declines. brAIn edits the file instead, validates it and reloads. See [how the layers fit](/brain/how-brain-controls-ha/#yaml-config-is-not-an-exception).
+- **Override core services.** Everything is under `brain.*`, so running [Spook](https://github.com/frenck/spook) alongside is fine.
 
-So *"move the office lamp to the bedroom and label everything battery-powered"* becomes: look up the ids, validate, call the services, report back. No file edits, no restarts, no guesswork. The same services power [voice](/brain/voice/) requests and [automation tasks](/brain/automations/) — and because they're real HA services, your automations can call them with no Claude in the loop. Where this layer sits relative to the MCP and CLI tools: [How Claude controls your home](/brain/how-brain-controls-ha/).
+## How brAIn uses them
 
-What Power Tools deliberately **don't** do: add an integration (config flows are interactive, so Claude walks you to the screen and you click — removing one it can do), or touch credentials and auth internals.
+brAIn reads ids with the `get_registry` tool (areas, floors, labels, devices, entities, integrations, users), then calls the `brain.*` service with `call_service`. It never reads or edits `/config/.storage`. Where this sits beside the other tools: [How brAIn controls your home](/brain/how-brain-controls-ha/).
 
-They also don't reach objects defined in YAML rather than through the UI, and that is a routing detail rather than a limit. A `brain.*` service edits the registry, and a YAML-defined dashboard, helper or person isn't in the registry — so brAIn edits the file instead, validates it, and reloads the domain. It gets there either way; only the layer changes. See [how the layers fit](/brain/how-brain-controls-ha/#yaml-config-is-not-an-exception).
+## Credit
 
-A well-organized registry also improves every analysis [brAIn](/brain/) generates — it reads your areas, labels, and statistics.
-
-## Credit where due
-
-Power Tools are adapted from **[Spook](https://github.com/frenck/spook)** by Franck Nijhof (MIT licensed). brAIn renames, consolidates, and hardens that foundation for an AI-operated home: namespaced services, validation-first handlers, response data, and dry-run defaults. If you don't run brAIn, use Spook directly — it's excellent.
+Power Tools are adapted from [Spook](https://github.com/frenck/spook) by Franck Nijhof (MIT licensed), with namespaced services, checks before every change, response data and previews added. If you do not run brAIn, use Spook directly.

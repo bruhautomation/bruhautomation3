@@ -1,140 +1,152 @@
 ---
 title: Light Map, Lab & Calibration
-description: How BRight finds your LIFX bulbs and measures them, how the Light Map's roles and zones shape every show, and how each speaker's delay is measured with your phone so the lights land on the beat.
+description: Find your LIFX bulbs and measure them in the Lab, place each light on the Light Map with a role and a zone, and measure each speaker's delay on Calibrate so the lights land on the beat.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-Three tabs hold everything BRight needs to know about the room before it can light a song: the
-**Lab** (what the lights are and how fast they answer), the **Light Map** (where they are and
-what each one is for) and **Calibrate** (how late your speaker is).
+Three tabs tell BRight about your room before it lights a song. The **Lab** finds your lights and
+measures how fast they answer. The **Light Map** says where they are and what each one is for.
+**Calibrate** measures how late your speaker is.
 
-## Lab — measure the house
+## Find and measure your lights
 
-Nothing in the Lab changes your lights permanently; it measures.
+![The Lab tab: Discover bulbs and Probe all unprobed, the line All 8 checked, all fast, and a list of bulbs each reading Fast with its milliseconds and no loss, one with its menu open showing Find speed limit and Beat-pulse demo](./images/lab.webp)
 
-- **LIFX bulbs — direct LAN.** **Discover bulbs** broadcasts on the LAN and lists every bulb that
-  answers. **Check** measures one bulb's round trip with an invisible echo (not a flash) and its
-  sustained message rate; **Probe all unprobed** does every bulb not yet checked, and becomes
-  **Stop** while it runs. A room's list starts with one line such as *"All 8 checked, all fast"*.
-- **Aux lights — through Home Assistant.** Party lights and lasers on smart plugs ride Home
-  Assistant service calls, which are slower. **Measure latency** toggles the chosen entity a few
-  times, measures the real call-to-state round trip, and puts it back. Compiled shows send those
-  cues early by exactly that much.
-- **Latency report.** Everything measured so far, in one read.
+Nothing in the Lab changes your lights permanently. It measures.
 
-![The Lab's Aux lights card with an entity picker and Measure latency, above the Test mode card: an analysed-track picker, a speaker picker, Start, and bulbs grouped by zone with a tick for each zone](./images/lab-test-mode.webp)
+| To | Press |
+| --- | --- |
+| List every LIFX bulb on the LAN | **Discover bulbs** |
+| Time one bulb's round trip, with an invisible echo instead of a flash | **Check** on its row |
+| Check every bulb not yet checked | **Probe all unprobed** (it becomes **Stop** while it runs) |
+| Find how many messages a second a bulb can take | **⋯ → Find speed limit** |
+| Watch one bulb pulse on a beat by itself | **⋯ → Beat-pulse demo**, at the **BPM** and **Seconds** set above the list |
+| Measure a party light or laser on a smart plug | **Load switches & lights**, pick the entity, **Measure latency** |
+| Read everything measured so far | **Latency report → Refresh** |
 
-### Test mode — beats & drops
+The list starts with one line that sums it up, such as *"All 8 checked, all fast"*.
 
-The honest end-to-end check. Pick an analysed track and a calibrated speaker, tick which bulbs
-join in, and press **Start**: the song plays while every ticked bulb pulses on the beat and
-flashes on every drop. No choreography — just the whole chain from analysis to speaker to bulb.
+**Measure latency** toggles the entity a few times, times the real round trip through Home
+Assistant, and puts it back. Shows then send that light's cues early by that much.
 
-- **Off the beat?** Nudge the calibration (see below).
-- **Flashing on nothing?** Analyse the song again.
+### Prove the sync with Test mode
 
-Bulbs are grouped by zone in closed folds, each with a tick for the whole zone and a count.
-The test starts with the bulbs this browser last used — one light you can see is all the proof
-needs, not every light in the house blinking at once.
+![The Lab's Aux lights card with an entity picker and Measure latency, above the Test mode card: a track picker, a speaker picker, Start, All and None, and the bulbs grouped by zone with a tick for each zone](./images/lab-test-mode.webp)
 
-## Light Map — where the lights are
+<Steps>
 
-The Light Map is the director's cast list. Drag each light to roughly where it sits in the room
-— **left ↔ right matters most**, because sweeps and chases travel across it — and give it a role.
+1. In **🧪 Test mode — beats & drops**, pick an analysed track and a calibrated speaker.
+2. Tick the bulbs that join in. They are grouped by zone, with a tick for the whole zone. One
+   bulb you can see is enough.
+3. Press **Start**. The song plays, every ticked bulb pulses on the beat and flashes on every
+   drop. **Stop & restore** ends it.
 
-![The Light Map: a floor-plan grid with nine labelled lights, and the Add lights row below with a bulb picker, a role picker, a zone box, Add this bulb, Refresh list, Add every discovered bulb and Add a switch light](./images/light-map.webp)
+</Steps>
 
-Tap a light to select it: the dot, its row in the list and the bar above the floor all highlight
-together, and the selected light can be re-roled or removed right there. Every dot carries its
-name on the map, and lights that share a spot show as one dot with a count you can open.
+| You see | Do this |
+| --- | --- |
+| Pulses off the beat | Nudge the speaker's calibration (below) |
+| Flashes on nothing | Analyse the song again |
 
-### Adding lights
+Test mode has no choreography. It checks the whole chain from analysis to speaker to bulb, so if
+it hits the beat, shows will.
 
-- **The picker** lists every discovered bulb that is not on the map yet. Choose one, give it a
-  role and (optionally) a zone, and press **Add this bulb**. This is the one to use after the
-  first run.
-- **Add every discovered bulb** adds every unmapped bulb at once — the right button exactly once.
-  Neither ever overwrites a light you have already placed.
-- **Add a switch light…** adds a party light or laser by its Home Assistant entity.
+## Place lights on the map
 
-### Roles — what a light *is*
+![The Light Map with Kitchen bar selected: a bar above the floor plan with its role picker, zone box and Remove this light, nine labelled lights on the grid, and the Add lights row with a bulb picker, role, zone, Add this bulb, Refresh list and Add a switch light](./images/light-map.webp)
 
-A role changes how BRight drives a light, and it is how a show says "the candles" without naming
-four bulbs — which is what keeps a show working when you add a fifth.
+Drag each light to roughly where it sits in the room. **Left ↔ right matters most**, because
+sweeps and chases travel across it.
+
+| To | Do this |
+| --- | --- |
+| Add one bulb | Choose it in the picker under **Add lights**, pick a role, type a zone if you want one, press **Add this bulb** |
+| Add every bulb the Lab found | Press **Add all to the map** under **Every light**. Use it once, on the first run |
+| Add a party light or laser | **Add a switch light…**, pick the entity and `party` or `laser`, press **Add** |
+| Change a light's role or zone | Tap the light, then use the bar above the floor (or the role picker on its row in the list) |
+| Remove a light | Tap it, then **Remove this light** |
+| Find a light on a big map | Type in **Find a light or zone** |
+
+Adding never overwrites a light you have already placed. Lights that share a spot show as one dot
+with a count you can open. The list under the map groups lights by zone and counts any not yet
+placed.
+
+<Aside type="tip">
+The map is what an effect travels through. A chase ordered by `x` runs left to right across the
+room you drew, `center_out` starts in the middle, and `zone` goes room by room. Rough positions
+are enough to make automatic shows look deliberate.
+</Aside>
+
+### Give each light a role
+
+A role says what a light is, and it changes how BRight drives it. It also lets a show say "the
+candles" without naming bulbs, so the show still works when you add a fifth.
 
 | Role | What the director does with it |
 | --- | --- |
 | `candle` | Glows and drifts, capped at 45% brightness. Never strobes or pulses hard. |
 | `downlight` | Carries the beat at full range. |
 | `lamp` | Carries the beat, with more colour latitude. |
-| `strip` | Carries motion — sweeps travel across the room on it. |
-| `party` | A switch: on or off, no colour, sent early to cover Home Assistant's latency. Saved for the moments that earn it — drops, choruses. |
-| `laser` | Same as `party`, rarer. |
+| `strip` | Carries motion. Sweeps travel across the room on it. |
+| `party` | A switch: on or off, no colour, sent early to cover Home Assistant's latency. Saved for drops and choruses. |
+| `laser` | Same as `party`, used more rarely. |
 
-Getting a role wrong is how a bedside candle ends up strobing.
+A wrong role is how a bedside candle ends up strobing.
 
-### Zones — which part of the house
+### Group lights into zones
 
-A **zone** is just a name you give a group of lights, usually a room. Type the same word on
-several lights and they are one zone; there is no list to maintain. A zone exists exactly as long
-as a light is in it, and a light with no zone still plays in every show.
+A zone is a name you give a group of lights, usually a room. Type the same word on several lights
+and they are one zone. There is no list to maintain, and a light with no zone still plays in
+every show.
 
-What zones buy you is being able to talk about *part* of the house:
+Zones let you address part of the house:
 
-- An effect can own just the kitchen — `"select": {"zones": ["kitchen"]}` — and leave everything
-  else exactly as the scene put it.
-- A chase or sweep with `"order": "zone"` travels room by room rather than straight across the
-  floor plan — what you want in an open-plan space where "left to right" crosses three areas.
-- A party's allowed lights and the Claude director both read them, so "keep it to the lounge
-  after 11" is one word rather than five bulb ids.
+| With a zone you can | How |
+| --- | --- |
+| Give the kitchen its own effect and leave the rest alone | `"select": {"zones": ["kitchen"]}` |
+| Send a chase or sweep room by room in an open-plan space | `"order": "zone"` |
+| Tell Claude *"keep it to the lounge"* | The Claude director reads zones from the map |
 
-Set a zone when you add a bulb, or select any light on the map and type one beside its role.
-**Suggest zones from names** proposes zones from a word the lights' names share ("Kitchen bar",
-"Kitchen pendant") and saves them only when you press **Use these zones**. The list under the
-map groups lights by zone, counts lights not yet placed, and has a search box.
+**Suggest zones from names** proposes zones from a word your lights' names share ("Kitchen bar",
+"Kitchen pendant"). Nothing is saved until you press **Use these zones**.
 
-<Aside title="The map is not decoration">
-It is what an effect travels *through*. A chase ordered by `x` runs left to right across the room
-you drew, `center_out` starts in the middle, and `zone` walks room by room. Getting the positions
-roughly right is what makes the automatic shows look deliberate.
-</Aside>
+## Measure your speaker's delay
 
-## Calibrate — how long your speaker takes
+A speaker starts playing some time after Home Assistant sends the command. AirPlay buffers about
+two seconds, and nothing reports the figure. BRight measures it, and a show will not start on a
+speaker with no calibration profile.
 
-`media_player.play_media` returns when Home Assistant has *taken* the command, not when sound
-comes out. Between the two, Home Assistant resolves the media, signs a path and hands a URL to a
-speaker that then fetches it over the network — and buffers it. AirPlay buffers about two seconds,
-and no API reports it. So BRight measures it.
+![The Calibrate tab: Measure with this phone's microphone with Play clicks & listen, No microphone? Tap along instead with a large TAP pad, Or type the delay in with Save for this speaker, and Stored profiles listing two speakers with their delay, runs, spread and a nudge box](./images/calibrate.webp)
 
-![The Calibrate tab: Measure with this phone's microphone with Play clicks & listen, No microphone? Tap along instead with a large TAP pad, Or type the delay in with a Save for this speaker button, and Stored profiles](./images/calibrate.webp)
+<Steps>
 
-1. **Test playback** first. It sends the click track and follows it the whole way — file on disk,
-   media id, the address handed to your speaker, the command, and whether the speaker actually
-   started — and names the step that broke. **■ Stop the sound** stops it.
-2. **Play clicks & listen** — the real measurement. Open the panel **on your phone**, in the room
-   with the speaker. BRight plays a 13-second click track; the page records it through the
-   microphone and cross-correlates. The clicks are unevenly spaced on purpose: the pattern lines
-   up exactly one way, so the answer cannot be out by a beat.
-3. **Play clicks & tap** — for browsers that refuse the microphone (plain HTTP). You tap the big
-   button on each click. Coarser, because your reaction time (~100 ms) rides along.
-4. **Or type the delay in.** A show will not start without a calibration profile, so one speaker
-   that refuses the click track would otherwise block everything. A typed profile is stored as
-   *manual* — it never claims to have been measured. 0 is right for a wired speaker; about
-   2000 ms is a reasonable guess for AirPlay.
+1. **Test playback first.** Pick the speaker and press **Test playback**. BRight sends the click
+   track and names the step that broke if it does not play. **■ Stop the sound** stops it. See
+   [When nothing plays](/bright/reference/#when-nothing-plays).
+2. **Measure with your phone.** Open the panel on your phone, in the room with the speaker, and
+   press **Play clicks & listen**. BRight plays a 13-second click track and the page works out
+   the delay through the microphone. The clicks are unevenly spaced, so the answer cannot be out
+   by a beat.
 
-**Stored profiles** keep a median across runs plus a **fine-tune** nudge per speaker (negative
-moves the whole show earlier). Run the measurement once per speaker, and again if shows ever feel
-consistently early or late — speakers renegotiate their buffers between sessions. A speaker you
-no longer have can be deleted.
+</Steps>
 
-The click track lives at `/media/bright/calibration.wav`, because your speaker fetches it from
-Home Assistant, not from the add-on.
+If the microphone is not an option:
 
-### Trimming while it plays
+| Method | When | Accuracy |
+| --- | --- | --- |
+| **Play clicks & tap** | The browser refuses the microphone (plain HTTP). Tap the big button on each click. | Coarser. Your reaction time (about 100 ms) is included. |
+| **Or type the delay in** | A speaker will not play the click track, or you are in a hurry. 0 for a wired speaker, about 2000 ms for AirPlay. | A guess. It is stored as *manual* and never shown as measured. |
 
-While any show or party is running, **−25 ms / +25 ms** trims the sync by ear, and
-**🎤 Sync by ear** does the same trim measured: the phone records the room for four seconds,
-BRight matches what it heard against the playing track, and the lights shift by exactly the
-difference. **Keep this trim** folds either kind into the speaker's calibration, so every future
-show starts in tune.
+**Stored profiles** keeps a median across runs for each speaker, plus a **Nudge ms** fine-tune.
+Negative moves the whole show earlier. Measure once per speaker, and again if shows feel
+consistently early or late, because speakers change their buffers between sessions. **✕** deletes
+a speaker you no longer have.
+
+### Trim the sync while it plays
+
+| Control | Where | What it does |
+| --- | --- | --- |
+| **−25ms** / **+25ms** | Shows and Party, while something plays | Moves the lights later or earlier by ear |
+| **🎤 Sync by ear** | Party | The phone records the room for four seconds, BRight matches it against the playing track, and the lights shift by the difference |
+| **Keep this trim** | Party | Saves the trim into the speaker's calibration for every future show |

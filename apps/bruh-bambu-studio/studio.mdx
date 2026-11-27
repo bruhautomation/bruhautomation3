@@ -1,69 +1,66 @@
 ---
 title: The Studio
-description: Bambu Lab's own Bambu Studio running inside the add-on on a virtual screen and shown in the Home Assistant sidebar through noVNC — with a mouse on a computer and touch controls on a phone.
+description: Bambu Lab's own Bambu Studio in the Home Assistant sidebar, with a mouse on a computer and touch controls on a phone.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-The **Studio** tab is the real Bambu Studio — Bambu Lab's own Linux build, not a look-alike —
-running inside the add-on and shown in your Home Assistant sidebar. Everything you do in it
-on your desktop works here: open a model, paint supports, arrange a plate, sign in to
-MakerWorld, slice, save a project.
+The **Studio** tab is Bambu Lab's own Bambu Studio, running inside the app and shown in your
+sidebar. Everything you do in it on a desktop works here: open a model, paint supports, arrange
+a plate, sign in to MakerWorld, slice, save a project.
 
-## How it runs
+## Use it on a computer
 
-- **Downloaded once.** The first start downloads the Bambu Studio AppImage (about 220 MB)
-  from Bambu Lab's GitHub releases and unpacks it into the add-on's own storage, where it is
-  kept. The tab shows the progress. It is left out of backups, because the add-on fetches it
-  again on its own.
-- **A version you choose.** `bambu_studio_version: latest` takes the newest release on first
-  start and keeps it. Put a release tag there (for example `v02.08.02.61`) to stay on that
-  version; changing it downloads that one on the next start. `appimage_url` takes a direct
-  AppImage link when GitHub is unreachable. See [Reference](/bruh-bambu-studio/reference/).
-- **On a virtual screen.** Bambu Studio draws on a screen inside the add-on
-  (`screen_resolution`, 1600×900 by default) and the panel shows it through noVNC, scaled to
-  your window. A larger screen shows more of the slicer at once and makes text smaller on a
-  phone. The VNC server listens only inside the add-on; the panel bridges it through Home
-  Assistant's ingress, so it is reachable only by a signed-in administrator.
-- **Kept running.** If its window is closed it is started again. If it stops, the tab says so,
-  offers **Start**, and shows *What it last printed* — its last lines of output.
+The mouse and keyboard go straight through. Use it as you would on your desktop.
 
-## On a computer
+## Use it on a phone or tablet
 
-Use it as you would on your desktop: the mouse and keyboard go straight through.
+| Do | How |
+|---|---|
+| Click | Tap |
+| Right-click | Hold |
+| Zoom and move around | Two fingers |
+| Choose what one finger does | **Move** (the view), **Drag** (sliders and the 3D view) or **Scroll** on the toolbar |
+| See the whole screen again | **Fit** |
+| Type | **Keyboard**, with **Backspace**, **Enter** and **Done** beside it |
 
-## On a phone or tablet
+## Move files in and out
 
-On a touch screen the tab has controls like a remote desktop app:
+Bambu Studio's Open and Save dialogs reach `/share/bambu`, the same folder as the
+[Files tab](/bruh-bambu-studio/printing/#add-models-to-the-library).
 
-- **Tap** to click, **hold** to right-click, **two fingers** to zoom and move around.
-- A toolbar switches what **one finger** does: **Move** (the view), **Drag** (for sliders and
-  Bambu Studio's 3D view) or **Scroll**.
-- **Fit** goes back to the whole screen.
-- **Keyboard** opens your phone's keyboard, with **Backspace**, **Enter** and **Done** beside
-  it.
-
-## Files in and out
-
-Bambu Studio's own Open and Save dialogs reach **`/share/bambu`**, the same folder as the
-[Files tab](/bruh-bambu-studio/printing/#the-library-sharebambu). Save a project there and it
-appears in Files, ready to print from anywhere. Going the other way, **Open in Studio** on any
-file — or **Open in Bambu Studio** on a designed part — opens it on this tab.
+- **Save a project there** and it appears in Files, ready to print from anywhere.
+- **Open in Studio** on any file, or **Open in Bambu Studio** on a designed part, opens it on
+  this tab.
 
 <Aside type="tip" title="MakerWorld">
 MakerWorld models need a signed-in Bambu account. Sign in on Bambu Studio's MakerWorld page
-here and open the model: it goes straight into the slicer. Nothing else in the add-on needs a
-Bambu account.
+here and open the model. Nothing else in the app needs a Bambu account.
 </Aside>
+
+## Choose the version and screen size
+
+| Option | What it does |
+|---|---|
+| `bambu_studio_version` | `latest` takes the newest release on first start and keeps it. A release tag such as `v02.08.02.61` stays on that version. Changing it downloads that one on the next start |
+| `appimage_url` | A direct AppImage link, for when GitHub is unreachable |
+| `screen_resolution` | The screen Bambu Studio draws on, `1600x900` by default. The panel scales it to your window. A larger screen shows more of the slicer and makes text smaller on a phone |
+
+See [Reference](/bruh-bambu-studio/reference/) for all options.
 
 ## Good to know
 
-- **The slicer draws with software OpenGL**, because the add-on has no graphics card to use.
-  A large model's 3D view is slow; slicing is unaffected.
-- **Prints started elsewhere don't disturb it.** A print from the Files tab, a design or an
-  automation slices through Bambu Studio's command line with its own settings folder, never
-  the one this window has open. On a machine short of memory, the window is closed while that
-  slice runs and opens again, on the same file, afterwards; the tab says so meanwhile.
-- **Missing libraries are named.** Before starting Bambu Studio the add-on checks every system
-  library it needs. If a new Bambu Studio release needs one the image lacks, the tab lists them
-  and suggests updating the add-on or pinning an older Bambu Studio version.
+- **The first start downloads about 220 MB** from Bambu Lab's GitHub releases. The tab shows
+  the progress. The download is kept, and left out of backups because the app can fetch it
+  again.
+- **If Bambu Studio's window closes, it starts again.** If it stops, the tab says so, offers
+  **Start**, and shows its last lines of output under *What it last printed*.
+- **Only a signed-in administrator can reach it.** The screen is served through Home
+  Assistant's ingress and nowhere else.
+- **A large model's 3D view is slow.** The app has no graphics card to use. Slicing is
+  unaffected.
+- **Prints started elsewhere do not change what you have open.** They slice separately. On a
+  machine short of memory the window closes while that slice runs and opens again on the same
+  file afterwards. The tab says so meanwhile.
+- **Missing libraries are named.** If a new Bambu Studio release needs a system library the
+  app lacks, the tab lists it. Update the app or pin an older Bambu Studio version.

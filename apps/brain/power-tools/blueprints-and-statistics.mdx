@@ -1,54 +1,61 @@
 ---
 title: Blueprints & Statistics
-description: Import automation blueprints from URLs and backfill long-term statistics with brain services.
+description: Ask brAIn to import a blueprint from a link and set it up, and to import or backfill long-term statistics.
 sidebar:
   order: 8
 ---
 
-Two importers. `import_blueprint` pulls an automation or script blueprint straight from a community-forum topic, GitHub file, or Gist. Tell Claude "set up that blueprint" with a link and it can import *and* configure it in one conversation.
+import { Aside } from '@astrojs/starlight/components';
 
-`import_statistics` writes long-term statistics rows directly: repair a broken energy dashboard, migrate meter history from a previous system, or feed external data (solar forecasts, utility bills) into HA's statistics store. brAIn reads long-term statistics for its energy analysis, so backfilled history makes those insights smarter too.
+Give brAIn a blueprint link and it imports and configures it. Give it meter history and it backfills your long-term statistics.
 
-## Import blueprint
+## Ask brAIn
 
-`brain.import_blueprint`
+```text
+Import this motion-activated-light blueprint from the forum and set it up for the hallway.
+My energy dashboard has a gap from when the meter was offline. Backfill it from this CSV.
+Bring the gas meter history over from my old system.
+```
 
-Import an automation or script blueprint from a URL (Home Assistant community forum, GitHub, or GitHub Gist). Returns the blueprint domain, name, and file path as response data.
+## What brAIn can do
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url` | text | yes | The URL to import the blueprint from. |
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-```yaml
-service: brain.import_blueprint
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.import_blueprint` | Import an automation or script blueprint from a Home Assistant community forum topic, a GitHub file or a Gist. Returns the blueprint's domain, name and file path. | `url`\* |
+| `brain.import_statistics` | Import or backfill long-term statistics rows. **Reports only** unless you pass `dry_run: false`: the preview gives the affected time range and the existing rows that would be overwritten. | `statistic_id`\*, `has_mean`\*, `has_sum`\*, `name`, `unit_of_measurement`, `stats[]`\*, `dry_run` |
+
+Fields of `import_statistics`:
+
+| Field | What to send |
+| --- | --- |
+| `statistic_id` | An entity ID (`sensor.gas_meter`) for recorder statistics, or an external ID (`bruh:solar_forecast`). |
+| `has_mean` | `true` when rows carry `mean`, `min` and `max` (measurements). |
+| `has_sum` | `true` when rows carry `state` and `sum` (metered totals such as energy). |
+| `name`, `unit_of_measurement` | Display name and unit of the values. |
+| `stats` | The rows. Each needs a `start` at the top of an hour, plus `mean`/`min`/`max` and/or `state`/`sum`. |
+
+<Aside type="caution">
+A real import overwrites the existing rows in that window. They cannot be restored without a backup of the recorder database, so run the preview first.
+</Aside>
+
+## Examples
+
+```yaml title="Import a blueprint"
+action: brain.import_blueprint
 data:
   url: https://community.home-assistant.io/t/motion-activated-light/123456
 ```
 
-> 🗣️ *"Import that motion-activated-light blueprint from the forum and set it up for the hallway."*
-
-## Import statistics
-
-`brain.import_statistics`
-
-Import or backfill long-term statistics rows. Use an entity ID (sensor.gas_meter) for recorder statistics, or an external ID (bruh:solar_forecast) for external statistics; the source is derived automatically.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `statistic_id` | text | yes | Entity ID (sensor.gas_meter) or external ID (domain:object_id). |
-| `has_mean` | boolean | yes | Whether the rows carry mean/min/max values (measurements). |
-| `has_sum` | boolean | yes | Whether the rows carry sum values (metered totals like energy). |
-| `name` | text | no | Display name for the statistic. |
-| `unit_of_measurement` | text | no | Unit of measurement of the values. |
-| `stats` | list of objects | yes | List of statistics rows. Each row needs a start timestamp (top of an hour) plus mean/min/max and/or state/sum values. |
-
-```yaml
-service: brain.import_statistics
+```yaml title="Backfill two hours of gas meter history"
+action: brain.import_statistics
 data:
   statistic_id: sensor.gas_meter
   has_mean: false
   has_sum: true
   unit_of_measurement: "m³"
+  dry_run: false   # leave out to preview
   stats:
     - start: "2026-07-01T00:00:00+00:00"
       state: 1234.5
@@ -58,4 +65,4 @@ data:
       sum: 1235.1
 ```
 
-> 🗣️ *"My energy dashboard has a gap from when the meter was offline — backfill it from this CSV."*
+To fix a wrong reading or a spike in existing history, see [Statistics and the energy dashboard](/brain/power-tools/system/#statistics-and-the-energy-dashboard).

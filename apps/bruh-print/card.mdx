@@ -1,28 +1,47 @@
 ---
 title: Dashboard Card
-description: The BRUH Print Lovelace card puts a label printer on any Home Assistant dashboard — free text, one-press quick labels, a template form or a list of templates — and works from any phone, at home or away.
+description: Put a label printer on any Home Assistant dashboard with the BRUH Print card. Print free text, one-press quick labels, a template form or any saved template, from any phone, at home or away.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-BRUH Print ships a Lovelace card and registers it for you. Edit a dashboard, **Add card**, and pick
-**BRUH Print** from the card picker; its visual editor covers every option below.
+The BRUH Print card puts a text box and a **Print** button on any dashboard, so anyone in the
+house can print a label from a phone.
 
-The card reads the integration's sensors and calls its services — it never talks to the add-on
-directly. So it works from a phone on mobile data through Home Assistant Cloud exactly as it does
-on the LAN.
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;align-items:start">
 
-## What it shows
+![The card titled Label the freezer: a LabelWriter 450 Twin Turbo status pill, left and right roll tiles with the left marked prints text and about 989 left, Leftovers and Dated freezer bag quick buttons, a What should it say box reading Chili, Copies and Print](./images/card.webp)
 
-- **A status pill** for the printer (`show_status`, on by default).
-- **The roll tiles** (`show_rolls`, on by default): *Left roll* and *Right roll*, the roll text
-  prints on marked **prints text**, the label's size, and *about N left* while counting is on.
-  Press a roll to make plain text print there — the same choice the panel's Quick tab shows.
-- **The form**: a text box and **Print** (`mode: text`), or one template's fields (`mode:
-  template`).
-- **Quick buttons** (`quick:`) for labels you print all the time.
-- **Saved templates** as buttons (`show_templates: true`, off by default): press one, fill in its
-  fields, print — on the label the template was made for.
+![The card with show_templates on: the roll tiles, the text form, then Freezer bag, Pantry jar and Moving box buttons under Templates, with Pantry jar picked and its Contents and Link boxes above a Print Pantry jar button](./images/card-templates.webp)
+
+</div>
+
+## Add the card
+
+<Steps>
+
+1. Edit a dashboard and press **Add card**.
+2. Search for **BRUH Print** and pick it. BRUH Print registers the card for you.
+3. Set the title, mode, copies and what to show in the visual editor. `quick`, `fields` and the
+   entity options are set in YAML.
+
+</Steps>
+
+The card talks to Home Assistant, not to the app. It works on mobile data through Home Assistant
+Cloud the same way it does at home.
+
+## What you can do on it
+
+| Part | What it does | Option |
+| --- | --- | --- |
+| Status pill | Shows the printer and whether it is ready | `show_status` |
+| Roll tiles | Show each roll's label, size and *about N left*. Press a roll to make plain text print there. | `show_rolls` |
+| Text form | Type a label and press **Print** | `mode: text` |
+| Template form | Fill in one template's fields and print | `mode: template` |
+| Quick buttons | Print a fixed text or a filled-in template in one press | `quick` |
+| Template list | A button per saved template. Press one, fill in its fields, print. | `show_templates` |
+
+Pressing a roll tile changes the same setting as the **Prints on** line on the panel's Quick tab.
 
 ## Examples
 
@@ -37,7 +56,7 @@ quick:
     text: "Leftovers"
   - label: "Dated freezer bag"
     template: Freezer bag
-    fields: { date: "{{date}}" }
+    fields: { contents: "Leftovers" }
 ```
 
 A form for one template:
@@ -49,8 +68,8 @@ mode: template
 template: Pantry jar
 fields:
   - contents
-  - key: date
-    label: Filled on
+  - key: link
+    label: Recipe link
 ```
 
 Every saved template, one press each:
@@ -66,27 +85,32 @@ show_templates: true
 | --- | --- | --- |
 | `title` | `BRUH Print` | The card's heading |
 | `mode` | `text` | `text` for a free-text form, `template` for one template's form |
-| `template` | — | The template's name, required with `mode: template` |
+| `template` | | The template's name. Required with `mode: template`. |
 | `fields` | `[]` | With `mode: template`, the fields the form asks for: a name, or `key` with an optional `label` and `default` |
-| `stock` | — | A stock id for text prints, instead of the roll marked *prints text* |
+| `stock` | | A stock id for text prints, instead of the roll marked **prints text** |
 | `copies` | `1` | Copies per press |
-| `quick` | `[]` | One-press buttons: `label` plus `text`, or `template` with `fields` |
+| `quick` | `[]` | One-press buttons: `label` plus `text`, or `label` plus `template` with `fields` |
 | `show_status` | `true` | Show the printer status pill |
 | `show_rolls` | `true` | Show the roll tiles |
 | `show_templates` | `false` | List the saved templates as buttons |
 | `printer_entity`, `left_roll_entity`, `right_roll_entity`, `problem_entity` | found automatically | Point the card at renamed entities |
 
-## What the card needs
+## What the card says after a print
 
-Printing and the readouts depend on different things, and the card keeps them apart.
+| What happened | What the card says |
+| --- | --- |
+| It printed | *Printed 1 on the left roll*, plus any notes about the label |
+| The print was refused | The reason, such as which stock is in the roll and which the label is for |
+| The job was taken and nothing printed | *BRUH Print took the job and printed nothing*, with why |
+| No answer came back | *BRUH Print took the job, but sent nothing back to say a label came out. Check the printer.* |
 
-- **Printing is a service call** (`bruh_print.print_text`, or `print_template`). Those exist whenever
-  the integration is loaded, whatever the entities are called, so that is the only thing that can
-  take the Print button away — and the card says which service is missing.
-- **The status pill and roll tiles are the sensors**, found by the end of their entity id
-  (`printer`, `left_roll`, `right_roll`). A renamed device or a second BRUH Print leaves the card with
-  nothing to show; it says so and **keeps printing**. Name the odd one out and the rest are still
-  found:
+## Fix a card that shows nothing or cannot print
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| *Custom element doesn't exist* | Home Assistant has not started serving the card's folder yet | Restart Home Assistant once. A repair under **Settings → System → Repairs** says so and clears itself. |
+| *This card cannot print: Home Assistant has no `bruh_print.print_text` service* | The integration is not loaded | Set up the BRUH Print integration under **Settings → Devices & Services** |
+| *Printing works from here, but this card cannot find the printer sensor or the roll sensors* | The entities were renamed | Name them in the card, as below. Printing keeps working meanwhile. |
 
 ```yaml
 type: custom:bruh-print-card
@@ -94,25 +118,9 @@ printer_entity: sensor.label_maker_printer
 left_roll_entity: sensor.label_maker_left_roll
 ```
 
-## What it says after a print
-
-The confirmation is the add-on's own answer — *"Printed 1 on the left roll"*, plus any notes about
-the label itself. Three other outcomes each get their own sentence:
-
-| What came back | What the card says |
-| --- | --- |
-| A refusal | The add-on's own reason, such as which stock is in the roll and which the label is for — never just "print failed" |
-| An answer saying nothing printed | *BRUH Print took the job and printed nothing*, with why |
-| Nothing at all | *BRUH Print took the job, but sent nothing back to say a label came out. Check the printer.* |
+Name only the entities the card cannot find. It still finds the rest by itself.
 
 ## Updates and caching
 
-Home Assistant serves custom cards with a month-long cache, so the card is registered under a URL
-that changes whenever the file does. An update reaches your dashboard on the next page load.
-
-<Aside title="Custom element doesn't exist">
-Restart Home Assistant once. Home Assistant only serves `/config/www` if that folder existed when it
-started, and on a house that never had one (most houses, unless you run HACS or another custom card)
-BRUH Print has just created it. A repair in **Settings → System → Repairs** says so and clears itself
-afterwards. You will not have to do it again.
-</Aside>
+A card update reaches your dashboard on the next page load. You do not need to clear the browser
+cache.

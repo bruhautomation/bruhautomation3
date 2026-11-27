@@ -1,204 +1,91 @@
 ---
 title: Devices & Integrations
-description: Rename, enable, disable, and delete devices, and enable, disable, reload, or delete integration config entries with brain services.
+description: Ask brAIn to rename, enable, disable and delete devices, and to enable, disable, reload or remove integrations.
 sidebar:
   order: 5
 ---
 
-Device-level and integration-level switches. Disabling a device disables all of its entities at once; when the last child of a hub is disabled, the hub follows, and enabling walks back up the chain.
+import { Aside } from '@astrojs/starlight/components';
 
-`reload_integration` is the service equivalent of the **Reload** button on an integration page — the classic first fix when an integration wedges, now available to automations and to Claude.
+Ask brAIn to rename, switch off or remove a device, and to reload, disable or remove an integration.
 
-## Rename device
+## Ask brAIn
 
-`brain.rename_device`
-
-Set the user-facing name of a device.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `device_id` | device | yes | The device to rename. |
-| `name` | text | yes | The new name. |
-
-```yaml
-service: brain.rename_device
-data:
-  device_id: a1b2c3d4e5f6
-  name: Kitchen Ceiling Light
+```text
+The Hue integration is acting up. Reload it.
+Rename that Shelly device to "Kitchen Ceiling Light".
+Disable the old motion sensor I unplugged.
+That old thermostat is gone. Show me what deleting its device would take with it, then do it.
+Are there devices left behind by integrations I removed? Clean them up.
+I've sold the Sonos speakers. How much goes if I remove that integration?
 ```
 
-> 🗣️ *"Rename that Shelly device to 'Kitchen Ceiling Light'."*
+brAIn confirms with you before it disables or deletes a device or an integration.
 
-## Enable device
+## What brAIn can do
 
-`brain.enable_device`
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-Enable one or more disabled devices (including their parent hub devices if those were disabled).
+### Devices
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `device_id` | device (list) | yes | Devices to enable. |
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.rename_device` | Set the name you see for a device. | `device_id`\*, `name`\* |
+| `brain.enable_device` | Enable disabled devices, and their parent hub if that was disabled too. | `device_id[]`\* |
+| `brain.disable_device` | Disable devices and all their entities. A parent hub is disabled once none of its children remain enabled. | `device_id[]`\* |
+| `brain.delete_device` | Remove devices and their entities from the registry. Returns each device's name, entities, child devices and `live_config_entries`. `dry_run: true` shows that without deleting. | `device_id[]`\*, `dry_run` |
+| `brain.delete_orphaned_devices` | Remove devices no loaded integration claims any more. **Reports only** unless you pass `dry_run: false`. With `device_id`, each one is re-checked and anything still claimed is skipped and reported under `skipped_not_orphaned`. | `dry_run`, `device_id[]` |
 
-```yaml
-service: brain.enable_device
-data:
-  device_id:
-    - a1b2c3d4e5f6
-```
+### Integrations
 
-> 🗣️ *"Re-enable the garage sensor device."*
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.reload_integration` | Reload integration entries, like pressing **Reload** on the integration page. | `config_entry_id[]`\* |
+| `brain.enable_integration` | Enable disabled integration entries. | `config_entry_id[]`\* |
+| `brain.disable_integration` | Disable integration entries and everything they provide. `dry_run: true` lists the entries and entity counts. | `config_entry_id[]`\*, `dry_run` |
+| `brain.delete_integration` | Remove integration entries with their devices and entities. Returns each entry's domain and title and how many entities and devices go with it. After a real removal, `require_restart` says whether Home Assistant needs a restart. | `config_entry_id[]`\*, `dry_run` |
 
-## Disable device
+<Aside type="caution">
+`delete_integration` cannot be undone. `disable_integration` can. A deleted device that its integration still provides comes back on the next reload; `live_config_entries` in the preview tells you so before you delete.
+</Aside>
 
-`brain.disable_device`
+brAIn cannot **add** an integration. Setup forms are interactive, so brAIn takes you to the screen and you click.
 
-Disable one or more devices and all their entities. A parent hub device is also disabled once none of its children remain enabled.
+## Examples
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `device_id` | device (list) | yes | Devices to disable. |
-
-```yaml
-service: brain.disable_device
-data:
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"Disable the old motion sensor I unplugged."*
-
-## Delete device
-
-`brain.delete_device`
-
-Remove one or more devices from the registry, along with their entities. Returns what went (or would go) as response data: each device's name, the entities removed with it, its child devices, and the config entries still providing it. A device its integration still provides comes straight back on the next reload — `live_config_entries` in the response is how you see that before you delete rather than after.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `device_id` | device (list) | yes | Devices to delete. |
-| `dry_run` | boolean | no | When on, only report what would be removed — nothing is deleted. Defaults to **off**. |
-
-```yaml
-# Preview first
-service: brain.delete_device
-data:
-  device_id:
-    - a1b2c3d4e5f6
-  dry_run: true
-response_variable: going
-
-# Then for real
-service: brain.delete_device
-data:
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"That old thermostat is gone — show me what deleting its device would take with it, then do it."*
-
-## Delete orphaned devices
-
-`brain.delete_orphaned_devices`
-
-Remove devices no loaded integration claims any more — either they have no config entry at all, or the config entry itself is gone. Runs as a dry run by default and returns the list of affected devices as response data. Optionally scoped to specific devices: each one is re-checked, and anything a live config entry still claims is skipped and reported under `skipped_not_orphaned`, never deleted.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `dry_run` | boolean | no | When on (default), only report what would be removed. |
-| `device_id` | device (list) | no | Restrict the cleanup to these devices. Each is re-checked; anything a live config entry still claims is skipped and reported in skipped_not_orphaned. Omit to target every orphaned device. |
-
-```yaml
-# Report only — nothing is deleted
-service: brain.delete_orphaned_devices
-response_variable: orphans
-
-# Delete only the ones you reviewed; live devices are skipped, never deleted
-service: brain.delete_orphaned_devices
-data:
-  dry_run: false
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"Are there devices left behind by integrations I removed? Clean them up."*
-
-## Enable integration
-
-`brain.enable_integration`
-
-Enable one or more disabled integration config entries.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `config_entry_id` | config entry (list) | yes | The config entries to enable. |
-
-```yaml
-service: brain.enable_integration
+```yaml title="Reload a stuck integration"
+action: brain.reload_integration
 data:
   config_entry_id: 1234abcd5678efgh
 ```
 
-> 🗣️ *"Turn the Sonos integration back on."*
-
-## Disable integration
-
-`brain.disable_integration`
-
-Disable one or more integration config entries and everything they provide.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `config_entry_id` | config entry (list) | yes | The config entries to disable. |
-
-```yaml
-service: brain.disable_integration
-data:
-  config_entry_id: 1234abcd5678efgh
+```yaml title="Preview a device delete, then do it"
+- action: brain.delete_device
+  data:
+    device_id:
+      - a1b2c3d4e5f6
+    dry_run: true
+  response_variable: going
+- action: brain.delete_device
+  data:
+    device_id:
+      - a1b2c3d4e5f6
 ```
 
-> 🗣️ *"Disable the Sonos integration while the speakers are packed away."*
-
-## Reload integration
-
-`brain.reload_integration`
-
-Reload one or more integration config entries — like pressing Reload on the integration page.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `config_entry_id` | config entry (list) | yes | The config entries to reload. |
-
-```yaml
-service: brain.reload_integration
-data:
-  config_entry_id: 1234abcd5678efgh
+```yaml title="Review orphaned devices, then delete the ones you checked"
+- action: brain.delete_orphaned_devices   # reports only
+  response_variable: orphans
+- action: brain.delete_orphaned_devices
+  data:
+    dry_run: false
+    device_id:
+      - a1b2c3d4e5f6
 ```
 
-> 🗣️ *"The Hue integration is acting up — reload it."*
-
-## Delete integration
-
-`brain.delete_integration`
-
-Remove one or more integration config entries completely, along with their devices and entities. This is not reversible — [`disable_integration`](/brain/power-tools/devices-and-integrations/#disable-integration) is. Returns the domain and title of each entry and how many entities and devices go with it; after a real removal, `require_restart` says whether Home Assistant needs restarting to finish.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `config_entry_id` | config entry (list) | yes | The config entries to remove. |
-| `dry_run` | boolean | no | When on, only report what would be removed — nothing is deleted. Defaults to **off**. |
-
-```yaml
-# Preview first
-service: brain.delete_integration
+```yaml title="See how much an integration takes with it"
+action: brain.delete_integration
 data:
   config_entry_id: 1234abcd5678efgh
   dry_run: true
 response_variable: going
-
-# Then for real
-service: brain.delete_integration
-data:
-  config_entry_id: 1234abcd5678efgh
 ```
-
-> 🗣️ *"I've sold the Sonos speakers — how much goes if I remove that integration?"*
