@@ -1,122 +1,106 @@
 ---
 title: Shadow Runner & Replay
-description: Before any automation is enabled, brAIn runs it against the last month of your recorded history and tells you exactly when it would have fired and what it would have done — calling no service and touching nothing.
+description: Before you enable an automation, brAIn replays it against up to 30 days of your recorded history and tells you when it would have fired and what it would have done. It calls no service and changes nothing.
 ---
 
-The difference between a suggestion and a decision is a number from history.
-
-Every proposal brAIn could make — *automate this*, *add this condition*, *this rule is wrong
-for your house* — is a guess until somebody enables it and lives with it for a week. That is
-exactly the commitment nobody wants to make on a guess, so the proposals never got made and
-the house went on being programmed by hand.
-
-The **shadow runner** is the other half. It takes an automation — one brAIn wrote, or one
-already in your house — and evaluates its triggers and conditions against the **recorded
-past**, reporting when it would have fired and what it would have done. It calls no service.
-It touches nothing.
-
-## What you get back
+Before you enable an automation, brAIn replays it against your recorded history and tells
+you when it would have fired and what it would have done. It calls no service and changes
+nothing.
 
 > *Over the last 30 days this would have fired **26 times**. On 4 of those a condition
 > would have blocked it, so it would have run **22 times**. It would have called
 > `light.turn_off` on `light.kitchen`.*
 
-Answered in seconds, before anything is enabled.
+The answer takes seconds.
 
-## Where to use it
+## Where you use it
 
 | Where | What it answers |
 | --- | --- |
-| **Needs you** | Every proposal shows its replay before you accept it |
-| **Any existing automation** | "What has this actually been doing?" — including ones you did not write |
-| `POST /api/replay` | The same answer, for an automation config you supply |
+| A proposal on **Needs you** | Each proposal shows its replay before you accept it. [Proposals →](/brain/proposals/) |
+| An automation you already have | What it has been doing, including automations you did not write |
+| A [condition suggestion](/brain/intents/) | The evidence for adding the condition |
+| A [one-week trial](/brain/proposals/#the-three-verdicts) | The same replay over the week you are living through, graded against the presses you made |
+| `POST /api/replay` | The same answer for an automation config you send |
 
-## The trigger kinds, and why the refusal is the feature
+## What can be replayed
 
-Replay covers **`time`**, **`state`**, **`numeric_state`** and **`template`** triggers.
-Those are the four classic kinds the recorder can reconstruct: a time trigger is arithmetic,
-and the other three are answered by state changes Home Assistant already keeps.
+| Trigger | Replayed | Notes |
+| --- | --- | --- |
+| `time` | Yes | Arithmetic |
+| `state` | Yes | `for:` is honoured. See [below](#how-triggers-are-counted) |
+| `numeric_state` | Yes | Counted as a crossing |
+| `template` | Yes | With [limits](#template-triggers) |
+| The new editor's triggers, such as "When a light turns on" | Yes, the common ones | See [below](#the-new-editors-triggers) |
+| `webhook`, `mqtt`, `event` | No | The recorder does not keep what they fire on |
+| `sun`, a brightness threshold | No | In the recorder, but brAIn cannot replay them yet |
+
+:::caution[One unsupported trigger refuses the whole replay]
+brAIn never trims an automation to the triggers it can replay. A count that leaves out a
+webhook firing forty times a day would read like a right number. The refusal names the
+trigger and says which kind of no it is:
+
+*A `webhook` trigger cannot be replayed — the recorder does not keep what it fires on, so
+brAIn would be guessing at how often it fired.*
+:::
 
 ### The new editor's triggers
 
-Since Home Assistant 2026.7 the automation editor writes purpose-specific triggers by
-default — "When a light turns on", "When a door opens" — with the device under `target:`.
-brAIn replays the common ones as the state changes Home Assistant itself fires them on:
-lights, switches, fans, motion and occupancy, locks, doors, windows, covers, climate, media
-players and alarm panels (`light.turned_on`, `occupancy.detected`, `door.opened`,
-`climate.started_heating`, `media_player.started_playing` and their siblings), plus the
-matching conditions. So an automation built in the new editor gets its "would have fired"
-numbers, can be [trialled for a week](/brain/proposals/#the-three-verdicts), and shows
-evidence on a [condition suggestion](/brain/intents/).
+Since Home Assistant 2026.7 the automation editor writes purpose-specific triggers with
+the device under `target:`. brAIn replays these as the state changes Home Assistant fires
+them on, along with the matching conditions:
 
-A target that is a **whole area, floor, label or device** is refused, because which entities
-those were at the time is something brAIn would have to guess.
-
-### What is refused
-
-A `webhook`, an `mqtt` message or an `event` is not in the recorder in a form anything can
-replay. A `sun` trigger or a brightness threshold is in the recorder, but brAIn does not know
-how to replay it yet. The refusal says which of those two kinds of no it is.
-
-:::caution[A partial replay is worse than no replay]
-Reporting *"this would have fired twice"* about an automation whose webhook fires forty
-times a day is a confident wrong number that reads exactly like a right one — and it is the
-number somebody would decide on.
-
-So an automation carrying **any** unsupported trigger is refused **whole**, naming the kind.
-Never trimmed to the replayable subset.
-:::
-
-You will see the refusal in as many words:
-
-> *A `webhook` trigger cannot be replayed — the recorder does not keep what it fires on, so
-> brAIn would be guessing at how often it fired.*
-
-## Templates are replayed against the world as it was
-
-A template trigger is a Jinja expression over the whole state machine, and a replay has a
-state machine only for the entities it fetched history for. So:
-
-- The template is parsed for the entities it names, and **every one of them has to be in the
-  timeline**. A template reading a sensor with no recorded history is refused, not rendered
-  against a blank — a blank reads as `unknown`, which reads as `false`, which is a confident
-  *no*.
-- Only a named set of Home Assistant's own helpers is allowed: `states`, `is_state`,
-  `state_attr`, `is_state_attr`, `has_value`, `now`, `as_timestamp`, `float`, `int`.
-  Anything else — a custom filter, `expand`, a bare `states` iteration — is refused **by
-  name**.
-
-## The details that decide whether a number is right
-
-**`for:` is a promise about a stretch of time**, not an instant. A state trigger with
-`for: 00:05:00` fires only where the entity then *stayed* that way for five minutes — a
-question about the next sample, not this one. A three-minute door blip does not count —
-and a light **dimmed** halfway through the hold is still a light that stayed on, so a change
-that only touches an attribute does not cut the stretch short.
-
-**`numeric_state` is a crossing, never a level.** Home Assistant fires when a value moves
-*into* the range, not for every sample it spends inside one. A replay that reported the level
-would be reporting a reading rather than a trigger.
-
-**An area or device target is recorded and deliberately not resolved.** Expanding one needs
-the entity registry as it was at the time, and a wrong expansion would tell you a proposal
-touches lights it does not.
-
-## The bounds
-
-| Bound | Why |
+| Domain | Triggers |
 | --- | --- |
-| **30 days** maximum window | The recorder's default purge is ten days and most houses leave it there — past this the window quietly becomes a window over nothing |
-| **500 firings** maximum | More than that is a trigger watching something that changes constantly rather than an automation, and the number is the sampling. brAIn says so and suggests a `to:` or a `for:` |
-| A condition it cannot evaluate | Refused, not assumed — a guessed condition silently changes the count |
+| Lights, switches, fans | Turned on, turned off |
+| Motion and occupancy | `motion.detected`, `motion.cleared`, `occupancy.detected`, `occupancy.cleared` |
+| Locks | `lock.locked`, `lock.unlocked`, `lock.jammed`, `lock.opened` |
+| Doors and windows | `door.opened`, `door.closed`, `window.opened`, `window.closed` |
+| Covers | Opened and closed, for awnings, blinds, curtains, shades and shutters |
+| Climate | `climate.turned_on`, `climate.turned_off`, `climate.started_heating`, `climate.started_cooling`, `climate.started_drying` |
+| Media players | `media_player.turned_on`, `media_player.turned_off`, `media_player.started_playing`, `media_player.stopped_playing`, `media_player.paused_playing` |
+| Alarm panels | Armed (any mode, away, home, night, vacation), disarmed, triggered |
 
-## What it is not
+A target that is a **whole area, floor, label or device** is refused. Which entities those
+held at the time is something brAIn would have to guess.
 
-It is **not** a simulator of your house. It replays triggers and conditions against what was
-recorded; it does not model what would have happened *differently* had the automation been
-running. If the proposal would have turned a light off at 23:05, the replay says so — it
-does not then re-simulate the evening with that light off.
+### Template triggers
 
-That is the honest limit, and a [trial](/brain/proposals/#the-three-verdicts) does not lift
-it — a trial is the same replay over the week you are living through, but it is graded against
-the presses you actually made, which is evidence a replay over old history cannot give you.
+A template is replayed only when brAIn can rebuild everything it reads:
+
+- **Every entity it names needs recorded history.** A template that reads a sensor with no
+  history is refused. A blank would read as `unknown`, then as `false`.
+- **Only these helpers are allowed:** `states`, `is_state`, `state_attr`, `is_state_attr`,
+  `has_value`, `now`, `utcnow`, `as_timestamp`, `float`, `int`, `round`, `abs`, `min` and
+  `max`. Anything else, such as a custom filter, `expand` or a loop over all `states`, is
+  refused by name.
+
+## How triggers are counted
+
+- **`for:` needs the whole stretch.** A state trigger with `for: 00:05:00` counts only where
+  the entity stayed that way for five minutes. A three-minute door blip does not count. A
+  light dimmed during the hold still counts, because only an attribute changed.
+- **`numeric_state` counts crossings.** It fires when a value moves into the range, as Home
+  Assistant does, and not for every sample inside it.
+- **Area and device targets in actions are reported as written.** brAIn does not expand
+  them into entities, because the registry may have been different then.
+
+## Limits
+
+| Limit | What happens |
+| --- | --- |
+| **30 days** of history at most | The recorder keeps 10 days by default. A replay cannot reach past what your recorder kept |
+| **500 firings** at most | brAIn says the trigger watches something that changes constantly, and suggests a `to:` or a `for:` |
+| **25 entities** per replay | History is fetched for at most 25 entities |
+| A condition it cannot evaluate | The replay is refused. brAIn does not assume the condition passed |
+
+## What a replay does not tell you
+
+A replay is not a simulation of your house. It reports when the triggers and conditions
+would have matched what was recorded. It does not model what would have happened
+differently had the automation been running.
+
+If a proposal would have turned a light off at 23:05, the replay says so. It does not
+replay the rest of the evening with that light off. A
+[trial](/brain/proposals/#the-three-verdicts) adds evidence a replay cannot: it is graded
+against the presses you made during the week.

@@ -1,94 +1,92 @@
 ---
 title: BRUH Print Quick Start
-description: Install BRUH Print, plug in a DYMO LabelWriter, tell it which labels are loaded, line up the roll once, and print your first label — plus the two first-day problems and what they mean.
+description: Install BRUH Print, plug in a DYMO LabelWriter, say which labels are loaded, line up the roll once, and print your first label.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
+
+From a boxed LabelWriter to a printed label in about ten minutes.
 
 ## Install
 
 <Steps>
 
-1. **Add the repository.** In Home Assistant open **Settings → Add-ons → Add-on Store → ⋮ →
+1. **Plug the printer in.** Connect its power supply and a USB data cable to your Home Assistant
+   machine.
+
+2. **Add the repository.** In Home Assistant open **Settings → Add-ons → Add-on Store → ⋮ →
    Repositories** and add:
 
    ```text title="Repository URL"
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install BRUH Print and start it.** There is no USB setting to turn on: the add-on's manifest
-   asks for USB access, and the Supervisor maps the printer in when it creates the container. The
-   first lines of the add-on's **Log** say what it found:
+3. **Install BRUH Print and start it.** There is no USB setting to turn on. The first lines of the
+   app's **Log** say what it found:
 
    ```text
    INFO: USB printers: LabelWriter 450 Twin Turbo (…)
    ```
 
-3. **Accept the discovered integration** under **Settings → Devices & Services**. That adds the
-   `bruh_print.*` services, the printer and roll sensors, and the dashboard card.
+4. **Accept the discovered integration** under **Settings → Devices & Services**. That adds the
+   `bruh_print.*` services, the sensors and the dashboard card.
 
-4. **Open BRUH Print from the sidebar.** The **Printer** tab should show your LabelWriter.
+5. **Open BRUH Print from the sidebar.** The **Printer** tab shows your LabelWriter.
 
 </Steps>
 
-<Aside type="caution" title="Plugged in after the add-on started?">
-If the printer was plugged in after the container started, restart the add-on. If it still cannot
-see it: a LabelWriter needs its own power supply (with no power it does not appear on USB at all),
-the cable must carry data, and nothing else may hold the printer — a CUPS or print-server add-on
-will claim it on sight.
+<Aside type="caution" title="No printer on the Printer tab?">
+If you plugged the printer in after the app started, restart the app. If it still does not appear,
+check that the printer has power, that the cable carries data, and that no CUPS or print-server
+app is holding the printer.
 </Aside>
 
-## Your first label
+## Print your first label
+
+![The Printer tab: a LabelWriter 450 Twin Turbo card with Check paper and lid and Show connection info, and What is loaded with a left roll of 2.25 by 1.25 inch labels and a right roll of 0.56 by 3.44 inch labels, each with a count, Full roll, Line up this roll and Print a check label](./images/printer.webp)
 
 <Steps>
 
-1. **Tell it what is loaded.** On the **Printer** tab, under **What is loaded**, pick the stock in
-   each roll. A LabelWriter genuinely cannot report this, and it is the fact everything else
-   depends on. The common DYMO part numbers are already in the list; add your own under **Label
-   stock** with two measurements.
+1. **Say what is loaded.** On the **Printer** tab, under **What is loaded**, pick the label in each
+   roll. The common DYMO part numbers are in the list. For anything else, open **Label stock → Add
+   a stock** and enter two measurements.
 
-2. **Line up the roll.** Press **Line up this roll** on the bay that holds it, then **Print**. One
-   label comes out with a numbered grid; type in where the label's four edges fall on it (X1, X2
-   across, Y1, Y2 down) and press **Apply**. Then **Print a check label**: a complete frame around
-   the edge means you are done. Full detail in
+2. **Line up the roll.** Press **Line up this roll**, then **Print**. One label comes out with a
+   numbered grid. Type in where the label's four edges fall on it and press **Apply**. See
    [Lining up a roll](/bruh-print/rolls/#lining-up-a-roll).
 
-3. **Check the text direction.** On the stock's row, **Text direction** says which way
-   "automatic" decided — a label much longer than it is wide reads along the roll. Change it once
-   if it is wrong; nothing asks again per print.
+3. **Print a check label.** A complete frame around the edge means the roll is lined up.
 
-4. **Print.** On the **Quick** tab, type something, look at the preview, press **Print**.
+4. **Check the text direction.** Under **Label stock**, each row has a **Text direction** picker.
+   Change it once if text runs the wrong way on that label.
+
+5. **Print.** On the **Quick** tab, type something, look at the preview, press **Print**.
 
 </Steps>
 
-![The Printer tab: a LabelWriter 450 Twin Turbo card with Ask about paper and lid and USB details, and What is loaded with a left roll of 2.25" × 1.25" labels and a right roll of 0.56" × 3.44" labels, each with a count, Full roll, Line up this roll and Print a check label](./images/printer.webp)
+![The Quick tab with Spare keys typed and the label preview showing the two words stacked and filling the label, above a Print button and the line Prints on: Pantry labels (left)](./images/quick.webp)
 
-## A label for the dashboard
+## Add the dashboard card
 
-The integration registers the card for you. Edit a dashboard, **Add card**, search for **BRUH
-Print**, and you have a text box and a Print button that works from any phone — see
-[Dashboard Card](/bruh-print/card/).
+Edit a dashboard, press **Add card**, and search for **BRUH Print**. You get a text box and a
+**Print** button that work from any phone. See [Dashboard Card](/bruh-print/card/).
 
-<Aside>
-If the card shows *"Custom element doesn't exist"* on a house that never had a `/config/www`
-folder, restart Home Assistant once. BRUH Print raises a repair saying exactly that, and it clears
-itself.
+<Aside title="Custom element doesn't exist">
+Restart Home Assistant once. BRUH Print raises a repair that says so, and the repair clears itself.
 </Aside>
 
-## Two first-day surprises
+## If something is off on day one
 
-**It says it printed and nothing came out.** The printer accepted the bytes and did not use them.
-On the Printer tab, open **Settings → If nothing comes out**, try the next mode, and press **Print a
-check label**. *Standard* is what everything is tested against; *Compact* adds compression not
-every firmware reads; *Bare minimum* is the last resort.
+| What you see | What to do |
+| --- | --- |
+| It says it printed and nothing came out | **Printer → Settings → If nothing comes out**. Pick the next mode and press **Print a check label**. Try *Standard*, then *Compact*, then *Bare minimum*. |
+| **Check paper and lid** says the printer did not answer | Nothing. A LabelWriter in the middle of a feed does not reply. |
+| **Check paper and lid** says it cannot ask | Nothing. This printer's USB connection is one-way, and it still prints. **Show connection info** shows what it exposes. |
 
-**"Ask about paper and lid" has no answer.** Either *the printer did not answer* (ordinary — a
-LabelWriter mid-feed does not reply) or *there is no channel to ask on* (its USB interface is
-one-way). The panel says which. A one-way printer prints perfectly well; **USB details** shows what
-it exposes.
+More in [Troubleshooting](/bruh-print/reference/#troubleshooting).
 
 ## Next
 
 - [Quick & the Designer](/bruh-print/designer/)
 - [Templates](/bruh-print/templates/)
-- [Reference](/bruh-print/reference/) — options, services, entities and troubleshooting
+- [Reference](/bruh-print/reference/) for options, services, entities and troubleshooting

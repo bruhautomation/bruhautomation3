@@ -1,406 +1,211 @@
 ---
 title: Suggestions
-description: brAIn watches what you do by hand, finds the patterns and offers the automation, with a replay against your own history, a week-long trial graded against what you actually did, and an accept that writes a real automation you can undo.
+description: brAIn offers the automation for what you keep doing by hand. Each suggestion shows its evidence, can be tried for a week without changing anything, and becomes a real automation only when you press Apply, with an Undo.
 ---
 
-A **suggestion** is brAIn offering to change something rather than reporting something: a habit
-worth automating, a condition an automation you keep undoing is missing, an emergency playbook,
-four scenes for a room, or a [rule you asked for in a sentence](/brain/intents/). Suggestions
-are cards on **Insights → Needs you**, under **Chores and suggestions**, and each arrives with its
-evidence and what it *would have done* over your own history.
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-Every suggestion takes the same answers: **Apply**, **Snooze** and **Ignore** (with an optional
-reason, which teaches brAIn more than silence), and **Try it for a week** under its **⋯**.
-Nothing is written until you say yes, and everything written can be undone. A **Design scenes
-for** room picker sits at the top of Needs you. Turning off *Insights* does not hide
-suggestions, because the free house checks file them too.
+A suggestion is brAIn offering to change something: an automation for a habit, a fix for a
+rule you keep overriding, scenes for a room, an emergency playbook. Nothing is written until
+you press **Apply**, and every Apply can be undone.
 
-People automate less than a tenth of what they do by hand. Not because the rest is hard —
-because writing an automation means deciding the trigger, the condition and the edge cases
-up front, for something you have never watched yourself do.
+![Insights → Needs you with three Suggestion cards under Chores and suggestions: "Turn the porch light off at 23:10 on weekdays" with the evidence "You have turned the porch light off yourself on 9 of the last 12 weekdays", a card marked Edits your rule, and a card marked On trial reading "Day 3 of 7 · would have fired 6 times · you did the same on 5". Each has Apply, Snooze and Ignore](./images/act-suggestions.webp)
 
-Your logbook already recorded every one of those manual presses, with who made it and when.
-brAIn reads that and offers the automation.
+Suggestions are cards on **Insights → Needs you**, under **Chores and suggestions**. Turning
+off Insights does not hide them, because the free [house checks](/brain/checks/) file them
+too.
 
-## The fifth kind of knowledge
+## What brAIn suggests
 
-brAIn keeps its knowledge in separate stores on purpose, because mixing them makes each one
-worse:
-
-| | The question it answers | Where it lives |
+| Suggestion | Example | Where it comes from |
 | --- | --- | --- |
-| **Memory** | What is *true* of this home? | A document |
-| **Guesses** | What might brAIn have *wrong*? | Needs you |
-| **Findings** | What is *broken*? | Needs you |
-| **Timeline** | What *happened*? | Memory → Timeline |
-| **Suggestions** | What could be *better*? | Needs you, under **Chores and suggestions** |
+| **A routine you already have** | *Turn the porch light off at 23:10 on weekdays* | Things you do by hand at the same time of day. [Details](#routines-you-already-have) |
+| **The condition a rule is missing** | *Stand Evening lights down between 21:00 and 23:00 on weekdays* | An automation you keep undoing at the same hours. [Details](#the-condition-it-is-missing) |
+| **A rule you asked for** | *"Whenever the front door opens after dark, turn the hall light on"* | A sentence you typed or said. [Rules & one-offs](/brain/intents/) |
+| **A one-off you asked for** | *"Tell me when the tumble dryer finishes"* | A sentence about the next time. [Rules & one-offs](/brain/intents/) |
+| **Scenes for a room** | *Four scenes for the Living room* | You ask for a room by name. [Scene designer](/brain/scenes/) |
+| **An emergency playbook** | *Emergency playbook: water leak* | Your house has the detector for it. [Emergency playbooks](/brain/playbooks/) |
 
-Suggestions sit in their own group on Needs you rather than mixed in with problems. A list of
-things you might want, sitting beside a list of things that are broken, makes both worse —
-the broken things stop looking urgent and the nice-to-haves start to.
+Two more routes file the same kind of card. An [insight card](/brain/insights/) can point at
+an automation your house is missing. And the one automation brAIn may suggest at the end of
+its first study of your home starts here already on a week-long trial, if you tick it.
 
-## The lifecycle
+At most 12 suggestions are open at once. A new one waits until you answer some.
 
-```
-proposed  →  trialling  →  accepted
-    ↓                          
- declined
-```
+## Answer a suggestion
 
-**Proposed.** brAIn has found a pattern and written the automation. Nothing is enabled.
-You see what it would do, and the [replay](/brain/replay/) against your own last month.
+Every suggestion has the same row of presses.
 
-**Trialling.** You press **Try it for a week**. Nothing is created, nothing is called and
-nothing subscribes to your events. The trial is a **replay of the week as you live it**:
-every checks pass, brAIn replays the proposed automation over the days since you started it
-and grades each firing against the ledger of changes *you* made by hand. The card fills in as
-the week goes on rather than staying blank until Sunday —
+| Press | What happens |
+| --- | --- |
+| **Apply** | brAIn writes the change, reloads Home Assistant and checks it took. The toast offers **Undo**. |
+| **Snooze** | The card goes away for now and comes back later. Nothing is recorded. The toast says when. |
+| **Ignore** | *Not for this house.* A box asks *Why? (helps brAIn learn)*. The reason is optional, and it reaches every future suggestion. |
+| **⋯ → Run** | Starts a [week-long trial](#try-it-for-a-week-first). Nothing is switched on. |
 
-> *It would have fired 6 times. On 5 of those you did the same thing by hand.*
+**Details** on the card holds the replay: how often the automation would have run over
+your last 30 days. See [Shadow runner & replay](/brain/replay/).
 
-**Accepted.** It becomes a real automation in your `automations.yaml`, and it is yours —
-edit it, disable it, delete it, like any other. See
-[Saying yes, and taking it back](#saying-yes-and-taking-it-back).
+An ignored suggestion is remembered by the change it described, not by its wording. The same
+automation reworded does not come back. What you answered is in **Insights → History**.
 
-**Declined.** **Ignore** means *not for this house*: it goes away, and a box lets you say
-**why** in a sentence — optional, but the reason reaches every future suggestion. That
-sentence is the half
-that teaches, exactly as a finding's *Wrong* does: *"the hall light stays on because my
-partner works nights"* is a fact brAIn did not have, and it stops the same proposal coming
-back in different words next month.
+## Try it for a week first
 
-A declined proposal is remembered by the **change** it described, not by the sentence
-describing it — so a miner that rewords its own explanation is still offering something you
-have already answered, and it will not come back.
+![The ⋯ menu on a suggestion open, showing Run: "Try it for a week first: replay it over the days since and grade each firing against what you did. Nothing is switched on." Below it a card On trial reads "Day 3 of 7 · would have fired 6 times · you did the same on 5 · nothing happened on 1."](./images/act-trial-menu.webp)
 
-:::caution[Nothing brAIn proposes is ever enabled on its own]
-The trial changes nothing and calls nothing, and the automation only exists once you press
-**Apply** or **Keep it**. You *can* press it straight away without trialling — nothing
-stops you — but then it is a suggestion you liked rather than one you watched, and an
-automation you accepted after seeing it be right five times out of six is a different object
-from one you accepted because it sounded reasonable.
-:::
+<Steps>
+
+1. Press **⋯ → Run** on a suggestion. The card is marked **On trial**.
+2. Live your week. On every checks pass, brAIn replays the automation over the days since
+   and grades each firing against what you did by hand.
+3. Read the line on the card as it fills in: *Day 3 of 7 · would have fired 6 times · you did
+   the same on 5 · nothing happened on 1.*
+4. Press **Apply** to keep it, or **Ignore** to decline it. After seven days the card says
+   **Trial over** and stays, with its report, until you answer.
+
+</Steps>
+
+A trial creates nothing, calls nothing and subscribes to nothing. You can also press
+**Apply** without a trial.
 
 ### The three verdicts
 
-Every firing the replay finds lands in exactly one bucket, decided by the **nearest** press,
-so a verdict never depends on the order the ledger happens to be in:
+Each firing lands in one bucket, decided by your nearest press.
 
-- **Agreed** — you put the same thing in the same state within a **quarter of an hour** of
-  the moment it would have fired.
-- **Nothing happened** — weak evidence either way, and it is named for what it is rather than
-  counted against the change.
-- **You did the opposite** — you put the entity to the opposite state inside that window. You
-  would have undone it, which is the one answer worth having, and it is deliberately not
-  folded into the second.
+| On the card | Meaning |
+| --- | --- |
+| **you did the same** | You put the same thing in the same state within 15 minutes of when it would have fired. |
+| **nothing happened** | No press either way. Weak evidence, and not counted against the change. |
+| **you did the opposite** | You put it in the opposite state inside that window. You would have undone it. |
 
-A press that puts the entity somewhere else entirely is not evidence about a proposal to turn
-it *on*, so it leaves that firing unanswered rather than counting against it.
-
-When the week is up the row stays where it is with its report attached. Ending a trial is
-your press, not brAIn's — there is no seventh-day deadline that quietly decides for you.
+A press that puts the entity in some third state leaves that firing unanswered.
 
 ### What a trial cannot grade
 
-Automations built in Home Assistant's newer editor — triggers like *"When a light turns
-on"* or *"When a door opens"*, with the device as a target — are replayed like any other, as
-are their matching conditions. A trigger aimed at a whole area, floor or label is refused,
-with the reason.
-
-Two silences, and they are not the same one. *"It would never have fired"* is about the
-automation; *"brAIn cannot replay this"* is about brAIn, and the trial says which rather than
-reporting a confident zero. The [replay's own limits](/brain/replay/) are carried through
-verbatim.
-
-There is a third: an action that is not **one entity going to one state** — a scene, a
-script, three service calls in a row — has nothing single to grade your press against, and
-guessing which of them counts is how a confident wrong number gets made. Those trials report
-that instead of a score.
+- **A trigger brAIn cannot replay.** The card says *brAIn could not grade this trial* and
+  why. That is different from *it would not have fired*, which is about the automation. A
+  trigger aimed at a whole area, floor or label is one of these. The
+  [replay's limits](/brain/replay/) apply unchanged.
+- **An action that is not one entity going to one state.** A scene, a script or several
+  service calls have nothing single to compare your press with, so the trial reports that
+  instead of a score.
+- **Scenes and playbooks.** They have no trial at all. Each page says what you get instead.
 
 ## Saying yes, and taking it back
 
-**Applying it writes a real automation.** It is appended to `automations.yaml` with an `id` of
-`brain_<proposal id>`, the proposal's title as its alias, and a description saying where it
-came from. Your file is not reformatted: the automation goes on the end and everything above
-it is left byte-for-byte as you wrote it, comments, ordering and quoting included.
+![Needs you after pressing Apply: the applied card has left the list and a toast at the bottom reads "Added 'Turn the porch light off at 23:10 on weekdays' to your automations" with an Undo button](./images/act-apply-undo.webp)
 
-Two of the five producers write something else. A **[scene set](/brain/scenes/)** carries four
-moods rather than one automation and lands in `scenes.yaml`, checked against the
-`scene: !include scenes.yaml` line and reloaded with `scene.reload` — the same five steps
-against a different file. And a **[condition proposal](#the-condition-it-is-missing)** changes
-an automation you already have rather than adding one beside it: brAIn splices exactly the
-bytes of that one entry and every other byte of the file is identical afterwards. The card
-carries an **Edits your rule** pill so you know which of the two you are agreeing to before
-you press, and the toast afterwards says *changed* rather than *added*, because a toast
-claiming an addition would send you looking for a second automation that is not there.
+**Apply** writes a real automation, and it is yours to edit, disable or delete like any
+other.
 
-Then three things have to be true before the row leaves the list, and they are three
-different claims that were being reported as one:
+| Suggestion | What Apply writes |
+| --- | --- |
+| A routine, a rule, a one-off, a playbook, a scene schedule | A new automation appended to `automations.yaml`, with the card's title as its name and a description saying where it came from. |
+| A missing condition (**Edits your rule**) | One condition added to the automation you already have. The toast says *Changed*, not *Added*. |
+| Scenes | The scenes, appended to `scenes.yaml`. |
 
-1. **The file was written.**
-2. **Home Assistant read it** — `automation.reload`.
-3. **The automation exists** — the entity Home Assistant actually registered for it turns
-   up (read back from the registry, not guessed from its name).
+Your file is not reformatted. Everything already in it stays byte for byte as you wrote it,
+comments and ordering included.
 
-Only the third is what you meant by pressing the button. A `mode:` Core does not recognise, a
-trigger from a custom integration that has not loaded, a read-only `/config` — each of those
-leaves a file on disk and a reload that returns quite happily with no automation behind it.
+Before the card leaves the list, brAIn checks three things:
 
-If any of the three fails, brAIn **puts the file back**, reloads again, and tells you what it
-tried in a sentence. A yes it could not honour is not a yes it records: the proposal is
-exactly where it was, with no memory line and no settled entry, ready to press again once the
-reason is fixed.
+1. The file was written.
+2. Home Assistant reloaded it.
+3. The automation (or every scene) now exists in Home Assistant.
 
-When it works, the settled entry keeps the `automation_id` and the `entity_id` — *"accepted"*
-and *"accepted, and here is what it became"* are different claims, and only the second can be
-checked against the house six months later. You also get a notification about it, worded as a
-change you asked for rather than as a problem brAIn found, and it is **sent** rather than held
-for quiet hours: it answers a press you made seconds ago.
+If any of them fails, brAIn puts the file back, reloads again, and leaves the card where it
+was with the reason on it. Nothing is recorded as accepted. When it works you also get a
+notification that the change was made, sent straight away even in quiet hours.
 
 ### Undo
 
-**The toast carries an Undo for five minutes**, and it reverses all three effects or says
-which one it could not. The automation is removed — its registry entry too, so no
-*unavailable* automation is left behind — Home Assistant is reloaded, and the
-proposal comes back on the list under its own id — along with the memory line the accept had
-queued. A trial that was still running when you accepted it comes back as a **proposal**
-rather than as a trial whose week has since passed, because *try it for a week* is a promise
-about the next seven days.
+- **The toast carries Undo for five minutes.** It removes the automation and its registry
+  entry, reloads Home Assistant, and puts the suggestion back on the list. A suggestion that
+  was on trial comes back as a plain suggestion.
+- **`brain undo` in the terminal works later.** The file is snapshotted into the edit
+  journal before it is touched. See [the CLI](/brain/cli/).
+- If the file cannot be put back, Undo says so. It never reports a success it did not have.
 
-If the file cannot be put back it says so rather than claiming a success, because the
-automation is still running and an undo that lied about that would be worse than one that
-reported the failure.
+### What stops an Apply
 
-`automations.yaml` is snapshotted into the same edit journal that records Claude's own edits
-**before** it is touched, so **`brain undo`** in the terminal reverts an accepted proposal
-exactly as it reverts anything else brAIn changed — there is no second undo mechanism to keep
-true. See [the CLI](/brain/cli/#undo).
+Each refusal is a sentence on the card, and the card stays so you can press again once the
+cause is fixed.
 
-### Four things stop an accept, each in a sentence
+| Refusal | Why |
+| --- | --- |
+| **It touches a protected entity** | Anything in `protected_entities`. An action that targets an area or a device instead of named entities is also refused while that list is not empty. See [Permissions & safety](/brain/safety/). |
+| **No `automation: !include automations.yaml`** | With packages or a split config, brAIn cannot tell which file Home Assistant reads. The refusal names the line it looked for. Scenes need `scene: !include scenes.yaml` the same way. |
+| **The file is not a list** | `automations.yaml` is in a shape brAIn does not understand. An empty or missing file is created. |
+| **A duplicate `id` or name** | Home Assistant refuses two automations with one id, and nobody can tell two with one name apart. |
 
-- **A protected entity.** Anything in the add-on's `protected_entities` option — locks,
-  alarms, whatever you listed. That rule is enforced in the MCP server, at the chokepoint
-  every *Claude* path to your house goes through, and a YAML file the panel writes is not one
-  of its callers — so this path asks the same question the same way. An action naming an
-  **area or a device** rather than named entities is refused outright while the list is not
-  empty, because resolving one needs registries this does not have, and a protected entity
-  reached through its area is the bypass.
-- **No `automation: !include automations.yaml`.** With packages, a split config or
-  `automation manual:`, your automations live somewhere brAIn cannot find, and appending to a
-  file Home Assistant does not read is a change that silently does nothing. The refusal names
-  the line it looked for rather than guessing at another file.
-- **An `automations.yaml` that is not a list of automations.** That is your config in a shape
-  brAIn does not understand. (An empty or missing file it will create, exactly as Home
-  Assistant does.)
-- **A duplicate `id` or name.** Two automations with one id is a config Core refuses to load;
-  two with one alias is a house where nobody can tell which is which.
+<Aside type="caution" title="Nothing brAIn suggests is ever enabled on its own">
+A trial changes nothing, and the automation exists only after you press **Apply**. The one
+exception is a rule or scenes **you asked for** while *Act* or *No limits* is set in ⚙ →
+Permissions. Those are applied at once, with the same checks and the same Undo.
+</Aside>
 
-The habit miner drops a protected entity too, one layer earlier — the writer has to refuse
-one, being the last gate before `/config`, but a card offering something brAIn will not do is
-a wasted no.
+## Routines you already have
 
-## What gets proposed
+> *You have turned the hall lamp on yourself on 10 of the last 10 weekday evenings, at 18:40
+> give or take 4 minutes. Nothing in Home Assistant does it for you.*
 
-Five producers file here, and two of them you can start yourself. A sentence in Morph's *Ask or
-tell the house* line or a phone Reply routes that opens with a **moment** — *when…*, *once…*, *the next time…*,
-*tell me when…* — to a [one-off intent](/brain/intents/), and one that asks for scenes and
-names a **room** to the [scene designer](/brain/scenes/). Everything else on this page is
-offered on a house-checks pass, off evidence brAIn already had.
+brAIn keeps two months of the changes a person made, in the kinds of device a timer can
+sensibly act on. Changes made by automations are left out. A wall switch that reaches Home
+Assistant with no record of who pressed it is counted as unattributed, not guessed at.
 
-### Routines you already have
+The automation is a plain time trigger, with a weekday or weekend condition when the habit
+has one. It never adds a condition it did not measure.
 
-> *"You have turned the hall lamp on yourself on 10 of the last 10 weekday evenings, at
-> 18:40 give or take 4 minutes. Nothing in Home Assistant does it for you."*
+A habit is suggested only when all of these hold:
 
-brAIn keeps the changes **a person** caused — and only those. An automation moving a light
-says nothing about a habit, and a wall switch reaches Home Assistant with no record of who
-pressed it, which brAIn reports as *unattributed* rather than guessing at. Two months are
-kept, in the domains a timer can sensibly act on.
+| Rule | Detail |
+| --- | --- |
+| **Six separate days** | Twelve presses on one Monday count as one day. |
+| **Most of the days it could have happened** | At least 60% of them. Weekdays and weekends are counted apart. |
+| **A time of day** | The presses fall within about 45 minutes of each other. |
+| **Still happening** | Seen within the last 10 days. |
+| **Nothing already does it** | No automation moves the same thing to the same state. |
+| **Not protected** | Anything in `protected_entities` is left out before a card is made. |
 
-What it writes is a plain **time trigger**, with a weekday or weekend condition when the
-habit has one — and never a condition it did not measure. The ledger knows *when* you did
-something; it does not know what else was true at the time, so a trigger inventing a
-condition would be brAIn guessing in the one place you cannot check it.
+A daily habit is offered as *weekdays* until it has six weekend days behind it too, which
+takes about three weeks. Each pass offers at most three, strongest first.
 
-The floors that keep this from being noise, each one tested against a house with no habit in
-it before it is tested against one that has:
+## The condition it is missing
 
-- **Six separate days**, not six presses. Twelve presses on one Monday is one Monday.
-- **A share of the days it could have happened on.** Six times in a fortnight is a habit;
-  six times in two months is a coincidence — and a count with no denominator reports both
-  identically. Weekdays and weekends are counted apart, so a weekday habit is graded against
-  weekdays rather than being marked down for the two days it was never going to happen on.
-- **A time, not a stretch of evening.** The times are averaged *around the clock* — half
-  past eleven and half past midnight are forty minutes apart, and a plain average of them is
-  noon — and anything looser than about three quarters of an hour is not a time of day.
-- **It has to be still happening.** A habit you dropped two months ago has a beautiful shape
-  in the history and is not a proposal.
-- **Nothing must already do it.** A second automation moving the same thing to the same
-  state is not a helpful duplicate; it is two rules that will disagree the first time their
-  triggers land in the wrong order.
-
-*Every day* has to be earned twice, once on each half of the week. A habit on ten weekdays
-and one Sunday clears the whole-window share comfortably, and calling it daily would build a
-trigger that fires on two mornings you are asleep — so a genuinely daily habit reads as
-*weekdays* for its first three weeks, until six weekend days have accrued. That is the
-cheaper mistake of the two.
-
-A pass offers at most three, strongest first. The rest are still in the ledger next time.
-
-### Emergency playbooks
-
-Since 1.45: the automation you would want on a bad night —
-smoke or CO, a water leak, a freeze with the heating stopped — written from your own
-registries. brAIn never runs one; Home Assistant does, once you have accepted it.
-[Emergency playbooks](/brain/playbooks/) covers what each one does and what none of them
-will ever do.
-
-The card is the same card with four differences, because the evidence for a playbook is not a
-replay:
-
-- **A `Playbook` pill** in the head, so it does not read as a habit brAIn spotted.
-- **The list of what it would act on**, grouped by what happens to each group and counted —
-  *"Every light to full brightness (12)"* — with anything on your `protected_entities` list
-  shown as **Skipped: protected** rather than quietly left out. Seeing that brAIn knows the
-  valve is there and knows it may not touch it is the point of showing it.
-- **Rehearse it**, a disclosure that reads the house right now and renders every call against
-  each target's current state, changing nothing. It fetches when you open it, not with the
-  card — it reads every state in the house, and a list of five playbooks would ask five times
-  before anybody looked at one.
-- **No trial button**, and the reason where the button would have been. A trial replays the
-  week you have just lived, and that week had no emergency in it.
-
-The card also carries the sentence saying what this one will never do — on the smoke playbook,
-that it will not unlock any door and will not disarm the alarm, because that is where somebody
-decides.
-
-Some water valves close when they are switched *on*. Where brAIn has read a valve that way
-— whatever language its name is in — the leak playbook turns it on rather than off, under
-its own line on the card, so you can see which way each valve is driven before you accept.
-
-Accepting one goes down the path above, unchanged. There is no separate switch.
-
-### The condition it is missing
-
-When brAIn has watched you put the same automation back, at about the same time of day, on
-enough separate days, it can say more than *"you keep undoing this"*. The
-[finding](/brain/needs-you/) reports the fight; this is the change that ends it.
+When you keep putting one automation back at about the same hours, the
+[finding](/brain/needs-you/) reports the fight. This suggestion is the change that ends it.
 
 > *Stand Evening lights down between 21:00 and 23:00 on weekdays*
-
-The case on the card is a **pair** of numbers, because one alone is a fact about an automation
-rather than an argument for changing it:
-
+>
 > *Over the last 30 days it ran 30 times. With this condition it would have run 22 — 8 fewer,
 > in the hours you keep putting it back.*
 
-If the two numbers come out the same the card says so in as many words, rather than dressing
-it up: over the window the recorder can answer for, the change would have made no difference,
-and that is worth knowing before you say yes.
+The card carries an **Edits your rule** pill. Apply adds one time condition to that
+automation, so it stands down only in those hours on those days. The rest of the automation
+and the rest of the file are untouched.
 
-#### One condition, and it is negated
+If the two numbers come out the same, the card says the change would have made no
+difference over that window.
 
-What gets written is a single `time` condition **inside a `not`**. That is not decoration, and
-the obvious shape is wrong in the direction that breaks a working house.
+brAIn offers this only for a firm pattern: at least four overrides, on at least three
+separate days, the latest within the last week, at least three quarters of them inside the
+band, and a clear weekday or weekend shape. Each pass offers at most three.
 
-A `time` condition is a **conjunction**: it passes only when the clock is inside its window
-*and* the day is in its weekday list. Add one directly and the automation stands down every
-Saturday and Sunday as well, at every hour — which is not remotely what you have been telling
-brAIn by undoing it on weekday evenings. Wrapped in a `not`, it says the narrow thing the
-evidence actually supports.
+Four cases are never offered as a card. They are listed in **⚙ → Diagnostics** with the
+automation each is about:
 
-It is added to whichever spelling of the key your entry already uses (`condition:` or
-`conditions:`), because rewriting one as the other would be brAIn deciding how your file is
-spelled.
-
-#### The evidence is the ledger's, and is never re-derived
-
-The hours and the days come straight from the [override ledger](/brain/needs-you/), which
-already carries every floor that makes a band mean anything: at least four overrides, on at
-least three separate days, the most recent one inside the last week, and at least three
-quarters of them inside the band — which is reported as the hours actually occupied rather
-than as the window that found them. Asking those questions again here would be a second answer
-to *"is this a pattern"*, and the second answer is the one nobody can see.
-
-A pattern with no weekday or weekend shape to it is not offered at all. *Whenever* is not a
-condition, and one that stood an automation down at every hour of every day it was ever undone
-would be a switch somebody else has to go and find.
-
-#### Four things stop it, and they are not cards
-
-- **The automation has no `id`.** Home Assistant's own editor cannot change one either — there
-  is nothing stable to address it by. Open it in the automation editor and save it once.
-- **It already stands down over those hours.** You wrote the condition; a second copy of it is
-  noise.
-- **Its existing time condition names an entity** — an `input_datetime`, say — rather than a
-  clock. brAIn cannot read what that already forbids, and *"I could not tell"* may not be read
-  as *"there is nothing there"*, so it will not add a second condition beside it.
+- **The automation has no `id`.** Open it in Home Assistant's automation editor and save it
+  once.
+- **It already stands down over those hours.**
+- **Its existing time condition reads an entity**, such as an `input_datetime`. brAIn cannot
+  tell what that already forbids.
 - **It acts on a protected entity.**
-
-None of those becomes a card, because every card here is something you can answer and
-that one is not. They are named in **⚙ Diagnostics** instead, with the automation each is
-about — *"brAIn found nothing"* and *"brAIn found this and named the thing to change"* are
-different reports, and an empty list reads the same either way.
-
-A pass offers at most three, strongest evidence first.
-
-### Rules and one-offs, in a sentence
-
-Say a rule — *"whenever the front door opens after dark, turn the hall light on"* — in
-Morph's Ask line or to voice, and Claude drafts the automation, reading your house but unable to act.
-Before you see it, brAIn **simulates it twice** over your own history: a replay of the last
-month says how often it would have fired, and the last fortnight of those firings is graded
-against what you did yourself. That is the case on the card, in one sentence:
-
-> *Over the last 30 days it would have fired 9 times: 5 in the last 14 days, you had already
-> done the same on 4, you did the opposite on 1.*
-
-The card carries your sentence and what brAIn understood beside it, because when a rule is
-wrong the useful fact is which half was misread. A rule like *"turn the light off ten
-minutes after the last motion"* is written so that a second motion restarts the ten
-minutes. And once accepted, the automation's description quotes the sentence you asked
-with — *Asked for in brAIn: "…" — accepted on …* — so you can tell where it came from in
-six months.
-
-Say a one-off instead: a sentence that *opens* with a moment — *"turn the porch light off
-when the guests leave"*, *"tell me when the tumble dryer finishes"* — never becomes an
-insight card. It becomes one automation that runs once and switches itself off, and it
-arrives here with your sentence, what brAIn understood, and a replay of the trigger. It
-switches off *itself*, whatever Home Assistant named it, so a house that already had an
-automation by that name is no longer a problem.
-
-Two other routes land here as the same kind of proposal, through the same drafting and
-replay: an [insight card](/brain/insights/#a-card-can-suggest-an-automation) that points at
-an automation your house is missing, and the one automation brAIn may suggest at the end
-of its first study of your home — which, if you tick it, starts here already on a
-week-long trial.
-
-`brain.intent` is the same thing from a voice command or an automation, through the same
-request file.
-
-Accepted one-offs then sit **above** the proposals with their own pill — *Armed*, *It fired*,
-*Not armed* — because a one-off is waiting on the *house* where a proposal is waiting on you.
-That is also why the badge never counts them. [Rules & one-offs](/brain/intents/) covers
-the arming, the fortnight, the Remove and every sentence brAIn will refuse.
-
-### Four scenes for a room
-
-The fourth producer, and the only one you address by name: *"design my evening for the living
-room"*, or the **Design scenes for** picker at the top of Needs you.
-
-Its card is the one exception to the shape of everything else here. There is no replay and no
-trial button, because nothing in the last month set these scenes and there is no week to grade
-them against — the evidence is a **swatch per light per mood** instead, with the bulbs named
-underneath and anything protected shown as skipped. Accepting writes four scenes to
-`scenes.yaml`, and once they really exist brAIn offers a second proposal — the schedule that
-moves between them, which *is* an ordinary automation and can be tried for a week. That
-schedule is offered for any room, including ones with more than one word in the name
-(*Living Room*, *Master Bedroom*).
-[The scene designer](/brain/scenes/) covers the moods, the capabilities and the two refusals.
 
 ## Where to see it
 
-- **Insights → Needs you** in the panel, and **History** for what you answered.
-- `GET /api/proposals` — the store as JSON.
-- Declines are recorded with their note, so the scorecard can show which producers earn
-  their place. A proposal source that gets declined nine times out of ten stops proposing.
+| Where | What |
+| --- | --- |
+| **Insights → Needs you** | Open suggestions and trials, under **Chores and suggestions**. One-offs you applied sit under **Set to run once**. |
+| **Insights → History** | What you applied and ignored, with your reasons. |
+| **⚙ → Diagnostics** | Condition suggestions that could not be offered, and why. |
+| `GET /api/proposals` | The same list as JSON. |

@@ -1,9 +1,9 @@
 ---
 title: BRUH Minecraft Server
-description: A Minecraft Java server that lives inside Home Assistant — Bedrock cross-play for iPads and consoles, a Modrinth add-on browser, git-versioned worlds, a full sidebar panel, deep Home Assistant integration, and a brAIn companion that plays with your family.
+description: A Minecraft Java server inside Home Assistant. iPads, consoles and PCs on one world, add-ons in one press, backups you can roll back, Home Assistant automations, and a brAIn companion that builds what you ask.
 template: splash
 hero:
-  tagline: A real Minecraft server inside Home Assistant — iPads, phones, consoles and PCs on one world, add-ons in one press, backups you can roll back, and a family companion that builds what you ask for.
+  tagline: A real Minecraft server inside Home Assistant. iPads, phones, consoles and PCs on one world, add-ons in one press, backups you can roll back, and a family companion that builds what you ask for.
   # The full lockup, not a bare gable: the roof is the family mark and says
   # nothing about which add-on this is. Its plain caps flip between ink and
   # paper, so it needs both grounds.
@@ -32,111 +32,105 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-## What it is
+BRUH Minecraft runs a Minecraft Java Edition server on your Home Assistant machine and puts a
+management panel in the sidebar. Java and Bedrock players join the same world, and Home Assistant
+can see and drive everything in it.
 
-A Home Assistant add-on that runs a real Minecraft Java Edition server — Paper, Purpur, Folia,
-Vanilla, Fabric or Forge — with a management panel in your sidebar. No VPS, no proxy jars, and no
-Microsoft account needed when you do not want one. Bedrock players on iPad, iPhone, Android,
-Switch, Xbox, PlayStation and Windows join the same world through Geyser, and find it in their
-**Friends** tab on your Wi-Fi.
+![The BRUH Minecraft panel's Dashboard: the header with the version and changelog link and the Backup, Restart and Stop buttons; the tabs Dashboard, Console, Players, Properties, Add-ons, Backups and Worlds; a Status card (online, Paper 1.21.4, 2 of 10 players, uptime, 4 GB allocated); a Performance card (healthy, TPS 20, 19.9 and 19.8, latency 3 ms, Tune for my hardware); and Quick chat and Quick command boxes](./images/panel-dashboard.webp)
 
-![The BRUH Minecraft panel's Dashboard: the header with Backup, Restart and Stop, the tabs Dashboard, Console, Players, Properties, Add-ons, Backups and Worlds, and cards for status (online, version 1.21.4, Paper, uptime, 4 GB allocated), performance (TPS 20, 19.9, 19.8, latency 3 ms, Tune for my hardware), two players online, and Quick chat and Quick command](./images/panel-dashboard.webp)
+## What you can do
 
-## For the players
+### Play together on any device
 
-<CardGrid>
-  <Card title="Bedrock cross-play" icon="phone">
-    iPad, iPhone, Android, Switch, Xbox, PlayStation and Windows join through Geyser and Floodgate,
-    installed and configured for you. On the same network the server simply appears in
-    **Friends**. [Bedrock players →](/bruh-minecraft/bedrock/)
-  </Card>
-  <Card title="No-Xbox family mode" icon="approve-check">
-    Turn a world's `online-mode` off and the add-on fixes every setting that depends on it, so
-    children without Microsoft accounts join in seconds — on a home network.
-  </Card>
-  <Card title="Add-ons everyone gets" icon="puzzle">
-    Search Modrinth for plugins, data packs, server mods and resource packs this server can run,
-    and add them in one press. They run on the server, so iPads get them with nothing to install.
-    [Add-on browser →](/bruh-minecraft/addons/)
-  </Card>
-  <Card title="A companion in the world" icon="comment-alt">
-    With [brAIn](/brain/), a companion joins the family in game: *"build a little bridge over the
-    river"*, *"put a couch in this room"*. Every block it changes can be undone.
-    [The companion →](/bruh-minecraft/companion/)
-  </Card>
-</CardGrid>
-
-## For whoever runs it
-
-<CardGrid>
-  <Card title="Any flavour, any version" icon="seti:default">
-    Paper, Purpur, Folia, Vanilla, Fabric or Forge; `LATEST`, `SNAPSHOT` or pinned — including the
-    year-numbered releases (26.x). An existing world is never moved to a new Minecraft version
-    until you press **Upgrade this world**.
-  </Card>
-  <Card title="Worlds and backups" icon="document">
-    Several worlds side by side, each with its own settings, plugins and players. Git snapshots on
-    a schedule, grouped by day, with one-press restore. Import a `.zip`, or install a featured
-    world. [Worlds & backups →](/bruh-minecraft/worlds/)
-  </Card>
-  <Card title="First-class in Home Assistant" icon="setting">
-    Sensors for players, TPS and the world's time and weather; game events for chat, joins,
-    deaths and advancements; services that answer with the server's own reply.
-    [Home Assistant integration →](/bruh-minecraft/home-assistant/)
-  </Card>
-  <Card title="Self-healing and locked down" icon="seti:lock">
-    Crash auto-restart, a ghost-session kicker, a memory warning before the host starves, and a
-    panel that only answers through Home Assistant, with AppArmor confining the container.
-  </Card>
-</CardGrid>
-
-## Use cases
-
-**Family night on every device.** Alex is on a PC, Sam on an iPad, and a cousin on a Switch. They
-all open **Friends**, see the house server, and join the same world. No Realms subscription, no
-accounts for the children, and the world lives on your own hardware.
-
-**"Can we have chairs?"** Open **Add-ons**, search *sit*, press **Add to world**, and **Restart
-now**. Every player, iPads included, can sit on stairs. Or ask brAIn: *"add a sit-anywhere plugin
-to the family world"*.
-
-**Dinner's ready.** A Home Assistant automation says it in the game chat when the oven timer ends —
-or, with brAIn, *"tell everyone dinner's ready"* from any voice assistant.
-
-**Bedtime that enforces itself.** At 8:30pm an automation warns everyone online, waits a minute,
-and stops the server; at 7am it starts again. brAIn's companion says goodnight and starts nothing
-new for the children at bedtime.
-
-**A lever that turns on the porch light.** A command block in your build says
-`say bruh:signal porch_lights on`, Home Assistant hears `bruh_minecraft_signal`, and the real porch
-light comes on. Your house, driven from inside the game.
-
-**"Who broke the castle?"** Roll the world back to this morning's snapshot from the **Backups**
-tab — or, if the companion built something nobody liked, press **Undo** on that one action.
-
-**A grown-up's builder.** A parent with **Can ask for anything** types *"make the roof red and add
-a spiral staircase"*. The companion looks at the blocks, makes the change as a job, shows its
-progress over its allay, and keeps the whole edit undoable.
-
-## The panel
-
-A tab for everything you would otherwise SSH in for, built for a phone as much as a desktop:
-
-| Tab | What it does |
+| You do this | This happens |
 | --- | --- |
-| **Dashboard** | Status, uptime, memory, TPS with a health badge, players online, **Tune for my hardware**, quick chat and a quick command — plus brAIn's **Companion** card when brAIn is installed |
-| **Console** | The live, colour-coded server log and a command box |
-| **Players** | Everyone who has joined or is listed, Online/Offline, with op, kick, ban, pardon and whitelist from a menu |
-| **Properties** | The active world's `server.properties`, edited live |
-| **Add-ons** | Every plugin, data pack, mod and resource pack in the world, the server software and its updates, and the Modrinth browser |
-| **Backups** | Git snapshots and archives, grouped by day, with Restore |
-| **Worlds** | Switch, create, rename, import, download, delete — and featured worlds |
+| Open **Friends** in Minecraft on an iPad, phone, Switch, Xbox, PlayStation or Windows | The house server is listed under LAN games. Tap it to join the same world as the Java players. [Bedrock players →](/bruh-minecraft/bedrock/) |
+| Join from a PC or Mac at `<your-HA-host>:25565` | You are in. Clients a version ahead or behind can join too |
+| Turn the world's `online-mode` off | Children without Microsoft accounts join in seconds. The app fixes every setting that depends on it. Home network only |
+| Forward `25565` and `19132/udp` on your router | Friends outside the house can join |
 
-Always in the header: **Backup**, **Restart**, **Stop**, and **Update** only when a newer server
-build is waiting. The version links to the changelog, which says *"Updated since you last looked"*
-after an update. A first-run **wizard** walks you through the EULA and your first world.
+### Add things to the game
+
+| You do this | This happens |
+| --- | --- |
+| Open **Add-ons**, search *sit*, press **Add to world**, then **Restart now** | Everyone can sit on stairs, iPads included. Nothing is installed on any device. [Add-on browser →](/bruh-minecraft/addons/) |
+| Select several results and press **Add all to world** | Up to 25 plugins, data packs, server mods and resource packs install together, with what they require |
+| Press **Install** on a featured world such as Drehmal | A whole adventure map is added as a new world, resource pack included. Your current world is untouched |
+| Tick a plugin on the **Configuration** tab | EssentialsX, LuckPerms, WorldEdit and nine more are fetched for your Minecraft version at every start |
+
+![The Add-ons tab's Add more section: a Search Modrinth box, chips for Everything, Plugins, Data packs and Resource packs, and result cards for Chunky, WorldEdit, EssentialsX (In this world, Working), Terralith, Incendium and Faithful 32x, each with Add to world and Select](./images/panel-addons-search.webp)
+
+### Run the server from the sidebar
+
+| You do this | This happens |
+| --- | --- |
+| Open the **Console** tab | The live, colour-coded server log, with a box to send any command |
+| Pick **Op**, **Kick**, **Ban** or a whitelist change beside a name on **Players** | It applies at once. Op, ban and kick ask first |
+| Edit a value on **Properties** and press **Save** | The active world's `server.properties` changes. Difficulty, game mode and whitelist apply live |
+| Press **Tune for my hardware** | The app suggests memory and view distance for this machine. You confirm first |
+| Press **Backup**, **Restart** or **Stop** in the header | It happens now. **Update** appears only when a newer server build is waiting |
+
+The server restarts itself after a crash, clears hung sessions that block a rejoin, and warns
+before its memory setting would starve the host.
+
+### Keep several worlds, and roll any of them back
+
+| You do this | This happens |
+| --- | --- |
+| Press **Create new world…** or **Import** a `.zip` | A new world with its own settings, plugins, players and backups |
+| Press **Switch** | The server restarts into that world. The panel is back in about 30 seconds |
+| Do nothing | The world is backed up every hour, as git snapshots that store only what changed |
+| Press **Restore** on this morning's snapshot | The whole world goes back to that time. [Worlds & backups →](/bruh-minecraft/worlds/) |
+
+![The Backups tab: Git snapshots, 6 snapshots since Nov 22, grouped by day with Wednesday open showing a folded run of scheduled backups with Show 2, older days folded, and Archives with two archives each with Restore](./images/panel-backups.webp)
+
+### Connect the game to the house
+
+| You do this | This happens |
+| --- | --- |
+| Add the **BRUH Minecraft** device to a dashboard | Players online, TPS, the world's time and weather, and the latest thing that happened |
+| Call `notify.bruh_minecraft_broadcast` when the oven timer ends | *"Dinner's ready"* appears in game chat |
+| Trigger on `bruh_minecraft_join` | The kitchen speaker says who joined |
+| Automate `bruh_minecraft.stop_server` at 8:30pm | Bedtime enforces itself, with a one-minute warning in chat |
+| Put `say bruh:signal porch_lights on` in a command block | A lever in your build turns on the real porch light |
+
+Services answer with the server's own reply, and a refusal fails the call with the reason.
+[Home Assistant integration →](/bruh-minecraft/home-assistant/)
+
+![The Minecraft world card in Morph: 19:00, Day 41, Sunset, Raining; two players on now with where they are; a Watchtower build at 40%; two finished builds; and a feed of a death, an advancement, a chat line, a build starting and a join](./images/morph-world-card.webp)
+
+### Play with brAIn's companion
+
+With [brAIn](/brain/) installed, a companion joins the family in the world as a small named allay.
+
+| You do this | This happens |
+| --- | --- |
+| Type *"build a little bridge over the river"* in game chat | It builds the bridge as a job while you keep playing, and says one line when it is done |
+| Point your spyglass at a wall and say *"make this red"* | "This" is what you pointed at |
+| Stand on a coloured pad for two seconds | A child who cannot read yet has answered a question |
+| Say *"stop the bridge"*, or press **Undo** in the panel | The blocks it changed are put back |
+| Ask brAIn from a phone or voice assistant: *"teleport Sam to Alex"*, *"who's on?"* | brAIn runs the server for you, matching names the way you say them |
+
+The companion never builds in a **protected place**, and every block it changes can be undone.
+[The companion →](/bruh-minecraft/companion/)
+
+## What you need
+
+| | |
+| --- | --- |
+| **Home Assistant** | OS or Supervised, 2023.6.0 or newer |
+| **Machine** | 64-bit (`aarch64` or `amd64`): a Raspberry Pi 4 or 5, a mini PC, any 64-bit server |
+| **Memory** | About 2 GB free beyond Home Assistant, 4 GB or more with plugins |
+| **Server software** | Paper (default), Purpur, Folia, Vanilla, Fabric or Forge. `LATEST`, `SNAPSHOT` or a pinned version, the year-numbered releases (26.x) included |
+| **Accounts** | None for the server. Players need a Microsoft account unless the world's `online-mode` is off |
+| **Optional** | [brAIn](/brain/) for the companion and voice control |
+
+An existing world is never moved to a new Minecraft version until you press **Upgrade this
+world**. The panel answers only through Home Assistant, and AppArmor confines the container.
+
+## Where to go next
 
 <CardGrid>
   <LinkCard title="Quick Start" href="/bruh-minecraft/quickstart/" description="Install, accept the EULA, connect from Java or Bedrock." />
@@ -145,4 +139,6 @@ after an update. A first-run **wizard** walks you through the EULA and your firs
   <LinkCard title="The Companion & BRUH Sight" href="/bruh-minecraft/companion/" description="brAIn in the world, the spyglass, choice pads, jobs and undo." />
   <LinkCard title="Worlds & Backups" href="/bruh-minecraft/worlds/" description="Profiles, featured worlds, imports, snapshots and restore." />
   <LinkCard title="Home Assistant Integration" href="/bruh-minecraft/home-assistant/" description="Entities, events, services and automation recipes." />
+  <LinkCard title="Command Generator" href="/bruh-minecraft/command-generator/" description="Build plugin commands with a form and a copy button." />
+  <LinkCard title="Reference" href="/bruh-minecraft/reference/" description="Every option, port, path and fix." />
 </CardGrid>

@@ -1,104 +1,118 @@
 ---
 title: Add-on Browser
-description: BRUH Minecraft's Add-ons tab searches Modrinth for plugins, data packs, server-side mods and resource packs your server can run, installs them with their dependencies in one press, and shows everything in the world with whether it needs a restart — for every player, iPads included.
+description: Search Modrinth from the Add-ons tab for plugins, data packs, server-side mods and resource packs your server can run, and add them in one press for every player, iPads included.
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-The **Add-ons** tab is one screen for everything added to the active world, and a Modrinth browser
-to add more. It is the closest a Java server gets to Realms add-ons — and for a house full of iPads,
-arguably better.
-
-A Realms "add-on" is a Bedrock *behavior pack*, which no Java server can run. What a Java server
-*can* run is anything that lives on the **server**, and that reaches every player whatever they
-play on: Geyser translates the result, and nothing is installed on the device.
+The **Add-ons** tab adds plugins, data packs, server mods and resource packs to the active world
+from Modrinth. Everything runs on the server, so every player gets it, with nothing to install on
+an iPad or console.
 
 ![The Add-ons tab: a Restart the server to finish banner naming Simple Voice Chat with Restart now; Plugins (EssentialsX, Simple Voice Chat, LuckPerms) each marked Working or Starts after a restart; a Terralith data pack; a Faithful 32x resource pack marked Not used with Use in this world; and Server software listing Paper, Geyser, Floodgate and ViaVersion with Update everything now](./images/panel-addons.webp)
 
-## In this world
+## Add something
 
-Every plugin, data pack, server mod and resource pack the world has — added from the browser, by
-hand, by link or by the `plugins:` option — grouped by kind. A plugin added outside the browser
-shows the name and version its own `plugin.yml` declares. Each row says where it stands:
+<Steps>
+
+1. **Search.** Type what you want, such as *sit*, *vein miner* or *textures*. One search covers
+   every kind. Narrow it with the chips. Only what **this** server can run is offered: the
+   server type and Minecraft version decide.
+2. **Add.** Press **Add to world** on a card. To add several, press **Select** on each card,
+   across searches and kinds, then **Add all to world** in the tray. The limit is 25 at once.
+3. **Restart** if the banner asks. Data packs work immediately.
+
+</Steps>
+
+![Add more: a Search Modrinth box with Search, chips for Everything, Plugins, Data packs and Resource packs, and result cards for Chunky, WorldEdit, EssentialsX (In this world, Working), Terralith, Incendium and Faithful 32x, each with Add to world and Select, and More results](./images/panel-addons-search.webp)
+
+Anything an add-on requires is installed with it and recorded as a dependency.
+
+**Add your own file or link** takes a plugin URL or a resource-pack `.zip` up to 250 MB. The app
+serves the pack to players on your network.
+
+## What each kind gives Bedrock players
+
+| Kind | Runs on | What Bedrock players get |
+| --- | --- | --- |
+| **Plugins** | Paper, Purpur, Folia | Everything. They run on the server |
+| **Data packs** | Any server type | Everything. They run in the world |
+| **Server mods** | Fabric, Forge | Only mods Modrinth marks as needing nothing on the client are offered |
+| **Resource packs** | Any | Java players are offered the pack on join. Geyser pushes Bedrock players a converted copy. Flat block and item textures convert. Custom 3D models and sounds do not |
+
+A Realms add-on is a Bedrock behavior pack, which no Java server can run. Server-side add-ons are
+the equivalent that reaches every device.
+
+## See what is in the world
+
+The top of the tab lists every plugin, data pack, server mod and resource pack the world has,
+grouped by kind. That includes ones added by hand, by link or by the `plugins:` option.
+A plugin added outside the browser shows the name and version it declares itself.
 
 | Status | Meaning |
 | --- | --- |
 | **Working** | Loaded now |
-| **Starts after a restart** | Added since the server started. Plugins, mods and a resource-pack change need a restart; data packs do not — they reload live |
+| **Starts after a restart** | Added since the server started. Plugins, mods and a resource-pack change need a restart. Data packs reload live |
 | **Turns on when the server starts** | The server is stopped |
-| **Not used** | A resource pack in the library that this world does not offer; **Use in this world** switches to it |
+| **Not used** | A resource pack in the library that this world does not offer. **Use in this world** switches to it |
 
-When anything is waiting, a banner at the top says exactly what (*Added VeinMiner, removed
-Chairs*) with **Restart now**, and the list refreshes itself until everything reads *Working*.
-Each add-on says **Up to date** or **Update to X available**, with **Update** only when there is one.
+When a restart is waiting, a banner says what changed (*Added VeinMiner, removed Chairs*) with
+**Restart now**. The list refreshes until everything reads **Working**.
 
-- **Removing** something another add-on needs asks first. Add-ons put on the server by hand can be
-  removed too, wherever the panel can actually remove them.
-- **Conflicts are named.** WorldEdit and FastAsyncWorldEdit installed together are both marked,
-  with which one to remove. Nothing is removed for you.
+## Update or remove an add-on
 
-## Server software
+- **Update.** Each add-on says **Up to date** or **Update to X available**. **Update** shows only
+  when there is one.
+- **Remove.** Removing something another add-on needs asks first. Add-ons put on the server by
+  hand can be removed too, wherever the panel can remove them.
+- **Conflicts.** WorldEdit and FastAsyncWorldEdit installed together are both marked, with which
+  one to remove. Nothing is removed for you.
 
-The server (Paper, Purpur, …) with its Minecraft version and build, and the cross-play plugins
-under it — **Geyser**, **Floodgate**, **ViaVersion**, **ViaBackwards** — with their versions.
+## Update the server software
 
-- Those download their newest build every time the add-on starts; **Update everything now**
-  restarts the add-on to do it on demand (players are disconnected for about a minute).
-- When a newer Minecraft version is out, **Upgrade this world** takes a backup and moves the world
-  to it. A world is **never** moved to a new Minecraft version on its own: the upgrade rewrites the
-  world and cannot be undone, and a plugin built only for the old version may stop loading.
+**Server software** lists the server (Paper, Purpur and so on) with its Minecraft version and
+build, and the cross-play plugins Geyser, Floodgate, ViaVersion and ViaBackwards.
 
-## Add more
+| Press | What happens |
+| --- | --- |
+| **Check for updates** | Looks for newer builds now |
+| **Update everything now** | Restarts the app to fetch the newest cross-play plugins. Players are disconnected for about a minute. This also happens at every start |
+| **Upgrade this world** | Shown when a newer Minecraft version is out. Takes a backup, then moves the world to it |
 
-![Add more: a Search Modrinth box with Search, chips for Everything, Plugins, Data packs and Resource packs, and result cards for Chunky, WorldEdit, EssentialsX (In this world, Working), Terralith, Incendium and Faithful 32x, each with Add to world and Select, and More results](./images/panel-addons-search.webp)
-
-<Steps>
-
-1. **Search.** One search across plugins, data packs, server mods and resource packs, one result
-   from each kind in turn — or narrow it with the chips. Only what **this** server can run is
-   offered: the server type and Minecraft version decide.
-2. **Add.** **Add to world** installs one. Or press **Select** on several cards, across searches and
-   kinds, and **Add all to world** in the tray — up to 25 at once, with one answer and one restart
-   note at the end.
-3. **Restart** if the banner asks. Data packs are live immediately.
-
-</Steps>
-
-**Add your own file or link** takes a plugin URL or a resource-pack `.zip` (up to 250 MB), served to
-players on your network by the add-on.
-
-### What each kind does for an iPad
-
-| Kind | Runs on | What Bedrock players get |
-| --- | --- | --- |
-| **Plugins** | Paper, Purpur, Folia | Everything — they run on the server |
-| **Data packs** | Any server type | Everything — they run in the world |
-| **Server mods** | Fabric, Forge | Only mods Modrinth marks as needing nothing on the client, because a mod every client must also have is one an iPad can never join with |
-| **Resource packs** | Any | Java players are offered the pack on join; Bedrock players are pushed a converted copy by Geyser. Flat block and item textures convert; custom 3D models and sounds do not |
-
-<Aside title="Safe downloads">
-Anything an add-on requires is installed with it and recorded as a dependency. Downloads come only
-from Modrinth's CDN and must match the SHA-512 hash Modrinth published, or they are refused.
-Add-ons are per world (`.bruh-addons.json` in the world folder), like everything else in `plugins/`.
+<Aside type="caution" title="A world upgrade cannot be undone">
+The upgrade rewrites the world, and a plugin built only for the old version may stop loading.
+A world is never moved to a new Minecraft version unless you press **Upgrade this world**.
 </Aside>
 
-## The one-click plugin options
+## Tick a popular plugin instead
 
-Beside the browser, twelve popular plugins can be ticked on the add-on's **Configuration** tab and
-are resolved from Modrinth on every boot, for your server's Minecraft version (Paper, Purpur and
-Folia). `install_viaversion` and `install_viabackwards` are on by default, so clients a version
-ahead or behind can still join. EssentialsX, EssentialsXChat, LuckPerms, WorldEdit, CoreProtect,
-GriefPrevention, mcMMO, ChestSort, VeinMiner and Spark are off until you tick them — see the
-[Reference](/bruh-minecraft/reference/#plugins). Ticking one off does **not** remove the jar; remove
-it on the Add-ons tab.
+Twelve popular plugins have a tick box on the app's **Configuration** tab. A ticked plugin is
+fetched from Modrinth at every start, for your server's Minecraft version (Paper, Purpur and
+Folia).
 
-The [Command Generator](/bruh-minecraft/command-generator/) builds commands for the popular
-plugins with a form and a copy button.
+| On by default | Off until you tick them |
+| --- | --- |
+| ViaVersion, ViaBackwards (clients a version ahead or behind can join) | EssentialsX, EssentialsXChat, LuckPerms, WorldEdit, CoreProtect, GriefPrevention, mcMMO, ChestSort, VeinMiner, Spark |
 
-## From Home Assistant and brAIn
+Unticking does **not** remove the jar. Remove it on the Add-ons tab. The option names are in the
+[Reference](/bruh-minecraft/reference/#plugins), and the
+[Command Generator](/bruh-minecraft/command-generator/) builds commands for these plugins.
 
-- Services: `bruh_minecraft.list_addons`, `search_addons` (`query`, `kind`, `offset`),
-  `install_addon` (`id`, `kind`) and `remove_addon` (`id`).
-- [brAIn](/brain/)'s `minecraft_addons` tool uses them: *"add a sit-anywhere plugin to the family
-  world"*. Installing and removing need a **Whole house** or **Full admin** agent, not a voice-level
-  one, and the answer says whether a restart is needed.
+## Add add-ons from Home Assistant or brAIn
+
+Ask [brAIn](/brain/): *"add a sit-anywhere plugin to the family world"*. The answer says whether
+a restart is needed. Installing and removing need a **Whole house** or **Full admin** agent, not
+a voice-level one.
+
+| Service | Fields | What it does |
+| --- | --- | --- |
+| `bruh_minecraft.list_addons` | none | What the browser can offer and what the world has |
+| `bruh_minecraft.search_addons` | `query`, `kind`, `offset` | Search Modrinth |
+| `bruh_minecraft.install_addon` | `id`, `kind` | Add a project and what it requires |
+| `bruh_minecraft.remove_addon` | `id` | Remove one |
+
+## Safety
+
+- Downloads come only from Modrinth's CDN and must match the SHA-512 hash Modrinth published, or
+  they are refused.
+- Add-ons are per world, recorded in `.bruh-addons.json` in the world folder.

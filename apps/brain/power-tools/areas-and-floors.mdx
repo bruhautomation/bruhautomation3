@@ -1,317 +1,103 @@
 ---
 title: Areas & Floors
-description: Create, rename, and organize Home Assistant areas and floors — and assign devices and entities to them — with brain services.
+description: Ask brAIn to create, rename and delete areas and floors, set their icons and voice aliases, and move devices and entities between rooms.
 sidebar:
   order: 2
 ---
 
-Areas and floors are how Home Assistant understands the *shape* of your home — and how voice assistants resolve "turn off the lights upstairs". These services let Claude (or any automation) build and maintain that structure: create rooms, group them into floors, move devices and entities around, and manage the aliases voice assistants listen for.
+Ask brAIn to build and maintain the rooms and floors of your home, and to put every device and entity in the right one.
 
-A device normally gives its area to all of its entities; assigning an **entity** to an area directly overrides that — handy when one hub owns gadgets in different rooms.
+## Ask brAIn
 
-## Create area
+```text
+Move every hallway light to the Hallway area.
+Create a Guest Room area on the upstairs floor, with "spare room" as a voice alias.
+Put the master bedroom and the kids' room on the upstairs floor.
+The basement is level -1, not 0. Fix it.
+Make the living room also answer to "lounge" and "front room".
+Put the under-cabinet light in the kitchen, even though its hub lives elsewhere.
+```
 
-`brain.create_area`
+brAIn looks up the ids, checks every one, makes the change, and tells you what moved.
 
-Create a new area. Returns the new area_id as response data.
+## What brAIn can do
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | Name of the new area. |
-| `icon` | icon | no | Icon for the area. |
-| `aliases` | text (list) | no | Alternative names, used by voice assistants. |
-| `floor_id` | floor | no | Floor to place the area on. |
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-```yaml
-service: brain.create_area
+### Areas
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_area` | Create an area. Returns its `area_id`. | `name`\*, `icon`, `aliases[]`, `floor_id` |
+| `brain.rename_area` | Rename an area. | `area_id`\*, `name`\* |
+| `brain.set_area_aliases` | Replace the alternative names voice assistants listen for. Send the full new list. | `area_id`\*, `aliases[]`\* |
+| `brain.set_area_icon` | Set the area's icon. Leave `icon` out to clear it. | `area_id`\*, `icon` |
+| `brain.delete_area` | Delete an area. Its devices and entities are left unassigned. `dry_run: true` lists what would lose its area. | `area_id`\*, `dry_run` |
+| `brain.add_device_to_area` | Move devices into an area. | `area_id`\*, `device_id[]`\* |
+| `brain.remove_device_from_area` | Take devices out of whatever area they are in. | `device_id[]`\* |
+| `brain.add_entity_to_area` | Move entities into an area. This overrides the area of the device they belong to. | `area_id`\*, `entity_id[]`\* |
+| `brain.remove_entity_from_area` | Take entities out of whatever area they are in. | `entity_id[]`\* |
+
+### Floors
+
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_floor` | Create a floor. Returns its `floor_id`. `level` is the storey number: 0 for the ground floor. | `name`\*, `icon`, `level`, `aliases[]` |
+| `brain.rename_floor` | Rename a floor. | `floor_id`\*, `name`\* |
+| `brain.update_floor` | Change a floor's icon, level or aliases. Fields you leave out stay as they are. Use a negative `level` for a basement. | `floor_id`\*, `icon`, `level`, `aliases[]` |
+| `brain.delete_floor` | Delete a floor. Its areas are left without a floor. `dry_run: true` lists them. | `floor_id`\*, `dry_run` |
+| `brain.add_area_to_floor` | Put areas on a floor. | `floor_id`\*, `area_id[]`\* |
+| `brain.remove_area_from_floor` | Take areas off whatever floor they are on. | `area_id[]`\* |
+
+## Good to know
+
+- A device gives its area to all of its entities. Assign an **entity** to an area to override that, for example when one hub owns gadgets in different rooms.
+- Aliases are what voice assistants use to resolve "turn off the lights upstairs" or "the lounge".
+- Find ids by asking brAIn, or in the pickers under **Developer tools → Actions**.
+
+## Examples
+
+```yaml title="Create a room on a floor"
+action: brain.create_area
 data:
   name: Guest Room
   icon: mdi:bed
   aliases: ["spare room"]
   floor_id: upstairs
+response_variable: area   # area.area_id
 ```
 
-> 🗣️ *"Create a Guest Room area on the upstairs floor, with 'spare room' as a voice alias."*
+```yaml title="Move a device, and one entity that lives elsewhere"
+- action: brain.add_device_to_area
+  data:
+    area_id: office
+    device_id:
+      - a1b2c3d4e5f6
+- action: brain.add_entity_to_area
+  data:
+    area_id: kitchen
+    entity_id:
+      - light.under_cabinet
+```
 
-## Delete area
+```yaml title="Create a floor and fill it"
+- action: brain.create_floor
+  data:
+    name: Upstairs
+    level: 1
+    icon: mdi:home-floor-2
+- action: brain.add_area_to_floor
+  data:
+    floor_id: upstairs
+    area_id:
+      - master_bedroom
+      - kids_room
+```
 
-`brain.delete_area`
-
-Delete an area. Entities and devices in it are left unassigned.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The area to delete. |
-
-```yaml
-service: brain.delete_area
+```yaml title="See what deleting an area would unassign"
+action: brain.delete_area
 data:
   area_id: guest_room
+  dry_run: true
+response_variable: preview
 ```
-
-> 🗣️ *"Delete the guest room area."*
-
-## Rename area
-
-`brain.rename_area`
-
-Rename an existing area.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The area to rename. |
-| `name` | text | yes | The new name. |
-
-```yaml
-service: brain.rename_area
-data:
-  area_id: guest_room
-  name: Nursery
-```
-
-> 🗣️ *"Rename the guest room to Nursery."*
-
-## Set area aliases
-
-`brain.set_area_aliases`
-
-Replace the aliases of an area (used by voice assistants).
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The area to update. |
-| `aliases` | text (list) | yes | The full new list of aliases. |
-
-```yaml
-service: brain.set_area_aliases
-data:
-  area_id: living_room
-  aliases: ["lounge", "front room"]
-```
-
-> 🗣️ *"Make the living room also answer to 'lounge' and 'front room'."*
-
-## Set area icon
-
-`brain.set_area_icon`
-
-Set or clear the icon shown for an area. Omit the icon to clear it.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The area to update. |
-| `icon` | icon | no | The new icon, e.g. `mdi:sofa`. Leave it out to clear the icon. |
-
-```yaml
-service: brain.set_area_icon
-data:
-  area_id: living_room
-  icon: mdi:sofa
-```
-
-> 🗣️ *"Give the living room a sofa icon."*
-
-## Add device to area
-
-`brain.add_device_to_area`
-
-Assign one or more devices to an area.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The target area. |
-| `device_id` | device (list) | yes | Devices to assign. |
-
-```yaml
-service: brain.add_device_to_area
-data:
-  area_id: office
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"Move the desk lamp's device into the office."*
-
-## Remove device from area
-
-`brain.remove_device_from_area`
-
-Remove one or more devices from whatever area they are in.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `device_id` | device (list) | yes | Devices to unassign. |
-
-```yaml
-service: brain.remove_device_from_area
-data:
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"Take that device out of whatever room it's in."*
-
-## Add entity to area
-
-`brain.add_entity_to_area`
-
-Assign one or more entities to an area (overrides the device's area).
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area | yes | The target area. |
-| `entity_id` | entity (list) | yes | Entities to assign. |
-
-```yaml
-service: brain.add_entity_to_area
-data:
-  area_id: kitchen
-  entity_id:
-    - light.under_cabinet
-```
-
-> 🗣️ *"Put the under-cabinet light in the kitchen (even though its hub device lives elsewhere)."*
-
-## Remove entity from area
-
-`brain.remove_entity_from_area`
-
-Remove one or more entities from whatever area they are in.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `entity_id` | entity (list) | yes | Entities to unassign. |
-
-```yaml
-service: brain.remove_entity_from_area
-data:
-  entity_id:
-    - light.under_cabinet
-```
-
-> 🗣️ *"Remove that light from its area."*
-
-## Create floor
-
-`brain.create_floor`
-
-Create a new floor. Returns the new floor_id as response data.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | Name of the new floor. |
-| `icon` | icon | no | Icon for the floor. |
-| `level` | number | no | Level number (0 = ground floor). |
-| `aliases` | text (list) | no | Alternative names, used by voice assistants. |
-
-```yaml
-service: brain.create_floor
-data:
-  name: Upstairs
-  level: 1
-  icon: mdi:home-floor-2
-```
-
-> 🗣️ *"Create an Upstairs floor and put the bedrooms on it."*
-
-## Delete floor
-
-`brain.delete_floor`
-
-Delete a floor. Areas on it are left without a floor.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `floor_id` | floor | yes | The floor to delete. |
-
-```yaml
-service: brain.delete_floor
-data:
-  floor_id: upstairs
-```
-
-> 🗣️ *"Delete the upstairs floor."*
-
-## Rename floor
-
-`brain.rename_floor`
-
-Rename an existing floor.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `floor_id` | floor | yes | The floor to rename. |
-| `name` | text | yes | The new name. |
-
-```yaml
-service: brain.rename_floor
-data:
-  floor_id: upstairs
-  name: First Floor
-```
-
-> 🗣️ *"Rename Upstairs to First Floor."*
-
-## Update floor
-
-`brain.update_floor`
-
-Change a floor's icon, level, or aliases — use `rename_floor` for the name. Pass at least one field; anything you leave out is left as it is.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `floor_id` | floor | yes | The floor to update. |
-| `icon` | icon | no | The new icon, e.g. `mdi:home-floor-2`. |
-| `level` | number | no | The storey number — 0 for the ground floor, negative for a basement. |
-| `aliases` | text (list) | no | The full new list of aliases, used by voice assistants. |
-
-```yaml
-service: brain.update_floor
-data:
-  floor_id: basement
-  level: -1
-  icon: mdi:home-floor-negative-1
-```
-
-> 🗣️ *"The basement is level -1, not 0 — fix it."*
-
-## Add area to floor
-
-`brain.add_area_to_floor`
-
-Place one or more areas on a floor.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `floor_id` | floor | yes | The target floor. |
-| `area_id` | area (list) | yes | Areas to place on the floor. |
-
-```yaml
-service: brain.add_area_to_floor
-data:
-  floor_id: upstairs
-  area_id:
-    - master_bedroom
-    - kids_room
-```
-
-> 🗣️ *"Put the master bedroom and the kids' room on the upstairs floor."*
-
-## Remove area from floor
-
-`brain.remove_area_from_floor`
-
-Remove one or more areas from whatever floor they are on.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `area_id` | area (list) | yes | Areas to remove from their floor. |
-
-```yaml
-service: brain.remove_area_from_floor
-data:
-  area_id:
-    - kids_room
-```
-
-> 🗣️ *"Take the kids' room off its floor."*

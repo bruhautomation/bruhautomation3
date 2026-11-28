@@ -1,114 +1,137 @@
 ---
 title: Effects
-description: The effect is the unit every BRight show is made of. Build one by hand or describe it in a sentence, choose which lights it owns and how it travels through the room, preview it, save it, and drop it into a show.
+description: Build a BRight effect by hand or describe it in a sentence, choose which lights it owns and how it travels through the room, preview it, save it, and put it in a show.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
 An **effect** is one thing some of your lights do for a stretch of music: a chase across the
-room, a build into the drop, a strobe on the last four bars. It is the unit everything in BRight
-is made of — the automatic director writes effects, the Effects tab builds them by hand, and a
-show script is a list of them. There is no private vocabulary the automatic show can use and you
-cannot.
+room, a build into the drop, a strobe on the last four bars. Every show is a list of effects, and
+the Effects tab builds the same ones the automatic director uses.
 
-![The Effects tab: a Describe it box with Write it and Or suggest some, the What it does form for a Chase with name, BPM, seconds, travel order, lock and palette, and the Which lights card with role chips and a checkbox per light](./images/effects.webp)
+![The Effects tab: the Describe it box with Write it and Or suggest some, the What it does form for a Chase with name, BPM, seconds, travel order, lock, palette and its own settings, and the Which lights card with role chips and four lamps ticked](./images/effects.webp)
 
-## The four parts of an effect
+## Describe an effect and let Claude write it
 
-1. **What it does** — one of the 22 types below, with its own parameters. Every setting is named
-   in plain words with its unit and range.
-2. **Which lights it owns** — ticked individually, by role chip (`lamp (4)`, `strip (1)`…) or by
-   zone. **Everything you do not tick is left exactly as the rest of the show left it** — the
-   whole reason for building effects rather than scenes. With nothing ticked, the effect drives
-   every light on the map it suits.
-3. **How it travels** — the order it moves through those lights, from the Light Map: `x` (left
-   to right), `-x`, `y`, `-y`, `center_out`, `edges_in`, `snake` (reading order through the
-   room), `zone`, `random` (seeded, so it is the same every night) or `listed`.
-4. **What it locks to** — `beat`, `downbeat`, `bar` or plain `time`. Everything that steps,
-   steps on the beat grid, which is why a chase stays with the music when the tempo is not a
-   round number.
+<Steps>
 
-**Keep role manners** (on by default) stops a candle strobing and holds each light under its
-role's brightness ceiling. Turn it off when an effect means to own a fixture outright.
+1. Type a sentence in **Describe it**, such as *"bounce a warm pulse between the two window
+   lamps"*.
+2. Press **Write it**. Claude fills in the form for your room, naming your lights.
+3. The effect lands unsaved. Preview it, change anything, then save it or put it in a show.
 
-## Describe it, and Claude writes it
+</Steps>
 
-The **Describe it** box takes a sentence — *"bounce a warm pulse between the two window lamps"* —
-and **Write it** has Claude fill in the form *for this room*, naming your actual lights. It lands
-unsaved: preview it, change anything, then save it or put it in a show. **Or suggest some** asks
-Claude for ideas that suit your room. Both need [brAIn](/brain/) and run on the
-`director_model` option; everything else on the tab works without it.
+**Or suggest some** asks Claude for ideas that suit your light map. Both buttons need
+[brAIn](/brain/) and use the `director_model` option. Everything else on the tab works without it.
 
-## The catalog
+## Build an effect by hand
 
-| Effect | What it is for |
+<Steps>
+
+1. **Pick what it does.** Choose one of the [22 types](#the-22-effect-types). Each setting is
+   named in plain words with its unit and range.
+2. **Tick the lights it owns**, one by one or with a role chip such as `lamp (4)`. Everything you
+   do not tick keeps doing what the rest of the show is doing. With nothing ticked, the effect
+   drives every light on the map it suits.
+3. **Choose how it travels** under **Travels**.
+4. **Choose what it locks to** under **Locked to**.
+
+</Steps>
+
+| Travels | Order through the lights |
 | --- | --- |
-| `wash` | Hold a colour. The still ground everything else moves against. |
-| `fade` | Travel from one level to another across the window — a transition that reads as intent rather than a cut. |
-| `build` | Tension: climb in stages, optionally lighting one more fixture per stage, so the drop has somewhere to land. |
-| `pulse` | The beat itself. One packet carries eight beats of motion; the bulb keeps time locally. |
-| `strobe` | Hard flashing for a short burst — one packet per bulb however fast it runs. |
-| `chase` | Jump between bulbs in order. Width and bounce make it a runner, a comet or a ping-pong. |
-| `sweep` | One wave travelling across the room, phase-shifted by where each light stands. |
-| `breathe` | Slow rise and fall under everything else. |
-| `sparkle` | A few random lights catch each beat. Texture, not pattern. |
-| `colour_cycle` | Rotate the palette through the lights — motion without brightness. |
-| `rainbow` | Hue spread across the room, turning slowly. Its own colour scheme. |
-| `theater` | Alternating groups answering each other. |
-| `stab` | One hit, at one moment — the drop, the downbeat back in. |
-| `blackout` | Take the selected lights down. Silence is a lighting cue. |
-| `melody` | Follow the tune. Each note lands on a light placed by its pitch, and its colour comes from the scene's palette — a rising phrase climbs across the room. |
-| `harmony` | The palette follows the chords: the selection crossfades on every chord change, so the room turns over with the song. |
-| `colour_drift` | The colour travels and the brightness never moves — the bulb walks its hue around the wheel by itself. The only motion a candle can join. |
-| `saturate` | *Colour swell*: saturation breathes, washing out toward white and back, with the level untouched. |
-| `level` | Brightness follows how loud the song actually *is* — the audio itself. Pick a band and the lights breathe with the kick, the vocal or the shimmer. |
-| `hit` | A drum hit: full brightness the instant the beat lands, then a decay before the next one. |
-| `accent` | A hit on every drum the analyser actually heard, at the strength it heard it — the kick on one set of lights and the snare on another. |
-| `aux` | Party lights and lasers: on, off, or flashed on the beat. Sent early by the latency the Lab measured. |
+| `x`, `-x` | Left to right, right to left |
+| `y`, `-y` | Front to back, back to front |
+| `center_out`, `edges_in` | From the middle outward, from the edges inward |
+| `snake` | Reading order through the room |
+| `zone` | Room by room |
+| `random` | Shuffled, the same way every night |
+| `listed` | The order you listed the lights |
 
-### Swells and strikes
+| Locked to | Steps on |
+| --- | --- |
+| `beat` | Every beat of the song |
+| `downbeat` | The first beat of each bar |
+| `bar` | Whole bars |
+| `time` | Plain seconds, ignoring the music |
 
-Every effect is one or the other, and it is the biggest difference between a light show and mood
-lighting. A **swell** travels smoothly up and back: `pulse`, `breathe`, `sweep`, `colour_drift`,
-`saturate`. A **strike** is at full brightness the instant it lands and decays from there: `hit`,
-`accent`, `stab`, `strobe`. A show made only of swells reads as a row of lights fading in and out
-near the music.
+**Keep role manners** is on by default. It stops a candle strobing and holds each light under its
+role's brightness ceiling. Turn it off when an effect is meant to own a fixture outright.
 
-### One rule about layering
+## Preview it, then run it on the lights
 
-`pulse`, `strobe`, `breathe`, `sweep`, `stab`, `hit`, `accent`, `colour_drift` and `saturate` are
-run *by the bulb* — that is the sync trick, and why they cost one packet however long they run.
-A LIFX bulb runs exactly **one** of them at a time, so two overlapping on the same light is not a
-layered effect: the later one cancels the earlier, and from across a room that reads as an effect
-that mysteriously does nothing. Give them different lights or different windows. Everything else
-layers freely, and the show editor flags it on the effect's own row when a script does it anyway.
+![The Preview card: a chase lighting one lamp on the floor plan, a strip with one row per light showing the chase stepping across four lamps, a scrub slider, the cost line reading 192 cues and a peak of 4 per second at one bulb against a budget of 18, and two saved effects with Load and Delete](./images/effects-preview.webp)
 
-<Aside>
-`melody` and `harmony` need the song's musical analysis. On the Effects tab they preview against a
-stand-in tune, because the bench has no track; in a show they use the real one.
-</Aside>
+- **Preview** draws the effect two ways: the room, animated on your floor plan, and a strip with
+  one row per light and time running left to right. Scrub with the slider or press **▶ Play**.
+- **The cost line** shows how many cues the effect sends and the busiest bulb's messages per
+  second, against a budget of 18 per second.
+- **Run it on the lights** plays it on the real bulbs with no music, then restores them.
 
-## Preview, then run it on the lights
+The preview uses the same render the compiler turns into packets, so what you see is what the
+bulbs get.
 
-**Preview** renders the effect two ways: the room, animated on your own floor plan, and a strip
-with one row per light and time running left to right — the view that tells you whether a chase
-actually chases. Both come from the same render the compiler turns into packets, so a preview that
-looks wrong is an effect that is wrong. Scrub with the slider; ▶ plays it.
+## Save and reuse an effect
 
-Underneath is the price: how many cues it costs and the busiest bulb's messages per second against
-the 18-per-second budget. **Run it on the lights** does exactly that — no music, the real bulbs,
-restored afterwards.
+| To | Do this |
+| --- | --- |
+| Keep an effect | Name it and press **Save this effect**. It keeps its lights as well as its settings. |
+| Bring one back or remove it | **Load** or **Delete** under **Saved effects** |
+| Add it to a show | Under **Put it in a show**, pick a compiled track and a scene, then **Add to the chosen scene**. The show recompiles and stays editable. |
+| Save an effect from a show | Press **＋ Library** on its row in the [show editor](/bright/shows/#edit-a-show) |
 
-## Save it, reuse it
-
-**Save this effect** keeps its **lights** as well as its settings, because "kitchen chase" is the
-chase *and* the three lights it runs across — the part that took the time. Saved effects appear in
-the Manual tab's rack and in every brief Claude gets, and a show script can use one by name:
+Saved effects also appear in the [Manual](/bright/manual/) rack (★) and in every brief Claude
+gets. A show script can use one by name:
 
 ```json
 {"use": "kitchen chase"}
 ```
 
-**Put it in a show** drops the effect into one scene of one track's show and recompiles. The show
-stays completely editable afterwards. And from the show editor, **＋ Library** turns an effect that
-worked out well in a show into a saved effect.
+## The 22 effect types
+
+| Effect | What it does |
+| --- | --- |
+| `wash` | Holds a colour. The still ground everything else moves against. |
+| `fade` | Travels from one level to another across the window. A transition instead of a cut. |
+| `build` | Climbs in stages, optionally lighting one more fixture per stage, into a drop. |
+| `pulse` | The beat. One packet carries eight beats of motion and the bulb keeps time. |
+| `strobe` | Hard flashing for a short burst. One packet per bulb however fast it runs. |
+| `chase` | Jumps between bulbs in order. Width and bounce make it a runner, a comet or a ping-pong. |
+| `sweep` | One wave travelling across the room, shifted by where each light stands. |
+| `breathe` | A slow rise and fall under everything else. |
+| `sparkle` | A few random lights catch each beat. |
+| `colour_cycle` | Rotates the palette through the lights. Motion without brightness. |
+| `rainbow` | Hue spread across the room, turning slowly. Uses its own colours. |
+| `theater` | Alternating groups answering each other. |
+| `stab` | One hit at one moment, such as the drop. |
+| `blackout` | Takes the selected lights down. |
+| `melody` | Follows the tune. Each note lands on a light placed by its pitch, in a palette colour, so a rising phrase climbs across the room. |
+| `harmony` | Follows the chords. The selection crossfades on every chord change. |
+| `colour_drift` | The colour travels and the brightness stays still. The only motion a candle can join. |
+| `saturate` | *Colour swell*. Saturation washes out toward white and back, with the level untouched. |
+| `level` | Brightness follows how loud the song is. Pick a band to follow the kick, the vocal or the shimmer. |
+| `hit` | A drum hit: full brightness the instant the beat lands, then a decay. |
+| `accent` | A hit on every drum the analyser heard, at the strength it heard it. Put the kick on one set of lights and the snare on another. |
+| `aux` | Party lights and lasers: on, off, or flashed on the beat, sent early by the latency the Lab measured. |
+
+`melody` and `harmony` need the song's musical analysis. On the Effects tab they preview against a
+stand-in tune. In a show they use the real one.
+
+### Mix swells and strikes
+
+| Kind | Effects | How it moves |
+| --- | --- | --- |
+| **Swell** | `pulse`, `breathe`, `sweep`, `colour_drift`, `saturate` | Smoothly up and back |
+| **Strike** | `hit`, `accent`, `stab`, `strobe` | Full brightness the instant it lands, then a decay |
+
+A show made only of swells looks like lights fading in and out near the music. Strikes give it an
+attack.
+
+<Aside type="caution" title="One bulb-run effect per light at a time">
+`pulse`, `strobe`, `breathe`, `sweep`, `stab`, `hit`, `accent`, `colour_drift` and `saturate` are
+run by the bulb itself, and a LIFX bulb runs only one at a time. If two overlap on the same light,
+the later one cancels the earlier and one effect appears to do nothing. Give them different lights
+or different times. Everything else layers freely, and the show editor flags the clash on the
+effect's row.
+</Aside>

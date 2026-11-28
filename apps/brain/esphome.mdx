@@ -1,110 +1,95 @@
 ---
 title: ESPHome
-description: Ask brAIn to work on your ESPHome devices — edit YAML, validate, install over the air, read logs, create new devices and set secrets, from the chat or the terminal.
+description: Ask brAIn to work on your ESPHome devices. Edit YAML, validate, install over the air, read logs, create new devices and set secrets, from the chat or the terminal.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 
-brAIn works on every ESPHome device you have — edits its YAML, validates it, installs it
-over the air, reads its logs — and you ask for it in a sentence. There is no ESPHome screen
-in brAIn's panel: the ESPHome dashboard already is one, and a second copy of it inside
-brAIn was clutter (the tab was removed in 2.10). Everything it did is still there, as the
-tools Claude uses from the chat and the terminal.
+Ask brAIn in a sentence to change an ESPHome device, and it edits the YAML, validates it, and installs the firmware over the air.
 
-## What you can ask for
+![brAIn's Ask tab: a request to add a DHT22 on GPIO4 to the garage sensor and install it, the four steps brAIn took (get config, write config, validate, install over the air), and its summary of the new entities](./images/connect-esphome-chat.webp)
 
-From the chat or the terminal (or a voice agent set to **Whole house** or **Full admin**):
+## What you can ask
 
-```text
-What ESPHome devices do I have, and which need a firmware update?
-Add a DHT22 on GPIO4 to the garage sensor and install it.
-Why does the porch light keep dropping off Wi-Fi?
-Update every device that has firmware waiting.
-Make a new ESP32 device for the shed with a relay on GPIO26.
-Change the Wi-Fi password in my ESPHome secrets.
-```
+Ask from the chat or the terminal, or by voice with an agent set to **Whole house** or **Full admin**.
 
-What happens behind each kind of request:
-
-- **Listing devices** gives every file in `/config/esphome` with its chip and board,
-  whether it's online, the firmware it's running against the version the dashboard would
-  build now (*2026.8.0 → 2026.9.0*), and which Home Assistant device it is. Shared files
-  (packages and includes) are listed too, marked as such.
-- **Changing a device** edits the YAML, validates it, reads ESPHome's own error if there
-  is one, fixes it, and compiles and flashes over the air — "done" means flashed, not just
-  compiled. A device that's offline is compiled now and flashed by the dashboard when it
-  comes back, and brAIn says so.
-- **"Why" questions** stream the device's own log and read it.
-- **A new device** gets the file the dashboard's wizard would write — a fresh API encryption
-  key, OTA password and fallback hotspot, and Wi-Fi from your secrets. The first install
-  onto a brand-new board still has to be over USB from the ESPHome dashboard itself; every
-  one after that can be asked for.
-- **Secrets** are set without ever being read back. brAIn can list the names in
-  `secrets.yaml`, never the values.
-- **Deleting a device** moves its file into `archive/`, exactly as the dashboard does. The
-  device keeps running its firmware.
-- **A stuck build** can be cleared ("clean the build files for the garage sensor"), and a
-  device can be compiled without flashing.
-
-## Safety
-
-- **Every save is undoable.** The file is snapshotted into the same edit journal before it's
-  written, so `brain undo` puts it back.
-- **Your edits aren't overwritten.** If a file was saved from the ESPHome dashboard since
-  brAIn read it, brAIn refuses to save over it.
-- **Broken YAML is still saved** — it's your file — and brAIn says where the parser stopped.
-- **Protected entities apply.** Installing firmware acts on every entity a device carries,
-  so a device holding anything on `protected_entities` is refused — install, upload, update
-  and delete alike — naming the entity.
-
-## Who may use these tools
-
-| Who's asking | What they get |
+| Ask | What happens |
 | --- | --- |
-| The chat and the terminal | Everything above. |
-| A voice agent set to **Whole house** or **Full admin** | Everything above. |
-| A voice agent set to **Voice assistant** | None of the ESPHome tools. |
-| Scheduled, unattended runs (cards, the Resident) | Read device files, validate them, read logs and check on a build. Writing, compiling, installing and deleting only ever happen because somebody asked. |
+| *"What ESPHome devices do I have, and which need a firmware update?"* | A list of every file in `/config/esphome`: chip and board, online or not, running firmware against what the dashboard would build now (*2026.8.0 → 2026.9.0*), and which Home Assistant device it is. Shared packages and includes are listed and marked. |
+| *"Add a DHT22 on GPIO4 to the garage sensor and install it."* | brAIn edits the YAML, validates it, fixes what ESPHome complains about, then compiles and flashes over the air. "Done" means flashed. |
+| *"Why does the porch light keep dropping off Wi-Fi?"* | brAIn reads the device's live log and tells you what it shows. |
+| *"Update every device that has firmware waiting."* | Each device with an update is rebuilt and flashed. |
+| *"Make a new ESP32 device for the shed with a relay on GPIO26."* | A new file like the dashboard's wizard writes: a fresh API encryption key, OTA password and fallback hotspot, and Wi-Fi from your secrets. |
+| *"Change the Wi-Fi password in my ESPHome secrets."* | That one line of `secrets.yaml` changes. The value is never read back. |
+| *"Clean the build files for the garage sensor."* | A stuck build is cleared. brAIn can also compile without flashing. |
+| *"Delete the old test device."* | Its file moves into `archive/`, as the dashboard does. The device keeps running its firmware. |
 
-## How brAIn reaches the dashboard
+Two limits to know:
 
-brAIn edits `/config/esphome` directly, so **editing never needs the dashboard**. Building
-does — validate, compile, install and logs — because ESPHome's toolchains don't run inside
-brAIn's container. brAIn finds the ESPHome add-on on its own and can reach its dashboard
-three ways:
+- **A new board's first install is over USB**, from the ESPHome dashboard. Every install after that can be asked for.
+- **An offline device is compiled now** and flashed by the dashboard when it comes back. brAIn tells you so.
 
-1. **Through Home Assistant's ingress**, the way your browser opens it. Current Supervisor
-   versions no longer let one add-on open another's dashboard with its own credentials, so
-   this needs the `esphome_ha_token` option: a long-lived access token from a Home Assistant
-   administrator. brAIn uses it only to ask Home Assistant for an ingress session.
-2. **The ESPHome add-on's own port**, if you gave it one under that add-on's **Network**
-   settings. Used automatically, but it only answers without a password when that add-on's
-   `leave_front_door_open` is on, which leaves the dashboard open to your whole network.
-3. **`esphome_dashboard_url`**, for a dashboard somewhere else, e.g.
-   `http://192.168.1.20:6052`.
+## Set it up
 
-brAIn speaks both the current **ESPHome Device Builder** (ESPHome 2026.9 and later) and the
-older dashboard, and works out which one it's talking to by itself.
-
-When none of the three can be reached, brAIn says exactly why and which setting ends it,
-file editing keeps working, and a device with a firmware update waiting can still be
-updated **through Home Assistant**'s own update entity.
-
-## Setup
+brAIn edits files in `/config/esphome` directly. To validate, compile, install and read logs it needs to reach the ESPHome dashboard.
 
 <Steps>
 
-1. **Install and start the ESPHome add-on** (ESPHome Device Builder), if you haven't.
+1. **Install and start the ESPHome app** (ESPHome Device Builder).
 
-2. **Create a long-lived access token** as a Home Assistant administrator: your profile →
-   **Security** → **Long-lived access tokens**.
+2. **Create a long-lived access token** as a Home Assistant administrator: your profile → **Security** → **Long-lived access tokens**.
 
 3. **Paste it into `esphome_ha_token`** on brAIn's Configuration tab and restart brAIn.
 
-4. **Ask** — "what ESPHome devices do I have?" in the chat. If brAIn can't reach the
-   dashboard, the answer names the setting that's missing.
+4. **Ask** *"what ESPHome devices do I have?"* in the chat. If brAIn cannot reach the dashboard, the answer names the setting that is missing.
 
 </Steps>
 
-Running the ESPHome dashboard somewhere else (a container on another machine)? Set
-`esphome_dashboard_url` instead of the token.
+brAIn finds the ESPHome app on its own and reaches its dashboard one of three ways:
+
+| Route | When to use it |
+| --- | --- |
+| `esphome_ha_token` | The usual one. brAIn uses the token only to ask Home Assistant for an ingress session, the way your browser opens the dashboard. |
+| The ESPHome app's own port | Used automatically if you gave the app a port under its **Network** settings. It answers without a password only when that app's `leave_front_door_open` is on, which leaves the dashboard open to your whole network. |
+| `esphome_dashboard_url` | A dashboard somewhere else, such as `http://192.168.1.20:6052`. Set it instead of the token. |
+
+brAIn works with both the current **ESPHome Device Builder** (ESPHome 2026.9 and later) and the older dashboard.
+
+If the dashboard cannot be reached, brAIn says why and which setting fixes it. File editing keeps working, and a device with an update waiting can still be updated through Home Assistant's own update entity.
+
+## Safety
+
+- **Every save can be undone.** The file is snapshotted before it is written, so `brain undo` puts it back.
+- **Your edits are not overwritten.** If a file was saved from the ESPHome dashboard since brAIn read it, brAIn refuses to save over it.
+- **Broken YAML is still saved**, because it is your file. brAIn says where the parser stopped.
+- **Protected entities apply.** A device that carries anything on `protected_entities` is refused for install, upload, update and delete, and the refusal names the entity.
+- **Secret values are never shown.** brAIn can list the names in `secrets.yaml`, not the values.
+
+## Who may use these tools
+
+| Who is asking | What they get |
+| --- | --- |
+| The chat and the terminal | Everything. |
+| A voice agent set to **Whole house** or **Full admin** | Everything. |
+| A voice agent set to **Voice assistant** | None of the ESPHome tools. |
+| Scheduled, unattended runs (cards, the Resident) | Read device files, validate them, read logs and check on a build. Writing, compiling, installing and deleting happen only when somebody asks. |
+
+## Tool reference
+
+| Tool | What it does |
+| --- | --- |
+| `esphome_list_devices` | Every device file with its name, platform, board, address, online state, deployed and current firmware version, its Home Assistant device and whether it carries a protected entity. Also discovered devices not yet adopted, the key names in `secrets.yaml`, and whether the dashboard can be reached. |
+| `esphome_get_config` | Read one device's YAML as it is on disk. |
+| `esphome_write_config` | Save a device's YAML. Nothing changes on the device until it is installed. |
+| `esphome_create_device` | Start a new device file the way the dashboard's wizard does. |
+| `esphome_delete_device` | Move a device file into the archive folder. |
+| `esphome_validate` | Validate a configuration with ESPHome itself. |
+| `esphome_compile` | Compile firmware without installing it. |
+| `esphome_install` | Compile and install, over the air by default or to an address. The device reboots. |
+| `esphome_update_firmware` | Install a waiting update through Home Assistant's update entity. Works when the dashboard cannot be reached. |
+| `esphome_clean` | Delete a device's build files. |
+| `esphome_logs` | Read a device's live log for 20 seconds by default, 120 at most. |
+| `esphome_job` | Follow a validate, compile, install, logs or clean job by its id. |
+| `esphome_set_secret` | Set one key in `secrets.yaml`. |
+
+brAIn's panel has no ESPHome screen. Use the ESPHome dashboard for that, and brAIn for everything you would rather ask for.

@@ -1,9 +1,9 @@
 ---
 title: Morph
-description: Morph is brAIn's dashboard and its face — a calm Home Assistant dashboard that says what matters in the house right now, opens cards in place, and that you change by telling brAIn what you want.
+description: Morph is brAIn's dashboard. It says what matters in the house right now, opens cards in place, and changes when you tell brAIn what you want.
 template: splash
 hero:
-  tagline: "The dashboard that knows what matters right now — and says why. Hold anything, tell brAIn what should change, and watch it change."
+  tagline: "The dashboard that says what matters right now, and why. Hold anything, tell brAIn what should change, and it changes."
   actions:
     - text: Quick Start
       link: /brain/morph/quickstart/
@@ -18,123 +18,96 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
 
-## What it is
+Morph is the dashboard in brAIn's first tab. A sentence at the top says what is going on in
+the house, your rooms stay where you put them, and you change anything by telling brAIn.
 
-**Morph is brAIn's dashboard, and brAIn's face.** It was an add-on of its own until brAIn
-4.0; now it is part of brAIn, one switch in **⚙ › Features**, and it lives in the first tab
-of brAIn's one sidebar entry, beside Insights, Ask and Memory.
+![Morph on brAIn's first tab, in the light theme: the greeting "Good night.", a verdict sentence saying it is a quiet evening, the Ask line, the Coming up strip with a 3D print running, the scenes line, and the Kitchen and Living Room with their lights, fan, blinds, speaker and TV](./images/morph-home-light.webp)
 
-Every other dashboard is a map of devices, with the same weight at 3 AM as at 6 PM. Morph
-reads the house the way brAIn has learned it — what is normal for each sensor and door at
-this hour, the house's rhythm — and puts that reading on the page: a **verdict** sentence
-at the top that says what is going on, in the colour of what it means, and a colour and a
-*because* line on each card that is out of the ordinary. It never shuffles the page to do
-it: your rooms stay where you put them, so everyone in the house still knows where things
-are.
+## What you can do
 
-And you never have to learn a YAML schema to change it. **Hold anything and tell brAIn**
-what should be different — "the kitchen header is too tall", "put the porch light in
-Entry", "make the cards rounder" — and brAIn makes the change, shows you the card before
-and after, and gives you **Keep** and **Undo**. Every change is a git commit.
+### Read the house in two seconds
 
-![Morph on brAIn's first tab, in the light theme: the greeting "Good night.", a verdict sentence saying it is a quiet evening, the Ask line, the Coming up strip with a 3D print running, the scenes line, and the Kitchen room with its light strips and speaker](./images/morph-home-light.webp)
+The first line is a verdict: rose when something is wrong, amber for something worth a look,
+indigo when the house is at rest. A card that stands out is tinted and says why. Nothing on
+the page moves to make the point.
 
-Since 5.0 Morph is also a layer on **Home Assistant's own dashboards**: Morph's cards are
-ordinary Lovelace cards with HA's visual editor, brAIn can build card types you reuse
-everywhere, and any dashboard you let brAIn look after keeps a full history you can undo.
+- *The garage door is open*, in rose. Tap the garage card, tap again to confirm, and it closes.
+- On a quiet evening the page is exactly where you left it.
+
+[Using Morph →](/brain/morph/using/)
+
+### Tap, slide, hold
+
+| Gesture | Does |
+| --- | --- |
+| **Tap** | The main thing: toggle a light, play, lock, run a script. |
+| **Slide** | Sets a level: brightness, fan speed, blind position. |
+| **Hold** | Opens the card in place with its options, its history and Home Assistant's own Details. The other cards make room. |
+
+![A light group held open in place: the Kitchen's Cans card with a lane for each of six lights, an All slider at 35%, a colour track, and today's on and off history, with the Countertop and Bar cards moved down to make room](./images/morph-card-open-light.webp)
+
+### Ask the house
+
+Type into the *Ask or tell the house…* line. A question is answered right there. A change to
+the dashboard is made, with Undo.
+
+![The Ask line with an answer under it: "Why is it warm upstairs?", the answer that the attic is 96° and the Upstairs thermostat is holding at 73°, a "Show me Upstairs" link and "Change the dashboard instead"](./images/morph-ask-answer-light.webp)
+
+### Change it by telling brAIn
+
+Hold a card, a room, a floor or the whole page and say what should be different.
+
+| You say | What happens |
+| --- | --- |
+| *"This is cut off."* | brAIn looks at a picture of the card as you see it, and fixes it. |
+| *"Make this simpler."* | brAIn draws two or three versions in the card's place. Pick one with **Use this**. |
+| *"Put the porch light in Entry."* | The card moves. **Keep** or **Undo**. |
+| *"Add a switch in the header for the porch light."* | brAIn changes your copy of Morph's own code. |
+
+![Three versions of a temperature card offered in its place: the chips Current, A "Kitchen only", B "Inside" and C "Average", the line "B · Inside — Just the rooms people live in, one chart", and Use this, More like this, Change… and Discard](./images/morph-tell-versions-dark.webp)
+
+Every change is a commit you can undo. [Tell brAIn & Edit →](/brain/morph/tell-brain/)
+
+### Everything else
+
+- **Host any Lovelace card.** Paste a built-in or HACS card's YAML and it sits in a room,
+  with your theme and live state.
+- **See the day on a line.** The Coming up strip shows what is scheduled and what is running,
+  with lanes for machines such as a washer or a 3D printer.
+- **Protect a sleeping room.** With `sleep_guard` on, anything aimed at a room whose sleeper
+  is in bed asks first.
+- **Get around a big house.** On a touch screen, swipe the right edge and slide from room to
+  room.
+- **Use it on Home Assistant's dashboards.** 21 Morph cards in **Add card**, card types
+  brAIn builds once and you reuse, a brAIn button on any dashboard, and Morph's themes.
+  [Morph on HA dashboards →](/brain/morph/home-assistant-dashboards/)
+- **Let it learn.** Morph notices how the dashboard is used and suggests changes. A no is
+  remembered. Nothing leaves your house. [How it learns →](/brain/morph/learning/)
 
 <Aside type="caution" title="Experimental">
-The Morph dashboard is still being actively developed. Expect missing cards and rough
-edges, and keep your usual dashboards beside it rather than replacing them. It only ever
-writes its own folder (`/config/morph`), every change there is a version you can undo,
-and it changes Home Assistant itself only when you ask for that in words.
+Morph is still being developed. Keep your usual dashboards beside it. It writes only its own
+folder (`/config/morph`), and it changes Home Assistant itself only when you ask for that in
+words.
 </Aside>
-
-<CardGrid>
-  <Card title="It says what matters" icon="star">
-    The first line is a verdict — rose for something wrong, amber for something worth a
-    look, indigo when the house is at rest — and every card's colour and *because* line
-    come from the same reading. They colour what is there; they never move it.
-  </Card>
-  <Card title="Tap, slide, hold" icon="rocket">
-    Tap does the main thing, slide sets a level, and **hold opens the card in place** —
-    its options, its history, and Home Assistant's own Details — while everything else
-    makes room.
-  </Card>
-  <Card title="Tell brAIn, don't edit YAML" icon="pencil">
-    Hold a card, a room, a floor or the whole page in Edit and say what should change.
-    brAIn sees a picture of exactly what you see, makes the change, and says where every
-    change landed. [Tell brAIn & Edit →](/brain/morph/tell-brain/)
-  </Card>
-  <Card title="Any Lovelace card fits" icon="puzzle">
-    Paste any card's YAML — a built-in card, a HACS card — and Morph hosts it inside a
-    room, with your theme and live state.
-  </Card>
-  <Card title="Every change is undoable" icon="random">
-    The dashboard is a git repository at `/config/morph`. Every save, every Tell and every
-    hand edit is one commit, with **Undo** or **Restore** on each.
-  </Card>
-  <Card title="On your HA dashboards too" icon="laptop">
-    21 Morph cards in **Add card**, brAIn-built card types, a brAIn button on any dashboard,
-    the room rail and Morph's themes. [Morph on HA dashboards →](/brain/morph/home-assistant-dashboards/)
-  </Card>
-</CardGrid>
-
-## Use cases
-
-**The two-second glance.** You walk past the tablet in the hallway on the way out. The
-first line reads *The garage door is open* in rose, and the garage card is tinted with
-a line saying why it stands out. You tap the card, tap again to confirm, and the door
-closes. No digging through a tab of twenty switches.
-
-**A quiet evening.** Nothing is out of the ordinary, so the verdict says the house is at
-rest in indigo. The page is exactly where you left it — Living room, Kitchen, Office in
-the order you chose — because Morph colours what matters instead of rearranging it.
-
-**"What's using all the power?"** You type it into the Ask line under the verdict. brAIn
-answers right there, and the page lifts what the answer names. Answer again to carry on:
-it is one conversation, also in brAIn's Ask tab.
-
-**The kids' room after bedtime.** Alex's room has `sleep_guard: true`. When the sleep
-sensor reads *In bed*, the room dims, and anything the page would do to it — a light, the
-fan, a scene — asks first instead of waking someone with a mis-tap.
-
-**"The thermostat card is cut off on my phone."** In Edit, you hold the thermostat card
-and say exactly that. brAIn looks at the picture Morph took of the card, changes it,
-and shows the card before and after. Don't like it? **Undo** reverts that one commit.
-
-**One card type, every dashboard.** You ask brAIn for a thermostat card with your
-"Boost" and "Eco" scripts as buttons. It builds it as a card type, so it appears in
-Home Assistant's **Add card** as **Morph · Thermostat with buttons**. You drop a copy on
-the Bedroom and Office dashboards; later you ask for a bigger target temperature, and
-every copy changes at once.
-
-**The dashboard learns how you use it.** After a week, Morph's learning loop notices the
-Office section is opened every evening but sits at the bottom of the page, and suggests
-moving it up. A yes hands the suggestion to brAIn as an ordinary Tell; a no means it is
-never suggested again. Nothing leaves your house.
 
 ## What you need
 
-- **brAIn** installed, signed in, and Home Assistant restarted once so the brAIn
-  integration is loaded — see [brAIn's Quick Start](/brain/quickstart/).
-- The **Morph dashboard** switch on in brAIn's **⚙ › Features**. It is off on a fresh
-  install, and on automatically if you upgraded from the old Morph app.
-- For **Tell** and the **learning loop**: brAIn's **Automation tasks** option
-  (`enable_automation_integration`, on by default), and the **Learning loop** switch for
-  learning.
-- A Home Assistant **administrator** to change the dashboard. Someone who is not an
-  administrator sees the dashboard alone, without brAIn's other tabs.
+| | |
+| --- | --- |
+| **brAIn** | Installed and signed in, with Home Assistant restarted once. [brAIn's Quick Start](/brain/quickstart/) |
+| **The switch** | **Morph dashboard** on in brAIn's **⚙ › Features**. It is off on a fresh install and on if you upgraded from the old Morph app. |
+| **For Tell and learning** | brAIn's **Automation tasks** option (`enable_automation_integration`, on by default), and the **Learning loop** switch for learning. |
+| **An administrator** | Only a Home Assistant administrator can change the dashboard. Everyone else sees the dashboard alone, without brAIn's other tabs. |
 
-## Where to next
+## Where to go next
 
 <CardGrid>
   <LinkCard title="Quick Start" description="Switch Morph on, open it, and make your first change." href="/brain/morph/quickstart/" />
   <LinkCard title="Using Morph" description="The verdict, rooms, cards in place, Coming up, Ask, the room rail." href="/brain/morph/using/" />
-  <LinkCard title="Tell brAIn & Edit" description="Hold anything, say what should change; Edit mode; history and undo." href="/brain/morph/tell-brain/" />
+  <LinkCard title="Tell brAIn & Edit" description="Hold anything and say what should change. Versions, Edit mode, history and undo." href="/brain/morph/tell-brain/" />
   <LinkCard title="Morph on HA dashboards" description="Morph cards, card types, dashboards brAIn looks after, the rail and themes." href="/brain/morph/home-assistant-dashboards/" />
-  <LinkCard title="How it learns" description="The learning loop: suggestions, lessons, and why nothing leaves the house." href="/brain/morph/learning/" />
+  <LinkCard title="How it learns" description="Suggestions, lessons, and why nothing leaves the house." href="/brain/morph/learning/" />
   <LinkCard title="Settings & files" description="⚙ › Dashboard, and every key of dashboard.yaml." href="/brain/morph/settings/" />
 </CardGrid>

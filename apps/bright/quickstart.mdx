@@ -1,12 +1,12 @@
 ---
 title: BRight Quick Start
-description: Install BRight, prove your speaker can play, map your lights, measure the speaker's delay, analyse your music and watch the first show — in the order that has the fewest dead ends.
+description: Install BRight, test your speaker, map your lights, measure the speaker's delay, analyse your music and watch the first show.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-You can wander the tabs in any order, but this is the path with the fewest dead ends. Allow
-twenty minutes plus however long your library takes to analyse the first time.
+Go from install to a room following a song in about twenty minutes, plus the time your library
+takes to analyse the first time.
 
 ## Install
 
@@ -19,83 +19,80 @@ twenty minutes plus however long your library takes to analyse the first time.
    https://github.com/bruhautomation/BRUH-HA-Apps
    ```
 
-2. **Install BRight and start it.** It installs from a prebuilt image, so it is a download rather
-   than a build on your machine. The panel appears in your sidebar as **BRight**.
+2. **Install BRight and start it.** It downloads a prebuilt image. The panel appears in your
+   sidebar as **BRight**.
 
-3. **Accept the discovered integration.** Under **Settings → Devices & Services**, accept
-   **BRight**. The add-on deploys the integration itself; accepting it is what adds the
-   `bright.*` services and the show-status sensor. If the add-on log says Home Assistant needs a
-   restart for a newer integration, restart it then — it only says so when one is needed.
+3. **Accept the integration.** Under **Settings → Devices & Services**, accept the discovered
+   **BRight**. This adds the `bright.*` services and the show-status sensor. Restart Home
+   Assistant only if the app's log asks for it.
 
 </Steps>
 
-<Aside>
-BRight runs with **host networking**, because LIFX discovery is a UDP broadcast whose replies come
-back to the sender's own address — a bridged container never hears them. Its panel port is
-assigned by the Supervisor rather than fixed, and the panel answers only Home Assistant itself, so
-open it from the sidebar.
-</Aside>
+Open the panel from the sidebar. It answers only Home Assistant itself, on a port the Supervisor
+assigns.
 
-## First show
+## Your first show
 
 <Steps>
 
-1. **Prove your speaker can play — Calibrate → Test playback.** Pick a speaker and press
-   **Test playback**. BRight sends its click track and follows it the whole way: whether the file
-   is on disk, whether Home Assistant can resolve it, what address it hands your speaker, whether
-   the speaker accepted the command, and whether it actually started. It names the step that
-   broke. Ten seconds, and everything downstream depends on it.
+1. **Test the speaker.** On **Calibrate**, pick a speaker and press **Test playback**. BRight
+   sends a click track and names the step that broke if you hear nothing.
 
-   On a Chromecast, Google or Nest speaker the usual culprit is an *Internal URL* of
-   `http://homeassistant.local:8123` — see [When nothing plays](/bright/reference/#when-nothing-plays).
+   On a Chromecast, Google or Nest speaker the usual cause is an *Internal URL* of
+   `http://homeassistant.local:8123`. See [When nothing plays](/bright/reference/#when-nothing-plays).
 
-2. **Find the bulbs — Lab → Discover bulbs.** BRight broadcasts on the LAN and lists every LIFX
-   bulb it hears. **Probe all unprobed** checks how quickly each one answers ("Fast, 8 ms, no
-   loss"). If you have party lights or lasers on smart plugs, measure one under **Aux lights** so
-   their cues can be sent early by exactly that much.
+2. **Find the bulbs.** On **Lab**, press **Discover bulbs**, then **Probe all unprobed**. Each
+   bulb reports how quickly it answers ("Fast, 8 ms, no loss"). For party lights or lasers on smart
+   plugs, pick one under **Aux lights** and press **Measure latency**.
 
-3. **Map the lights — Light Map.** Drag each light to roughly where it sits in the room
-   (left ↔ right matters most) and give it a **role**: `candle`, `downlight`, `lamp`, `strip`,
-   `party` or `laser`. Optionally type a **zone** — a room name. **Add every discovered bulb** is
-   right exactly once; after that, add bulbs one at a time from the picker. Switch lights go in
-   with **Add a switch light…**. See [Light Map, Lab & Calibration](/bright/light-map/).
+   ![The Lab tab: Discover bulbs and Probe all unprobed, the line All 8 checked, all fast, and a list of bulbs each reading Fast with its milliseconds and no loss, one with its menu open showing Find speed limit and Beat-pulse demo](./images/lab.webp)
 
-4. **Measure the speaker — Calibrate → Play clicks & listen.** Open the BRight panel **on your
-   phone**, in the room with the speaker. BRight plays a 13-second click track while the page
-   listens through the microphone and works out the delay. No microphone (plain HTTP)? **Play
-   clicks & tap** instead. In a hurry? **Type the delay in** — 0 for a wired speaker, about 2000 ms
-   for AirPlay.
+3. **Map the lights.** On **Light Map**, drag each light to roughly where it sits in the room.
+   Give each a **role** (`candle`, `downlight`, `lamp`, `strip`, `party` or `laser`) and,
+   optionally, a **zone** such as a room name. Add switch-driven lights with
+   **Add a switch light…**. See [Light Map, Lab & Calibration](/bright/light-map/).
 
-5. **Analyse the music — Library.** Press **Browse media**, open folders, and tick the ones to
-   scan (each is scanned all the way down). Then **Analyze new tracks**. Analysis happens once per
-   track; renaming a file or listing it in two folders costs nothing, because tracks are known by
-   their content.
+4. **Measure the speaker.** Open the panel **on your phone**, in the room with the speaker. On
+   **Calibrate**, press **Play clicks & listen**. BRight plays a 13-second click track and works
+   out the delay through the microphone.
 
-6. **Compile and watch — Shows.** Pick the speaker, then a song. Press **▶ Play**, or open **⋯**
-   to build the show again, ask Claude to write it, or run a plain beat test (every mapped light pulsing on the
-   analysed beat). Tap the
-   song's name to open its show below: your room on the floor plan, the song as a strip, and every
-   effect as a row you can edit.
+   | If | Do this instead |
+   | --- | --- |
+   | The browser refuses the microphone (plain HTTP) | **Play clicks & tap** |
+   | You are in a hurry | **Or type the delay in**: 0 for a wired speaker, about 2000 ms for AirPlay |
 
-7. **Throw a party — Party.** Tick the songs (or none, for everything), pick the speaker, press
-   **🎉 Play everything**. Name it with **Save as a set** to start it later by name.
+5. **Analyse the music.** On **Library**, press **Browse media**, tick the folders to scan, then
+   press **Analyze new tracks**. Each track is analysed once.
+
+6. **Play a show.** On **Shows**, pick the speaker and press **Build show** beside a song, then
+   **▶ Play**. Tap the song's name to open its show: your room, the song, and every effect as a
+   row you can edit.
+
+   ![The Shows tab: a speaker picker, five songs with Play or Build show, one song's menu open showing Rebuild show, Ask Claude to write it and Test beats and drops, and the mood box with Check Claude](./images/shows.webp)
+
+7. **Throw a party.** On **Party**, tick the songs (or none, for everything), pick the speaker and
+   press **🎉 Play**. Press **Save as a set** to start it later by name.
 
 </Steps>
 
-## Sanity checks worth doing once
+## Check the sync once
 
-- **Lab → Test mode — beats & drops.** Pick an analysed track and a calibrated speaker, tick a
-  bulb you can see, and press **Start**. Every ticked bulb pulses on the beat and flashes on every
-  drop. Off the beat? Nudge the calibration. Flashing on nothing? Analyse the song again. If Test
-  mode hits the beat, shows will.
-- **±25 ms by ear.** While a show or party plays, the ±25 ms buttons trim the sync live, and
-  **🎤 Sync by ear** measures it from the room. **Keep this trim** folds it into the speaker's
-  calibration.
-- **Recompile after changing the map.** A show is built for the lights that existed when it was
-  compiled.
+- **Run Test mode.** In **Lab → Test mode — beats & drops**, pick an analysed track and a
+  calibrated speaker, tick a bulb you can see, and press **Start**. The bulb pulses on the beat
+  and flashes on every drop. If it is off the beat, nudge the calibration. If it flashes on
+  nothing, analyse the song again.
+- **Trim by ear.** While a show or party plays, **−25ms** and **+25ms** shift the lights. On the
+  Party tab, **🎤 Sync by ear** measures the shift from the room and **Keep this trim** saves it
+  for that speaker.
+
+<Aside type="tip">
+Rebuild a show after you change the Light Map. A show is built for the lights that were on the map
+when it was compiled.
+</Aside>
 
 ## Next
 
-- [How a Show Is Built](/bright/shows/) — what the director does with your music, and the editor.
-- [Effects](/bright/effects/) — build your own.
-- [Reference](/bright/reference/) — options, services, entities and troubleshooting.
+- [How a Show Is Built](/bright/shows/): watch, edit and revise a show.
+- [Effects](/bright/effects/): build your own.
+- [Manual Mode](/bright/manual/): play the lights live.
+- [Reference](/bright/reference/): options, services, the sensor and troubleshooting.

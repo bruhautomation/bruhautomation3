@@ -1,86 +1,97 @@
 ---
 title: Worlds & Backups
-description: Run several Minecraft worlds side by side in BRUH Minecraft, each with its own settings, plugins and players — switch, rename, import a .zip, install featured worlds like Drehmal, and roll any world back from git snapshots or archives.
+description: Keep several Minecraft worlds side by side, each with its own settings, plugins and players. Switch, import a .zip, install featured worlds like Drehmal, and roll any world back from a snapshot.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-## Worlds
-
-Each **world** is a full server root at `/config/minecraft-worlds/<name>/` with its own world files,
-`server.properties`, plugins and add-ons, operators, whitelist and bans, and backup history. One runs
-at a time: **Switch** restarts the add-on into another, and the panel is back in about 30 seconds.
+Keep several worlds on one server, switch between them in one press, and put any of them back
+the way it was this morning.
 
 ![The Worlds tab: three worlds with size and settings (Survival, Normal difficulty, Normal world, Whitelist on), the active marker, Switch, Rename, Download and Delete; and Featured worlds with a SkyBlock card already installed and an adventure map with Install](./images/panel-worlds.webp)
 
-| Action | What it does |
+## Manage worlds
+
+One world runs at a time. Each has its own world files, `server.properties`, plugins and add-ons,
+operators, whitelist, bans and backup history.
+
+| Press | What happens |
 | --- | --- |
-| **Switch** | Makes that world active and restarts the add-on into it |
-| **Rename** | Moves the world, its level folder and name, its backups and the active-world setting together; restarts the server if it was running |
-| **Download** | The world as a file |
-| **Delete** | Removes the world and its backup history. The active world cannot be deleted — switch away first |
-| **Create new world…** | A wizard for a fresh world with its own game mode, difficulty and player rules |
-| **Import** | A Minecraft world `.zip` up to 2 GB. The folder holding `level.dat` is found wherever it is in the zip, and staged as a new world to switch to |
+| **Switch** | That world becomes active and the app restarts into it. The panel is back in about 30 seconds |
+| **Create new world…** | A wizard makes a fresh world with its own game mode, difficulty and player rules |
+| **Import** | Upload a Minecraft world `.zip` up to 2 GB. The folder holding `level.dat` is found wherever it is in the zip, and added as a new world to switch to |
+| **Rename** | Moves the world, its level folder and name, and its backups together. Restarts the server if it was running |
+| **Download** | Saves the world as a file |
+| **Delete** | Removes the world and its backup history. Switch away first: the active world cannot be deleted |
 
 Each world's line says what it is: *Survival · Normal difficulty · Normal world · Whitelist on*.
 
-**Shared across worlds:** the add-on's own options — server type and version, memory, backups,
-Bedrock, the `plugins:` list and plugin ticks — and the RCON password. **Per world:** everything
-about how the world plays.
+| Shared by every world | Separate per world |
+| --- | --- |
+| The app's options: server type and version, memory, backups, Bedrock, the `plugins:` list and plugin ticks. The RCON password | Everything about how the world plays: properties, plugins and add-ons, players, ops, whitelist, bans, backups |
 
-### Per-world settings
+## Change how a world plays
 
-The **Properties** tab edits the active world's `server.properties`: MOTD, game mode, difficulty,
-max players, PVP, hardcore, `online-mode`, whitelist, view and simulation distance, world
-generation, flight, command blocks, spawn protection and the rest. Difficulty, game mode and
-whitelist apply live; the rest on the next restart. Keys the add-on manages (RCON, query, ports)
-are shown read-only, and world-generation keys are marked as only affecting new worlds.
+Open **Properties**, change a value and press **Save**. This edits the active world's
+`server.properties`.
 
 ![The Properties tab: Editing world "world", per-world, with editable keys such as level-name, motd, gamemode, difficulty, max-players, pvp, online-mode and white-list, each with Save](./images/panel-properties.webp)
 
-**Tune for my hardware** on the Dashboard inspects the machine's memory and CPU and suggests
-`memory_mb` plus the world's view and simulation distance; you confirm first.
+| Keys | When a change applies |
+| --- | --- |
+| Difficulty, game mode, whitelist | Live |
+| MOTD, max players, PVP, hardcore, `online-mode`, view and simulation distance, flight, command blocks, spawn protection and the rest | On the next restart |
+| World generation (seed, level type, feature packs) | New worlds only. The tab marks them |
+| RCON, query and ports | Read-only. The app manages them |
 
-### Featured worlds
+**Tune for my hardware** on the Dashboard reads the machine's memory and CPU and suggests
+`memory_mb` plus the world's view and simulation distance. You confirm before anything changes.
 
-Curated community worlds installed with one click, entirely **server-side** — so iPads and iPhones
-on Bedrock just join, with nothing to download.
+## Install a featured world
 
-- **Install** downloads the world and its bundled data packs as a **new** world (your current one is
-  untouched), writes its settings from the catalog, hosts its resource pack for Java players and
-  converts it to a Bedrock pack that Geyser pushes on join.
-- **Switch** then pins the server to the software and Minecraft version the world needs, turns
-  Bedrock support on and restarts. Switching back to your own world may need a version picked again
-  on the Configuration tab.
+Featured worlds are community worlds that install entirely on the server. Bedrock players join
+with nothing to download.
 
-The headline entry is [Drehmal: APOTHEOSIS](https://www.drehmal.net), a hand-built 12k × 12k
-adventure world (about 1.5 GB, Minecraft 1.20.1 on Paper). Bedrock players can explore the whole
-map; vanilla retextures convert, custom 3D models and animated textures do not, and Drehmal's
+1. Press **Install** on a card. The world and its data packs download as a **new** world. Your
+   current one is untouched.
+2. Press **Switch**. The server pins itself to the software and Minecraft version the world
+   needs, turns Bedrock support on and restarts.
+
+The world's resource pack is hosted for Java players and converted to a Bedrock pack that Geyser
+pushes on join. After switching back to your own world, you may need to pick a version again on
+the **Configuration** tab.
+
+[Drehmal: APOTHEOSIS](https://www.drehmal.net) is the headline entry: a hand-built 12k × 12k
+adventure world, about 1.5 GB, on Minecraft 1.20.1 and Paper. Bedrock players can explore the
+whole map. Vanilla retextures convert. Custom 3D models and animated textures do not. Drehmal's
 optional client-side mods are not needed to play.
 
-## Backups
+## Back up a world
 
-Backups run on a schedule (`auto_backup`, every `backup_interval_minutes`, keeping
-`backup_keep_count`), on demand from the header's **Backup** button, and before anything large the
-companion does. They are per world: switch worlds to browse another one's history.
+Backups run on a schedule, when you press **Backup** in the header, and before anything large the
+companion does. They are kept per world, so switch worlds to see another one's history.
 
 ![The Backups tab: Git snapshots, 6 snapshots since Nov 22, grouped by day with Wednesday open showing a folded run of scheduled backups with Show 2, older days folded, and Archives with two archives each with Restore](./images/panel-backups.webp)
 
-- **Git snapshots** (`backup_use_git: true`, the default) keep a history with only the changes
-  stored each time.
-- **Archives** (`backup_use_git: false`) are timestamped `.tar.gz` files — simpler for very large
-  worlds.
+| Option | Default | What it does |
+| --- | --- | --- |
+| `auto_backup` | `true` | Back up on a schedule |
+| `backup_interval_minutes` | `60` | How often |
+| `backup_keep_count` | `48` | How many to keep |
+| `backup_use_git` | `true` | `true`: git snapshots that store only the changes. `false`: timestamped `.tar.gz` archives, which suit very large worlds |
 
-Snapshots are grouped by day, older days folded; a run of identical scheduled snapshots folds into
-one line with **Show N**. Each says what it was — scheduled, manual or before a world change —
-whether the world changed, and how many players were on.
+Snapshots are grouped by day, with older days folded. A run of identical scheduled snapshots
+folds into one line with **Show N**. Each line says whether it was scheduled, manual or taken
+before a world change, whether the world changed, and how many players were on.
 
-**Restore** puts the whole world (with its Nether and End) back as it was and restarts the server.
-It asks first, naming the time it goes back to, because anything built since is lost.
+## Restore a world
 
-<Aside title="Smaller than a backup: Undo">
-To take back just one thing the companion did, press **Undo** on that action in the Companion card
-or in brAIn — it puts back the blocks it changed and leaves everything else alone.
+Press **Restore** on a snapshot or archive. The panel names the time it goes back to and asks
+first. The whole world, with its Nether and End, is put back and the server restarts.
+
+<Aside type="caution" title="Restore loses everything built since">
+To take back one thing the companion did, press **Undo** on that action in the Companion card or
+in brAIn instead. It puts back the blocks that action changed and leaves everything else alone.
 </Aside>
 
 ## Where it all lives

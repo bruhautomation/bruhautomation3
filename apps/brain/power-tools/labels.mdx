@@ -1,143 +1,65 @@
 ---
 title: Labels
-description: Create, rename, and update labels, and apply them to entities, devices, and areas in bulk with brain.add_label and friends.
+description: Ask brAIn to create, rename, restyle and delete labels, and to apply or remove them on entities, devices and areas in one call.
 sidebar:
   order: 3
 ---
 
-Labels cut across rooms: *battery powered*, *holiday lights*, *rental-guest accessible*, *critical*. Home Assistant can target a whole label in one service call.
+Ask brAIn to label things that cut across rooms, such as *battery powered*, *holiday lights* or *critical*, so Home Assistant can target the whole group in one action.
 
-Unlike Spook's six single-target label services, `add_label` and `remove_label` take entities, devices, and areas in the same call.
+## Ask brAIn
 
-## Create label
-
-`brain.create_label`
-
-Create a new label. Returns the new label_id as response data.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | text | yes | Name of the new label. |
-| `icon` | icon | no | Icon for the label. |
-| `color` | text | no | Label color: a theme color name (e.g. red, blue, amber) or hex code. |
-| `description` | text | no | What this label is for. |
-
-```yaml
-service: brain.create_label
-data:
-  name: Battery powered
-  icon: mdi:battery
-  color: amber
+```text
+Label every battery-powered sensor in the house "Battery powered".
+Create an amber "Holiday lights" label and put it on the porch and tree plugs.
+Make the battery label red and say what it's for.
+That motion sensor is wired now. Drop its battery label.
+Delete the "test" label everywhere.
 ```
 
-> 🗣️ *"Create an amber 'Battery powered' label."*
+## What brAIn can do
 
-## Rename label
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-`brain.rename_label`
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.create_label` | Create a label. Returns its `label_id`. `color` is a theme color name (`red`, `blue`, `amber`) or a hex code. | `name`\*, `icon`, `color`, `description` |
+| `brain.rename_label` | Rename a label. Everything carrying it keeps it. | `label_id`\*, `name`\* |
+| `brain.update_label` | Change a label's icon, color or description. Fields you leave out stay as they are. | `label_id`\*, `icon`, `color`, `description` |
+| `brain.delete_label` | Delete a label and remove it from everything it was on. `dry_run: true` lists what carries it. | `label_id`\*, `dry_run` |
+| `brain.add_label` | Apply one or more labels to entities, devices and areas in the same call. Name at least one target. | `label_id[]`\*, `entity_id[]`, `device_id[]`, `area_id[]` |
+| `brain.remove_label` | Remove one or more labels from entities, devices and areas. Name at least one target. | `label_id[]`\*, `entity_id[]`, `device_id[]`, `area_id[]` |
 
-Rename an existing label. Everything carrying it keeps it.
+## Examples
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `label_id` | label | yes | The label to rename. |
-| `name` | text | yes | The new name. |
-
-```yaml
-service: brain.rename_label
-data:
-  label_id: battery_powered
-  name: Battery
+```yaml title="Create a label and apply it"
+- action: brain.create_label
+  data:
+    name: Battery powered
+    icon: mdi:battery
+    color: amber
+- action: brain.add_label
+  data:
+    label_id: [battery_powered]
+    entity_id:
+      - sensor.front_door_battery
+      - sensor.motion_battery
+    device_id:
+      - a1b2c3d4e5f6
 ```
 
-> 🗣️ *"Rename the 'Battery powered' label to just 'Battery'."*
-
-## Update label
-
-`brain.update_label`
-
-Change a label's icon, colour, or description — use `rename_label` for the name. Pass at least one field; anything you leave out is left as it is.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `label_id` | label | yes | The label to update. |
-| `icon` | icon | no | The new icon, e.g. `mdi:lightbulb`. |
-| `color` | text | no | A theme color name (primary, red, green, …) or a hex color. |
-| `description` | text | no | What the label is for. |
-
-```yaml
-service: brain.update_label
+```yaml title="Restyle it"
+action: brain.update_label
 data:
   label_id: battery_powered
   color: red
   description: Anything that runs on a battery and needs watching
 ```
 
-> 🗣️ *"Make the battery label red and say what it's for."*
-
-## Delete label
-
-`brain.delete_label`
-
-Delete a label. It is removed from everything it was applied to.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `label_id` | label | yes | The label to delete. |
-
-```yaml
-service: brain.delete_label
-data:
-  label_id: battery_powered
-```
-
-> 🗣️ *"Delete the battery-powered label everywhere."*
-
-## Add label
-
-`brain.add_label`
-
-Apply one or more labels to entities, devices, and/or areas. At least one target is required.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `label_id` | label (list) | yes | Labels to apply. |
-| `entity_id` | entity (list) | no | Entities to label. |
-| `device_id` | device (list) | no | Devices to label. |
-| `area_id` | area (list) | no | Areas to label. |
-
-```yaml
-service: brain.add_label
-data:
-  label_id: [battery_powered]
-  entity_id:
-    - sensor.front_door_battery
-    - sensor.motion_battery
-  device_id:
-    - a1b2c3d4e5f6
-```
-
-> 🗣️ *"Label every battery-powered sensor in the house 'Battery powered'."*
-
-## Remove label
-
-`brain.remove_label`
-
-Remove one or more labels from entities, devices, and/or areas. At least one target is required.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `label_id` | label (list) | yes | Labels to remove. |
-| `entity_id` | entity (list) | no | Entities to unlabel. |
-| `device_id` | device (list) | no | Devices to unlabel. |
-| `area_id` | area (list) | no | Areas to unlabel. |
-
-```yaml
-service: brain.remove_label
+```yaml title="Take it off one sensor"
+action: brain.remove_label
 data:
   label_id: [battery_powered]
   entity_id:
     - sensor.motion_battery
 ```
-
-> 🗣️ *"That motion sensor is wired now — drop its battery label."*

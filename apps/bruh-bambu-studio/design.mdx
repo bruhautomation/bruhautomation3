@@ -1,146 +1,170 @@
 ---
 title: Designing parts with brAIn
-description: Describe a part in plain words and brAIn designs it as a parametric CadQuery model, shows it in a 3D view in its print colours, measures it, keeps every version, and prints it on the right printer and AMS trays.
+description: Describe a part in plain words. brAIn designs it, shows it in 3D in its print colours, keeps every version, and prints it on the right printer and AMS trays.
 ---
 
-import { Steps, Aside, Card, CardGrid, FileTree } from '@astrojs/starlight/components';
+import { Steps, Aside, FileTree } from '@astrojs/starlight/components';
+import measureShot from './images/design-measure.webp';
+import phoneShot from './images/design-phone.webp';
 
-With [brAIn](/brain/) installed and its **Automation integration** on, a **Design** tab appears
-in BRUH Bambu Studio. Without brAIn the tab is not there (or, if you already have parts, it
-shows them and says why it cannot chat), and nothing else in the add-on changes.
+Describe a part in a sentence and brAIn designs it, shows it in 3D, changes it as you talk,
+and prints it.
 
-## The flow
+![The Design tab: the parts list, a two-colour headphone hook in the 3D view with view buttons and Measure, and the conversation with brAIn beside it](./images/design.webp)
+
+The **Design** tab appears when [brAIn](/brain/) is installed with its **Automation
+integration** on. Without brAIn the tab is hidden, or shows the parts you already have and
+says why it cannot chat. Nothing else in the app changes.
+
+## Design a part
 
 <Steps>
 
-1. **Describe it.** Press **New part** and say what it is for, what it fits, and any sizes you
-   know: *a wall hook for a 20 mm rail, holds a bike helmet*. brAIn picks sensible defaults,
-   says what it chose, and asks only what it cannot guess — a mating size, a clearance — with
-   its questions as buttons you can tap. It cannot open a link or see a photo, so it asks for
-   the measurements instead.
+1. **Describe it.** Press **New part** and say what it is for, what it fits and any sizes you
+   know: *a wall hook for a 20 mm rail, holds a bike helmet*. brAIn picks defaults, says what it
+   chose, and asks only what it cannot guess, with its questions as buttons you can tap.
 
-2. **brAIn writes the part** as a parametric CadQuery script. The add-on checks it, builds it
-   into STEP, 3MF and STL, and shows it in the **3D view**. If a build fails, the error goes
-   straight back to brAIn to fix (twice at most) before you ever see it.
+2. **Look at it.** brAIn writes the part, the app builds it into STEP, 3MF and STL and shows it
+   in the 3D view. A build that fails goes back to brAIn to fix, twice at most, before you
+   see it.
 
-3. **Keep talking to change it.** *Make it 10 mm longer.* *Add a chamfer on the screw holes.*
-   *Put our initials on the front in black.* Every change that builds is a new **version**;
-   nothing is overwritten.
+3. **Change it by talking.** *Make it 10 mm longer.* *Add a chamfer on the screw holes.* *Put
+   our initials on the front in black.* Every change that builds is a new version. Nothing is
+   overwritten.
 
-4. **Print it.** Say *print it* in the conversation, or press **Print** — see
-   [Printing a design](#printing-a-design).
+4. **Print it.** Say *print it*, or press **Print**. See [Print a design](#printing-a-design).
 
 </Steps>
 
-## The 3D view
+<Aside type="note">
+brAIn cannot open a link or see a photo in a design conversation. Give it the measurements
+that matter.
+</Aside>
 
-The part is drawn **in the colours it will print in** — a white part is white, and a
-multi-colour part shows each body in its own colour, on a bed that reads like the printer's.
+## Look at the part in 3D
 
-<CardGrid>
-  <Card title="Moves like Fusion 360">
-    **Mouse:** drag (or Shift + middle-drag) turns the part about the point you grab;
-    middle-drag or right-drag slides it; the wheel zooms toward the pointer; double-click puts
-    a point in the middle. **Touch:** one finger turns, two fingers slide, a pinch zooms toward
-    your fingers. Z stays up and the view never flips over the top. The **?** in the corner
-    shows all of this, and opens by itself the first time.
-  </Card>
-  <Card title="Named views">
-    **Home** goes back to the corner view with the whole part in sight; **Iso**, **Top**,
-    **Front** and **Right** turn to that side, each framing the whole part. They move rather
-    than jump. **Wireframe** shows the edges through the part.
-  </Card>
-  <Card title="Measure that snaps">
-    Tap two points for the distance and its X, Y and Z legs. Near a corner, the middle of an
-    edge, an edge, the centre of a flat face or a face, the pick snaps to it and a marker says
-    which. A face beside a point gives the distance square to the face; two faces or two edges
-    give the angle between them. The last five measurements stay listed until **Clear**;
-    Escape starts the current one again.
-  </Card>
-  <Card title="Bodies and colours">
-    Each body has a pill under the view. Tap its name to hide or show it. Tap its **colour dot**
-    to change what it prints in — the AMS trays' colours first, then any colour, or **Back to
-    brAIn's colour**. Your choice is saved on the part, used by Print, and passed to brAIn on
-    your next message.
-  </Card>
-</CardGrid>
+The part is drawn in the colours it will print in, on a bed like the printer's. A multi-colour
+part shows each body in its own colour.
 
-**Full screen** fills the screen with the view and its tools (or fills the window where Home
-Assistant's frame refuses full screen); Escape or **‹ Leave full screen** comes back. On a
-desktop the view's bottom edge drags to make it taller, and the view and conversation sit side
-by side. On a phone the part fills the screen under the bar, the conversation scrolls under the
-view, and **▾** folds the view away for a long conversation.
+| To | Mouse | Touch |
+|---|---|---|
+| Turn the part | Drag, or Shift + middle-drag. It turns about the point you grab | One finger |
+| Slide it | Middle-drag or right-drag | Two fingers |
+| Zoom | Wheel, toward the pointer | Pinch, toward your fingers |
+| Centre a point | Double-click | |
 
-**Invert vertical drag** (Settings › 3D view) is on by default: dragging down raises the view.
-Turn it off for Fusion 360's way round. It is remembered on that browser.
+The **?** in the corner of the view shows these, and opens by itself the first time.
 
-## Versions
+| Button | What it does |
+|---|---|
+| **Home** | Back to the corner view with the whole part in sight |
+| **Top**, **Front**, **Right**, **Iso** | Turn to that side, framing the whole part |
+| **Measure** | Measure between two points (below) |
+| **Wireframe** | Show the edges through the part |
+| **Full screen** | Fill the screen with the view and its tools. Escape or **‹ Leave full screen** comes back |
 
-Under the view, one line says which version you are on, its size, its weight and how many
-warnings it has. Open it for what changed, the warnings, the dimensions and the other versions:
-the chips switch between them, and **Keep working from vN** makes an older one the base for the
-next change. The **⋯** on the part downloads its **3MF** or **STEP** (named like
-`Wall hook v3.3mf`) or deletes it.
+**Invert vertical drag** in **Settings › 3D view** is on by default: dragging down raises the
+view. Turn it off for Fusion 360's way round. It is remembered on that browser.
+
+### Measure it
+
+<img src={measureShot.src} width="560" alt="Measure on the 3D view: a line along the hook's arm labelled 44.00 mm, with its X, Y and Z legs and the measurement listed under the view" />
+
+Press **Measure** and tap two points. You get the distance and its X, Y and Z legs.
+
+- **Picks snap** to a corner, the middle of an edge, an edge, the centre of a flat face or a
+  face. A marker says which.
+- **A face and a point** give the distance square to the face.
+- **Two faces or two edges** give the angle between them.
+- The last five measurements stay listed until **Clear**. Escape starts the current one again.
+
+### Hide bodies and change colours
+
+Each body has a pill under the view.
+
+- **Tap its name** to hide or show it.
+- **Tap its colour dot** to change what it prints in. The AMS trays' colours come first, then
+  any colour, or **Back to brAIn's colour**.
+
+Your choice is saved on the part, used by Print, and passed to brAIn with your next message.
+
+### On a phone
+
+<img src={phoneShot.src} width="390" alt="The Design tab on a phone: the part in the 3D view, the view buttons, the body pills, the version line and the conversation underneath" />
+
+The view sits above the conversation, which scrolls on its own. **▾** folds the view away for
+a long conversation. On a desktop the view and conversation sit side by side, and the view's
+bottom edge drags to make it taller.
+
+## Go back to an earlier version
+
+One line under the view says which version you are on, its size, its weight and how many
+warnings it has. Open it for what changed, the warnings, the dimensions and the other versions.
+
+- **The chips** switch between versions.
+- **Keep working from vN** makes an older version the base for the next change.
+- **⋯** on the part downloads its **3MF** or **STEP** (named like `Wall hook v3.3mf`) or deletes
+  the part.
 
 ## Printing a design
 
-**Print** offers three ways.
+![Print this part: Auto print (recommended), Manual print and Open in Bambu Studio](./images/design-print.webp)
 
-<CardGrid>
-  <Card title="Auto print (recommended)" icon="rocket">
-    brAIn chooses the printer (one that is online and idle), the AMS tray for every body —
-    material first, then the closest colour — and the settings, and starts the print. It asks
-    first only when something it needs is missing: no idle printer, a colour or material that
-    is not loaded (it says which to load), or a printer whose last print may still be on the
-    plate. Saying *print it* in the conversation does the same.
-  </Card>
-  <Card title="Manual print" icon="setting">
-    Choose the printer, the tray for each body, and every
-    [print option](/bruh-bambu-studio/printing/#print-options) yourself, starting from what
-    brAIn suggests.
-  </Card>
-  <Card title="Open in Bambu Studio" icon="laptop">
-    Opens that version on the [Studio tab](/bruh-bambu-studio/studio/) as a full project — with
-    the printer, process and filament settings of one of your printers (the first with its model
-    set) and one filament per colour — to set up and print from Bambu Studio itself.
-  </Card>
-</CardGrid>
+| Choice | What happens |
+|---|---|
+| **Auto print** (recommended) | brAIn chooses a printer that is online and idle, the AMS tray for each body (material first, then the closest colour) and the settings. It says its plan and starts the print. Saying *print it* in the conversation does the same |
+| **Manual print** | You choose the printer, the tray for each body and every [print option](/bruh-bambu-studio/printing/#print-options), starting from what brAIn suggests |
+| **Open in Bambu Studio** | Opens that version on the [Studio tab](/bruh-bambu-studio/studio/) as a full project, with the settings of the first of your printers that has its model set and one filament per colour |
 
-**Colours are bodies.** A part in several colours is several bodies that touch — a logo on a
-cube is two bodies — and each body prints from its own tray, so those colours need to be loaded
-in the AMS. The external spool holds one filament and suits a one-colour part. A designed part's
-3MF is one object with a part per body, so a print-in-place part never comes apart on the plate.
+Auto print asks first only when something is missing: no idle printer, a colour or material
+that is not loaded (it says which to load), or a printer whose last print may still be on the
+plate.
 
-**brAIn designs for the printer.** It knows each printer's build volume and nozzle, keeps parts
-inside the build volume (and splits one that is too big into pieces that join), lays out copies
-and print-by-object jobs, and keeps a second colour to a few layers because every colour change
-purges filament — saying roughly what a wasteful choice would cost. It can set any print option
-when you ask: *print it by object*, *four copies*, *ironing on top*, *on the textured plate*. It
-says its plan before it prints, and the conversation then shows the sliced time and the filament
-per colour, and when the print started.
+After the print is sent, the conversation shows the sliced time, the filament per colour, and
+when the print started.
 
-Printing a design uses Bambu Studio's own profiles for that printer and each tray's filament,
-puts the part's settings over them, slices with Bambu Studio's command line, uploads and starts.
-Set each printer's **model** on the Printers tab so the right profiles are chosen.
+**Ask for any print option in words.** *Print it by object.* *Four copies.* *Ironing on top.*
+*On the textured plate.*
+
+<Aside type="tip">
+Set each printer's **model** on **Settings › Printers**. Printing a design uses Bambu Studio's
+own profiles for that printer and each tray's filament.
+</Aside>
+
+### Print in several colours
+
+A part in several colours is several bodies that touch. A logo on a cube is two bodies. Each
+body prints from its own tray, so load those colours in the AMS. The external spool holds one
+filament and suits a one-colour part.
+
+A print-in-place part never comes apart on the plate, because a designed part is sent as one
+object.
+
+### What brAIn takes care of
+
+- It knows each printer's build volume and nozzle, and keeps the part inside it.
+- It splits a part that is too big into pieces that join.
+- It lays out copies and print-by-object jobs.
+- It keeps a second colour to a few layers, because every colour change purges filament, and
+  says roughly what a wasteful choice would cost.
 
 ## Standing instructions
 
 ![Settings › brAIn: the model for designing and the model for print checks, the Designing and Printing standing instructions, and brAIn's built-in design instructions](./images/settings-brain.webp)
 
+**Settings › brAIn** shapes every conversation. Changes apply on the next message, with no
+restart.
 
-**Settings › brAIn** holds two things that shape every conversation:
+| Setting | What it does |
+|---|---|
+| **Model for designing**, **Model for print checks** | *brAIn's choice* (brAIn's own plan), Haiku (fastest), Sonnet, Opus (most capable) or Fable |
+| **Designing** instructions | Added to every Design conversation: units, wall thickness, fillets, screw clearances |
+| **Printing** instructions | Followed when brAIn picks print settings or starts a print with Auto print: plate, layer height, walls, infill, brims, materials |
+| *brAIn's built-in design instructions* | Shows what yours are added to |
 
-- **Models.** One for Design conversations and one for print checks: *brAIn's choice* (leaves it
-  to brAIn's own plan), Haiku (cheapest), Sonnet, Opus (most capable) or Fable.
-- **Your standing instructions.** *Designing* is added to every Design conversation — units,
-  wall thickness, fillets, screw clearances. *Printing* is followed whenever brAIn picks print
-  settings or starts a print with Auto print — plate, layer height, walls, infill, brims,
-  materials. What you say in a conversation still wins. *brAIn's built-in design instructions*
-  shows what yours are added to.
+What you say in a conversation still wins over your standing instructions.
 
-Both are read on every turn; no restart needed.
-
-## Where a part lives
+## Find a part's files
 
 <FileTree>
 - share/bambu/designs/
@@ -155,25 +179,24 @@ Both are read on every turn; no restart needed.
     - v2/
 </FileTree>
 
-Every part lives in its own folder under `/share/bambu/designs/` — its conversation and each version's
-`design.py`, STEP, 3MF and STL — so you can open the STEP in Onshape or Fusion, or the 3MF in
-Bambu Studio. Come back days later from the parts list and the same brAIn conversation resumes;
-it also appears in brAIn's own chat list.
+Open the STEP in Onshape or Fusion, or the 3MF in Bambu Studio. Come back days later from the
+parts list and the same conversation resumes. It also appears in brAIn's own chat list.
 
 ## Safety
 
 <Aside type="note" title="brAIn never runs anything itself">
-brAIn answers design requests with **reading tools only**; it never writes files or runs
-anything. The add-on runs the script it writes in a **separate process with no Home Assistant
-token and a time limit**, after checking it imports nothing but CadQuery, the add-on's cadkit
+brAIn answers design requests with **reading tools only**. It never writes files or runs
+anything. The app runs the script brAIn writes in a **separate process with no Home Assistant
+token and a time limit**, after checking it imports nothing but CadQuery, the app's cadkit
 helpers, math and numpy.
 </Aside>
 
-## From anywhere else
+## Design from chat, voice or an automation
 
-Designing is not tied to the Design tab. brAIn's chat, the terminal and voice reach it through
-its `bambu_design` tool, and automations through three services — `bruh_bambu.design_part`,
-`design_status` and `print_part`. They run the same conversation and the same Slice and print,
-so the part, its versions and its print are on the Design tab afterwards. See
-[Voice & brAIn](/bruh-bambu-studio/voice/) and
-[Home Assistant](/bruh-bambu-studio/home-assistant/#designing-from-an-automation).
+The same conversation, versions and print are reachable outside the Design tab, and the part
+is on the tab afterwards.
+
+| From | Use |
+|---|---|
+| brAIn's chat, the terminal, voice | brAIn's `bambu_design` tool. See [Voice & brAIn](/bruh-bambu-studio/voice/) |
+| An automation | `bruh_bambu.design_part`, `design_status` and `print_part`. See [Home Assistant](/bruh-bambu-studio/home-assistant/#designing-from-an-automation) |

@@ -1,73 +1,49 @@
 ---
 title: Diagnostics & Repairs
-description: Find automations referencing dead entities, and surface custom repair issues in Settings → System → Repairs.
+description: Ask brAIn to find automations, scripts and scenes that reference entities that no longer exist, and to raise or clear issues in Settings → System → Repairs.
 sidebar:
   order: 11
 ---
 
-`find_orphaned_references` scans every automation, script, and scene for references to entities Home Assistant doesn't know — the silent breakage left behind by renames, removed integrations, and typos. It never changes anything; it reports, and can optionally raise a repair issue with the findings.
+Ask brAIn what is quietly broken after a rename or a removed integration, and have it flag things in **Settings → System → Repairs**.
 
-`create_repair_issue` gives Claude and your automations a first-class way to flag things in **Settings → System → Repairs**: persistent, severity-tagged, dismissible. A proper paper trail instead of a notification that scrolls away.
+## Ask brAIn
 
-## Find orphaned references
+```text
+Do any of my automations still reference entities that don't exist?
+Put a repair issue up when the front door lock battery is low.
+The lock battery is replaced. Clear that repair issue.
+```
 
-`brain.find_orphaned_references`
+## What brAIn can do
 
-Scan every automation, script, and scene for references to entities Home Assistant doesn't know (renamed, deleted, or typo'd). Returns the findings as response data; optionally raises a repair issue listing them.
+Every service is admin-only. Call one from **Developer tools → Actions**, a script or an automation, or ask brAIn. \* marks a required field, and `[]` marks a field that takes one value or a list.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `create_issue` | boolean | no | Also surface the findings in Settings > System > Repairs. |
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.find_orphaned_references` | Scan every automation, script and scene for entities Home Assistant does not know: renamed, deleted or mistyped. Returns the findings. With `create_issue: true` it also lists them in Repairs. It never changes anything. | `create_issue` |
+| `brain.create_repair_issue` | Create an issue in Repairs. `severity` is `critical`, `error` or `warning` (default). `persistent` keeps it across restarts. Give an `issue_id` to remove or replace it later, or one is generated. Returns the `issue_id`. | `title`\*, `description`\*, `severity`, `persistent`, `issue_id` |
+| `brain.remove_repair_issue` | Remove an issue by the `issue_id` it was created with. | `issue_id`\* |
 
-```yaml
-service: brain.find_orphaned_references
-response_variable: findings
+brAIn's own findings show up in Repairs too, with their answer buttons. See [Events and entities](/brain/automations/#events-and-entities).
 
-# Or surface the results as a repair issue
-service: brain.find_orphaned_references
+## Examples
+
+```yaml title="Find broken references and list them in Repairs"
+action: brain.find_orphaned_references
 data:
   create_issue: true
+response_variable: findings
 ```
 
-> 🗣️ *"Do any of my automations still reference entities that don't exist?"*
-
-## Create repair issue
-
-`brain.create_repair_issue`
-
-Create a custom issue in Settings > System > Repairs: persistent, severity-tagged, dismissible. Returns the issue_id as response data. Claude also uses this on its own initiative — an insight job that spots a failing sensor can flag it here.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | text | yes | Short title of the issue. |
-| `description` | text | yes | Full description shown when the issue is opened. |
-| `severity` | select | no | How serious the issue is (default warning). |
-| `persistent` | boolean | no | Keep the issue across Home Assistant restarts. |
-| `issue_id` | text | no | Optional stable ID so the issue can be removed or replaced later. Auto-generated when omitted. |
-
-```yaml
-service: brain.create_repair_issue
-data:
-  title: "Low battery: front door lock"
-  description: "The front door lock reported 8% battery. Replace soon."
-  severity: warning
-  issue_id: front_lock_battery
+```yaml title="Raise an issue, then clear it"
+- action: brain.create_repair_issue
+  data:
+    title: "Low battery: front door lock"
+    description: "The front door lock reported 8% battery. Replace soon."
+    severity: warning
+    issue_id: front_lock_battery
+- action: brain.remove_repair_issue
+  data:
+    issue_id: front_lock_battery
 ```
-
-## Remove repair issue
-
-`brain.remove_repair_issue`
-
-Remove a previously created repair issue by its issue ID.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `issue_id` | text | yes | The issue_id used (or returned) when the issue was created. |
-
-```yaml
-service: brain.remove_repair_issue
-data:
-  issue_id: front_lock_battery
-```
-
-> 🗣️ *"The lock battery is replaced — clear that repair issue."*

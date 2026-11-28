@@ -1,57 +1,62 @@
 ---
 title: The four switches
-description: ⚙ › Features is the first section of brAIn's Settings. Four switches turn on the Morph dashboard, Personality, the Learning loop and the Development loop, and each says what it does and whether anything leaves your house.
+description: Four switches in ⚙ › Features turn on the Morph dashboard, Personality, the Learning loop and the Development loop. Each says what it does and whether anything leaves your house.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-**⚙ › Features** is the first section of brAIn's Settings: four switches, each saying what it
-does and where its work goes. A switch takes effect at once; nothing needs a restart. Only
-one of them ever sends anything out of your house.
+**⚙ › Features** has four switches that decide how much brAIn does. Each takes effect at once,
+with no restart. Only the Development loop sends anything out of your house.
 
 ![⚙ › Features: the Morph dashboard, Personality, Learning loop (self-improvement) and Development loop switches, each with a line about what it does, "Learned 3 things this week" under the learning loop, and a note that only the development loop sends anything out of this house](./images/settings-features.webp)
 
-| Switch | What it does | Where its work goes | On a new install |
+| Switch | What you get | Where its work goes | On a new install |
 | --- | --- | --- | --- |
-| **Morph dashboard** | The Home tab: a dashboard that knows what matters right now and says why, which brAIn designs and edits with you. | Stays in this house | Off |
+| **Morph dashboard** | The Home tab: a dashboard that says what matters right now, which brAIn designs and edits with you. | Stays in this house | Off |
 | **Personality** | brAIn uses the name and personality you give it, everywhere. | Stays in this house | Off (on if a personality is already set) |
 | **Learning loop** (self-improvement) | Everything brAIn learns and changes about itself on its own. | Stays in this house | On (follows the `learning` option) |
 | **Development loop** | brAIn reports its own faults as issues in your private GitHub repository. | **Leaves this house**, with names, rooms and entity ids replaced by aliases | Off |
 
 ## Morph dashboard
 
-Switched on, brAIn's sidebar entry opens on the **Home** tab (labelled *Morph UI* unless you
-rename it): a dashboard built from your areas and floors. It keeps your order and colours what
-matters right now, with a verdict and a *because* line, and has an *Ask or tell the house* line
-at the top. In Edit, hold anything and [Tell brAIn](/brain/morph/tell-brain/) what to change.
-Every change is a version you can undo. Since 5.0 Morph's cards, view and themes also work on
-[Home Assistant's own dashboards](/brain/morph/home-assistant-dashboards/).
+Switch it on and brAIn's sidebar entry opens on the **Home** tab, labelled *Morph UI* until
+you rename it. brAIn builds the dashboard from your areas and floors.
 
-Morph is experimental and changes often. Keep your usual dashboards beside it.
+- A verdict sentence says what is going on, and cards that stand out carry a *because* line.
+- Your order never changes.
+- An *Ask or tell the house* line sits at the top.
+- In Edit, hold anything and [Tell brAIn](/brain/morph/tell-brain/) what to change. Every
+  change is a version you can undo.
+- Morph's cards, room rail and themes also work on
+  [Home Assistant's own dashboards](/brain/morph/home-assistant-dashboards/).
+
+Someone who is not a Home Assistant administrator sees the dashboard alone, without brAIn's
+other tabs. Morph is experimental, so keep your usual dashboards beside it.
+
 **[The Morph dashboard →](/brain/morph/)** · [Quick Start](/brain/morph/quickstart/) ·
 [Settings](/brain/morph/settings/)
 
-Somebody in the house who is not a Home Assistant administrator sees the dashboard alone,
-without brAIn's other tabs.
-
 ## Personality
 
-brAIn takes the name and personality you write in **⚙ › Personality**, everywhere: the sidebar
-entry, every screen, the chat, voice and notifications. With a name set, nothing says
-"brAIn" any more, and in BRUH Minecraft the companion goes by it too.
+Write a name and a personality in **⚙ › Personality** and brAIn uses them everywhere: the
+sidebar entry, every screen, the chat, voice and notifications.
 
-What brAIn writes without being asked (the morning brief, the weekly report, a report on
-something it looked into, a notification that can wait) is written in that personality: the
-tone only, never the facts, and anything urgent stays plain.
+![⚙ › Personality: what the top bar shows, a Name box, a Spoken voice box, the Personality text with Edit, Save and Ask, and the "How it has grown", "Shape brAIn" and "How brAIn is growing" parts](./images/settings-personality.webp)
 
-With the Learning loop on too, the assistant can ask you how it should be and keep a
-paragraph about how it has learned to be in your house. [Learning →](/brain/learning/#shaping-who-it-is)
+- With a name set, nothing says "brAIn" any more. In BRUH Minecraft the companion uses the
+  name too.
+- What brAIn writes unprompted (the morning brief, the weekly report, a report on something
+  it looked into, a notification that can wait) takes the personality's tone. The facts do
+  not change, and anything urgent stays plain.
+- With the Learning loop also on, the assistant can ask how it should be and keeps a
+  paragraph about how it has learned to be in your house.
+  [Learning →](/brain/learning/#shaping-who-it-is)
 
-Off, the personality you wrote is kept and nothing reads it.
+Switched off, the personality you wrote is kept and nothing reads it.
 
 ## Learning loop
 
-One switch for everything brAIn learns on its own:
+One switch covers everything brAIn learns on its own:
 
 - the memory it files from what you say in a conversation or to voice;
 - the nightly lessons it draws from how its reports ended;
@@ -60,31 +65,30 @@ One switch for everything brAIn learns on its own:
 - memory clean-up.
 
 A line under the switch says what learning wrote in the last seven days, counted per learner.
-Off, brAIn still does what you ask, and learns and changes nothing on its own; what it already
+
+Switched off, brAIn still does what you ask and learns nothing on its own. What it already
 learned is kept. [Learning →](/brain/learning/)
 
-The add-on option `learning` is now only where this switch **starts**: on the first start of a
-version with the switch, a house that had `learning: false` finds it off, and from then on only
-the switch decides. The memory consolidator and the study watcher, which start with the add-on,
-follow a change at the next restart.
+The add-on option `learning` only sets where this switch starts. After the first start, only
+the switch decides. The memory consolidator and the study watcher follow a change at the next
+restart of the app.
 
 ## Development loop
 
-brAIn reports its own faults, redacted, as issues in a **private** GitHub repository you own,
-where a scheduled cloud routine can fix brAIn's code and ship an update. The repository, the
-token, what it sends and its daily limits are in **⚙ › Developer**. It refuses to send to a
-public repository. [Development loop →](/brain/development-loop/)
+brAIn reports its own faults, redacted, as issues in a **private** GitHub repository you own.
+A scheduled cloud routine can then fix brAIn's code and ship an update.
 
-<Aside type="note" title="Two loops, one line each">
-**Self-improvement** is brAIn learning and changing itself on this house, with nothing leaving
-it. **Development** is brAIn reporting back to the repository its code comes from, so the fix
-reaches everybody. What brAIn has learned about your *home* (facts, the memory document) is
-under Memory › Knowledge, and is neither.
+Set the repository, the token, what it sends and its daily limits in **⚙ › Developer**. It
+refuses to send to a public repository. [Development loop →](/brain/development-loop/)
+
+<Aside type="note" title="Two loops, and your home's facts are neither">
+**Learning** is brAIn changing itself on this house, with nothing leaving it.
+**Development** is brAIn reporting back to the repository its code comes from. What brAIn
+knows about your home (facts, the memory document) is under Memory › Knowledge.
 </Aside>
 
 ## Upgrading from 3.x
 
-A house that upgraded from 3.x started with the switches matching what it had: the Morph
-dashboard on if the Morph app was installed, Personality on if a personality was set, the
-learning loop on, and the development loop as it was. brAIn stops the old Morph app and sets
-it not to start at boot; it never uninstalls it.
+The switches start matching what you had: Morph on if the Morph app was installed,
+Personality on if one was set, the Learning loop on, and the Development loop as it was.
+brAIn stops the old Morph app and sets it not to start at boot. It never uninstalls it.

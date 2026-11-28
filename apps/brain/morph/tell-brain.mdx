@@ -1,201 +1,194 @@
 ---
 title: Tell brAIn & Edit
-description: Change the Morph dashboard by holding anything and telling brAIn what should be different. brAIn sees what you see, makes the change, shows it before and after, and every change is a git commit with Undo.
+description: Change the Morph dashboard by holding anything and telling brAIn what should be different. brAIn sees what you see, offers versions or makes the change, and every change is a commit with Undo.
 ---
 
-import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-Morph is built to be changed by saying so. **Hold anything — a card, a room, a floor, the
-whole dashboard — and tell brAIn what should be different.** brAIn looks at exactly what
-you are looking at, makes the change, and shows you the card before and after, with
-**Keep** and **Undo**. And for the times you would rather do it yourself, there is an
-ordinary Edit mode.
+Hold a card, a room, a floor or the whole dashboard and tell brAIn what should be different.
+brAIn looks at what you are looking at, makes the change, and gives you **Keep** and **Undo**.
 
-## Tell brAIn
+![The Tell box open under the Kitchen's Countertop card in Edit, dark theme: "Tell Juniper" (the assistant's name in this house), a picture of the card labelled "How it looks now", the request "Make this the full width of the room and call it Counter.", a note that Send asks for versions and Just do it makes one change straight away, and Cancel, Just do it and Send for versions](./images/morph-tell-box-dark.webp)
 
-![Morph in Edit mode, dark theme: YAML and Done in brAIn's header, a hint line reading "hold anything to tell brAIn what to change · drag a section by its title · tap a card to rename, resize or remove it", the Ask line now reading "Tell … how to change this dashboard", and each room with a drag handle and its own Edit](./images/morph-edit-dark.webp)
+## Tell brAIn about a card
 
 <Steps>
 
-1. **Press the pencil** (**Edit**) at the right of the page's first line.
+1. **Open the Tell box.** Press the pencil (**Edit**) and hold the card. Outside Edit,
+   right-click the card, tap it with two fingers, or point at it and press **T**.
 
-2. **Hold** what you mean: a card, a section, a floor, or the whole dashboard. The Tell box
-   opens.
+2. **Check the picture.** Morph takes a picture of what you hold and shows it in the box.
+   brAIn reads it first, so *"this is cut off"* means what is on your screen.
 
-3. **Look at "What brAIn will see".** The moment you hold something, Morph takes a picture
-   of it and shows it in the box. brAIn reads that picture before anything else, so *"this
-   is cut off"* or *"the colours are wrong"* mean what is on your screen.
+3. **Say what should change.**
 
-4. **Say what should change**, and press **Send**.
+4. **Choose how.** **Send for versions** asks for versions to pick from. **Just do it** makes
+   one change straight away.
 
 </Steps>
 
-You do not need Edit at all: type the change into the **Ask** line — *"remove the Coming up
-timeline"*, *"the kitchen header is too tall"* — and brAIn reads it as a change to the
-dashboard or to Morph itself and makes it as a Tell.
+The same works for a room's title, a floor or the whole dashboard. There the box has one
+**Send** button, which makes the change.
+
+You can also type a change into the **Ask** line: *"remove the Coming up timeline"*, *"the
+kitchen header is too tall"*. brAIn reads it as a change and makes it as a Tell.
 
 ### Things to tell it
 
-<CardGrid>
-  <Card title="Layout">
-    "Put the porch light in Entry." · "Move the Office above the Kitchen." · "Make the
-    thermostat the full width of the room."
-  </Card>
-  <Card title="Looks">
-    "The kitchen header is too tall." · "Make the cards rounder." · "Use teal for the
-    Office."
-  </Card>
-  <Card title="New cards">
-    "Add a card with the washer and dryer and how long they have left." · "Show the
-    driveway camera in Garage."
-  </Card>
-  <Card title="Morph itself">
-    "Add a switch in the header for the porch light." · "The Coming up strip should start
-    at 6 AM." — changes to Morph's own code, made in your copy.
-  </Card>
-</CardGrid>
+| Kind | Examples |
+| --- | --- |
+| **Layout** | *"Put the porch light in Entry."* *"Move the Office above the Kitchen."* *"Make the thermostat the full width of the room."* |
+| **Looks** | *"The kitchen header is too tall."* *"Make the cards rounder."* *"Use teal for the Office."* |
+| **New cards** | *"Add a card with the washer and dryer and how long they have left."* *"Show the driveway camera in Garage."* |
+| **Morph itself** | *"Add a switch in the header for the porch light."* *"The Coming up strip should start at 6 AM."* These change your copy of [Morph's own code](#changing-morph-itself). |
 
-### You can watch it work
+## Pick from versions
 
-brAIn's own steps appear in the box as it takes them — looking at the picture, reading
-`dashboard.yaml`, checking an entity, editing a file — with how long it has been at it.
-Close the box and the work carries on: a strip at the top of the dashboard says what brAIn
-is doing, and **Show** opens it again.
+**Send for versions** gets two or three versions of the card. Each has a short name and one
+line saying what is different. Morph draws them in the card's place with your house's real
+states. Nothing changes while you choose.
 
-### It says where every change landed
+![Three versions of a temperature card offered in its place, dark theme: the request "Make this simpler", the chips Current, A "Kitchen only", B "Inside" and C "Average", the line "B · Inside — Just the rooms people live in, one chart", arrows to step, and Use this, More like this, Change… and Discard](./images/morph-tell-versions-dark.webp)
 
-When brAIn answers, Morph commits the dashboard half as **one change** and shows what brAIn
-did, what it saw, and the card **before and after**. The result has one line for each place
-a request could reach, whether or not anything happened there:
+| Control | What it does |
+| --- | --- |
+| **Current · A · B · C** | Shows that version. The arrows, the arrow keys and a sideways swipe step too. |
+| **Use this** | Makes the shown version the card, as one change you can Undo. |
+| **More like this** | Asks for variations on the shown version. |
+| **Change…** | Revises that one version. |
+| **Discard** | Leaves the card as it was. |
+
+- A version that needs something new in Home Assistant, such as a template sensor, says so.
+  It is made only if you pick that version.
+- If the card changed after the versions were made, **Use this** becomes **Use it anyway**
+  and **New versions**.
+- The Tell box lists the card's **earlier versions**, the last five it replaced. Tap one to
+  see it in place, and **Use this** puts it back.
+
+## Watch it work and read the result
+
+brAIn's steps appear in the box as it takes them, with how long it has been at it. Close the
+box and the work carries on. A strip at the top of the dashboard says what brAIn is doing,
+and **Show** opens the box again.
+
+![A finished Tell, dark theme: the steps "Looking at the screenshot", "Reading dashboard.yaml", "Editing dashboard.yaml", "Changed dashboard.yaml", the answer "Made the cans card wider and moved it to the top of the kitchen", the lines Dashboard "Changed the card Cans in Kitchen", Home Assistant "Not changed" and GitHub "Nothing sent", what the assistant saw, and Keep, Undo and Tell it more](./images/morph-tell-result-dark.webp)
+
+When brAIn answers, the change is one commit. You see the card **before and after**, and one
+line for each place the request could reach:
 
 | Line | What it reports |
 | --- | --- |
-| **Dashboard** | What is different on screen — worked out by reading the dashboard back from the file, not from what brAIn said. |
-| **Home Assistant** | Any change to the house itself (only when you asked for one). |
+| **Dashboard** | What is different on screen, read back from the file. |
+| **Home Assistant** | Any change to the house itself. Only when you asked for one. |
 | **Morph's code** | Shown when Morph's own code changed. |
 | **brAIn's memory** | Facts about the house it queued along the way. |
-| **GitHub** | *Nothing sent* — unless you say yes to an issue. |
+| **GitHub** | *Nothing sent*, unless you say yes to an issue. |
 
-If nothing changed, it says *Nothing on the dashboard changed* and quotes brAIn. If brAIn
-left `dashboard.yaml` unreadable, it says *Not applied* — Morph keeps showing the last
-version that read — and **Undo** puts the file back. If your screen has not caught up,
-**Refresh** loads it.
+Then choose:
 
-### Keep, Undo, Tell it more
+| Button | What it does |
+| --- | --- |
+| **Keep** | Done. |
+| **Undo** | Reverts exactly that commit. If you asked for a change in Home Assistant, it asks brAIn to put that back too. |
+| **Tell it more** | Keeps the conversation, takes a new picture, and asks what should be different. |
 
-- **Keep** — done.
-- **Undo** — reverts exactly that commit, and if you asked for a change in Home Assistant,
-  asks brAIn to put that back too.
-- **Tell it more** — keeps the conversation above, takes a new picture of how it looks now,
-  and asks what should be different. It is a conversation, not a one-shot.
+If nothing changed, the box says *Nothing on the dashboard changed* and quotes brAIn. If
+brAIn left `dashboard.yaml` unreadable, it says *Not applied*, Morph keeps showing the last
+version that read, and **Undo** puts the file back. **Refresh** reloads a screen that has not
+caught up.
 
-### A choice that is yours comes back as buttons
+### Answer a choice that is yours
 
-The commonest one: a card that works a number out from other sensors — a difference, a
-total, an efficiency — has no history, because Home Assistant only records entities. When
-you might want that history, brAIn builds the card with the number worked out in it and
-asks: **Calculate it in the card**, or **Make a Home Assistant sensor** so it is recorded.
-The button that changes Home Assistant says so, and pressing one sends it as your next
-request.
+Some choices come back as buttons. The commonest: a card that works out a number from other
+sensors has no history, because Home Assistant only records entities. brAIn builds the card
+and asks:
+
+- **Calculate it in the card**, or
+- **Make a Home Assistant sensor**, so the number is recorded.
+
+The button that changes Home Assistant says so. Pressing one sends it as your next request.
 
 ## What a Tell may change
 
-**brAIn acts at once on Morph's own things:**
+| Target | When |
+| --- | --- |
+| The dashboard, `/config/morph/dashboard.yaml` | At once. |
+| Morph's card code, `/config/morph/cards/` | At once. |
+| [Morph itself](#changing-morph-itself): header, layout, built-in cards, styles | At once, in your copy. |
+| **Home Assistant itself**: entity ids, names, areas, automations, scripts, helpers | **Only when you ask for it in words**: *"change the entity ID"*, *"rename the device"*, *"make an automation that…"*. |
 
-- the dashboard, `/config/morph/dashboard.yaml`;
-- Morph's card code, `/config/morph/cards/`;
-- Morph itself — its header, its layout, its built-in cards, its styles (see
-  [Changing Morph itself](#changing-morph-itself)).
+*"Call this card Counter"* renames the card. *"Rename the device to Kitchen counter"* renames
+it in Home Assistant.
 
-**It changes Home Assistant itself — entity ids, names, areas, automations, scripts,
-helpers — only when you ask for that in words**: *"change the entity ID"*, *"rename the
-device"*, *"make an automation that…"*. When a request would need a house change you did not
-ask for, brAIn does the dashboard part and lists what would have to change under **Left for
-you**, so you can ask.
+When a request would need a house change you did not ask for, brAIn does the dashboard part
+and lists the rest under **Left for you**.
 
 <Aside type="note" title="brAIn's safety still holds">
-Whatever you ask, brAIn's [protected entities](/brain/safety/), its action gate and its edit
+brAIn's [protected entities](/brain/safety/#protected-entities), its action gate and its edit
 snapshots (`brain undo`) still apply. What brAIn learns about the house along the way goes
-into brAIn's own memory, not Morph's lessons.
+into brAIn's memory, not Morph's lessons.
 </Aside>
 
-## Edit mode
+## Edit by hand
 
-Press the quiet pencil (**Edit**) at the right of the page's first line, under brAIn's
-header. **Done** and **YAML** are in the header while you edit.
+Press the pencil (**Edit**) at the right of the page's first line. **Done** and **YAML**
+appear in the header.
+
+![Morph in Edit mode, dark theme: YAML and Done in brAIn's header, a hint line reading "hold anything to tell Nova what to change · drag a section by its title · tap a card to rename, resize or remove it", the Ask line now reading "Tell Nova how to change this dashboard", and each room with a drag handle and its own Edit](./images/morph-edit-dark.webp)
 
 | Do | To |
 | --- | --- |
 | **Tap a section** | Rename it, recolour it, move it to another floor (or a new one), widen it, add a group, hide it or remove it. |
 | **Tap a card** | Rename it, resize it, move it, edit its JSON, or remove it. |
 | **Drag a section** | Reorder it, or move it between floors. |
-| **Add card** (in each section) | Offers the entities in that room first, then any entity, then **Lovelace card** — paste any card's YAML or JSON. |
-| **YAML** (in the header) | Opens the dashboard as YAML. |
+| **Add card** (in each section) | Pick from the entities in that room, then any entity, then **Lovelace card** to paste any card's YAML or JSON. |
+| **YAML** (in the header) | Open the dashboard as YAML. |
 | **Hold anything** | Tell brAIn. |
 
-**Every save is one commit.** The toast after a change offers **Undo**.
+Every save is one commit. The toast after a change offers **Undo**.
 
-## History and undo
+## Undo any change
 
-`/config/morph/` is a **git repository**. Every change — yours in Edit, brAIn's in a Tell,
-the learning loop's, and an edit you make to the files by hand — is one commit, with who made
-it.
+`/config/morph/` is a git repository. Every change is one commit, with who made it: yours in
+Edit, brAIn's in a Tell, the learning loop's, and a hand edit to the files.
 
-- **⚙ › Dashboard › History** lists every change with who made it, and **Undo** or
-  **Restore** for each. An undo is itself a commit, so an undo can be undone.
+- **⚙ › Dashboard › History** lists every change, with **Undo** or **Restore** on each. An
+  undo is itself a commit, so it can be undone.
 - **Edit the files by hand** if you like. Morph commits your edit as *Edited outside Morph*.
 - **A broken file never blanks the page.** If `dashboard.yaml` stops parsing, the panel keeps
-  showing the last version that did, with the parser's message and line above it, until the
-  file is fixed.
+  showing the last version that did, with the parser's message and line above it.
 
 ## Changing Morph itself
 
-Nothing about Morph is out of reach. Morph's own panel is a handful of modules that ship with
-brAIn. To change one, brAIn **copies it into `/config/morph/frontend/` and edits the copy**,
-and Morph serves your copy in place of its own after a page reload.
+brAIn can change Morph's own panel. It copies the module into `/config/morph/frontend/` and
+edits the copy. Morph serves your copy after a page reload.
 
-- **It is one change like any other.** It is in History, and Undo puts Morph's own back.
-- **A copy that does not load is not a blank page.** Morph runs its own copy for that page
-  load and says what went wrong.
-- **An update can pause a copy.** If a brAIn update changes a file you changed, or a module
-  your copy builds on, your change is **paused** and Morph's own runs — an old copy beside
-  new modules is how a panel breaks. A note says so, with **Update** (merges your changes into
-  the new version, as one change you can undo) and **Not now**. Where the update rewrote the
-  same code your change was in, brAIn does not guess: it asks how to bring them together, with
-  a button for each way.
-- Your dashboard and your own cards (`cards/`) are **never touched by an update**.
+- The box offers **Reload to see it** and **Undo**.
+- It then asks **Would you like to open an issue to update Morph's code?** Nothing is sent
+  unless you press **Open an issue**.
+- The change is in History like any other. Undo puts Morph's own back.
+- A copy that does not load is not a blank page. Morph runs its own copy for that page load
+  and says what went wrong.
+- Your dashboard and your own cards (`cards/`) are never touched by an update.
 
-When a Tell changes Morph's code, the box offers **Reload to see it** and **Undo**, then asks
-**Would you like to open an issue to update Morph's code?** so everybody can have it.
-**Nothing is sent unless you press Open an issue.**
+### When an update pauses your change
+
+If a brAIn update changes a file you changed, or a module your copy builds on, your change is
+paused and Morph's own runs. A note offers:
+
+| Button | What it does |
+| --- | --- |
+| **Update** | Merges your change into the new version, as one change you can undo. |
+| **Not now** | Keeps Morph's own running. |
+
+Where the update rewrote the same code your change was in, brAIn asks how to bring them
+together, with a button for each way.
 
 ### When Morph's own code fails
 
-A card that fails to draw, a layout that overlaps at rest, or an answer from brAIn that Morph
-could not read is a fault in Morph, not in your dashboard, and Morph records it. A request
-that needs Morph's code changed is recorded only when you press **Open an issue** or **Send as
-issue**. brAIn being slow or signed out is not Morph's fault and is not recorded.
+Morph records a fault when a card fails to draw, a layout overlaps at rest, or it cannot read
+an answer from brAIn. A request that needs Morph's code changed is recorded only when you
+press **Open an issue** or **Send as issue**. brAIn being slow or signed out is not recorded.
 
 Nothing leaves your house unless brAIn's **Development loop** switch (⚙ › Features) is on.
-With it on, brAIn files each fault once in your private reports repository, redacted, where
-the fix is made in Morph's code and arrives as an update.
-
-## Use cases
-
-**"This is cut off."** On the wall tablet, the Media card's title is truncated. You hold it,
-type *this is cut off*, and brAIn — reading the picture of your screen, not a guess — widens
-the card. You see before and after and press Keep.
-
-**A total with history.** You ask for a card showing the whole house's power draw. brAIn
-builds it, then asks: **Calculate it in the card**, or **Make a Home Assistant sensor**? You
-want next month's chart, so you press the sensor button; brAIn says it will create a template
-sensor, and does.
-
-**"Rename the device" vs "rename the card".** *"Call this card Counter"* renames the card on
-the dashboard. *"Rename the device to Kitchen counter"* renames it in Home Assistant — because
-you said so in words.
-
-**A header switch.** You want the porch light in Morph's header. No built-in card can do
-that, so brAIn changes your copy of Morph's header module, offers **Reload to see it**, and
-asks whether to open an issue so the feature can ship for everyone. You say no; it stays
-yours.
+With it on, brAIn files each fault once in your private reports repository, redacted.

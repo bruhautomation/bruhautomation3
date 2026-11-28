@@ -1,173 +1,136 @@
 ---
 title: Scene Designer
-description: Four moods for a room — morning, day, evening and night — composed from what each bulb in it can actually be told, shown as swatches before you say yes, and written to scenes.yaml only if you accept them.
+description: Ask for scenes for a room and brAIn composes morning, day, evening and night from what each bulb can do, shows them as swatches, and writes them to scenes.yaml when you press Apply.
 ---
 
-Scenes are the thing everybody means to set up and nobody does. Not because any one of them is
-hard — because doing it by hand means opening each bulb in turn, picking a colour temperature
-that will look wrong beside the next one, saving four of them, and then writing the schedule
-that moves between them.
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-What makes it possible to do *for* somebody is that the answer is **deterministic**. Your
-registries already say which lights a room has and what each of them can be told, and a mood
-is a warmth and a level.
+Ask for scenes for a room and brAIn composes four moods for it: morning, day, evening and
+night. You see every light in every mood before anything is written.
 
-## Asking for four
+![A Suggestion card marked Scenes, "Four scenes for the Living room". Under Details, four rows named Bright start, Daylight, Wind down and Night path, each with one colour swatch per light: pale cool swatches for morning, warm orange for evening, and at night a single dim swatch with the rest as empty outlines. The lights are named underneath, and a line reads "Skipped: protected — Bookshelf plug". Presses: Apply, Snooze, Ignore](./images/act-scenes.webp)
 
-Either of:
+## Design scenes for a room
 
-- **Say it** in Morph's *Ask or tell the house* line, or ask in Ask: *"Design my evening for
-  the living room"*, *"set up scenes for the kitchen"*. The sentence has to name a room.
-- **Pick a room** from **Design scenes for** at the top of [Needs you](/brain/needs-you/), which lists every room brAIn could compose for with its light count beside it.
+<Steps>
 
-The picker only ever offers rooms it can actually do — a control that hands you a choice its
-own rule forbids is a control that teaches you to distrust it. If no room in the house has two
-lights brAIn can set, it says that rather than sitting there empty.
+1. Ask, naming the room: *"Design my evening for the living room"* or *"Set up scenes for
+   the kitchen"*. Type it in the *Ask or tell the house* line on [Morph](/brain/morph/), or
+   ask in [Ask](/brain/terminal/), where the **Design lighting scenes for a room** starter
+   fills the box for you to finish with the room.
+2. brAIn answers straight away. Either it is designing them, or it tells you why it cannot
+   for that room.
+3. A card marked **Scenes** lands on **Insights → Needs you** a moment later.
+4. Open **Details** to see the swatches, then press **Apply**.
 
-Composing is deterministic and costs one read of the house, so **a refusal comes back
-immediately**: *"the box room has only one light brAIn can set"* is an answer you should have
-before you wonder whether anything is happening. Naming the four is a Claude run, so the offer
-lands on the tab a moment later.
+</Steps>
 
-## What each bulb is told, and why it differs
+Apply writes all the scenes at once to `scenes.yaml`, reloads, and waits for every scene to
+appear in Home Assistant. If any step fails the file is put back and the card says what was
+tried. The toast offers **Undo**, and `brain undo` works later. The full path is on
+[Suggestions](/brain/proposals/#saying-yes-and-taking-it-back).
 
-Read from `supported_color_modes`, never assumed. Four answers, in the order a mood wants
-them:
+With *Act* or *No limits* set in ⚙ → Permissions, scenes you ask for are written at once,
+with the same checks and the same Undo.
 
-| What the bulb can take | What the scene sets |
+## Read the card
+
+| On the card | Meaning |
 | --- | --- |
-| A **colour temperature** | The mood's kelvin, and a brightness |
-| **Colour** but not a temperature | The nearest colour to that kelvin, and a brightness |
-| **Brightness** only | The brightness |
-| **On and off** only | On, or off |
+| **A swatch per light per mood** | The colour and level that bulb will hold in that scene. |
+| **An empty outline** | That light is off in that scene. |
+| **The names under the strip** | Which light each swatch is, left to right. |
+| **Skipped: protected** | A light on your `protected_entities` list. brAIn knows it is there and will not set it. |
 
-A scene of whites is a colour-temperature scene, and kelvin is the control that says so — an
-RGB approximation of 2400 K on a bulb that could have taken the number is a worse answer
-written more precisely. A bulb whose modes **cannot be read at all** falls to the last row
-rather than being dropped: *I could not tell* is not *it does not work*, and the honest thing
-to do with it is the setting that works on every bulb ever made.
-
-The card says which is which, so a room of cheap bulbs is a set of scenes that still works
-rather than an empty card.
-
-:::note[The number in the file is 0–255, not a percentage]
-A scene entry is a **state Home Assistant reproduces**, not a service call. `light`'s
-reproduce-state reads `brightness`, `color_temp_kelvin` and `rgb_color` — a `brightness_pct`
-in a scene is an attribute nothing reads. It would store, load, reload and apply perfectly,
-and every light would come on at whatever level it was already at. The percentage is the
-vocabulary of the card; the byte is the vocabulary of the file.
-:::
+There is no replay and no trial week for scenes. Nothing in your history set them, so the
+swatches are the evidence.
 
 ## The four moods
 
-**Morning** is cool and bright — it is the one that has to wake somebody up, so it is cooler
-than day on purpose. **Day** is neutral and full. **Evening** is warm and dimmed. **Night** is
-the only one that turns most of the room off.
+| Mood | Colour temperature | Brightness | Lights on |
+| --- | --- | --- | --- |
+| **Morning** | 5000 K, cool | 80% | All |
+| **Day** | 4000 K, neutral | 100% | All |
+| **Evening** | 2400 K, warm | 45% | All |
+| **Night** | 2000 K | 10% | Only the night lights |
 
-Which light stays on at night comes from what brAIn has
-[read about each device](/brain/checks/#reading-what-a-device-is-in-any-language) — in any
-language — and, where it is not sure, from its **name**: *night*, *bedside*, *hall*,
-*landing*, as whole words. There is no attribute for *"this is the one I leave on"*, and
-inventing a rule from the wattage would be a guess about your furniture. A room with nothing
-named that way goes fully dark, which is what night means in a room without a nightlight in
-it.
+The numbers are fixed, so the same room gets the same scenes every time you ask.
 
-The numbers are plain and fixed rather than a model's choice. A set of scenes that came out
-different every time it was offered would be one nobody could reason about.
+**Night lights.** brAIn uses what it has [read about each device](/brain/checks/), in any
+language. Where it is not sure, it goes by the name: *night*, *bedside*, *hall* or *landing*
+as whole words. A room with no such light goes fully dark at night.
 
-## The card is a picture
+**Names.** brAIn asks Claude for four names you would say out loud, each under 24
+characters. This is the only thing a model decides. If that run fails, the scenes are called
+Morning, Day, Evening and Night. Names follow the pattern your existing scenes already use.
 
-There is no replay and no trial week here — nothing in the last month set these scenes, so
-there is no week to grade them against. The evidence is what the room will look like:
+**Moods you already have.** If the room has a scene for a mood, brAIn does not make a
+second one. It offers only the missing moods, and none if all four exist.
 
-- **A swatch per light per mood**, four rows, drawn from the colour the bulb will actually
-  hold.
-- **A light that is off in a scene is an empty outline**, not a dark square, because a dark
-  square on a dark panel is indistinguishable from a very dim one.
-- **The lights named in text** under the strip. A phone has no hover, and which bulb is which
-  is the whole reading.
-- **Anything on your `protected_entities` list is shown as *Skipped: protected***, not quietly
-  left out. Seeing that brAIn knows the lamp is there and knows it may not set it is the point
-  of showing it. Protection is asked at the producer as well as at the writer — a card
-  offering something brAIn will refuse to write is a wasted no.
+## What each bulb is told
 
-## Saying yes
+brAIn reads each light's `supported_color_modes` and sets the most it can take.
 
-Accepting writes all four at once — four moods are one decision and one press, and offering
-them one at a time would be four cards you have to answer consistently for the set to mean
-anything.
-
-They go into `scenes.yaml` by the same five steps an accepted proposal uses against
-`automations.yaml`: snapshot into the [edit journal](/brain/cli/#undo), **append** with your
-file above them untouched, `scene.reload`, then wait for **all four** `scene.` entities to
-turn up in Core — because three out of four is a mood missing from a schedule nobody has
-written yet. If any of that does not happen the file goes back and the card tells you what it
-tried. Undo takes them straight out again.
-
-The same refusals apply, in the shape this file needs them:
-
-- **No `scene: !include scenes.yaml`** in your `configuration.yaml`. Without that line brAIn
-  cannot tell where this house keeps its scenes, and appending to a file Home Assistant does
-  not read is a change that silently does nothing. The refusal names the line it looked for.
-- **A `scenes.yaml` that is not a list of scenes.** An empty or missing one it creates. A file
-  holding nothing but a comment header is **empty**, not unreadable — that is the ordinary
-  case on a house that has never saved a scene, and it used to be refused.
-- **A duplicate id or name** already in the file.
-- **A protected light**, asked again here because a file the panel writes never passes through
-  the chokepoint that normally enforces that list.
-
-## Two rooms are refused, each with the reason
-
-- **Fewer than two lights brAIn can set.** Four scenes over one bulb is four ways of saying
-  the same thing. If the rest of the room is protected, the refusal says so.
-- **More than forty.** That is a floor rather than a room, and brAIn would be composing moods
-  for a building. Split it into areas and ask again.
-
-## Claude names them, and only that
-
-One optional run, two turns, four lines: a name a person would use out loud about their own
-home, each under 24 characters, shown beside the room's own name. **All four or none** — three
-good names and one that came back as *"4."* is a set with a hole in it.
-
-If the run fails you get **Morning**, **Day**, **Evening** and **Night**, which work perfectly
-well. Nothing about which bulb takes which kelvin is a model's decision: that is composed from
-the registries, because a model choosing it is a guess wearing a config and one nobody can
-check by looking at the card.
-
-## Then the schedule
-
-Once all four scenes **really exist**, brAIn offers a second proposal: the automation that
-walks the room through them.
-
-It is offered off `scenes.yaml` rather than off the proposals store, deliberately — what makes
-the schedule sayable is the scenes being *there*, and somebody who copied the card's YAML in by
-hand has earned it exactly as much as somebody who pressed the button. A schedule naming a
-scene that is not there is an automation that errors at seven every morning. It is offered
-for any room, including one whose name is more than one word — *Living Room*, *Master
-Bedroom*.
-
-Unlike the scenes it is an ordinary automation, so it can be
-[tried for a week](/brain/proposals/#the-lifecycle) — which is itself a replay of the days you
-have just lived, graded against what you actually did.
-
-Two of its four times are measured and two are not, and the card says which:
-
-| Mood | When |
+| The bulb takes | The scene sets |
 | --- | --- |
-| **Morning** | The wake time brAIn has [measured](/brain/measurements/) for this house |
-| **Day** | 11:00 — a fixed guess |
-| **Evening** | 18:30 — a fixed guess |
-| **Night** | The measured settle time — after midnight, if that is when this house goes to bed |
+| A colour temperature | The mood's kelvin and a brightness |
+| Colour but no temperature | The nearest colour to that kelvin, and a brightness |
+| Brightness only | The brightness |
+| On and off only, or modes brAIn could not read | On or off |
 
-Nobody's first press of the day is at noon, so midday and the early evening are not things
-brAIn can see. They are stated as the guesses they are, and they are yours to change once the
-automation is in your file. If brAIn has not gathered enough days yet, morning and night fall
-back to 07:00 and 22:30 — and the card says *that* too, rather than presenting a default as a
-measurement.
+The card's first lines say how many of the room's lights fall into each row.
+
+<Aside type="note" title="In scenes.yaml, brightness is 0–255">
+The card speaks in percent. The file stores `brightness` from 0 to 255, with
+`color_temp_kelvin` or `rgb_color`, because those are the values Home Assistant restores
+from a scene.
+</Aside>
+
+## Rooms brAIn will not design for
+
+The refusal comes back as soon as you ask.
+
+| Refusal | Why |
+| --- | --- |
+| **Fewer than two lights brAIn can set** | Four scenes over one bulb are the same scene. If the rest are protected, the refusal says so. |
+| **More than 40 lights** | That is a floor, not a room. Split it into areas and ask again. |
+| **Every mood already has a scene** | There is nothing to add. |
+| **These scenes were already offered** | The card is waiting on Needs you. |
+
+Apply is refused, with the reason on the card, when:
+
+- `configuration.yaml` has no `scene: !include scenes.yaml` line. The refusal names the line.
+- `scenes.yaml` is not a list of scenes. An empty file, a missing one, or one holding only
+  comments is fine.
+- A scene with the same id or name is already in the file.
+- A scene would set a protected light.
+
+## Add the schedule
+
+Once all four scenes exist, brAIn offers a second suggestion: one automation that moves the
+room through them.
+
+![A Suggestion card "Move the Living room through its four scenes": "Morning at 06:50 and night at 23:10 are measured — that is when this house actually gets up and settles; 11:00 and 18:30 are fixed guesses you can change." Presses: Apply, Snooze, Ignore and a ⋯ menu](./images/act-scene-schedule.webp)
+
+| Mood | When | If brAIn has not measured enough days |
+| --- | --- | --- |
+| **Morning** | Your house's [measured](/brain/measurements/) wake time | 07:00 |
+| **Day** | 11:00, a fixed guess | 11:00 |
+| **Evening** | 18:30, a fixed guess | 18:30 |
+| **Night** | Your house's measured settle time | 22:30 |
+
+The card says which times are measured and which are defaults. All four are yours to
+change once the automation is in your file.
+
+The schedule is an ordinary automation. You can
+[try it for a week](/brain/proposals/#try-it-for-a-week-first) before applying it. It is
+offered whenever the four scenes are in `scenes.yaml`, including when you pasted them in
+yourself.
 
 ## Where to see it
 
-- **The Needs you**, with a **Scenes** pill on the card and the room picker above the list.
-- `GET /api/scenes/areas` — the rooms that qualify, and how many lights each has.
-- **⚙ Diagnostics** carries how many sets have been designed and how many asks were refused,
-  because an empty tab reads the same either way.
+| Where | What |
+| --- | --- |
+| **Insights → Needs you** | The card, with a **Scenes** pill. |
+| **⚙ → Diagnostics** | How many sets have been designed and how many asks were refused. |
+| `GET /api/scenes/areas` | The rooms that qualify, and how many lights each has. |

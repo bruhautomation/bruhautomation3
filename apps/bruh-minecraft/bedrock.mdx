@@ -1,85 +1,90 @@
 ---
 title: Bedrock Players
-description: How iPad, iPhone, Android, Switch, Xbox, PlayStation and Windows players join a BRUH Minecraft Java server through Geyser and Floodgate — LAN discovery, family mode without Xbox accounts, names with a dot, resource packs, and fixing connection problems.
+description: How iPad, iPhone, Android, Switch, Xbox, PlayStation and Windows players join a BRUH Minecraft Java server. LAN discovery, family mode without Xbox accounts, names with a dot, resource packs, and connection fixes.
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-Minecraft comes in two editions that cannot normally play together: **Java** (PC and Mac) and
-**Bedrock** (iPad, iPhone, Android, Switch, Xbox, PlayStation and the Windows store version). BRUH
-Minecraft runs a Java server and puts **Geyser** in front of it, which translates for Bedrock
-players, plus **Floodgate**, which lets them sign in without a Java account. Both are installed,
-configured and updated for you.
+Players on iPad, iPhone, Android, Switch, Xbox, PlayStation and Windows Bedrock join the same
+world as Java players. The app installs, configures and updates **Geyser**, which translates
+between the two editions, and **Floodgate**, which lets Bedrock players sign in without a Java
+account.
 
-## Joining from a Bedrock device
+## Join from a Bedrock device
 
 <Steps>
 
 1. Put the device on the **same network** as Home Assistant.
-2. Open Minecraft → **Play** → **Friends**. The house server appears under LAN games — the add-on
-   runs with host networking precisely so this discovery works.
-3. If it does not appear: **Servers** → **Add Server**, enter your Home Assistant machine's IPv4
-   address and port **19132**. Prefer the raw address over `homeassistant.local`, which iOS sometimes
-   fails to resolve.
+2. Open Minecraft → **Play** → **Friends**. The house server is listed under LAN games.
+3. If it is not listed, go to **Servers** → **Add Server**. Enter your Home Assistant machine's
+   IPv4 address and port **19132**. Use the raw address: iOS sometimes fails to resolve
+   `homeassistant.local`.
 
 </Steps>
 
-From outside your home, forward `19132/udp` to the Home Assistant machine (and see the caution under
-family mode below).
+To join from outside your home, forward `19132/udp` to the Home Assistant machine.
 
-## Names with a dot
+## Whitelist or op a Bedrock player
 
-Floodgate puts a `.` in front of every Bedrock player's name — `.Sam` — so a Bedrock player can
-never collide with a Java account of the same name. The panel's **Players** tab explains it, and
-when you whitelist or op a Bedrock player by name, **include the dot**. brAIn matches names the way
-you say them, so *"teleport Sam to Alex"* finds `.Sam`.
+Floodgate puts a `.` in front of every Bedrock player's name, such as `.Sam`, so a Bedrock player
+never collides with a Java account of the same name. **Include the dot** when you whitelist or op
+a Bedrock player by name.
 
 ![The Players tab: four players with Online or Offline, roles such as Operator, Whitelisted and Banned, a Choose… menu beside each, and Add or manage by name with a note to include the dot for a Bedrock player](./images/panel-players.webp)
 
-## Family mode — no Xbox accounts
+brAIn matches names the way you say them, so *"teleport Sam to Alex"* finds `.Sam`.
 
-By default Bedrock players sign in with a Microsoft account, checked by Floodgate. For children who
-do not have one, turn the world's `online-mode` **off** in the wizard or on the **Properties** tab.
-The add-on then changes everything that depends on it: Geyser's sign-in mode becomes offline,
-Floodgate is removed, Bedrock login validation is off and secure-profile enforcement is off. Java
-and Bedrock both join without signing in.
+## Let children join without Xbox accounts
+
+By default Bedrock players sign in with a Microsoft account, which Floodgate checks. To skip
+that, turn the world's `online-mode` **off** in the wizard or on the **Properties** tab.
+
+The app then sets Geyser's sign-in mode to offline, removes Floodgate, and turns off Bedrock
+login validation and secure-profile enforcement. Java and Bedrock players both join without
+signing in.
 
 <Aside type="caution" title="Only on a home network">
 With accounts unchecked, anyone who can reach the server can join under any name. Keep an offline
-server off the internet. It also means a name proves nothing, so brAIn's companion never grants a
-grown-up's *Can ask for anything* on an unchecked name.
+server off the internet. A name also proves nothing, so brAIn's companion never grants a
+grown-up's **Can ask for anything** on an unchecked name.
 </Aside>
 
-The `geyser_auth_type` option controls this directly: `auto` (default) picks `offline` when the
-active world's `online-mode` is off and `floodgate` otherwise; `online` and `offline` force it.
+To set the sign-in mode yourself, use `geyser_auth_type`:
 
-## What Bedrock players see
+| Value | Result |
+| --- | --- |
+| `auto` (default) | `offline` when the active world's `online-mode` is off, `floodgate` otherwise |
+| `floodgate` | Bedrock players sign in to Xbox Live, and Floodgate identifies them |
+| `online` | Geyser's own sign-in prompt for every Bedrock player |
+| `offline` | No sign-in. Names come from the device as typed, without the dot |
 
-- **Plugins and data packs** — everything. They run on the server. This is why the
-  [Add-on browser](/bruh-minecraft/addons/) only offers server-side add-ons.
-- **Resource packs** — Geyser pushes a converted copy on join. Flat block and item textures come
-  across; custom 3D models, model-data items, animated textures and sounds do not. That is a Bedrock
-  platform limit, not a setting.
-- **Featured worlds** such as Drehmal install entirely server-side, so iPads explore the whole map
-  with nothing to download. See [Worlds & Backups](/bruh-minecraft/worlds/#featured-worlds).
-- **The companion** — its allay, choice pads, the boss bar of a long job, the spyglass and its
-  pointing all work for Bedrock players. A skin set by brAIn appears to a Bedrock player after they
-  rejoin.
+## What Bedrock players get
 
-## Server types
+| Feature | On Bedrock |
+| --- | --- |
+| **Plugins and data packs** | Everything. They run on the server, which is why the [Add-on browser](/bruh-minecraft/addons/) only offers server-side add-ons |
+| **Resource packs** | Geyser pushes a converted copy on join. Flat block and item textures come across. Custom 3D models, model-data items, animated textures and sounds do not. This is a Bedrock platform limit |
+| **Featured worlds** | Worlds such as Drehmal install on the server, so there is nothing to download. See [Worlds & Backups](/bruh-minecraft/worlds/#install-a-featured-world) |
+| **The companion** | Its allay, choice pads, the boss bar of a long job, the spyglass and its pointing all work. A skin set by brAIn appears after the player rejoins |
 
-Geyser runs as a plugin on **Paper, Purpur and Folia**, and as a mod on **Fabric**. Vanilla and
-Forge are not supported by Geyser-as-a-plugin; set `enable_bedrock_support: false` there to avoid the
-warning. Geyser and Floodgate appear under **Server software** on the Add-ons tab with their
-versions; turn `enable_bedrock_support` off rather than removing them.
+## Server types that support Bedrock
+
+| Server type | Bedrock support |
+| --- | --- |
+| Paper, Purpur, Folia | Yes. Geyser runs as a plugin |
+| Fabric | Yes. Geyser runs as a mod |
+| Vanilla, Forge | No. Set `enable_bedrock_support: false` to avoid the warning |
+
+Geyser and Floodgate are listed under **Server software** on the Add-ons tab with their versions.
+To turn cross-play off, set `enable_bedrock_support: false` instead of removing them.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 | --- | --- |
-| iOS hangs on "Connecting multiplayer server…" | Set `geyser_mtu: 1200`. Many home routers fragment UDP above about 1200 bytes mid-handshake, which Bedrock does not recover from. |
-| Not in the Friends tab | Same subnet/VLAN? Guest networks, IoT VLANs and client isolation block discovery. Add the server manually by IPv4 and port 19132. |
+| iOS hangs on "Connecting multiplayer server…" | Set `geyser_mtu: 1200`. Many home routers fragment UDP above about 1200 bytes during the handshake, and Bedrock does not recover. |
+| Not in the Friends tab | Check the device is on the same subnet or VLAN. Guest networks, IoT VLANs and client isolation block discovery. Add the server by IPv4 and port 19132. |
 | "Please log into Xbox" / "You are not permitted to join" | The world needs `online-mode=false` for players without accounts (home network only). |
-| "You are already connected to this server" | A previous connection hung. The ghost-session kicker (`auto_kick_ghost_sessions`) clears it; or kick the old session from **Players**. |
-| "Slow down, you're connecting too fast!" | Set the world's `connection-throttle` to `0` on the **Properties** tab — safe on a home network. |
+| "You are already connected to this server" | A previous connection hung. The ghost-session kicker (`auto_kick_ghost_sessions`) clears it. You can also kick the old session from **Players**. |
+| "Slow down, you're connecting too fast!" | Set the world's `connection-throttle` to `0` on the **Properties** tab. This is safe on a home network. |
 | A client a version ahead or behind cannot join | Keep `install_viaversion` and `install_viabackwards` on (the default). |

@@ -1,137 +1,142 @@
 ---
 title: Development loop
-description: brAIn's optional development loop files the problems it finds on your install as issues in a private GitHub repository you own, redacted with aliases, so its code can be fixed. What it sends, what it never sends, the streams, and how to turn it on.
+description: brAIn's optional development loop files the problems it finds on your install as issues in a private GitHub repository you own, with names replaced by aliases. What it files, what it never sends, and how to turn it on.
 ---
 
 import { Aside, Steps } from '@astrojs/starlight/components';
 
-The development loop turns the problems brAIn finds on your own install into issues in a
-**private GitHub repository you own**. The bugs that matter most are the ones that only show up
-on real houses, and this collects them without anybody having to notice, write up and paste a
-report.
+The development loop files the problems brAIn finds on your install as issues in a **private GitHub repository you own**, so they can be fixed without anybody writing a bug report.
 
-<Aside type="note" title="Off by default, and nobody is expected to turn it on">
-Nothing in this feature runs, connects anywhere or sends anything until you switch it on. If
-you never do, brAIn behaves exactly as if it were not there. It is the only one of brAIn's
-[four switches](/brain/features/) that sends anything out of your house.
+```text
+You:  "the settings page is too crowded"          (⚙ › Developer › What do you want to fix?)
+brAIn files one issue: your words quoted, the real problem behind them, and what "fixed" looks like.
+Later, on the issue:  Held: not seen since … on brAIn x.y.z (fixed in x.y.z)
+```
+
+<Aside type="note" title="Off by default">
+Nothing here runs, connects anywhere or sends anything until you switch it on. It is the only one of brAIn's [four switches](/brain/features/) that sends anything out of your house. The [Learning loop](/brain/learning/) beside it sends nothing.
 </Aside>
 
-It is the **Development loop** switch in ⚙ › Features. Its repository, token, streams and
-limits are in **⚙ › Developer**. It is not the [Learning loop](/brain/learning/) beside it,
-which improves brAIn on your house and sends nothing.
-
-## What it does
-
-brAIn looks at itself on a schedule and files what it finds. Each kind of evidence is a
-**stream** with its own switch, schedule and **Run** button:
-
-| Stream | What it files | On at first | Costs |
-| --- | --- | --- | --- |
-| **Faults** | The fault list from ⚙ › Diagnostics: a service that stopped, a run that keeps failing. | Yes, hourly | Nothing |
-| **Scorecard** | How right each house check was on this release; one issue per release. | Yes, daily | Nothing |
-| **Wrongs** | A check you have ignored at least 3 times and at least half the time, with your reasons. | Yes, daily | Nothing |
-| **Judgement** | Where brAIn's own looks were wrong about this house, from what you answered. | No | Nothing |
-| **Unmet requests** | Things brAIn told you in the chat it could not do, once the same one came up in two or more conversations. | No | Nothing |
-| **House shape** | Counts only: how many lights, rooms and so on, and which features are on. | No | Nothing |
-| **Gaps** | Where brAIn falls short on this house, from a read-only Claude run. | No | One run |
-| **Ideas** | Features this house would use, from a read-only Claude run. | No | One run |
-| **Design review** | What brAIn actually showed you, judged as a product. | No | One run |
-| **Screens** | Redacted pictures of brAIn's panel and the other BRUH apps' panels, with layout faults a script can measure. | No | Nothing |
-| **Morph** | Problems the Morph dashboard found in its own code. Needs the Morph dashboard on too. | Yes, hourly | Nothing |
-| **Other BRUH add-ons** | Read from outside through the Supervisor: an add-on stopped although set to start at boot, each distinct error in its log, and what Home Assistant logged about its integration. | Yes, hourly | Nothing |
-| **Walkthrough** | brAIn uses each app you pick the way a person does and files what it finds. | No | One run per app |
-| **Liked** | What this household agreed with, thanked and kept, as counts, so fixes protect what works. | No | Nothing |
-
-**What do you want to fix?** takes a sentence the way you would say it to a person (*"the
-settings page is too crowded"*) and files one issue with your words quoted, the real problem
-behind it and what "fixed" looks like. You can also tell brAIn in the chat that another BRUH
-app is broken; it looks at the app's status and log, does what can be done on the box, and
-files the rest.
-
-**Autopilot** turns every stream on with nothing waiting for you to press Send.
-
-## How a report behaves
-
-- **One issue per problem**, kept for as long as the problem exists. A count that changes is
-  updated in the issue, not filed again.
-- **It waits for you first.** With *Ask before sending each new report* on (the default), a new
-  report sits in ⚙ until you press **Send** or **Delete**. **View** shows exactly the text, and
-  the pictures, that would be sent.
-- **After that, it only says when**: *Not seen since…*, *Back again on brAIn x.y.z*, *Still
-  happening on brAIn x.y.z*, and *Held: … (fixed in x.y.z)*, the one line that says a fix worked.
-  These comments contain only dates and version numbers.
-- **It asks whether your own request was fixed**, once, when the release that fixed it is
-  installed.
-- **It listens to the answer.** A report closed as declined, not brAIn's or a duplicate is never
-  filed again, even reworded, and a stream that is mostly noise runs less often.
-- **Two daily limits** in ⚙ › Developer: new issues a day (no limit by default) and Claude runs a
-  day (4 by default). Scheduled runs also stop when automatic insights are paused or the budget
-  is spent.
-
-## What leaves your house, and what never does
-
-**Sent**, inside the issue: the problem's description and the journal rows and log lines behind
-it (credentials and addresses taken out), what a Claude run wrote, brAIn's version and health,
-an abridged diagnostics summary, counts, and for **Screens**, pictures.
-
-**Replaced with aliases before sending:** every entity id, friendly name and room name.
-`light.bedroom_lamp` becomes `light.light_07`, *Master Bedroom* becomes *Room 3*. The numbering
-is stable, so two issues about the same light match up. The map back to real names stays on
-your machine. File names and service names (`light.turn_on`) are left as they are.
-
-**Before a picture is taken**, every piece of text on the page is rewritten: calendar events,
-street addresses, email addresses, phone numbers, coordinates and zone names are blacked out;
-password fields and anything credential-shaped are blacked out; names, rooms and entity ids get
-the same aliases. Canvases, video, images and anything brAIn could not read are covered with a
-grey box. While a panel is photographed, every request that is not a read is stopped, so a label
-is never printed and a show never starts.
-
-**Never sent:**
-
-- credentials of any kind (Claude, Home Assistant or GitHub tokens) and `secrets.yaml`;
-- camera images;
-- calendar events and addresses;
-- where people are;
-- your memory document as a whole.
-
-Even with aliases, a fault list describes the *shape* of a home. That is why brAIn only sends
-to a **private** repository, and refuses to send to a public one.
-
-## Turning it on
+## Turn it on
 
 <Steps>
 
-1. **Create a private repository** on GitHub for the reports.
-2. **Create a fine-grained personal access token** (GitHub → Settings → Developer settings →
-   Fine-grained tokens) with access to *only that repository* and **Issues: Read and write**.
-   If you switch **Screens** on, also **Contents: Read and write**, because the pictures are
-   files in that repository. Add nothing else.
-3. **Switch on Development loop** in ⚙ › Features, then in **⚙ › Developer** enter
-   `owner/repo` and the token, press **Save**, then **Recheck**.
+1. **Create a private repository** on GitHub for the reports. brAIn refuses to send to a public one.
+2. **Create a fine-grained personal access token** (GitHub → Settings → Developer settings → Fine-grained tokens) with access to *only that repository* and **Issues: Read and write**. If you switch **Screens** on, add **Contents: Read and write**, because the pictures are files in that repository. Add nothing else.
+3. **Switch on Development loop** in ⚙ › Features.
+4. In **⚙ › Developer**, enter `owner/repo` and the token, press **Save**, then **Recheck**.
 
 </Steps>
 
-The token is kept in the add-on's secrets folder, which Home Assistant backups leave out. The
-panel never shows it again. When it lapses, ⚙ shows the error and brAIn stops sending until you
-paste a new one.
+The token is kept in the add-on's secrets folder, which Home Assistant backups leave out. The panel never shows it again. When it lapses, ⚙ shows the error and brAIn stops sending until you paste a new one.
 
-The same controls are in the terminal: `brain devloop status`, `brain devloop run [stream]`
-and `brain devloop look "<what to fix>"`.
+## What you can do
 
-## Going further: brAIn fixing itself
+| You do | What happens |
+| --- | --- |
+| Type a sentence in **What do you want to fix?** and press **Send** | One read-only Claude run works out the real problem and files one issue. If the run fails, your sentence is filed as typed |
+| Tell brAIn in the chat that a BRUH app is broken | It reads the app's status and log, fixes what can be fixed on the box, and files the rest |
+| Press **Run** on a stream | That stream runs now |
+| Press **View**, **Send** or **Delete** on a waiting report | See exactly the text and pictures that would be sent, send it, or never report it |
+| Switch on **Report everything without asking** | Autopilot: every stream on, nothing waits for **Send**, and at least 8 Claude runs a day. Switching it off restores your own switches |
+| Switch apps on under **Apps brAIn looks at** | The Walkthrough uses those apps. brAIn and Morph start on; the rest start off, and autopilot leaves them as you set them. **Look now** looks once |
+| Read **Did the fixes hold?** | How many fixes held on this house, how many came back, and how many wait for an update |
 
-The reports repository can feed a loop that needs nobody in it. The brAIn source repository
-ships the cloud half: instructions for a scheduled Claude Code routine that works through the
-open issues, fixes them in pull requests with tests, and merges them when CI is green, plus a CI
-check that guards what an automated pull request may change. With the add-on's **Auto update**
-on in Home Assistant, a merged fix reaches the house that reported it, and the house's next
-*Not seen since* or *Back again* says whether it worked.
+The same controls are in the terminal:
 
-Running that loop against the public repository ships every fix to everybody who installed
-brAIn, so it is for whoever maintains it. Anyone else should point it at a fork.
+```bash
+brain devloop status
+brain devloop run [stream]
+brain devloop look "<what to fix>"
+```
 
-## Sharing a report with the brAIn project
+## The streams
 
-Your reports stay in your repository. If one looks like a brAIn bug and you are happy to share
-it, open an issue on [BRUH-HA-Apps](https://github.com/bruhautomation/BRUH-HA-Apps/issues) and
-paste the parts you are comfortable with. You are never expected to.
+Each kind of evidence is a stream with its own switch, schedule and **Run** button.
+
+| Stream | What it files | On at first | Costs |
+| --- | --- | --- | --- |
+| **Faults** | The fault list from ⚙ › Diagnostics: a service that stopped, a run that keeps failing | Yes, hourly | Nothing |
+| **Scorecard** | How right each house check was on this release. One issue per release | Yes, daily | Nothing |
+| **Wrongs** | A check you ignored at least 3 times and at least half the time, with your reasons | Yes, daily | Nothing |
+| **Canary** | How this house runs for 24 hours after it installs a release, so a fix that broke something can be reverted. Never waits for **Send** | Yes, hourly | Nothing |
+| **Morph** | Problems the Morph dashboard found in its own code. Needs the Morph dashboard on | Yes, hourly | Nothing |
+| **Other BRUH add-ons** | Read from outside through the Supervisor: an add-on stopped although set to start at boot, each distinct error in its log, and what Home Assistant logged about its integration | Yes, hourly | Nothing |
+| **Judgement** | Where brAIn's own looks were wrong about this house, from what you answered | No | Nothing |
+| **Unmet requests** | Things brAIn told you in the chat it could not do, once the same one came up in two or more conversations | No | Nothing |
+| **House shape** | Counts only: how many lights, rooms and so on, and which features are on | No | Nothing |
+| **Liked** | What this household agreed with, thanked and kept, as counts, so fixes protect what works | No | Nothing |
+| **Screens** | Redacted pictures of brAIn's panel and the other BRUH apps' panels, with layout faults a script can measure, once per release | No | Nothing |
+| **Corpus** | First looks that were wrong or missed here, as test cases for [the corpus](/brain/corpus/). Needs capture on | No | Nothing |
+| **Gaps** | Where brAIn falls short on this house, from a read-only Claude run | No | One run |
+| **Ideas** | Features this house would use, from a read-only Claude run | No | One run |
+| **Design review** | What brAIn showed you, judged as a product | No | One run |
+| **Walkthrough** | brAIn uses each app you pick the way a person does and files what it finds | No | One run per app |
+
+## How a report behaves
+
+- **One issue per problem.** A count that changes is updated in the issue, not filed again.
+- **It waits for you first.** With **Ask before sending each new report** on (the default), a new report sits in ⚙ until you press **Send** or **Delete**.
+- **After that, it only says when.** Follow-up comments contain only dates and version numbers:
+
+  | Comment | Meaning |
+  | --- | --- |
+  | *Not seen since …* | It stopped happening |
+  | *Back again on brAIn x.y.z* | It returned |
+  | *Still happening on brAIn x.y.z* | An update came out and did not fix it |
+  | *Held: … (fixed in x.y.z)* | The fix is installed here and the problem stopped |
+
+- **It asks whether your own request was fixed**, once, when the release that fixed it is installed.
+- **It listens to the answer.** A Gaps, Ideas, Design review, Walkthrough or Unmet report closed as declined, not brAIn's or a duplicate is not filed again for 90 days, even reworded. A stream that is mostly noise runs less often, and ⚙ says so with an **Undo**.
+
+### Daily limits
+
+| Limit | Default | Notes |
+| --- | --- | --- |
+| **New issues a day** | No limit | Past a number you set, reports wait for the next day |
+| **Claude runs a day** | 4 (up to 24) | Scheduled runs also stop when automatic insights are paused or the budget is spent. A **Run** press skips the budget but counts here |
+
+## What leaves your house
+
+**Sent**, inside the issue:
+
+- the problem's description, with the journal rows and log lines behind it (credentials and addresses removed);
+- what a Claude run wrote;
+- brAIn's version and health, an abridged diagnostics summary, and counts;
+- for **Screens**, pictures.
+
+**Replaced with aliases before sending:** every entity id, friendly name and room name. `light.bedroom_lamp` becomes `light.light_07`, and *Master Bedroom* becomes *Room 3*. The numbering is stable, so two issues about the same light match. The map back to real names stays on your machine. File names and service names (`light.turn_on`) are left as they are.
+
+**Before a picture is taken**, the text on the page is rewritten:
+
+- calendar events, street addresses, email addresses, phone numbers, coordinates and zone names are blacked out;
+- password fields and anything credential-shaped are blacked out;
+- names, rooms and entity ids get the same aliases;
+- canvases, video, images and anything brAIn could not read are covered with a grey box.
+
+While a panel is photographed, every request that is not a read is stopped, so a label is never printed and a show never starts.
+
+<Aside type="caution" title="Never sent">
+- Credentials of any kind (Claude, Home Assistant or GitHub tokens) and `secrets.yaml`
+- Camera images
+- Calendar events and addresses
+- Where people are
+- Your memory document as a whole
+</Aside>
+
+Even with aliases, a fault list describes the shape of a home. That is why brAIn sends only to a private repository.
+
+## Let brAIn fix itself
+
+The reports repository can feed a loop with nobody in it. The brAIn source repository ships the cloud half:
+
+- instructions for a scheduled Claude Code routine that works through the open issues, fixes them in pull requests and merges them when CI is green;
+- a CI check that guards what an automated pull request may change.
+
+With the add-on's **Auto update** on in Home Assistant, a merged fix reaches the house that reported it. The house's next *Held*, *Not seen since* or *Back again* says whether it worked, and the **Canary** stream tells the cloud to revert a release that broke something.
+
+Running that loop against the public repository ships every fix to everybody who installed brAIn, so it is for whoever maintains it. Anyone else should point it at a fork.
+
+## Share a report with the brAIn project
+
+Your reports stay in your repository. If one looks like a brAIn bug and you are happy to share it, open an issue on [BRUH-HA-Apps](https://github.com/bruhautomation/BRUH-HA-Apps/issues) and paste the parts you are comfortable with. You are never expected to.

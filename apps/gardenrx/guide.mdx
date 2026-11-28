@@ -1,190 +1,59 @@
 ---
 title: Using GardenRX
-description: A tour of every GardenRX screen — Today, Crops, Garden, Harvest, Spray, Products and Weather — and how the season, the spray window, pre-harvest intervals and the tank-mix planner work, plus the add-on's options and troubleshooting.
+description: Every GardenRX screen, task by task. See what needs doing, check the spray window, plan and log a tank mix, track harvests, crops, products and stock, and map your garden. Plus options and troubleshooting.
 ---
 
-import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-GardenRX opens in the Home Assistant sidebar. On a computer the screens are in a sidebar
-of their own, with the clock, the theme switch (Auto, Light, Medium, Dark), the version
-and a link to the in-app changelog at the bottom; on a phone they become a bottom bar of
-seven: **Today, Crops, Garden, Harvest, Spray, Products, Weather**. The current weather
-sits in the top bar on every page, with a search that finds any crop or product.
+GardenRX opens from the Home Assistant sidebar and has seven screens: **Today, Crops,
+Garden, Harvest, Spray, Products** and **Weather**.
 
-## Today
+![GardenRX's Today page on a computer: the seven screens down the left, an "All crops protected" banner with the temperature and wind, a "While the garden rests" list, and a queued copper spray with a Log Spray button](./images/today.webp)
 
-The first page answers one question: *does anything need doing?*
+On a phone the screens are a bottom bar. The top bar shows the current weather and a search
+that finds any crop, product, disease or ingredient.
 
-- **The banner** says it in one line — *All crops protected*, a spray that is due, or
-  *Hold off* with the reason — with the temperature and wind now. When it says to hold
-  off, it names the next good spray window with its day and time, never the hour already
-  under way, and the Weather page gives the same answer.
-- **Needs attention** lists crops whose fungicide or insecticide cover has run out, and
-  crops ready to pick. A row opens the Spray page's planner with that crop already ticked.
-  "Fungicide due" and "Ready to pick" count only crops in season; a crop picked in the
-  last two weeks still counts as ready.
-- **Don't harvest yet** — crops inside a pre-harvest interval, with the days left. This is
-  never hidden.
-- **Queued sprays**, each with its products and rates, how long its coverage will last,
-  and **Log Spray**.
-- **Watering advice** and a one-line rain summary that links to Weather.
+## See what needs doing
 
-**Out of season** the page changes. *While the garden rests* shows a frost warning when a
+Open **Today**. It tells you whether anything needs doing right now.
+
+| Section | What it shows |
+|---|---|
+| **The banner** | *All crops protected*, a spray that is due, or *Hold off* with the reason, plus the temperature and wind now. When it says to hold off, it names the next good spray window with its day and time. |
+| **Needs attention** | Crops whose fungicide or insecticide cover has run out, and crops ready to pick. Tap a row to open the planner with that crop ticked. |
+| **Don't harvest yet** | Crops inside a pre-harvest interval, with the days left. This is never hidden. |
+| **Coming up** | Covers about to run out, with the days left. |
+| **Queued sprays** | Each planned spray with its products and rates, how long its coverage will last, and **Log Spray**. |
+| **Spray window, 3 days** | The same hour-by-hour window as the Weather page. |
+| **Watering and rain** | Watering advice and a one-line rain summary that links to Weather. |
+
+Only crops in season count as due or ready. A crop picked in the last two weeks still
+counts as ready.
+
+### In winter
+
+Out of season, **While the garden rests** takes over. It shows a frost warning when a
 freeze is forecast, each crop's stage and when it usually wakes ("Bud Break is typically
 around Feb 26") with what to do meanwhile, the last spray and the last pick. Watering tips
 stop while nothing is growing.
 
 ![GardenRX's Today page on a phone in November: the All crops protected banner, then While the garden rests with a freeze warning for Tuesday night, apples and pears in post-harvest with a note about a post-harvest copper spray, and blueberries dormant; the seven-item bottom bar reads Today, Crops, Garden, Harvest, Spray, Products, Weather](./images/today-phone.webp)
 
-## Crops
+## Check the spray window
 
-Every crop you grow, grouped as **Orchard** and **Garden**, each one compact row with its
-stage, its varieties, and — while it is in season — when its next spray is due
-("Fungicide: next due Dec 3"). Filter by area, search, and sort by priority.
-
-![The Crops page: six crops, an explanation that none needs fungicide or insecticide cover now because five are dormant or past harvest and one is finished for the year, then Orchard (Apples post-harvest, Blueberries dormant, Peaches dormant, Pears post-harvest) and Garden (Garlic dormant, Tomatoes finished for the year)](./images/crops.webp)
-
-### The season
-
-Each crop belongs to a **crop group** (Pome Fruit, Stone Fruit, Berries, Grapes,
-Cucurbits, Nightshades, Leafy Greens, Brassicas, Legumes, Alliums, Root Vegetables, Herbs,
-Ornamentals, Turf, Pawpaw…), and each group has a **phenology calendar**: the stages of its
-year and their usual dates — dormant, silver tip, bud break, bloom, petal fall, green
-fruit, harvest, post-harvest.
-
-- A variety's stage **follows the date**. A past-season crop reads *Dormant* in November,
-  not *Bud Break*. A garden south of the equator reads its own season.
-- You can **set a stage by hand** (a late spring, an early bloom). It gives way to the
-  calendar once that stage's season is over.
-- **Annual crops** at the end of the season read *Finished for the year*; garlic and
-  shallots, in the ground over winter, read *Dormant*. A crop with no varieties (roses,
-  shrubs) follows its group's season.
-- **Resting crops** (dormant or past harvest) never show a red "lapsed" and never count as
-  due. Crops, Today and Harvest ask one rule what is due, so they always agree.
-
-### A crop's page
-
-Open a crop for its varieties and their stages, a stage timeline, its spray coverage,
-its harvest windows, its $/lb (and average weight each, for crops you count), and the
-**problems to watch for**: the diseases and pests of its group, with symptoms, timing,
-the conditions that favour them, and the products labelled against them.
-
-## Garden
-
-A map of your garden. Draw beds, rows and trees in zones, give each a variety and a
-colour, and keep **dated notes** on any place — "pruned", "fire blight strike on the
-north limb". Notes left with the `gardenrx.log_note` service land here too, one dated line
-each, in that place's Edit dialog.
-
-## Harvest
-
-Log picks by weight (lb, oz, kg, g) or by count. The page shows:
-
-- **What to pick now** — crops ready, held by a pre-harvest interval, or still developing;
-  when nothing is, one line such as *Nothing to pick or hold right now · 3 crops off season*.
-- **Season total** — yield, value, what the sprays cost, and the net.
-- **A running chart** of the season's value (drag across it to read any date), by total or
-  by crop.
-- **Value by crop**, broken down by variety, and every pick in a log you can edit.
-
-![The Harvest page: a Season total of 67.4 lb worth $240.25, spray cost $9.89 and net $230.36, a cumulative value chart from June to October, and Value by Crop with apples split into Honeycrisp, Enterprise and Liberty](./images/harvest.webp)
-
-A pick's value is its weight times the crop's $/lb; a count is turned into weight with the
-crop's *average weight each*. A pick logged inside a pre-harvest interval is saved, and
-flagged.
-
-## Spray
-
-The **tank-mix builder** and the spray record, in two tabs.
-
-### Plan a mix
-
-Tick the crops you want to spray. GardenRX shows each crop's **coverage status** (what it
-needs: fungicide, insecticide or both), then **recommended mixes** built from the products
-labelled for the crops in the selection — drawn from your own stock when you have one.
-
-For each product in a mix you get:
-
-- its active ingredient and **FRAC/IRAC group**, and *Tap to swap* for an alternative;
-- a **rate slider** within the label's range for those crops, and the amount to add **to
-  your tank** in practical units ("Add 4.3 fl oz to 4 gal tank"), in mL, and its cost;
-- for the whole mix, the **total cost** and the **PPE** the labels require.
-
-![The Spray page's Plan a mix tab with Apples and Peaches ticked: their coverage status, and a recommended mix of Bonide Captan 50W (FRAC M4) and Thuricide BT (IRAC 11A) with rate sliders, "Add 4.3 fl oz to 4 gal tank", a cost of $7.78, the PPE list, and a Queue This Spray button](./images/tank-mix.webp)
-
-Before you queue it, the mix is checked against GardenRX's **interlock rules**:
-
-| Rule | What it watches for |
-|---|---|
-| Tank mix incompatibility | Products that must not go in the same tank |
-| FRAC/IRAC rotation, resistance management | The same mode of action used too often in a row |
-| Pollinator interlock | Bee-toxic products during bloom |
-| Separation interval | Products that need days between them |
-| Sulfur high temp | Sulfur above 85 °F, where it burns leaves |
-| Captan on pears, copper after bud break on cherries, carbaryl after petal fall, streptomycin outside bloom | Crop- and stage-specific label limits |
-| High wind, marginal wind, rain approaching, high or low temperature | The weather in the spray window |
-
-Press **Queue This Spray** to put it on the list (it shows on Today and on the spray
-card). When you have sprayed, **Log Spray** records it, clears the queued spray, starts
-the pre-harvest clocks and takes what was used out of stock.
-
-### History
-
-Every spray: date, products and rates, crops, the volume, and the weather at the time.
-Filter it, and edit or delete a record.
-
-### Coverage and pre-harvest intervals
-
-A spray **covers** a crop for its product's cover interval (10 days for many fungicides; 14
-when a label does not say) — and rain beyond what the product tolerates wears it off
-sooner. The **pre-harvest interval** (PHI) is the label's minimum days between the last
-spray of a product and picking that crop; GardenRX counts it from your logged spray and
-shows the date the crop clears.
-
-## Products
-
-### Catalog
-
-The reference that ships with the add-on: **256 products** with their **active
-ingredients**, manufacturer and EPA registration number, signal word, **REI** (re-entry
-interval), **rain-fast** time, **cover interval**, **rain tolerance**, **temperature
-range**, **bee toxicity**, how many times you have used it this season, the **PPE** and
-**first aid** from the label, a typical price, and the crops it is labelled for with their
-rates and PHIs. Badges say what they are — *REI 24h*, *Re-spray 10d*, or *n/a*.
-
-![A product page for Bonide Captan 50W: DANGER signal word, Albaugh, EPA registration number, a $19.99 per 12 oz price with a Buy link, the captan active ingredient at 50% (FRAC M4), and specifications — multi-site contact activity, low bee toxicity, REI 24 hours, rain-fast 2 hours, cover interval 10 days, rain tolerance 2 inches, temperature range 40–90 °F — above the PPE requirements](./images/product.webp)
-
-The catalog is only ever **added to** on an update: a product you edited keeps your edit.
-
-### Your stock
-
-What is on your shelf, by area (Orchard, Garden, Landscape), each with a **level bar** you
-drag to set how much is left, and a pencil for its size, count and cost. Anything at **20%
-or less** is red, and counts towards the *Treatments running low* sensor. Logging a spray
-takes what it used out of stock automatically.
-
-![Your stock: six products as cards with level bars — horticultural oil 81% left, Captan 50W 25%, copper fungicide 88%, neem oil 19% in red, Captan 80 WDG 63% and Thuricide BT 75%](./images/stock.webp)
-
-## Weather
-
-Forecast and rainfall for your house's location, from Open-Meteo.
-
-- **The banner** names the next opening — *"Next opening: tomorrow 5–6 pm"* — or says it is
-  a good time now.
-- **The 3-day spray window**: every daylight hour as a square, *Good to spray*, *Caution*,
-  *Hold*, or grey for hours that are over or dark, with the reason under each day ("Hold
-  8a–11a below 40° · 1p–4p wind"). The banner's next opening is always the grid's first
-  green hour, and nothing ever says it is good to spray in the dark: at night the rating
-  reads *Dark*.
-- **The 7-day forecast**, with a chip that says when to spray each day — "Spray 3–7 pm",
-  "Short 4–5 pm" for a window under three hours, or nothing when no spray is due.
-- **Rainfall** this week and over 30 days, days since rain, and a status (*Adequate*,
-  *Dry*, *Drought* — drought only in the growing season).
-- **Watering advice**. With a quarter inch or more of rain due in the next three days it
-  says to wait for the rain; in real heat a *water now* stays when the rain coming is
-  less than the soil is short. A resting garden is never told to water now.
+Open **Weather** for the forecast and rainfall at your house's location, from Open-Meteo.
 
 ![The Weather page: Next opening tomorrow 5–6 pm, current conditions 33° and partly cloudy, the 3-day spray window grid with today greyed out, Wednesday mostly on hold for cold and wind with one green hour, Thursday on hold for wind and rain, and a 7-day forecast with rain totals](./images/weather.webp)
+
+| Section | What it shows |
+|---|---|
+| **The banner** | The next opening, such as *"Next opening: tomorrow 5–6 pm"*, or that now is a good time. It is always the grid's first green hour. |
+| **3-day spray window** | Every daylight hour as a square: *Good to spray*, *Caution*, *Hold*, or grey for hours that are over or dark. The reason is under each day ("Hold 8a–11a below 40° · 1p–4p wind"). |
+| **7-day forecast** | A chip says when to spray each day: "Spray 3–7 pm", "Short 4–5 pm" for a window under three hours, or nothing when no spray is due. |
+| **Rainfall** | This week and the last 30 days, days since rain, and a status: *Adequate*, *Dry* or *Drought* (drought only in the growing season). |
+| **Watering advice** | With a quarter inch or more of rain due in the next three days, it says to wait. In real heat, *water now* stays when the rain coming is less than the soil is short. A resting garden is never told to water now. |
+
+Nothing ever says it is good to spray in the dark. At night the rating reads *Dark*.
 
 ### What the window weighs
 
@@ -197,69 +66,219 @@ Forecast and rainfall for your house's location, from Open-Meteo.
 
 A product's own temperature range and rain-fast time apply on top when it is in the mix.
 
-## Settings
+## Plan, queue and log a spray
 
-The gear at the bottom of the sidebar.
+Open **Spray**. It has two tabs: **Plan a mix** and **History**.
 
-- **Sprayer** — your tank size in gallons (4 by default, a backpack sprayer). Every dose is
-  worked out for it.
-- **Appearance** — theme (Auto follows your device; Light, Medium, Dark), and display
-  preferences.
+![The Spray page's Plan a mix tab with Apples and Peaches ticked: their coverage status, and a recommended mix of Bonide Captan 50W (FRAC M4) and Thuricide BT (IRAC 11A) with rate sliders, "Add 4.3 fl oz to 4 gal tank", a cost of $7.78, the PPE list, and a Queue This Spray button](./images/tank-mix.webp)
 
-## Where your data is
+<Steps>
 
-Everything is in one file, `gardenrx.db`, in the add-on's own data folder. It is
-**included in Home Assistant backups** and restored with them. Nothing in it is a
-credential: the token the integration uses lives in `/config/.gardenrx/api_token` and is
-regenerated if it goes missing.
+1. **Tick the crops** you want to spray. **Coverage Status** shows what each needs:
+   fungicide, insecticide or both.
 
-## Location
+2. **Read the recommended mix.** It is built from the products labelled for those crops,
+   drawn from your own stock when you have one. Each product shows its active ingredient
+   and **FRAC/IRAC group**.
 
-Forecasts, rainfall and the time of day use the latitude, longitude and time zone set in
-**Settings → System → General**. Turn off **Use Home Assistant's location** to use the
-location built into GardenRX instead — you will almost always want it on.
+3. **Adjust it.** *Tap To Swap* a product for an alternative, or move the **rate slider**
+   within the label's range for those crops.
 
-## Options
+4. **Measure.** Each product shows the amount to add to your tank in practical units ("Add
+   4.3 fl oz to 4 gal tank"), in mL, and its cost. The mix shows the total **cost** and the
+   **PPE** the labels require.
 
-On the add-on's **Configuration** tab:
+5. **Press Queue This Spray.** The spray shows on Today, on the Spray page and on the
+   spray card.
+
+6. **Press Log Spray** when you have sprayed. This records the spray, clears it from the
+   queue, starts the pre-harvest clocks and takes what you used out of stock.
+
+</Steps>
+
+### What the planner checks
+
+A mix that breaks a **Blocks** rule cannot be queued. A **Warns** rule shows a warning and
+lets you go on.
+
+| Rule | What it watches for | Result |
+|---|---|---|
+| Tank mix incompatibility | Products that must not go in the same tank | Blocks |
+| Separation interval | Products that need days between them | Blocks |
+| Pollinator interlock | Any insecticide while any of your varieties is in bloom | Blocks |
+| Sulfur high temp | Sulfur with a forecast high above 85 °F, where it burns leaves | Blocks |
+| Captan on pears, copper after bud break on cherries, carbaryl after petal fall, streptomycin outside bloom | Crop- and stage-specific label limits | Blocks |
+| High wind | Wind over 10 mph | Blocks |
+| FRAC/IRAC rotation | The same mode of action used too often in a row on a crop | Warns |
+| Resistance management | A single-site fungicide with no multi-site partner | Warns |
+| Marginal wind, rain approaching, low or high temperature | The weather in the spray window | Warns |
+
+### Review past sprays
+
+The **History** tab lists every spray on a timeline: date, products and rates, crops, the
+volume, the weather at the time and the estimated cost, with the season's spray cost at
+the top. Filter it by area. Edit or delete a record, or log a spray you did not queue.
+
+### How coverage and pre-harvest intervals are counted
+
+- **Coverage.** A spray covers a crop for its product's cover interval: 10 days for many
+  fungicides, 14 when a label does not say. Rain beyond what the product tolerates wears it
+  off sooner.
+- **Pre-harvest interval (PHI).** The label's minimum days between the last spray of a
+  product and picking that crop. GardenRX counts it from your logged spray and shows the
+  date the crop clears.
+
+## Log and value a harvest
+
+Open **Harvest** and press **Log Harvest**. Enter a weight (lb, oz, kg, g) or a count.
+
+![The Harvest page: a Season total of 67.4 lb worth $240.25, spray cost $9.89 and net $230.36, a cumulative value chart from June to October, and Value by Crop with apples split into Honeycrisp, Enterprise and Liberty](./images/harvest.webp)
+
+| Section | What it shows |
+|---|---|
+| **What to pick now** | Crops ready to pick, held by a pre-harvest interval, or still developing. When there are none, one line such as *Nothing to pick or hold right now · 3 crops off season*. |
+| **Season total** | Yield, value, what the sprays cost, and the net. |
+| **Charts** | The season's running value, by total or by crop. Drag across it to read any date. |
+| **Value By Crop** | Each crop broken down by variety. |
+| **Picks log** | Every pick. Edit or delete any of them. |
+
+A pick's value is its weight times the crop's $/lb. A count is turned into weight with the
+crop's *average weight each*. A pick logged inside a pre-harvest interval is saved and
+flagged.
+
+## Track crops and their season
+
+Open **Crops** for every crop you grow, grouped as **Orchard** and **Garden**. Each row
+shows the crop's stage and its varieties. While it is in season, it also shows when its
+next spray is due ("Fungicide: next due Dec 3"). Filter by area, search, and sort by
+priority. Press **Add crop** to add one.
+
+![The Crops page: six crops, an explanation that none needs fungicide or insecticide cover now because five are dormant or past harvest and one is finished for the year, then Orchard (Apples post-harvest, Blueberries dormant, Peaches dormant, Pears post-harvest) and Garden (Garlic dormant, Tomatoes finished for the year)](./images/crops.webp)
+
+### Open a crop
+
+A crop's page holds:
+
+- its **varieties** and their stages, with **Add Variety**;
+- a **growth timeline** and **Set Growth Stage**;
+- its **protection coverage**, treatment history and labelled products;
+- its harvest windows and status;
+- its **$/lb**, and an average weight each for crops you count;
+- the **problems to watch for**: the diseases and pests of its group, with symptoms,
+  timing, the conditions that favour them, and the products labelled against them.
+
+### How the season works
+
+Each crop belongs to a **crop group** (Pome Fruit, Stone Fruit, Berries, Grapes,
+Cucurbits, Nightshades, Leafy Greens, Brassicas, Legumes, Alliums, Root Vegetables, Herbs,
+Ornamentals, Turf, Pawpaw…). Each group has a calendar of stages with their usual dates:
+dormant, silver tip, bud break, bloom, petal fall, green fruit, harvest, post-harvest.
+
+| Situation | What you see |
+|---|---|
+| Any variety | Its stage follows the date. A garden south of the equator reads its own season. |
+| You set a stage by hand (a late spring, an early bloom) | It holds until that stage's season is over, then the calendar takes over. |
+| An annual crop at the end of the season | *Finished for the year* |
+| Garlic and shallots over winter | *Dormant* |
+| A crop with no varieties (roses, shrubs) | Its group's season |
+| A dormant or past-harvest crop | Never a red "lapsed", and never counted as due. Crops, Today and Harvest always agree on what is due. |
+
+## Look up a product
+
+Open **Products**. The **Catalog** tab holds the **256 products** that ship with the app.
+
+![A product page for Bonide Captan 50W: DANGER signal word, Albaugh, EPA registration number, a $19.99 per 12 oz price with a Buy link, the captan active ingredient at 50% (FRAC M4), and specifications — multi-site contact activity, low bee toxicity, REI 24 hours, rain-fast 2 hours, cover interval 10 days, rain tolerance 2 inches, temperature range 40–90 °F — above the PPE requirements](./images/product.webp)
+
+Each product page shows:
+
+| | |
+|---|---|
+| **Identity** | Manufacturer, EPA registration number, signal word, a typical price |
+| **Active ingredients** | Each with its percentage and FRAC/IRAC group |
+| **Specifications** | Mode of action, bee toxicity, **REI** (re-entry interval), **rain-fast** time, **cover interval**, **rain tolerance**, **temperature range**, times used this season |
+| **Safety & handling** | The **PPE** and **first aid** from the label |
+| **Labelled crops** | Each crop with its rates and PHI |
+
+Badges say what they are: *REI 24h*, *Re-spray 10d*, or *n/a*.
+
+An update only ever adds to the catalog. A product you edited keeps your edit.
+
+## Keep track of stock
+
+Open **Products → Your stock**.
+
+![Your stock: six products as cards with level bars — horticultural oil 81% left, Captan 50W 25%, copper fungicide 88%, neem oil 19% in red, Captan 80 WDG 63% and Thuricide BT 75%](./images/stock.webp)
+
+| To | Do this |
+|---|---|
+| Add a product you own | Search in **Add a product to your stock…** |
+| Set how much is left | Drag the level bar |
+| Change its size, count or cost | Tap the pencil |
+| Find something | Filter by area (Orchard, Garden, Landscape) or sort by name, area or % left |
+
+Anything at **20% or less** is red and counts towards the *Treatments running low* sensor.
+Logging a spray takes what it used out of stock by itself.
+
+## Map your garden
+
+Open **Garden** to draw your garden on a grid.
+
+| To | Do this |
+|---|---|
+| Look around safely | Stay in **View**. Pan, zoom and tap a box to see what it is. Nothing can be changed by accident. |
+| Add a part of the garden | Add a **zone**, then switch to **Edit**. |
+| Draw | Add planting beds, trees and bushes, trellises, paths, structures and landmarks. Give each a variety and a colour. |
+| Rearrange | Move, rotate, duplicate, merge or delete elements, and send them to the front or back. Undo and redo are there. |
+| Repeat a layout | Save elements as a **template** and stamp copies in a row or column. |
+| Keep a record of a place | Add **dated notes** in its Edit dialog, such as "pruned" or "fire blight strike on the north limb". |
+
+Notes left with the `gardenrx.log_note` service land in the same place, one dated line each.
+
+## Set your tank size and theme
+
+Open Settings with the gear at the bottom of the sidebar.
+
+| Setting | What it does |
+|---|---|
+| **Sprayer** | Your tank size in gallons. The default is 4, a backpack sprayer. Every dose is worked out for it. |
+| **Appearance** | The theme: Auto (follows your device), Light, Medium or Dark. The same switch is at the bottom of the sidebar. |
+
+The sidebar's footer also shows the version and links to the in-app changelog.
+
+## Reference
+
+### Options
+
+On the app's **Configuration** tab in Home Assistant:
 
 | Option | Default | What it does |
 |---|---|---|
-| **Home Assistant integration** (`enable_ha_integration`) | on | Deploy the `gardenrx` integration: the sensors, the `gardenrx.*` services and the cards. Restart Home Assistant once after the first start to load it. |
-| **Install the Morph cards** (`install_morph_cards`) | on | When brAIn's Morph dashboard is present (`/config/morph`), copy the cards there on every start as `custom:morph-gardenrx-harvest`, `-spray` and `-inventory`. |
-| **Use Home Assistant's location** (`use_home_assistant_location`) | on | Forecast for Home Assistant's latitude, longitude and time zone. Off: the app's built-in location. |
-| **Log level** (`log_level`) | `info` | How much the add-on writes to its log while it starts. |
+| **Home Assistant integration** (`enable_ha_integration`) | on | Deploys the `gardenrx` integration: the sensors, the `gardenrx.*` services and the cards. Restart Home Assistant once after the first start to load it. |
+| **Install the Morph cards** (`install_morph_cards`) | on | When brAIn's Morph dashboard is present (`/config/morph`), copies the cards there on every start as `custom:morph-gardenrx-harvest`, `-spray` and `-inventory`. |
+| **Use Home Assistant's location** (`use_home_assistant_location`) | on | Uses Home Assistant's latitude, longitude and time zone for forecasts, rainfall and the time of day. Off: the location built into GardenRX. Leave it on. |
+| **Log level** (`log_level`) | `info` | How much the app writes to its log while it starts. |
 
-## Security
+### Your data and backups
+
+Everything is in one file, `gardenrx.db`, in the app's own data folder. It is **included in
+Home Assistant backups** and restored with them.
+
+### Security
 
 - The app is reachable only through Home Assistant's ingress, behind its login.
-- The integration talks to the app with a bearer token from `/config/.gardenrx/api_token`.
-- Every query the screens make is checked against the database schema, table by table and
-  column by column, with every value bound — the browser can't send SQL.
-- AppArmor is on, and a watchdog restarts the app if its health check (which opens the
-  database) stops answering.
+- The integration talks to the app with a token kept in `/config/.gardenrx/api_token`. It
+  is regenerated if it goes missing.
+- The browser cannot send SQL. Every query is checked against the database schema.
+- AppArmor is on. A watchdog restarts the app if its health check stops answering.
 
-## Troubleshooting
+### Troubleshooting
 
-<CardGrid>
-  <Card title="No GardenRX under Discovered">
-    Restart Home Assistant once after the add-on's first start — it has to load the
-    integration before it can offer it. Check that **Home Assistant integration** is on
-    in the add-on's options.
-  </Card>
-  <Card title="A card says it can't find its sensor">
-    Add the integration (Settings → Devices & services). Each card finds its GardenRX
-    sensor by itself; with several, point it at one with `entity:`.
-  </Card>
-  <Card title="The forecast is for the wrong place">
-    Set your home's location in Settings → System → General, and leave **Use Home
-    Assistant's location** on. Restart the add-on after changing it.
-  </Card>
-  <Card title="The log says to restart Home Assistant">
-    The integration's code changed with this update. Restart Home Assistant once; card-only
-    updates never ask.
-  </Card>
-</CardGrid>
+| Problem | Fix |
+|---|---|
+| No GardenRX under *Discovered* | Restart Home Assistant once after the app's first start. Check that **Home Assistant integration** is on in the app's options. |
+| A card says it can't find its sensor | Add the integration under **Settings → Devices & services**. Each card finds its sensor by itself. With several, point it at one with `entity:`. |
+| The forecast is for the wrong place | Set your home's location under **Settings → System → General** and leave **Use Home Assistant's location** on. Restart the app after changing it. |
+| The log says to restart Home Assistant | The integration's code changed with this update. Restart Home Assistant once. Card-only updates never ask. |
 
 <Aside type="caution" title="Read the label">
 GardenRX is a decision aid. Product labels change, and the label on the container is the

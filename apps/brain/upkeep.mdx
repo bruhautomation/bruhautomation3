@@ -1,148 +1,171 @@
 ---
 title: Upkeep & the house book
-description: Keeping Home Assistant itself in order. Tidier names, rooms and aliases as one card you approve with a 30-day undo, an answer to "is this update safe tonight?" that quotes its evidence, an overnight check that names root causes, a cited house book you can share and take back, and a weekly sentence about who can reach the house.
+description: Keep Home Assistant itself in order. Tidy names, rooms and aliases with a 30-day undo, get a quoted answer to "is this update safe tonight?", find root causes overnight, keep a cited house book you can share, and see who can reach the house.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Steps } from '@astrojs/starlight/components';
 
-Most of brAIn is about your house. These jobs are about Home Assistant itself: the names
-nobody tidied, the devices in no room, the updates you are not sure about, the error log nobody
-reads, and the knowledge of how the house works that lives in one person's head.
+These jobs look after Home Assistant itself: names nobody tidied, devices in no room,
+updates you are not sure about, the error log nobody reads, and the knowledge of how the
+house works that lives in one person's head.
 
-| Job | Where it shows |
-| --- | --- |
-| [Names, rooms and aliases](#names-rooms-and-aliases) | A **Tidy-up** card on Insights → Needs you |
-| [Updates waiting](#updates-waiting) | A card per assessed update on Needs you |
-| [Overnight health check](#overnight-health-check) | Root causes on Needs you; **Run** in ⚙ → Diagnostics |
-| [The house book](#the-house-book) | **Memory → House book** |
-| [Who can reach the house](#who-can-reach-the-house) | A weekly sentence in ⚙ → Diagnostics, and access checks on Needs you |
+| You want to | brAIn does | Where |
+| --- | --- | --- |
+| [Fix messy names and missing rooms](#names-rooms-and-aliases) | Suggests names, rooms and aliases as one card you tick and **Apply** | **Tidy-ups** on Insights → Needs you |
+| [Know if an update is safe](#updates-waiting) | Reads the release notes against your configuration | A card per update on Needs you |
+| [Find what is really wrong](#overnight-health-check) | Reads the error log and the mesh every night and names root causes | Needs you, and **Run** in ⚙ → Diagnostics |
+| [Explain the house to someone else](#the-house-book) | Writes a cited house book | **Memory → House book** |
+| [See who can reach the house](#who-can-reach-the-house) | Checks access and writes one sentence a week | Needs you and ⚙ → Diagnostics |
 
-<Aside type="note" title="Nothing in Home Assistant changes on its own">
-A tidy-up is a list you tick; a verdict on an update is advice; the overnight check files cards;
-the house book is a page. The only thing here that writes to Home Assistant is **Apply** (and
-**Undo**) on a names-and-rooms card.
+![The Tidy-ups group on Needs you: a "Tidy 2 names and rooms" card marked Change ready with Apply, Snooze and Ignore; an "Update Home Assistant Core" card marked Safe tonight, 2026.10.1 → 2026.10.2, with a "What could go wrong" line and Apply; and an "Update Workshop switch firmware" card marked Can't tell, with Add to To Do](./images/panel2-tidyups.webp)
+
+<Aside type="note" title="Nothing here changes Home Assistant on its own">
+Only your press changes anything: **Apply** and **Undo** on a names-and-rooms card, and
+**Apply** on an update brAIn checked as safe. The overnight check files cards, and the
+house book is a page.
 </Aside>
 
 ## Names, rooms and aliases
 
-brAIn reads the house's own naming style first, a sample of the names *you* chose, then
-suggests tidier names, rooms and spoken aliases as one **Tidy-up** card reading *Change ready*:
+brAIn reads a sample of the names *you* chose first, so its suggestions follow your
+house's style. They arrive as one **Tidy-up** card marked *Change ready*.
 
 | Kind | What it fixes |
 | --- | --- |
-| **Rename** | Names that are still the hardware's (`0x00158d0001a2b3c4`, `Shelly Plus 1PM 8A4C`), which are unfindable in a picker and unsayable to Assist |
-| **Room** | Entities and devices in no area, which "turn off the kitchen" and every area card cannot see |
-| **Alias** | Spoken aliases for the things people actually say |
+| **Rename** | Names that are still the hardware's (`0x00158d0001a2b3c4`, `Shelly Plus 1PM 8A4C`), which you cannot find in a picker or say to Assist. |
+| **Room** | Entities and devices in no area, which "turn off the kitchen" and every area card cannot see. |
+| **Alias** | Spoken aliases for what people actually say. |
 
-Every change is a ticked row under the card's **Details**. Untick what you disagree with, or
-press **Change** on a row to say what it should be instead (a different name, or a room from your
-own list); what you type is checked the same way brAIn's suggestion was. Then press **Apply**.
+<Steps>
 
-- **A room move says what it changes.** A row that moves a device names it, and if the move
-  changes what an automation reaches, the card says so and Details names the automation.
-- **Apply re-reads every field** from Home Assistant before writing and records only what Home
-  Assistant accepted, so a batch that half-applied undoes exactly the half that happened.
-- **Undo** is in **History › Done** for 30 days, and never overwrites a rename you made since.
-- The *named after its hardware* and *no room* problems run this from **Plan**.
+1. Open the card's **Details**. Every change is a ticked row.
+2. Untick what you disagree with. Press **Change** on a row to give a different name, or to
+   pick a room from your own list.
+3. Press **Apply**.
+
+</Steps>
+
+- **A room move says what it changes.** If moving a device changes what an automation
+  reaches, the card says so and Details names the automation.
+- **Apply re-reads every field** from Home Assistant before writing and records only what
+  Home Assistant accepted.
+- **Undo** is in **History → Done** for 30 days. It never overwrites a rename you made
+  since.
+- brAIn never suggests a change to a protected entity, a room that does not exist, or a
+  name another entity already answers to.
+
+A *named after its hardware* or *no room* problem on Needs you starts this from its
+**Go ahead** press.
 
 ## Updates waiting
 
-Each pending update brAIn has read the release notes for is a card on Needs you saying **safe
-tonight**, **wait** (with the edit you would need to make first) or **not sure**, with the line
-from the notes and the line from your configuration it relied on under **Details**. **Add to To
-Do** puts the update on To Do.
+Each pending update brAIn has read the release notes for is a card on Needs you.
 
-**A *safe* or *wait* has to quote its evidence**: one line from the release notes and one line
-from your configuration, and both are checked **word for word** against what was actually
-read. An answer that cannot quote both is shown as *can't tell*, and so are notes that could
-not be fetched — a verdict on notes nobody read is a guess, so no run is spent on one.
+| Verdict | What it means | First press |
+| --- | --- | --- |
+| **Safe tonight** | Nothing in the notes reaches what your house runs. | **Apply** installs it, with *What could go wrong* on the card. Home Assistant backs up first where the update offers it. |
+| **Wait** | Something in the notes affects you. The card names the edit to make first. | **Add to To Do** |
+| **Can't tell** | brAIn could not quote its evidence, or could not fetch the notes. The card says what it could not reach. | **Add to To Do**, with **Check again** under **⋯** |
 
-The release notes are treated as data, never as instructions, and the run that reads them
-has no tools at all.
+A *safe* or *wait* has to quote two lines, shown under **Details**: one from the release
+notes, and one from your configuration or from the device itself. Both are checked word
+for word against what was actually read. An answer that cannot quote both is *can't tell*.
 
-:::caution[What it never does]
-- **It never installs anything.** There is no button here that runs an update.
-- **It never reads `secrets.yaml`.** Any line in your configuration whose key looks like a
-  credential is blanked before it is sent, and Home Assistant's own storage and the
-  recorder's database are skipped.
-:::
+<Aside type="caution" title="What it never does">
+- **It never installs an update unattended.** Installing is your press on **Apply**, offered
+  only on an update checked as safe for exactly the version waiting. An update cannot be
+  undone from the card.
+- **It never reads `secrets.yaml`.** Any configuration line whose key looks like a
+  credential is blanked, and Home Assistant's storage and the recorder database are
+  skipped.
+- **Release notes are data, never instructions.** The run that reads them holds reading
+  tools only.
+</Aside>
 
 ## Overnight health check
 
-Once a night, between **03:00 and 06:00**, and whenever you press **Run** beside *Overnight health check* in ⚙ → Diagnostics,
-brAIn reads:
+Once a night, between **03:00 and 06:00**, and whenever you press **Run** beside *Overnight health
+check* in ⚙ → Diagnostics, brAIn reads:
 
 - Home Assistant's error log;
-- the Zigbee mesh — routers, weak links, devices not seen;
-- Z-Wave node statistics and node status;
+- the Zigbee mesh: routers, weak links, devices not seen;
+- Z-Wave node statistics and status;
 - automations that switch a smart plug feeding a Zigbee router.
 
-It asks for **at most five root causes**, named as causes rather than symptoms:
+It names **at most five root causes**, as causes, not symptoms:
 
-> *The hallway plug that the upstairs Zigbee sensors route through keeps being switched off by
-> the bedtime automation.*
+> *The hallway plug that the upstairs Zigbee sensors route through keeps being switched off
+> by the bedtime automation.*
 
-**Every cause must cite the records it rests on**, by an id brAIn handed out — a log line, a
-Zigbee device, a Z-Wave node, an automation. A cause that cites nothing, or cites a record that
-was not there, is dropped and counted. The causes reach Needs you through the same
-[first look](/brain/checks/) every finding takes.
+- **Every cause cites the records it rests on**: a log line, a Zigbee device, a Z-Wave node,
+  an automation. A cause that cites nothing real is dropped.
+- **Passing errors are held back.** A burst around a restart that then stopped is not
+  filed. An integration is a cause only when it is still broken.
+- **A cause is one card, not one a night.** Reworded tomorrow, it is the same finding. An
+  error you explained with **Ignore** stays explained.
+- **A source that could not be read clears nothing.** *I could not look* is not *it went
+  away*.
 
-A cause re-worded tomorrow is the same finding, not a new card every night: it is keyed by the
-records it cites. And on a night a source could not be read, the findings that rest on it stay
-put — *I could not look* is not *it went away*.
-
-The scheduled run answers to the same switches every scheduled run does: a Claude sign-in,
-**Automatic insights**, and the usage budget. A night with nothing in the log or the mesh worth
-a look costs nothing.
+Causes reach Needs you through the same [first look](/brain/checks/) as every finding. The
+scheduled run needs a Claude sign-in, **Automatic insights** on and usage budget left. A
+quiet night costs nothing.
 
 ## The house book
 
-**Memory → House book** is how this house works, chapter by chapter: what runs on its own,
-lights and scenes, heating and cooling, locks and security, what to do when an alarm goes off,
-shutoffs and where things are, appliances, media and voice, and anything else worth knowing. It
-is written from your own automations, scripts, scenes and what brAIn has learned, for a partner,
-a sitter, or the person buying the house.
+**Memory → House book** is how this house works, written for a partner, a sitter or the
+person buying the house. brAIn writes it from your automations, scripts, scenes and what it
+has learned.
 
-![Memory → House book, headed "How this house works", with an Add info button, the line "Every sentence names what it came from; codes and passwords are left out", and an empty-book message explaining that Add info with a blank box writes one from your automations, devices and what brAIn has learned](./images/panel-housebook.webp)
+![Memory → House book: Add info and a ⋯ menu at the top, the line "Every sentence names what it came from; codes and passwords are left out", a search box, a room picker and chapter pills, then two chapters. "If an alarm goes off" says the house closes the mains water valve and texts Ben, cited to "Leak: close the water" and "Mains valve". "Heating and cooling" is cited to "Warm before wake". Each has Add to this section, and unwritten chapters are listed under "Not written yet"](./images/panel2-housebook.webp)
 
-- **Add info** (top right, and on every chapter) opens a box. Type what you want documented
-  (*the stopcock is under the kitchen sink*, *explain the bedtime routine*) and brAIn writes it in,
-  cited to you. Leave it blank and brAIn fills the book, or that chapter, in from the house.
-  **Add as written** puts your exact words in without a Claude run.
-- **Every sentence names what it came from**, and **codes and passwords are left out**, always.
-- **Every line has Edit and Delete.** A line you wrote or corrected is kept when brAIn rewrites
-  the book; only the lines nobody touched are replaced.
-- **Search, a room picker and chapter pills** narrow the book. Chapters with nothing in them yet
-  are listed under *Not written yet*.
-- **Gaps become questions** on Needs you, such as *where is the water shutoff?* Your answer goes
-  into memory as your own words, so the next book knows.
-- **It keeps itself current.** After the first book, brAIn rewrites it weekly, but only when
+Chapters: what the house does on its own, lights and scenes, heating and cooling, locks and
+security, what to do when an alarm goes off, shutoffs and where things are, appliances,
+media and voice, and anything else worth knowing.
+
+| To | Do this |
+| --- | --- |
+| Write the first book | Press **Add info** and leave the box blank. |
+| Document something | **Add info**, then type it: *the stopcock is under the kitchen sink*, *explain the bedtime routine*. brAIn writes it in, cited to you. |
+| Fill in one chapter | **Add to this section** under it. Blank fills the chapter from the house. |
+| Put your exact words in | **Add as written**. No Claude run. |
+| Correct or remove a line | The line's **⋯ → Edit this line** or **Delete this line**. |
+| Find something | Search, the room picker and the chapter pills. |
+
+- **Every sentence names what it came from.** A sentence brAIn cannot cite is left out.
+- **Codes and passwords are left out, always.**
+- **Your words survive.** A line you wrote or corrected is kept when brAIn rewrites the
+  book.
+- **Gaps become questions** on Needs you, such as *where is the water shutoff?* brAIn looks
+  in Home Assistant first and says what it found. Your answer goes into memory in your
+  words.
+- **It keeps itself current.** After the first book, brAIn rewrites it weekly, and only when
   something it reads has changed.
 
-### Sharing it, and taking it back
+### Share it, and take it back
 
-**⋯ → Share a copy** gives you a private link to a read-only, redacted copy with no script,
-under your Home Assistant's `/local` folder, and asks search engines to keep away. A shared copy
-is kept current. **Stop sharing** deletes the page **and changes the link**, so a link somebody
-kept stops working. The book's link has its own secret, separate from your shared insight cards.
+**⋯ → Share a copy** gives you a private link to a read-only copy under your Home
+Assistant's `/local` folder. The copy is redacted, has no script, asks search engines to
+keep away, and stays current.
+
+**Stop sharing** deletes the page **and changes the link**, so a link somebody kept stops
+working. The book's link has its own secret, separate from your shared insight cards.
 
 ## Who can reach the house
 
-Four [house checks](/brain/checks/#rules-worth-knowing-about) look at access, and file
-ordinary findings:
+Four [house checks](/brain/checks/#rules-worth-knowing-about) look at access and file
+ordinary cards:
 
 | Check | What it reports |
 | --- | --- |
-| `sec.lock_cloud_voice` | A lock or alarm panel exposed to Alexa or Google through Home Assistant Cloud |
-| `sec.addon_unprotected` | An add-on whose protection mode has been switched off |
-| `sec.login_bans` | Recent failed logins that got an address banned |
-| `sec.brain_posture` | A terminal session still acting without asking after *Let brAIn act without asking* was turned **off** — turning it on is your choice and files nothing |
+| `sec.lock_cloud_voice` | A lock or alarm panel exposed to Alexa or Google through Home Assistant Cloud. |
+| `sec.addon_unprotected` | An app whose protection mode has been switched off. |
+| `sec.login_bans` | Recent failed logins that got an address banned. |
+| `sec.brain_posture` | A terminal session still acting without asking after *Let brAIn act without asking* was turned **off**. Turning it on is your choice and files nothing. |
 
-Each says nothing when it could not look, and **Ignore** with a reason stops it for that lock
-or add-on.
+A check that could not look says nothing. **Ignore** with a reason stops it for that lock
+or app.
 
 Once a week brAIn also writes **one sentence** about who and what can reach the house, from
-what the last checks pass read — no new look at the house of its own. It shows in ⚙ → Diagnostics under *Who can reach the house*, with when it was written;
-**Run** writes it on demand. It answers to the same switches as every
-scheduled run, and a review that failed waits six hours before trying again rather than
-spending a run every few minutes.
+what the last checks read. It is in ⚙ → Diagnostics under *Who can reach the house*, with
+when it was written, and **Run** writes it on demand. It follows the same rules as every
+scheduled run.

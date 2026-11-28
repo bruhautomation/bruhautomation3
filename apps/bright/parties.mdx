@@ -1,62 +1,67 @@
 ---
 title: Parties
-description: BRight's Party tab plays a whole evening — tick the songs, pick a speaker, press Play. Save sets to start by name from an automation or by voice, choose which show version each song plays, and decide what the room looks like when it stops.
+description: Play a whole evening from BRight's Party tab. Tick the songs, pick a speaker, press Play. Save sets to start by name from an automation or by voice, choose which show each song plays, and decide what the room looks like when it stops.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-The sentence the add-on was built for: *"start party mode"*. One screen — tick the songs you want,
-pick the speaker, press **Play**. Building and testing one show lives on the Shows tab; this tab
-is for pressing Play on an evening.
+The Party tab plays a whole evening: every song with its own show, one after another, from one
+button or the sentence *"start party mode"*.
 
-![The Party tab: Play with a speaker picker, When it stops set to put the room back, Shuffle and Play everything; The set with All and None, a song row reading Latest, a name box and Save as a set; and Saved sets](./images/party.webp)
+![The Party tab with three songs ticked in play order, a Play 3 shows button, a speaker picker, When it stops, Shuffle, a Which show picker per song, a name box with Save as a set, and two saved sets with Start, Load and Delete](./images/party.webp)
 
-## Play
+## Start a party
 
-- **Speaker** — any calibrated speaker. With none calibrated yet, the picker says so and offers
-  **Calibrate a speaker first**.
-- **When it stops** — put the room back as it was, or call a Home Assistant scene (below).
-- **Shuffle** — off unless you ask. An order you just chose is a request, not a default to
-  override.
-- **🎉 Play everything** — with nothing ticked, every analysed song in your music folders plays.
+<Steps>
 
-## The set
+1. Pick the **Speaker**. Any calibrated speaker works. With none calibrated, the picker offers
+   **Calibrate a speaker first**.
+2. Tick the songs under **The set**. They play in the order you tick them, and each shows its
+   place (`#1`, `#2`). Tick nothing to play every analysed song in your music folders.
+3. Press **🎉 Play**.
 
-Tick songs to play them in the order you ticked them (each shows its place, `#1`, `#2`). A song
-with no show yet gets one written **while the party runs**, so a set can mix tracks you have
-directed with ones you have not. While one track plays, the next one's show compiles in the
-background; a track whose compile fails plays its floor show, and a track that fails outright is
-skipped. One bad file never ends the night.
+</Steps>
 
-Each song can also name **which of its shows to play**. The default is **Latest** — whatever is
-live, so the newest show plays without anyone choosing it — and the picker beside a song with
-several shows is there for the evening you want last month's version.
+| Option | What it does |
+| --- | --- |
+| **When it stops** | Put the room back as it was, or call a Home Assistant scene. See [Choose how the night ends](#choose-how-the-night-ends) |
+| **Shuffle** | Off unless you tick it, so the order you chose is the order you get |
+| **Which show** | Per song. **Latest** plays the newest show. Pick an older [version](/bright/shows/#go-back-to-an-earlier-version) for the night you want it |
 
-## While it plays
+A song with no show yet gets one written while the party runs. The next song's show compiles
+while the current one plays. If that compile fails, the song plays a basic show. A song that
+fails outright is skipped, so one bad file never ends the night.
 
-The live view is the transport: **⏮ Prev / ⏭ Next** move through the queue (Prev on the first
-track replays it), the **±25 ms** buttons trim the sync by ear, and **🎤 Sync by ear** does the
-same trim measured from the room. **Keep this trim** saves it to the speaker's calibration.
+## Control it while it plays
 
-The **Stop** button only exists while a run is actually in progress, with a line beside it saying
-what is playing and how far through the queue it is. Each track plays with its own clock anchor,
-so sync never depends on predicting a track boundary through an AirPlay buffer.
+The tab shows the playing song with the room's position on it, the room live, and what is up
+next.
 
-## Saved sets
+| Control | What it does |
+| --- | --- |
+| **⏮ Prev** / **⏭ Next** | Move through the queue. Prev on the first song replays it |
+| **−25ms lights later** / **+25ms lights earlier** | Trim the sync by ear |
+| **🎤 Sync by ear** | The phone listens to the room and shifts the lights to match |
+| **Keep this trim** | Saves the trim to the speaker's calibration |
+| **■ Stop & restore lights** | Ends the party. It appears only while something is running, with a line saying what is playing and how far through the queue it is |
 
-A saved set is a name on exactly what is on screen: the speaker, the songs, which lights may join
-in, and what the room should look like when it stops.
+## Save a set and start it by name
 
-- **Save as a set** names what you have picked; **Load** puts a saved one back on screen so you can
-  see what Play would do before pressing it.
-- Start one from the list, from an automation with `bright.start_party`, or by voice through
-  brAIn. Anything given at the time still wins over what the set saved, so *"the usual thing, but
-  on the kitchen speaker"* works.
-- A set that names lights uses only those; everything else on the map is left alone for the night.
+A saved set keeps what is on screen: the speaker, the songs and their order, which show each
+plays, shuffle, and what happens when it stops.
+
+| To | Do this |
+| --- | --- |
+| Save | Name it and press **Save as a set** |
+| Start one from the panel | **▶ Start** under **Saved sets** |
+| See what a set would play first | **Load** puts it back on screen |
+| Remove one | **Delete** |
+| Start one from an automation | Call `bright.start_party` with its name |
+| Start one by voice | Ask [brAIn](/brain/): *"start the Friday party on the den speaker"* |
 
 ```yaml
 automation:
-  - alias: "Saturday night, and lights out afterwards"
+  - alias: "Saturday night"
     triggers:
       - trigger: conversation
         command: "start saturday night"
@@ -66,28 +71,28 @@ automation:
           party: "Saturday Night"
 ```
 
-`bright.start_party` requires the name, which is what makes an automation fail loudly on a typo
-instead of quietly playing the default folder.
+Anything you give at the time wins over what the set saved, so the usual set on a different
+speaker works. `bright.start_party` requires the name, so a typo fails in the automation trace
+instead of playing the default folder. A set that names lights uses only those and leaves every
+other light alone.
 
-## The end scene
+## Choose how the night ends
 
-Stopping normally restores every light to what it was before the show started — right when the show
-interrupted an evening, and wrong at 1am. What people want then is "everything off" or "night
-lights", which is a scene you already have. Name one and stopping calls it **instead of**
-restoring. A scene that fails to run falls back to restoring, so the room never keeps the party
+By default, stopping restores every light to what it was before the show. At 1am you probably
+want "everything off" or "night lights" instead.
+
+Pick a scene under **When it stops**, or pass `end_scene` to the service. Stopping then calls that
+scene instead of restoring.
+
+<Aside type="tip">
+If the scene fails to run, BRight restores the lights instead. The room never keeps the party
 colours.
-
-<Aside title="Where did the vibe go?">
-Older versions had a "vibe" box on the Party tab. It steered the director at compile time, so it
-only ever reached songs with no show yet, and silently decided what got written to disk. It now
-lives on the Shows tab as the **mood** box, where it applies to the next Claude compile and you
-can see the show it produced.
 </Aside>
 
-## A dashboard Stop button
+## Add a Stop button to a dashboard
 
-The show-status sensor's `active` attribute is BRight's own answer to "is a run in progress", so a
-button can offer Stop exactly when the panel does:
+The show-status sensor's `active` attribute is true while a run is in progress, so this button
+appears exactly when the panel's Stop does:
 
 ```yaml
 type: button
@@ -103,5 +108,10 @@ visibility:
     attribute: active
     state: true
 ```
+
+## Steer the mood
+
+The mood box is on the [Shows tab](/bright/shows/#choose-who-writes-the-show), not here. It
+steers the next show Claude writes, and you can see the show it produced there.
 
 See the [Reference](/bright/reference/) for every service and attribute.

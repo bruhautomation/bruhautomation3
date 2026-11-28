@@ -1,9 +1,9 @@
 ---
 title: Reference
-description: Every BRUH Minecraft option with its default, the ports, where settings live, the panel tabs, offline behaviour, security, files and troubleshooting — in one place.
+description: Every BRUH Minecraft option with its default, the ports, where settings live, the panel tabs, offline behaviour, security, files and troubleshooting.
 ---
 
-Everything you might need to look up. Options are set under **Settings → Add-ons → BRUH Minecraft →
+Look up any option, port, path or fix. Set options under **Settings → Add-ons → BRUH Minecraft →
 Configuration**. Entities, events and services are on
 [Home Assistant Integration](/bruh-minecraft/home-assistant/).
 
@@ -28,12 +28,17 @@ Configuration**. Entities, events and services are on
 
 | Option | Default | Notes |
 |--------|---------|-------|
-| `memory_mb` | `2048` | 512–65536, used as both `-Xms` and `-Xmx`. The add-on warns (log and panel) when less than about 2 GB would be left for the host. |
+| `memory_mb` | `2048` | 512–65536, used as both `-Xms` and `-Xmx`. The app warns (log and panel) when less than about 2 GB would be left for the host. |
 | `use_aikar_flags` | `true` | The widely used G1GC tuning for Minecraft. |
 | `extra_jvm_args` | `""` | Your own extra JVM flags. |
 
-**Sizing guide:** 4 players = 2048, 10 players with plugins = 4096, 20+ heavy = 6144–8192. **Tune for
-my hardware** on the Dashboard suggests a value for your machine.
+| Players | `memory_mb` |
+|---------|-------------|
+| 4 | 2048 |
+| 10, with plugins | 4096 |
+| 20 or more, heavy | 6144–8192 |
+
+**Tune for my hardware** on the Dashboard suggests a value for your machine.
 
 ### Backups & restarts
 
@@ -43,7 +48,7 @@ my hardware** on the Dashboard suggests a value for your machine.
 | `backup_interval_minutes` | `60` | 5–1440. |
 | `backup_keep_count` | `48` | 1–500; older backups are pruned. |
 | `backup_use_git` | `true` | `true` = git snapshots storing only changes; `false` = `.tar.gz` archives. |
-| `auto_restart_on_crash` | `true` | Restart the server when it exits unexpectedly — including when the system kills it for memory — with a growing wait and an hourly limit. |
+| `auto_restart_on_crash` | `true` | Restart the server when it exits unexpectedly, including when the system kills it for memory. The wait grows from 10 seconds to 5 minutes, and it gives up after 10 restarts in an hour. |
 | `auto_restart_schedule` | `""` | Reserved; currently has no effect. Schedule restarts with an automation on `bruh_minecraft.restart_server`. |
 
 ### Connection handling
@@ -61,21 +66,22 @@ Connection throttle and idle timeout are per-world `server.properties` keys (`co
 | Option | Default | Notes |
 |--------|---------|-------|
 | `enable_bedrock_support` | `true` | Install Geyser + Floodgate so Bedrock clients can join. |
-| `geyser_auth_type` | `auto` | `auto` picks `offline` when the active world's `online-mode` is off, else `floodgate`. `online` and `offline` force it. |
+| `geyser_auth_type` | `auto` | `auto` picks `offline` when the active world's `online-mode` is off, else `floodgate`. `floodgate`, `online` and `offline` force it. |
 | `geyser_mtu` | `1400` | 576–1492. Drop to `1200` if iOS hangs on "Connecting…". |
 
 See [Bedrock Players](/bruh-minecraft/bedrock/).
 
 ### Plugins
 
-Two ways besides the [Add-on browser](/bruh-minecraft/addons/), mixed freely. Only `paper`, `purpur`
-and `folia` load plugins.
+Besides the [Add-on browser](/bruh-minecraft/addons/), you can tick popular plugins or list your own
+URLs. Only `paper`, `purpur` and `folia` load plugins.
 
-**One-click plugins.** Tick a box and the plugin is resolved from Modrinth on every boot — the newest
-release build **for your server's Minecraft version**, or skipped with a warning when there is none.
-Dependencies switch on with them (`install_essentialsx_chat` brings `install_essentialsx`;
-`install_viabackwards` brings `install_viaversion`). Unticking does **not** remove the jar — remove it
-on the Add-ons tab.
+**One-click plugins.** A ticked plugin is fetched from Modrinth at every start: the newest release
+build **for your server's Minecraft version**, or skipped with a warning when there is none.
+
+- Dependencies switch on with them. `install_essentialsx_chat` brings `install_essentialsx`, and
+  `install_viabackwards` brings `install_viaversion`.
+- Unticking does **not** remove the jar. Remove it on the Add-ons tab.
 
 | Option | Default | Plugin | What it does |
 |--------|---------|--------|--------------|
@@ -101,8 +107,9 @@ plugins:
   - "https://example.com/ViaVersion.jar"   # a plain URL also works
 ```
 
-Bad URLs are skipped with a warning and never block startup; unchanged jars are not downloaded
-again. A jar deleted on the panel comes back on the next start while its URL or tick is still set.
+- A bad URL is skipped with a warning and never blocks startup.
+- Unchanged jars are not downloaded again.
+- A jar deleted on the panel comes back on the next start while its URL or tick is still set.
 
 :::tip
 GitHub `releases/latest/download/X.jar` URLs only resolve when the asset is named exactly `X.jar`.
@@ -119,63 +126,75 @@ form and a copy button.
 | `rcon_password` | auto-generated | RCON listens only on `127.0.0.1:25575`. Leave it blank. |
 | `enable_ha_integration` | `true` | Deploy the `bruh_minecraft` integration and its bridge. |
 | `announce_ha_events` | `true` | Announce Home Assistant-triggered events (restarts, backups) in chat. |
-| `log_level` | `info` | `trace` to `fatal`; the add-on's own log, not the server's. |
+| `log_level` | `info` | `trace` to `fatal`; the app's own log, not the server's. |
 
 ## Ports
 
 | Port | What | Needed? |
 |------|------|---------|
 | 25565/tcp + udp | Minecraft Java Edition | For anyone joining from Java |
-| 19132/udp | Minecraft Bedrock, through Geyser | With `enable_bedrock_support` on — phones, tablets, consoles and Windows Bedrock |
+| 19132/udp | Minecraft Bedrock, through Geyser | With `enable_bedrock_support` on: phones, tablets, consoles and Windows Bedrock |
 | 24454/udp | Simple Voice Chat | Only with that plugin installed |
 
-The add-on runs with host networking (Bedrock LAN discovery needs it), so these answer on the host's
+The app runs with host networking (Bedrock LAN discovery needs it), so these answer on the host's
 own address. The management panel (8099) answers only through Home Assistant.
 
 ## What's set where
 
-1. **The Configuration tab = how the add-on runs.** EULA, server type and version, memory, backups,
-   Bedrock, plugin ticks and URLs, log level. Shared by every world.
-2. **The Properties tab = how this world plays.** Each world's `server.properties` is seeded with
-   sensible defaults on first boot, then it is yours. Difficulty, game mode and whitelist apply live;
-   the rest on the next restart. The add-on only enforces RCON, query and port keys, and in offline
-   mode keeps secure-profile enforcement off for you.
-3. **Players, ops, whitelist and bans are per world**, in each world's JSON files.
-4. **Add-ons are per world**, recorded in `.bruh-addons.json`.
+| What | Where | Scope |
+|------|-------|-------|
+| How the app runs: EULA, server type and version, memory, backups, Bedrock, plugin ticks and URLs, log level | The **Configuration** tab | Every world |
+| How a world plays: `server.properties` | The **Properties** tab | Per world |
+| Players, ops, whitelist and bans | The **Players** tab (each world's JSON files) | Per world |
+| Add-ons | The **Add-ons** tab (`.bruh-addons.json`) | Per world |
 
-Experimental features (Mojang's *feature packs*) go in `initial-enabled-packs` (comma-separated, keep
-`vanilla`) and only affect **newly generated** worlds — create a fresh world with the pack enabled.
+Each world's `server.properties` starts with defaults on first boot, then it is yours. Difficulty,
+game mode and whitelist apply live, and the rest on the next restart. The app enforces only the
+RCON, query and port keys, and in offline mode keeps secure-profile enforcement off.
+
+Experimental features (Mojang's *feature packs*) go in `initial-enabled-packs`, comma-separated,
+keeping `vanilla`. They affect only **newly generated** worlds, so create a fresh world with the pack
+enabled.
 
 ## Panel tabs
 
 | Tab | What it does |
 |-----|--------------|
-| **Dashboard** | Status, uptime, memory, TPS with a healthy/degraded/struggling badge, players, **Tune for my hardware**, quick chat and a quick command; brAIn's **Companion** card. A banner warns when the server log cannot be heard |
-| **Console** | The live, colour-coded server log; a command box that runs over RCON |
+| **Dashboard** | Status, players online, uptime, memory, TPS with a healthy/degraded/struggling badge, **Tune for my hardware**, quick chat and a quick command, and brAIn's **Companion** card. A banner warns when the server log cannot be heard |
+| **Console** | The live, colour-coded server log, and a command box (no leading slash needed) |
 | **Players** | Everyone who has joined or is listed, Online/Offline, with a menu of the changes that fit each one; op, ban and kick ask first |
 | **Properties** | The active world's `server.properties` |
-| **Add-ons** | Everything in the world and whether it needs a restart, server software and updates, and the Modrinth browser — see [Add-on Browser](/bruh-minecraft/addons/) |
-| **Backups** | Snapshots and archives by day, with Restore — see [Worlds & Backups](/bruh-minecraft/worlds/) |
+| **Add-ons** | Everything in the world and whether it needs a restart, server software and updates, and the Modrinth browser. See [Add-on Browser](/bruh-minecraft/addons/) |
+| **Backups** | Snapshots and archives by day, with Restore. See [Worlds & Backups](/bruh-minecraft/worlds/) |
 | **Worlds** | Switch, create, rename, import, download, delete, and featured worlds |
 
-Header: **Backup**, **Restart** (the server only, about 15 seconds), **Stop** (stays stopped until
-started), and **Update** only when a newer build is waiting. The version opens the changelog.
+| Header control | What it does |
+|----------------|--------------|
+| **Backup** | Backs the active world up now |
+| **Restart** | Restarts the server only, in about 15 seconds |
+| **Stop** | Stops the server. It stays stopped until started |
+| **Update** | Shown only when a newer server build is waiting |
+| Version · changelog | Opens the release notes. It reads *"Updated since you last looked"* after an update |
+
+On a phone the header buttons fold into a **Server** menu.
+
+![The Console tab: Auto-scroll, Clear, a command box with Send, and the live log with joins, chat, an advancement, a save and one warning line in amber](./images/panel-console.webp)
+
+![The Dashboard on a phone: a Server menu in the header, scrolling tabs, the Status card with players online, the Performance card with TPS and Tune for my hardware, and Quick chat](./images/panel-dashboard-phone.webp)
 
 ## Offline behaviour
 
-The server starts with no internet, once it has been online at least once to cache its jars. At
-boot the add-on checks whether it can reach the download servers; if not, it reuses the cached
-server jar, plugins and Geyser/Floodgate, and everything else — settings, players, backups, the
-panel and the Home Assistant integration — works as usual. The very first boot needs internet.
+The server starts with no internet once it has been online once. When the download servers cannot be
+reached at start, the app reuses the cached server jar, plugins, Geyser and Floodgate. Settings,
+players, backups, the panel and the Home Assistant integration work as usual. The very first start
+needs internet.
 
 ## Security
 
-- **The panel only answers requests that arrive through Home Assistant.** Host networking puts its
-  port on your network, so it refuses any connection that is not from the Supervisor or loopback,
-  judged by the connection's real address. Two paths stay public because they must: `/pack/<name>`
-  (players' games fetch resource packs from it) and `/api/health`.
-- **AppArmor is on**, letting the JVM do JVM things and denying the host-escape set — it matters
-  because plugin jars run with the server's full authority.
+- **The panel only answers requests that arrive through Home Assistant.** It refuses any connection
+  that is not from the Supervisor or the machine itself. Two paths stay public: `/pack/<name>`, which
+  players' games fetch resource packs from, and `/api/health`.
+- **AppArmor is on.** Plugin jars run with the server's full authority, so the container is confined.
 - **Add-on downloads are verified** against the SHA-512 Modrinth publishes.
 - **A watchdog** polls `/api/health` and restarts a hung panel.
 - **The RCON password and console log are excluded from Home Assistant backups.** Your worlds and
@@ -202,8 +221,8 @@ panel and the Home Assistant integration — works as usual. The very first boot
 |---------|-----|
 | `EULA has NOT been accepted` | Finish the wizard, or `eula: true`. |
 | `address already in use: 25565` | Stop the other server, or remap the port. |
-| Out-of-memory crashes | Raise `memory_mb` — and check the host has room (the add-on warns). |
-| A plugin warning, then it continues | A bad URL in `plugins:` — fix or remove it. |
+| Out-of-memory crashes | Raise `memory_mb`, and check the host has room (the app warns). |
+| A plugin warning, then it continues | A bad URL in `plugins:`. Fix or remove it. |
 | A one-click plugin did not appear | No Modrinth build exists for your Minecraft version; the log names it. |
 | A plugin moved to `plugins/.quarantine/` | A duplicate, or built for a newer Minecraft. Install a build for your version. |
 
@@ -212,7 +231,7 @@ panel and the Home Assistant integration — works as usual. The very first boot
 | Symptom | Fix |
 |---------|-----|
 | Cannot connect from the internet | Forward `25565/tcp` + `25565/udp` (and `19132/udp` for Bedrock). Never forward `8099`. |
-| Panel does nothing when opened by IP | By design — open it from the sidebar. Refusals are in the add-on log. |
+| Panel does nothing when opened by IP | This is intended. Open it from the sidebar. Refusals are in the app log. |
 | "Please log into Xbox" | The world's `online-mode=false` on **Properties** (home network only). |
 | iOS hangs on "Connecting…" | `geyser_mtu: 1200`. |
 | "You are already connected" | The ghost-session kicker clears it; or kick from **Players**. |
@@ -225,9 +244,14 @@ panel and the Home Assistant integration — works as usual. The very first boot
 | TPS sensors unavailable | TPS is only reported by Paper, Purpur and Folia. |
 | Sagging TPS | Lower view distance (8) and simulation distance (6) on **Properties**; add `install_spark` to find the cause. |
 | The Dashboard says the feed may miss chat | A plugin or script changed the join or chat format so joins are not being heard. The `world_feed` sensor carries the reason. |
-| The companion's bubble never shows | BRUH Sight needs Paper or Purpur; the add-on log says when it is not answering. |
+| The companion's bubble never shows | BRUH Sight needs Paper or Purpur; the app log says when it is not answering. |
 
-Bump `log_level: debug` and reproduce. The add-on **Log** tab has start-up errors; the panel's
-**Console** tab has the live server log; the full server log is `/data/panel/console.log`.
+### Where to look
+
+| Log | Where |
+|-----|-------|
+| Start-up errors | The app's **Log** tab. Set `log_level: debug` and reproduce for more detail |
+| Live server log | The panel's **Console** tab |
+| Full server log | `/data/panel/console.log` |
 
 File issues at <https://github.com/bruhautomation/BRUH-HA-Apps/issues>.

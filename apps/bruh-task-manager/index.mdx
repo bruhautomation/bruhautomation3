@@ -1,9 +1,9 @@
 ---
 title: BRUH Task Manager
-description: Task Manager for Home Assistant OS. See what is using your machine's CPU, memory, network and disk, app by app and — if you choose — process by process; restart or stop what is running too hard; and get a Home Assistant sensor when an app runs away.
+description: Task Manager for Home Assistant OS. See what is using your machine's CPU, memory, network and disk, app by app or process by process. Restart or stop what runs too hard, and get a sensor when an app runs away.
 template: splash
 hero:
-  tagline: What is using your Home Assistant machine — and a safe way to stop it. Every app's CPU and memory, live, in the sidebar.
+  tagline: See what is using your Home Assistant machine, live, in the sidebar. Restart or stop it knowing what that costs.
   actions:
     - text: Quick Start
       link: /bruh-task-manager/quickstart/
@@ -22,107 +22,82 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Experimental">
-BRUH Task Manager is marked **experimental** in the add-on store. Level 1 only reads what
-the Supervisor already measures; Level 2 and End process are off until you turn them on.
-</Aside>
-
-## What it is
-
-Your Home Assistant box feels slow. The fan is loud. The history graphs lag. Something is
-eating the CPU — but Home Assistant's own Hardware page shows one number for the whole
-machine, and the add-on store shows a little gauge per app that you have to open one by
-one.
-
-**BRUH Task Manager is the Task Manager your PC has, for Home Assistant OS.** It opens in
-the sidebar as **Task Manager**, lists every app busiest first with its CPU, memory,
-network and disk, a history line for each, and **Restart**, **Stop** and **Start** buttons
-that tell you what they will cost before you press them.
+BRUH Task Manager is the Task Manager your PC has, for Home Assistant OS. It lists every app
+busiest first, with its CPU, memory, network and disk, and lets you restart or stop the one
+that is slowing the machine down.
 
 ![BRUH Task Manager's Apps tab: four meters across the top (CPU 39%, Memory 62% — 2.3 GB of 3.7 GB, Load 1.42 on 4 CPUs, Up 4 days 13 hours), then Studio Code Server at 84% CPU marked "high CPU for under a minute", Home Assistant at 9.2%, the Supervisor, BRUH Task Manager itself and Mosquitto, each with memory, network and disk rates and Processes, Restart and Stop buttons](./images/apps.webp)
 
-## Two levels
+<Aside type="caution" title="Experimental">
+BRUH Task Manager is marked **experimental** in the app store.
+</Aside>
 
-<CardGrid>
-  <Card title="Level 1 · every app" icon="list-format">
-    **On from the moment you install it**, needing nothing from you. Every app, Home
-    Assistant, the Supervisor and its plugins, measured by the Supervisor every few seconds
-    — the same figures behind Settings → System → Hardware.
-  </Card>
-  <Card title="Level 2 · every process" icon="magnifier">
-    **Off until you turn it on.** Every process on the machine — Home Assistant's Python,
-    the ffmpeg it starts for a camera, each app's programs, Docker, the operating system —
-    grouped by the app it belongs to. Needs Protection mode off; the Settings tab says
-    exactly what that does first.
-  </Card>
-</CardGrid>
+## What you can do
 
-## Highlights
+### See what is using the machine
 
-<CardGrid>
-  <Card title="Restart with eyes open" icon="warning">
-    Every Restart and Stop asks first and says what it will cost: which integrations talk
-    to the app (they go unavailable while it is down), whether its sidebar panel stops
-    opening, and whether it starts again at boot.
-  </Card>
-  <Card title="End process, carefully" icon="close">
-    A third switch, off by default. Only for processes **inside apps**. It asks the process
-    to stop (SIGTERM) and offers **Force end** only if it is still running five seconds
-    later. Never offered for Home Assistant, the Supervisor or the operating system.
-  </Card>
-  <Card title="Runaway apps" icon="rocket">
-    An app above a CPU threshold (80%) for long enough (10 minutes) is marked, and a
-    **Runaway app** binary sensor turns on for your automations. A backup or an update
-    burst doesn't count. Nothing is stopped automatically.
-  </Card>
-  <Card title="Can't read your secrets" icon="seti:lock">
-    Even with Level 2 on, its AppArmor profile denies reading any other process's
-    environment or memory — so it can't see other apps' passwords or tokens. It opens no
-    port.
-  </Card>
-</CardGrid>
+| You do | What happens |
+|---|---|
+| Open **Task Manager** in the sidebar | Four meters show the whole machine: **CPU**, **Memory**, **Load** and **Up**. |
+| Look at the **Apps** tab | Every app, Home Assistant, the Supervisor and its plugins, busiest first. Each row has CPU, memory, network and disk, and a line for the last few minutes. |
+| Search, or sort by CPU, memory or name | The list narrows or reorders. |
+| Turn on Level 2 and open **Processes** | Every process on the machine, grouped by the app it belongs to, with its pid and command line. |
 
-## Use cases
+![The Processes tab: 19 processes grouped by app. Studio Code Server's group (27%, 1.2 GB, 3 processes) shows two node processes with End buttons and its s6-svscan supervisor, which explains that ending it stops the whole app. Home Assistant's group says to use Restart instead and lists python3, an ffmpeg camera stream and s6-svscan](./images/processes.webp)
 
-**"Why is the house slow tonight?"** Open Task Manager: Studio Code Server's extension
-host is at 84% — a search you started in the editor hours ago is still indexing. You
-switch to **Processes**, open Studio Code Server and **End** that one helper process; the
-editor stays up and the machine goes quiet.
+### Stop what is running too hard
 
-**The camera that ate a core.** Level 2 shows an `ffmpeg` under Home Assistant pulling 40%
-for one RTSP stream. You don't end it (Home Assistant's own processes are never offered) —
-you fix the stream's settings, and watch the line drop.
+| You do | What happens |
+|---|---|
+| Press **Restart**, **Stop** or **Start** on an app | It asks first and says what it costs: which integrations go unavailable, and whether the app starts again at boot. |
+| Press **End** on a process inside an app | The process is asked to stop. **Force end** is offered only if it is still running five seconds later. |
+| Add a name to **Never end these** | **End** is never offered for that process or app. |
 
-**The 3 AM runaway.** An app spins at 95% for ten minutes while everyone is asleep. The
-**Runaway app** sensor turns on; your automation restarts that app with
-`hassio.addon_restart` and sends you a note saying which app and when.
+![The question before stopping Mosquitto broker: it stays stopped until you start it again or Home Assistant restarts, Home Assistant integrations that talk to it (mqtt) show as unavailable while it is down, and its watchdog does not restart an app you stopped yourself. Cancel and Stop buttons](./images/stop-dialog.webp)
 
-**"Can I stop this, or will something break?"** Press **Stop** on Mosquitto and the
-dialog tells you the MQTT integration will show as unavailable, and that it's set to start
-at boot. You press **Restart** instead.
+### Catch a runaway app
 
-**A dashboard of the box.** The integration's **CPU**, **Memory used** and **Busiest app**
-sensors go on a wall tablet next to the weather.
+| You set up | What happens |
+|---|---|
+| Nothing | An app above 80% CPU for 10 minutes is marked on the panel, and the **Runaway app** binary sensor turns on. |
+| An automation on **Runaway app** | It restarts that app with `hassio.addon_restart` and tells you which one. [Copy the YAML](/bruh-task-manager/guide/#restart-a-runaway-app). |
+| The **CPU**, **Memory used** and **Busiest app** sensors on a dashboard | The machine's load sits beside the rest of your house. |
+
+## Two levels, three switches
+
+| | What it shows or does | How you turn it on |
+|---|---|---|
+| **Level 1** | Every app, as the Supervisor measures it | On from install. Nothing to set. |
+| **Level 2** | Every process on the machine | **Show every process**, then Protection mode off on this app's Info page, then a restart. |
+| **End process** | **End** on processes inside apps | **Allow ending processes**. Needs Level 2. Off by default. |
+
+## What it never does
+
+- **Stop anything by itself.** A runaway app is marked and reported. What happens next is up to you or your automation.
+- **Offer End** for Home Assistant, the Supervisor, its plugins, the operating system, the kernel, itself, an app's process supervisor, or a container it can't name.
+- **Stop Home Assistant or the Supervisor.** They can be restarted, not stopped. It never offers to stop itself.
+- **Read other apps' passwords or tokens.** Its AppArmor profile blocks reading another process's environment and memory, with Level 2 on or off.
+- **Open a network port.**
 
 ## What you need
 
-- **Home Assistant OS** (or Supervised) — the Supervisor is where the figures come from.
-  Home Assistant 2023.6 or newer.
-- **A 64-bit machine**: `amd64` or `aarch64`.
-- For Level 2 only: the willingness to turn **Protection mode off** on this one add-on
-  while you look, and back on when you are done.
+| | |
+|---|---|
+| **Home Assistant** | Home Assistant OS or Supervised, 2023.6 or newer |
+| **Machine** | 64-bit: `amd64` or `aarch64` |
+| **For Level 2** | Protection mode off on this one app while you look |
 
-## Security rating
+<Aside type="note" title="Security rating 5">
+The app store rates this app 5, not 6, because it asks for the machine's process list. The
+rating is the same with Protection mode on or off. brAIn's security check does not flag Task
+Manager's Protection mode as a fault.
+</Aside>
 
-The add-on store shows this add-on's **security rating as 5**, not 6. That is because it
-*asks* for the machine's process list at all (`host_pid`), and it is the same whether
-Protection mode is on or off: the Supervisor only grants that view while Protection mode
-is off. brAIn's security check knows this, and does not flag Task Manager's Protection
-mode as a fault.
+## Next
 
 <CardGrid>
-  <LinkCard title="Quick Start" description="Install, open, and (optionally) turn on Level 2." href="/bruh-task-manager/quickstart/" />
-  <LinkCard title="Guide & Reference" description="Every tab, every option, End process, runaway, the integration and automations." href="/bruh-task-manager/guide/" />
+  <LinkCard title="Quick Start" description="Install, open, add the sensors, and turn on Level 2 if you need it." href="/bruh-task-manager/quickstart/" />
+  <LinkCard title="Guide & Reference" description="Restart and Stop, End process and its limits, runaway apps, every option and sensor, an automation, troubleshooting." href="/bruh-task-manager/guide/" />
 </CardGrid>

@@ -1,165 +1,247 @@
 ---
 title: House Checks
-description: Deterministic checks that find what is broken in your house without spending a token — and clear themselves when it is fixed. Dozens of rules over your automations, devices, registry, access, dashboards and the machine underneath.
+description: The complete list of what brAIn checks in your house on a schedule, with no Claude run. Automations, devices, networks, the system, access, forecasts, baselines, chores and heating. Each row clears itself when the problem is fixed.
 ---
 
-Every finding brAIn filed used to come out of a Claude run. Both the analyst and study
-sessions are told that an empty list is the honest answer, so most of those runs spent tens
-of thousands of tokens to report nothing — while the problems that are *deterministically*
-visible were found only when a model happened to look in the right place.
+brAIn runs 68 checks over your house every six hours and files what is broken on
+**Needs you**. A pass takes seconds, uses no Claude run, and clears each row when its
+problem goes away.
 
-A **house check** is a pure function from one snapshot of your house to a list of findings.
-It reads the same registries, states, statistics and traces the analyst reads, and it calls
-Claude **never**.
+![Needs you: three cards that checks filed. "Bedroom is losing heat faster than it can" from a climate check, "Garage freezer temperature has been drifting up for weeks" from a forecast, and "Nursery is still warming up when this house gets up", each with its readings and a Fix line](./images/think-needs-you.webp)
 
-## What that changes
+Before you see a card, [the Resident](/brain/resident/) looks into it and either rewrites
+it with what it found or sets it aside with a reason.
 
-The model's job stops being *discovery* and becomes *judgement*: the checks hand it a
-ledger, and it answers "what do these miss, and which of them matter in this house?"
+## Run the checks
+
+| How | What it does |
+| --- | --- |
+| Automatically | Every 6 hours (`checks_interval_hours`, 0 to 168), plus one pass around your measured bedtime |
+| `brain check` | Runs every check now and prints what changed |
+| `brain check list` | Lists every check and when it last ran |
+| `brain check --json` | Prints the raw result |
+| `POST /api/checks/run` | Runs a pass from a script |
+
+## Answer a card
+
+- **Fix the problem** and do nothing else. The next pass removes the row. A row that clears
+  on its own leaves no line in memory, and the check files it again if it comes back.
+- **Ignore** it with a reason. brAIn writes that into memory and does not raise the same
+  thing again. **Ignore all like this** and **Stop raising this about…** widen the answer.
+- **Stop watching…** on the Ignore box means no check looks at that device again. It is not
+  offered for safety, security or protected things.
+
+The full set of buttons is on [Needs you](/brain/needs-you/).
 
 ## What gets checked
 
-| Family | Examples |
+Every check, by family. The id is what `brain check list` prints.
+
+### Safety
+
+| Check | What it catches |
 | --- | --- |
-| **Automations** | A trigger watching an entity that no longer exists; one that can never fire; a run that errored; one that never gets past its conditions; one still running when it is triggered again; two rules that undo each other; a rule you keep overriding |
-| **Devices** | Unavailable for a day; a Z-Wave node gone dead; a Zigbee device that has stopped reporting; a reading that is physically impossible; a battery to replace (not one you charge) |
-| **Registry** | Entities with no area; a helper nothing uses; a device with no entities; a name that is still a hex string |
-| **System** | An add-on that was meant to be running and is stopped; an integration that failed to set up; a recorder database growing without limit; no backup in a fortnight; disk filling; an update waiting to be installed |
-| **Access** | A lock or alarm panel exposed to Alexa or Google; an add-on with its protection mode off; failed logins that got an address banned; a terminal session still acting without asking after you turned that off |
-| **Forecasts** | A battery with a date on it; a device whose behaviour is declining; storage that will be full |
-| **Baselines** | A reading far outside its own normal; a slow drift the band cannot see |
-| **Bedtime** | Something open that is usually shut at this hour |
-| **Chores** | The washing finished and is still in the machine |
-| **Climate** | [Five of them](/brain/climate/) |
+| `safety.tripped` | A leak, smoke, CO or gas detector reading tripped right now |
+
+### Automations
+
+| Check | What it catches |
+| --- | --- |
+| `auto.dead_ref` | An automation that names an entity that no longer exists |
+| `auto.trigger_unavailable` | A trigger watching an entity that has stopped reporting, so the automation never fires |
+| `auto.dead_service` | An automation that calls a service that does not exist |
+| `auto.trace_error` | An automation or script whose last finished run failed |
+| `auto.condition_never_passes` | An automation that triggers and never gets past its conditions, with no actions run for two weeks |
+| `auto.already_running` | An automation in `mode: single` that keeps dropping triggers because it is still running |
+| `auto.never_fired` | An automation that has not fired in 30 days |
+| `auto.forgotten_off` | An automation left switched off for 30 days |
+| `auto.duplicate` | Two automations that do the same thing |
+| `auto.blueprint_missing` | An automation built on a blueprint that is gone |
+| `auto.conflict` | Two automations that keep undoing each other |
+| `auto.overridden` | An automation whose work a person keeps undoing |
+| `auto.second_responder` | An automation or script answering as brAIn's companion in Minecraft |
+
+### Devices
+
+| Check | What it catches |
+| --- | --- |
+| `dev.unavailable` | A device unavailable for a day |
+| `dev.battery_low` | A battery at 15 % or below, or one that has reported nothing for a week |
+| `dev.implausible` | A reading that is physically impossible for what the sensor measures |
+| `dev.frozen` | A sensor stuck on one value for a week |
+| `dev.restored` | An entity whose integration is gone |
+| `dev.door_disagree` | A lock's door sensor that contradicts the door's contact sensor |
+
+### Networks
+
+| Check | What it catches |
+| --- | --- |
+| `net.connectivity` | Devices dropping off Wi-Fi, Z-Wave or Zigbee, grouped into one card |
+| `dev.zwave_dead` | A Z-Wave node the controller marks dead |
+| `dev.zha_unseen` | A Zigbee device silent for a week |
+| `net.zwave_link` | A Z-Wave node with a weak or slow link |
+| `net.zigbee_weak` | A Zigbee router with a weak link |
+| `net.matter_empty` | Matter set up with no devices on it |
+| `net.bluetooth_faint` | A Bluetooth device heard only faintly |
+
+### Dashboards and the registry
+
+| Check | What it catches |
+| --- | --- |
+| `org.dashboard_dead_ref` | A dashboard card showing an entity that no longer exists |
+| `reg.hardware_name` | An entity still named after its hardware, such as a hex string |
+| `reg.no_area` | A device in no area |
+| `reg.unused_helper` | A helper nothing uses |
+| `reg.orphan_device` | A device with no entities |
+
+### System and integrations
+
+| Check | What it catches |
+| --- | --- |
+| `sys.backup_stale` | No backup, or none in the last week |
+| `sys.addon_down` | An app that should be running and is stopped or erroring |
+| `addon.needed_stopped` | A stopped app that an integration needs |
+| `sys.disk_space` | A disk that is nearly full |
+| `sys.recorder_size` | A recorder database that has grown large |
+| `sys.history_incomplete` | Recorder history that stops before what the live states show |
+| `sys.entry_failed` | An integration that did not load, with its reason |
+| `integ.log_flood` | An integration repeating the same error in the log |
+| `integ.custom_unused` | A custom integration installed and never set up |
+| `repairs.stale` | A Home Assistant repair left open for a week |
+| `hacs.update_pending` | HACS updates that have waited two weeks |
+| `sys.update_pending` | Updates waiting to be installed. [On trial](#new-checks-run-out-of-sight-first), so not shown yet |
+
+### Energy and people
+
+| Check | What it catches |
+| --- | --- |
+| `energy.missing_stat` | An Energy dashboard sensor that is gone |
+| `energy.rate_sensor` | An Energy dashboard reading a rate where it needs a total |
+| `people.phone_silent` | A phone that stopped reporting for a week |
+| `people.tracker_stale` | A tracker that stopped placing a person for a week |
+
+### Access
+
+| Check | What it catches |
+| --- | --- |
+| `sec.lock_cloud_voice` | A lock that a cloud voice assistant can open |
+| `sec.addon_unprotected` | An app running with its protection mode off |
+| `sec.login_bans` | An address banned after failed logins in the last two weeks |
+| `sec.brain_posture` | A terminal session still acting without asking after you turned that off |
+
+### Forecasts and baselines
+
+These read the nightly [measurements](/brain/measurements/).
+
+| Check | What it catches |
+| --- | --- |
+| `forecast.battery` | A battery that will be flat within three weeks at its current rate |
+| `forecast.decline` | A reading that has drifted one way for weeks |
+| `base.unusual` | A reading far outside its usual range for this hour of the week |
+| `base.stale` | The measurements themselves have stopped being taken |
+| `base.heater_idle` | A 3D printer's heater still hot well after the printer went idle |
+
+### Bedtime and chores
+
+| Check | What it catches |
+| --- | --- |
+| `evening.left_open` | A door, window, lock or cover open at bedtime that is usually shut then |
+| `chore.waiting` | A washing machine, dryer or dishwasher that finished and has not run since |
+| `chore.job_done` | A machine whose status says its job finished a while ago |
+| `chore.print_stopped` | A print the printer paused or failed on its own failure detection |
+| `chore.dehumidifier` | A dehumidifier stopped or left off while the room is still damp |
+
+### Climate
+
+Six checks, explained on [Heating & Climate](/brain/climate/).
+
+| Check | What it catches |
+| --- | --- |
+| `climate.underheated` | A room that never reaches the temperature it is set to |
+| `climate.heat_loss` | A room that loses heat much faster than the rest of the house |
+| `climate.preheat` | A room still warming up when the house gets up |
+| `climate.window` | A room losing heat faster than its insulation allows |
+| `climate.freeze` | A room on course for the temperature pipes are at risk at |
+| `climate.frost_ahead` | A near-freezing night in the forecast, and what holds water outside |
 
 ## Rules worth knowing about
 
-- **The trace checks read Home Assistant live.** "Ran and errored", "never gets past its
-  conditions" and "still running when it was triggered again" used to read a file Home
-  Assistant writes only when it shuts down, and looked runs up under the wrong key — so on
-  a real house they never found anything. brAIn now asks Home Assistant for the recent runs
-  of every automation and script, UI-made and package automations included. If Home
-  Assistant will not answer, the three checks say they could not look rather than reporting
-  a clean house. "Never gets past its conditions" also waits until the automation's actions
-  have not run for two weeks, so a night-only motion rule failing its conditions all day is
-  not reported.
-- **A safety automation is never offered for deletion.** "Has not run in 30 days" is what a
-  healthy smoke, leak, CO or gas response looks like. `auto.never_fired` leaves alone any
+- **A safety automation is never offered for deletion.** `auto.never_fired` leaves alone any
   automation watching a smoke, gas, moisture, carbon monoxide or safety sensor, any alarm
-  panel, and anything brAIn wrote itself — including the [emergency
-  playbooks](/brain/playbooks/).
-- **Automations built in the new editor are understood.** Home Assistant 2026.7's "When a
-  light turns on" and "When a door opens" triggers put the device under a target. The
-  "unavailable trigger" check now sees those too, and they can be
-  [replayed](/brain/replay/).
-- **A battery you charge is not a battery to replace.** Phones and tablets from the
-  companion app, robot vacuums and mowers, electric cars, home batteries, UPSs, and anything
-  that reports charging are left out of the low-battery check and the battery forecast, or
-  told to charge rather than replace. Pressing **Ignore** on a battery card now stops
-  that battery being reported again.
-- **Access checks** (`sec.lock_cloud_voice`, `sec.addon_unprotected`, `sec.login_bans`,
-  `sec.brain_posture`). Each says nothing when it could not look, and **Ignore** with a reason
-  stops it for that lock or add-on. Turning *Let brAIn act without asking* **on** files
-  nothing — it's your choice, with its own label; the row is for the case nobody chose, the
-  switch off while a terminal session started with it on is still acting. Once a week brAIn
-  also writes one sentence about who and what can reach the house, shown on
-  [Upkeep](/brain/upkeep/).
+  panel, and anything brAIn wrote itself, including the
+  [emergency playbooks](/brain/playbooks/).
+- **A battery you charge is not a battery to replace.** Phones and tablets, robot vacuums
+  and mowers, electric cars, home batteries, UPSs and anything that reports charging are
+  left out of the battery checks or told to charge. **Ignore** on a battery card stops that
+  battery being reported again.
+- **A night-only rule is not broken.** `auto.condition_never_passes` waits until an
+  automation's actions have not run for two weeks.
+- **Automations built in the new editor are understood.** Triggers such as "When a light
+  turns on" are read by the trigger checks and can be [replayed](/brain/replay/).
+- **Access checks respect your choices.** **Ignore** with a reason stops a check for that
+  lock or app. Turning **Let brAIn act without asking** on files nothing.
+  `sec.brain_posture` is only for a terminal session still acting after you turned it off.
+  Once a week brAIn also writes one sentence about who and what can reach the house, shown
+  on [Upkeep](/brain/upkeep/).
+- **One device, one card.** Checks that would name the same thing stand down for each
+  other, and network drops are grouped.
 
-## Reading what a device is, in any language
+## When a check cannot look
 
-Several checks used to decide what a sensor was from English words in its name: "nozzle"
-meant hot, "washer" meant a chore, "main water" meant a shutoff valve, "dew point" meant
-"not the outdoor temperature". A house that named things in Dutch, in shorthand or after the
-shop it came from got none of it.
+A check that could not read its data reports nothing and clears nothing. This keeps "I
+could not look" apart from "it went away".
 
-Once a night brAIn now reads the names, makes, models and rooms of the devices those checks
-care about and records what each one measures, what it controls, whether its battery is
-charged or replaced, and which way its switch closes. Every answer is checked against a
-closed list before it is kept, and a device is only read again when it changes, is renamed
-or moves. **Anything brAIn is unsure about falls back to the old word list**, so a house
-that read correctly before reads exactly the same — and a `hoofdkraan` now gets into the
-leak playbook.
-
-A reading can make a binary sensor Home Assistant never classified into a safety sensor —
-only when brAIn is very sure — but it can **never** stop a leak, smoke, gas or CO sensor
-being one, and it never touches the protected list. The instant alert when a detector trips
-still keys only on Home Assistant's own device class.
-
-## Three rules that make them trustworthy
-
-**A check that fires on a healthy house is worse than no check.** It is the one people learn
-to ignore first, and after that they ignore the rest. Every rule has a floor or a window for
-this reason, and the producer scorecard on Needs you is what proves each one earns its
-place in *your* house.
-
-**"I could not look" and "it went away" are different claims.** A check whose data was
-unavailable — the recorder was busy, a WebSocket call timed out — reports nothing, which is
-indistinguishable from the problem being fixed. So brAIn records which checks actually
-**ran**, and only those are allowed to clear a row. ⚙ → Diagnostics names the ones that could
-not run, and why.
-
-**Finding text is stable across runs.** The store deduplicates by wording, so a number that
-changes — "9 days left", "unavailable for 27h" — lives in the detail rather than the title.
-Otherwise every hour would file the same problem as a new one.
-
-## Clearing
-
-A problem that goes away on its own is **not** a fact about your house. When a check that
-ran no longer reports a row, the row is removed — with no memory line and no ledger entry.
-If it comes back, the check files it again.
-
-That is different from *you* ending a finding, which writes a line into memory and remembers
-the wording so the same problem is never raised at you twice.
-
-## Running them
-
-- **Automatically**, every few hours (`checks_interval_hours`), plus one pass around your
-  house's measured bedtime so the bedtime check is ever awake to fire.
-- **`brain check`** from the terminal — `brain check list` for the catalog and when each one
-  last ran.
-- **`POST /api/checks/run`**.
-
-A whole pass costs no tokens and takes seconds.
-
-## A new check runs where nobody can see it first
-
-Since 1.47 a rule that is new goes into **shadow** before it goes on the list. It runs on
-every pass, files to a store of its own, and reaches nothing you look at — not this list, not
-the badge, not a notification, not the To-do list, not the analyst's own prompt. ⚙ →
-Diagnostics shows what it has been finding and how often something else found the same thing,
-and **nothing is promoted automatically**: moving a check onto the visible list is a decision
-somebody makes reading those numbers. That is what stops a floor that is right in one house
-being tested against everybody else's with a week of **Ignore** presses.
-
-`sys.update_pending` is on trial now. The rule cannot be wrong about your house — the
-Supervisor either lists an update or it does not — so what is being measured is whether an
-update belongs on a list of decisions at all. How shadow works, and what its numbers mean:
-[Capture & the Corpus](/brain/corpus/#shadow-mode).
-
-## Do these rules work on *your* house?
-
-The suite tests every check against fixture houses, which cannot see your Home Assistant
-version, your integrations or your data shapes. Two things answer that on the install you
-actually have: [`brain doctor --rehearse`](/brain/doctor/#brain-doctor---rehearse), which
-plants a couple of defects here and scores the checks and the analyst against them; and the
-[corpus replay](/brain/corpus/#replay), which runs every check against frozen houses with
-known labels on every pull request, and fails — naming the house — when somebody moves a
-floor.
+- **⚙ → Diagnostics** names the checks that could not run and why.
+- When Home Assistant will not answer about recent runs, the three trace checks say they
+  could not look.
+- When recorder history has a hole, checks that read history stand down for that pass and
+  `sys.history_incomplete` says why.
+- A check about something your house does not have (no HACS, no Matter, no Energy
+  configuration) is listed as *not set up here*.
 
 ## When you hear about them
 
-Findings reach your phone in one of three ways, set by severity **and** urgency — a
-`critical` battery forecast is three weeks out and a `warning` about a boiler that has
-stopped answering is now, so urgency is declared per check rather than per finding:
+Each check declares how urgent it is. Severity and urgency together decide how a finding
+reaches your phone:
 
-- **Escalate** — `critical` and urgent (a leak, a freeze, a hub that stopped answering).
-  Sent straight away, quiet hours or not, then repeated three times and no more until
-  somebody answers.
-- **Notify** — at or above `findings_notify_min_severity` (default `critical`). Sent once,
-  and held through quiet hours unless its check says it cannot wait.
-- **Quiet** — everything below the floor. No message, and nothing lost: it is on the
-  Findings feed, in `todo.brain` and in Home Assistant's Repairs.
+| Tier | Which findings | What happens |
+| --- | --- | --- |
+| **Escalate** | `critical` and urgent: a leak, a freeze, a hub that stopped answering | Sent straight away through quiet hours, then repeated up to three times until somebody answers |
+| **Notify** | At or above `findings_notify_min_severity` (default `critical`) | Sent once. Held through quiet hours unless the check cannot wait |
+| **Quiet** | Everything else | No message. It is on Needs you, in `todo.brain` and in Home Assistant's Repairs |
 
-Quiet hours **hold** rather than drop: anything held overnight arrives when the quiet ends,
-minus anything that resolved itself while it waited. Being told at seven about a problem
-that went away at four is exactly how these messages stop being about anything.
+Quiet hours hold messages and do not drop them. A held message arrives when quiet hours
+end, unless its problem resolved in the meantime. [Notifications →](/brain/notifications/)
+
+## Reading what a device is, in any language
+
+Several checks need to know what a device is: a washer, a shutoff valve, an outdoor
+thermometer, a battery you charge. Once a night brAIn reads the names, makes, models and
+rooms of those devices and records what each one measures and controls. It works for names
+in any language, so a `hoofdkraan` is recognised as a main water valve and gets into the
+leak playbook.
+
+- A device is read again only when it changes, is renamed or moves.
+- Anything brAIn is unsure about falls back to a built-in list of English words.
+- A reading can make an unclassified binary sensor a safety sensor, only when brAIn is very
+  sure. It can **never** stop a leak, smoke, gas or CO sensor being one.
+- It never changes your protected list. The instant alert when a detector trips keys only on
+  Home Assistant's own device class.
+
+## New checks run out of sight first
+
+A new check runs in **shadow** before it reaches you. It runs on every pass and files to a
+store of its own. Nothing it finds appears on Needs you, the badge, a notification or the
+To-do list.
+
+**⚙ → Diagnostics** shows what a shadow check has been finding. Nothing is promoted
+automatically. `sys.update_pending` is in shadow now.
+[How shadow mode works →](/brain/corpus/#shadow-mode)
+
+## Test the checks on your house
+
+| Tool | What it does |
+| --- | --- |
+| [`brain doctor --rehearse`](/brain/doctor/#brain-doctor---rehearse) | Plants a couple of defects in your install and scores the checks against them |
+| [Corpus replay](/brain/corpus/#replay) | Runs every check against frozen houses with known answers |
+| **⚙ → Diagnostics → How right it's been** | Shows, per check, how often its cards were right in your house |
