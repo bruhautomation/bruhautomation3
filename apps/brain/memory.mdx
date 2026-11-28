@@ -1,245 +1,203 @@
 ---
 title: Memory & Knowledge
-description: How brAIn builds long-term memory about your home — what it learns, where it lives, how guesses get settled, and how to view, edit, or erase any of it.
+description: What brAIn has learned about your home, one fact at a time. Browse it by room and device, teach it, correct it, answer its guesses, undo any change and take it with you to new hardware.
 ---
 
-brAIn keeps one small, human-readable document about your home at `/config/.brain/memory/memory.md` — preferences, entity nicknames, household patterns, device quirks. It's what turns *"turn on the beacon"* into the office lamp, and every surface in the add-on reads and writes it: the terminal, voice, insight runs, study sessions.
+import { Aside } from '@astrojs/starlight/components';
 
-The whole design answers one question: **what, exactly, has it learned?** If you can't point at a line and say "it knows that", it isn't memory.
+brAIn keeps one memory of your home: preferences, nicknames, household patterns, device
+quirks. It is what turns *"turn on the beacon"* into the office lamp. The terminal, the
+chat, voice, insight cards and house checks all read it, and you can see and change every
+line.
 
 ![Memory → Knowledge: "Everything brAIn believes about this house", a list of rooms and devices on the left with a count beside each, and facts on the right such as "Bins go out on Thursday evenings" and "The back door sensor runs on a CR2032 that lasts about three months", each with a bin, then a "Tell brAIn about the house…" box with Teach, and the Suggested reports and Tools folds](./images/panel-memory.webp)
 
 ## What ends up in it
 
-Real lines from a real document — the kind of thing that changes an answer rather than
-padding a profile:
+Facts that change an answer:
 
 - *"The office" means the upstairs back bedroom, not the study downstairs.*
 - *Sam is a light sleeper. Nothing in the hallway should go above 15% brightness between
   23:00 and 06:00.*
-- *Heating is an 8 kW air-source heat pump on weather compensation. It is not a boiler, so
-  "boost the heating" means raising the flow temperature.*
-- *The garage fridge is meant to run 24/7. Its draw looking abnormal at 3 am is the defrost
-  cycle, not a fault.*
-- *Never rename an entity_id without asking — several are referenced in a Node-RED flow I
+- *Heating is an 8 kW air-source heat pump on weather compensation. "Boost the heating"
+  means raising the flow temperature.*
+- *The garage fridge is meant to run 24/7. Its draw at 3 am is the defrost cycle, not a
+  fault.*
+- *Never rename an entity_id without asking. Several are referenced in a Node-RED flow I
   cannot see.*
 
-That last kind matters more than it looks: memory is where you put the rules you'd
-otherwise have to repeat in every request.
+The last kind is a rule. Put the things you would otherwise repeat in every request here.
 
-## One document, one writer
+## Browse what brAIn knows
 
-| What | Where | Is it memory? |
-|------|-------|---------------|
-| `memory.md` | `/config/.brain/memory/` | **Yes.** The canonical document — plain markdown, **user-editable**, capped at `memory_max_kb` (default 32 KB, range 1–64). |
-| `voice.md` | `/config/.brain/memory/` | Derived. A ≤2 KB distillate spliced into voice prompts. Don't edit it; it's regenerated. |
-| `inbox/` | `/config/.brain/memory/` | No — a **queue**. Candidate facts waiting to be folded in. |
-| Hypotheses | `/config/.brain/memory/` | No — a **queue**. Open guesses awaiting a yes/no. |
-| Change log | `/config/.brain/memory/` | No — an **audit trail**, so you can see what changed and undo it. |
-| Facts | Memory → Knowledge | An **index** underneath the document — the same knowledge one fact at a time, with who taught it. It follows the document; see [below](#the-facts-underneath). |
+**Memory → Knowledge** lists every fact.
 
-Only the queues are ever written to directly. **Nothing writes `memory.md` except the consolidator**, which folds the inbox in once a day (or early when 20+ facts are pending), deduping, resolving contradictions newest-wins, and enforcing the size cap. One writer means no races, and it means the document stays a document rather than an append-only log.
+| To | Do this |
+| --- | --- |
+| See what it knows about one room or device | Pick it from the list on the left (a picker on a phone). |
+| Find a fact | **Search facts**. A device's friendly name works. |
+| Narrow the list | The **Rooms**, **Devices** and **House** pills, **Taught by** (anyone, you, a conversation, voice…) and the sort (newest, by room or device, oldest, most certain). |
+| Remove a wrong fact | The bin beside it. |
+| See where a fact came from | Each fact records who taught it (voice, the chat, the terminal, a run) and the conversation it came from. |
+| Have brAIn review its own memory | **Clean up**. brAIn reads its memory and lists what looks wrong, useless or mistaken. |
 
-The cap is not a speed setting. Voice reads the 2 KB `voice.md` distillate on every request and never the document, so shrinking `memory.md` buys nothing where speed is felt — the cap only decides how much brAIn can know before filing something new means dropping something old.
-
-**⇪ File into memory now** on **Memory → Knowledge** runs that same pass immediately — same script, same safety checks. The button *starts* the pass rather than waiting for it — a consolidation takes minutes, and a web request can't — so a banner counts the elapsed time and the tab reports the outcome when it lands. It empties **Waiting to be filed**, and what was in it is now in the document, which is the one place it's read and edited from. If the pass keeps the facts instead — it does that rather than write a document it isn't happy with — it says so, and the queue stays where it was.
-
-**Waiting to be filed** is the inbox itself: every queued line, labelled with where it came from — an insight run, a voice conversation, a correction, something you typed — and the count is the length of that same list, so the two can never disagree. **✕** on a row drops it from the queue — and from the facts every run is told — and asks the consolidator for nothing, because a queued fact has by definition never reached the document.
-
-The inbox, the hypothesis queue, and the change log are **never injected into prompts**. They're plumbing, not knowledge.
-
-:::note[A consolidation can't quietly erase what it knows]
-A pass that would drop more than 60% of the document's content lines is refused outright,
-and any failure leaves memory untouched with the inbox still pending. Nothing is ever
-half-written: both `memory.md` and `voice.md` are replaced atomically or not at all.
-
-A pass gets 480 seconds — it rewrites the whole document plus the voice distillate — and a
-failure is reported by name: a timeout says it timed out, anything else carries Claude's own
-last line. An answer over the size cap is retried once with the measured excess fed back
-("drop the oldest and lowest-value facts until it fits") before failing with a message that
-names `memory_max_kb`.
-:::
-
-## Memory → Knowledge
-
-**Memory → Knowledge** is everything brAIn believes about this house, one fact at a time. Pick a
-room or a device to see what it knows about it (a list beside the facts on a wide screen, a
-picker on a phone), and delete anything that's wrong with the bin beside it.
-
-- **Search** the facts (a device's friendly name works), filter by kind (**Rooms**, **Devices**,
-  **House**), by **Taught by** (anyone, you, a conversation, voice…) and sort newest first.
-- **Tell brAIn about the house…** with **Teach** files what you type straight in.
-- **Clean up** has brAIn read its whole memory and remove what is wrong, duplicated or stale.
-- **Suggested reports** lists [insight cards brAIn thinks you're missing](/brain/insights/#where-cards-come-from),
-  with **Run** for a fresh look.
-- **Tools** holds the memory document itself (**What brAIn has written down**, with **Edit**,
-  **Export** and what is waiting to be filed), **What brAIn brings to a run**, and the
-  [deep review](/brain/insights/#beyond-cards-the-weekly-report-and-a-deep-review).
-
-Nothing on Knowledge waits on you, so it has no badge. What brAIn has *measured* (when the house
-wakes, what is normal here and the rest) is in ⚙ → Diagnostics → Measurements; see
+Nothing on Knowledge waits on you, so it has no badge. What brAIn has *measured* (when the
+house wakes, what is normal here) is in ⚙ → Diagnostics → Measurements. See
 [Measurements](/brain/measurements/).
 
-## How it learns
+## Teach it
 
-- **You tell it** — say *"remember that…"* to a voice assistant, type it into the Teach box on Memory → Knowledge (*"the garage freezer is off in winter"*), run `brain memory add "…"` in the terminal, or call `brain.add_memory` from an automation.
-- **It notices** — when a voice conversation ends, a bounded reflection pass (cheap model, no tools) extracts up to 3 durable facts: preferences, corrections, nicknames. Transient states, one-off commands, and secrets are excluded. A preference stated by somebody signed in to Home Assistant ("I like the bedroom at 19") is remembered as theirs, not everyone's.
-- **The terminal and the chat teach it too** — after each turn a small, cheap run with no tools reads only what was said since it last looked, judging from *your* words alone, and files anything durable: a preference, a nickname, a correction. It needs either two new messages or one that plainly teaches something. Claude Code's own "auto memory" is switched off in every brAIn session, so there is one memory and you can read all of it.
-- **It studies** — `brain learn <topic>` (or the `brain.study` service, or `/learn` in the terminal) runs a deep session on one subject and files what it finds. Without a topic it picks whatever has gone stalest. During first setup, the screen lists what each study session learns as it lands.
-- **It analyses** — insight runs file their durable findings the same way, through the same inbox.
+| Way | How |
+| --- | --- |
+| **Type it** | **Tell brAIn about the house…** and **Teach** on Memory → Knowledge: *"the garage freezer is off in winter"*. |
+| **Say it** | *"Remember that…"* to a voice assistant. |
+| **Talk normally** | After each turn in the chat or the terminal, a small run with no tools reads what *you* said and files anything durable: a preference, a nickname, a correction. It needs two new messages, or one that plainly teaches something. |
+| **From the command line** | `brain memory add "…"` |
+| **From an automation** | `brain.add_memory` |
 
-Every fact records whether it came from voice, the chat or the terminal, and the
-conversation it came from — so *"why does brAIn think that?"* has an answer you can open.
+brAIn also learns without being told:
 
-## The facts underneath
+- **From voice.** When a voice conversation ends, a short pass with no tools extracts up to
+  three durable facts. Transient states, one-off commands and secrets are excluded. A
+  preference stated by somebody signed in to Home Assistant (*"I like the bedroom at 19"*)
+  is remembered as theirs.
+- **By studying.** `brain learn <topic>`, the `brain.study` service or `/learn` in the
+  terminal runs a deep session on one subject. With no topic it picks whatever has gone
+  stalest.
+- **From insight runs**, which file their durable findings the same way.
 
-Every fact that reaches the inbox is also filed as one row in a **facts store**, tagged
-with what it's about, who taught it, when, and the run that produced it. The document is
-what you read and edit; the facts are what a run *looks things up in*:
+New facts are used straight away and written into the memory document once a day, or
+sooner when 20 or more are waiting.
 
-- **By room and by question.** A run is handed the facts about the rooms and devices it is
-  reading, and facts that share words with the question you asked come first — not the
-  whole document, which on a mature house is 30 KB of things that are true and mostly beside
-  the point. No one chatty device can fill the space.
-- **The same fact said two ways is stored once.** Near-duplicates are merged as they arrive;
-  facts that differ by a "not" are kept apart.
-- **Some facts expire.** A note like *"the hall sensor's battery is at 12%"* is true for a
-  few weeks, not for ever, so notes about a device's health expire after thirty days. Facts
-  about an entity your house no longer has stop being used at once and are removed thirty
-  days later — and come back if the entity does.
+## Answer its guesses
 
-### Forgetting reaches everything
+brAIn states what it **believes** and asks you to confirm:
 
-Every time memory is filed, brAIn checks the facts against `memory.md`. A line you deleted
-from the document, a `brain memory forget`, a cleared memory, the **✕** on a queued fact and
-an **Undo** all reach what every run is told — not just the file you can see. A fact still
-waiting to be filed is left alone until it has been judged.
+> *"The garage fridge is meant to run 24/7, right?"*
 
-Two kinds of fact survive a document that doesn't quote them, because the document is a
-summary and not quoting something isn't withdrawing it: **your own corrections**, and the
-**rules** a *Ignore* made.
+Guesses appear on [Needs you](/brain/needs-you/) under **Questions for you**.
 
-### Rules you set, and how long an answer lasts
+| Press | What happens |
+| --- | --- |
+| **Yes** | It becomes a plain fact in memory. |
+| **No** | A dead end that is never revisited, in any wording. Say why if you can: the reason is kept as a correction. |
+| **Snooze** | It leaves every screen and stops counting against the limit, so brAIn can ask something else. Its fortnight starts again when it returns. |
+| **Doesn't apply** | The card closes and nothing is recorded. |
 
-Pressing *Ignore* on a [house check's finding](/brain/needs-you/#ignore-the-answer-that-teaches)
-writes a rule — this sensor, this check — that the check reads on its next pass. A
-correction can reach further (the whole device, the room, everywhere) and last for a while
-(until a date, a month or a season) rather than for good; wide ones are asked first. They
-are all listed under **Rules you set**. **Undo**, or *Let brAIn raise it again*, removes the
-rule too, and two checks marked wrong on the same sensor are two rules.
+Three rules hold in code, whatever a model does:
 
-:::note[Only "Ignore" is permanent]
-*I've already fixed it*, **Got it** after a fix, and finishing a to-do stop a finding being
-raised only **for as long as it stays fixed**. If the check finds the problem again it is
-raised again, saying how long it stayed away; anything else lapses after ninety days. A
-fixed problem coming back is news, not a decision being reopened.
-:::
-
-### What brAIn has learned about its own calls
-
-The facts list also holds short **judgements** brAIn writes about where its own calls keep
-disagreeing with you — *"Night motion on the hall landing is the cat — 4 of 4 it raised were
-marked not a problem."* The counts are brAIn's arithmetic, never the model's. A judgement
-never makes brAIn quieter about a leak, smoke, gas, a freeze or anything protected, is never
-about a person's health, sleep or whereabouts, goes away when a later card on the same thing
-turns out to be real, and expires after 30 days unless renewed. Forget one with ✕ like any
-other fact.
-
-## Guesses, not questions
-
-Earlier versions asked open-ended questions, which piled up unanswered and left you reading raw Q&A transcripts. brAIn instead states what it **believes**, phrased for a yes/no:
-
-> *"The garage fridge is meant to run 24/7 — right?"*
-
-Two taps settle it, on [Needs you](/brain/needs-you/) under **Questions for you** — open
-guesses ride in the same list as problems, because both are questions only the
-person living there can answer, and one badge counts everything waiting on a decision. **Memory → Knowledge** has no badge,
-because nothing on it waits on you: the queue files itself, and the document is there to
-read.
-
-- **✓ Yes** files it as a plain memory line. It's now a fact like any other; the guess is gone.
-- **✕ No** records a dead end that is never revisited, in any wording — and offers the same
-  optional one-sentence reason box a wrong finding does, because "no" usually means brAIn
-  has misread something worth explaining.
-- **Snooze** puts it to sleep: it stays open but leaves every screen and stops counting
-  against the limit below, so brAIn can ask something else meanwhile. Its fortnight starts
-  again when it comes back.
-
-The rules are enforced in code, not merely requested in a prompt — a model that ignores the budget still can't grow the queue:
-
-- **3 open at a time**, maximum.
-- **14-day expiry** — an unanswered guess retires itself.
-- **Never re-proposed**, confirmed or rejected, however it's reworded.
+- At most **3 open** at a time.
+- An unanswered guess expires after **14 days**.
+- A guess is **never proposed again**, confirmed or rejected, however it is reworded.
 
 When brAIn wonders why you did something by hand and three guesses are already open, it
-waits for a free slot before spending anything on working out the guess — and one it had
-already worked out is kept and offered, at no cost, as soon as a slot frees.
+waits for a free slot before spending anything. It never asks why about a lock, an alarm
+panel or where people are.
 
-`binary_sensor.brain_memory_questions_waiting` (*Questions waiting*) turns on when a guess needs an answer, with the open guesses and their ids in its attributes. That exists to be automated: a guess sitting in a panel nobody has open expires unanswered, but pushed to a phone it costs one tap. `brain.answer_question` answers one from Home Assistant exactly as Needs you's buttons do — start the answer with *yes* or *no*; a yes is filed as known, a no closes the guess and keeps your reason as a correction.
+Guesses from Home Assistant:
 
-## Learning you can see from outside the panel
+- `binary_sensor.brain_memory_questions_waiting` (*Questions waiting*) turns on when a guess
+  needs an answer, with the open guesses and their ids in its attributes. Use it to push a
+  guess to a phone before it expires.
+- `brain.answer_question` answers one. Start the answer with *yes* or *no*.
 
-- **`brain_learned`** fires as a logbook event for every new fact, so *"brAIn learned: the hallway sensor drops offline around 2am"* appears in your home's timeline next to lights and doors.
-- **`sensor.brain_memory_facts_learned`** — how many things it knows.
-- **`sensor.brain_memory_last_learned`** — the most recent one, with the text as an attribute.
-- **`sensor.brain_findings_open_findings`** — how many findings are waiting on you, with the severity
-  split and the texts as attributes.
-- **`brain_finding`** fires for every newly-filed finding — and can ring your phone; see
-  [notifications](/brain/notifications/).
+## Rules you set
 
-## Viewing, editing, undoing
+Pressing **Ignore** on a [house check's card](/brain/needs-you/#ignore-the-answer-that-teaches)
+writes a rule (this sensor, this check) that the check reads on its next pass.
 
-**Memory → Knowledge → Tools → What brAIn has written down** shows the document, with **Edit**
-for the raw file, and the **Teach** box files a new fact straight in. Everything there is
-also on the command line:
+- A correction can reach further (the whole device, the room, everywhere) and can last
+  until a date, a month or a season. Wide ones are asked first.
+- They are listed under **Rules you set**. **Undo**, or *Let brAIn raise it again*, removes
+  the rule.
+- Only **Ignore** is permanent. *Done* and a finished to-do stop a card being raised only
+  for as long as the problem stays fixed.
+
+brAIn also writes short **judgements** about where its own calls keep disagreeing with you:
+*"Night motion on the hall landing is the cat. 4 of 4 it raised were marked not a
+problem."* The counts are arithmetic, not a model's guess. A judgement expires after 30
+days unless renewed, goes away when a later card on the same thing turns out to be real,
+and can be deleted like any fact.
+
+<Aside type="caution" title="What a judgement never does">
+It never makes brAIn quieter about a leak, smoke, gas, a freeze or anything protected, and
+it is never about a person's health, sleep or whereabouts.
+</Aside>
+
+## Read, edit and undo the document
+
+**Memory → Knowledge → Tools** holds the memory document.
+
+| Under Tools | What it is |
+| --- | --- |
+| **What brAIn has written down** | The document, with **Edit** for the raw text and **Export**. Below it, **Waiting to be filed** lists every queued fact and where it came from. ✕ drops one before it reaches memory. |
+| **What brAIn is told before it works** | What each kind of run (a chat, a card, voice, a check) is handed, and what it can look up. |
+| **Review the whole house** | The [deep review](/brain/insights/#beyond-cards-the-weekly-report-and-a-deep-review). |
+
+The document is `/config/.brain/memory/memory.md`, plain markdown, and it is yours. Your
+edits are the source of truth, and brAIn merges new facts around them.
+
+Everything is also on the command line:
 
 ```bash
-brain memory list                        # what it knows
-brain memory add "Guests use the loft"   # queue a fact yourself
-brain memory inbox                       # facts awaiting consolidation
-brain memory hypotheses                  # pending guesses
-brain memory consolidate                 # run a consolidation pass now
-brain memory log                         # what changed recently, and why
-brain memory undo 2                      # revert memory change #2 from that log
+brain memory list                        # print the document
+brain memory add "Guests use the loft"   # teach it something
 brain memory forget "the loft is warm"   # queue a line for removal
 brain memory edit                        # open memory.md in $EDITOR
+
+brain memory log                         # what changed recently, and why
+brain memory history                     # every kept version
+brain memory undo                        # go back one version
+brain memory undo 2                      # revert change #2 from the log
+
+brain memory hypotheses                  # guesses waiting on a yes/no
+brain memory confirm "<text>"            # yes: file it as a fact
+brain memory reject "<text>" "why"       # no: a dead end, with your reason
+
+brain memory inbox                       # facts waiting to be filed
+brain memory consolidate                 # file them now
 brain memory clear --confirm             # reset (old file kept as memory.md.bak)
-brain memory export                      # everything learned, as one portable file
-brain memory import backup.json          # fold an export back in
 
 brain learn energy                       # study a topic now
 brain learn                              # study whatever is stalest
 ```
 
-`memory.md` is yours. Edit it freely — **your edits are the source of truth**, and the consolidator merges around them rather than over them. `brain memory log` shows every change the consolidator made, in plain English, and `brain memory undo <n>` reverts one.
+Forgetting reaches everything. A line you delete from the document, a
+`brain memory forget`, a cleared memory, the ✕ on a queued fact and an **Undo** all reach
+what every run is told, not only the file you can see. Your own corrections and the rules
+an *Ignore* made survive a document that does not quote them.
 
-:::note[Two different undos]
+<Aside type="note" title="Two different undos">
 `brain memory undo` reverts a change to what brAIn *knows*. Plain
-[`brain undo`](/brain/cli/#undo) reverts a change Claude made to a *file* in your `/config`.
-They're separate journals, and neither can touch the other's.
-:::
+[`brain undo`](/brain/cli/#undo) reverts a change Claude made to a *file* in your
+`/config`. They are separate journals.
+</Aside>
 
-## The learned home is portable
+## Move it to new hardware
 
-`brain memory export` writes one JSON file carrying everything brAIn has learned: the memory
-document, the [findings](/brain/needs-you/) work list, the settled answers and the facts
-store — including the rules your *Ignore* presses made, so the checks you told "not
-here" stay quiet on the new install. **Export** under Memory → Knowledge → Tools downloads the same file
-(`GET /api/memory/export`).
+```bash
+brain memory export                      # on the old box: one JSON file
+brain memory import backup.json          # on the new one
+```
 
-Import is CLI-only, and it is a **migration, not a sync**: ledgers merge with your existing
-entries winning, the memory document replaces only an effectively-empty one unless you pass
-`--replace-memory`, and importing the same file twice changes nothing the second time. The
-point is that new hardware doesn't mean starting the learning over — export on the old box,
-import on the new, and brAIn picks up already knowing the house.
+The export carries the memory document, the [Needs you](/brain/needs-you/) work list, the
+answers you gave, the facts and the rules your *Ignore* presses made. **Export** under
+Tools downloads the same file.
 
-## Services
+Import is command-line only, and it is a migration, not a sync:
+
+- Your existing entries win where the two disagree.
+- The memory document replaces only an effectively empty one, unless you pass
+  `--replace-memory`.
+- Importing the same file twice changes nothing the second time.
+
+## Use it from Home Assistant
 
 ```yaml
-# Queue a fact from an automation (administrators only when called by a signed-in user)
+# Teach a fact from an automation (administrators only when called by a signed-in user)
 action: brain.add_memory
 data:
-  fact: "The dog gets fed at 7 and 17 — kitchen lights on then means feeding time"
+  fact: "The dog gets fed at 7 and 17. Kitchen lights on then means feeding time"
   confidence: high     # high | medium | low (default medium)
 
 # Study a topic in the background; results arrive in memory, not in a response
@@ -248,8 +206,50 @@ data:
   topic: "energy"      # omit to study whatever has gone stalest
 ```
 
-## Kill switches
+| Entity or event | What it is |
+| --- | --- |
+| `brain_learned` | A logbook event for every new fact: *"brAIn learned: the hallway sensor drops offline around 2am"*. |
+| `sensor.brain_memory_facts_learned` | How many things it knows. |
+| `sensor.brain_memory_last_learned` | The most recent one, with the text as an attribute. |
+| `binary_sensor.brain_memory_questions_waiting` | On while a guess needs an answer. |
+| `sensor.brain_findings_open_findings` | How many cards are waiting on you, with the severity split and the texts. |
+| `brain_finding` | Fires for every new finding, and can ring your phone. See [notifications](/brain/notifications/). |
 
-- **⚙ › Features › Learning loop** — the master switch. Off stops the reflection pass, what the terminal and chat teach, and the rest of [learning](/brain/learning/). Existing memory is left untouched and still used. (The `learning` option is only where the switch starts.)
-- `memory_injection: false` — keep learning, stop splicing memory into voice prompts.
-- `brain memory clear --confirm` — forget everything learned so far.
+## Turn learning off
+
+| Switch | Effect |
+| --- | --- |
+| **⚙ → Features → Learning loop** | The master switch. Off stops the voice pass, what the terminal and chat teach, and the rest of [learning](/brain/learning/). Existing memory stays and is still used. |
+| `memory_injection: false` | Keep learning, but stop adding memory to voice prompts. |
+| `brain memory clear --confirm` | Forget everything learned so far. |
+
+## How memory is stored
+
+| What | Role |
+| --- | --- |
+| `memory.md` | The document. Plain markdown, editable, capped at `memory_max_kb` (default 32 KB, range 1–64). |
+| `voice.md` | A summary of at most 2 KB that voice reads on every request. Regenerated, so do not edit it. |
+| The inbox | A queue of facts waiting to be filed. |
+| Guesses | A queue of open guesses. |
+| The change log | An audit trail, so you can see what changed and undo it. |
+| Facts | The same knowledge one fact at a time, tagged with what it is about, who taught it and when. This is what Knowledge shows and what a run looks things up in. |
+
+All of it lives under `/config/.brain/memory/`. The queues and the change log are never
+put into a prompt.
+
+- **One writer.** Only the daily filing pass writes `memory.md`. It dedupes, lets the
+  newest fact win a contradiction and holds the size cap.
+- **It cannot quietly erase what it knows.** A pass that would drop more than 60% of the
+  document is refused, and a failed pass leaves memory untouched with the queue still
+  waiting. Both files are replaced whole or not at all.
+- **Runs get the facts that matter.** A run is handed facts about the rooms and devices it
+  is reading, with facts that share words with your question first.
+- **Duplicates merge.** The same fact said two ways is stored once. Facts that differ by a
+  "not" stay apart.
+- **Some facts expire.** A note about a device's health (*"the hall sensor's battery is at
+  12%"*) expires after thirty days, and a reading of one moment after two. Facts about an
+  entity your house no longer has stop being used at once, are removed thirty days later,
+  and come back if the entity does.
+- **The cap is not a speed setting.** Voice reads the 2 KB summary, never the document. The
+  cap decides how much brAIn can know before filing something new means dropping something
+  old.

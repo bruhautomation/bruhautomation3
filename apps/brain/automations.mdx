@@ -1,15 +1,25 @@
 ---
 title: Automations & Insight Jobs
-description: Run Claude from automations — brain.ask for answers an automation can branch on, brain.run_task for background jobs, send_prompt for one-shot text, insight jobs for scheduled reports, AI Task, tools for other assistants, and events for everything brAIn decides.
+description: Put brAIn to work from automations. brain.ask for answers you can branch on, brain.run_task for background jobs, brain.send_prompt for one-shot text, insight jobs for scheduled reports on sensors, AI Task, tools for other assistants, and events for everything brAIn decides.
 ---
 
-Ways to put Claude to work without opening the panel.
+import { Steps } from '@astrojs/starlight/components';
 
-## `brain.ask` — answers an automation can branch on
+Call brAIn from any automation or script: ask it a question, hand it a job, or react when it finds or fixes something.
 
-A question in, and the answer back as **data** — not a sentence your automation has to
-parse. Hand it the shape you want as a JSON schema; Claude looks the answer up (read-only
-by default) and returns an object that has already been checked against that shape.
+| You want | Use |
+| --- | --- |
+| An answer your automation can branch on | [`brain.ask`](#ask-a-question-and-branch-on-the-answer) |
+| A job done in the background, with a notification | [`brain.run_task`](#run-a-background-job) |
+| One line of text, right now | [`brain.send_prompt`](#get-a-one-line-answer) |
+| A report on a dashboard every morning | [Insight jobs](#insight-jobs) |
+| brAIn behind Home Assistant's **Suggest with AI** | [AI Task](#answer-home-assistants-ai-task) |
+| To react when brAIn finds or fixes something | [Events and entities](#events-and-entities) |
+| Findings on your phone with no YAML | [`findings_notify_service`](#send-findings-to-your-phone-with-no-yaml) |
+
+## Ask a question and branch on the answer
+
+`brain.ask` takes a question and returns the answer as data. Give it the shape you want as a JSON schema, and the object that comes back has already been checked against it.
 
 ```yaml
 automation:
@@ -42,16 +52,13 @@ automation:
                 Cold tonight: {{ cold.data.rooms | map(attribute='name') | join(', ') }}
 ```
 
-`response` always holds the answer as text; `data` holds the object when you gave a
-`schema` (as an object, or as a JSON string). `tools` is `read_only` (the default — a
-question isn't a change), `house` (it may control devices) or `full` (shell and files too).
-If the run fails, `brain.ask` **raises** rather than handing back an answer with `data`
-missing — so an empty `data` is never a "no" in disguise (see
-[When a task fails](#when-a-task-fails)).
+- `response` always holds the answer as text. `data` holds the object when you gave a `schema`.
+- It looks things up and changes nothing, unless you widen [`tools`](#choose-how-much-a-task-may-touch).
+- If the run fails, the action raises an error. An empty `data` is never a "no" in disguise.
 
-## `brain.run_task` — background jobs
+## Run a background job
 
-Runs Claude as a background task from any automation or script — error-log digests, config audits, morning summaries — with an optional notification when it's done.
+`brain.run_task` runs a job in the background: an error-log digest, a config audit, a morning summary. It can notify you when it is done.
 
 ```yaml
 automation:
@@ -71,31 +78,14 @@ automation:
           timeout: 300
 ```
 
-Tasks run with a generous budget — nobody is waiting on a background job, so they may take as many steps as they need, within `timeout`. Responses are also returned as service response data for use in the same automation, and like `brain.ask`, `brain.run_task` takes a `schema` and returns `data`.
+- A task takes as many steps as it needs, within `timeout`.
+- The answer also comes back as response data, as text. For a checked object, use `brain.ask`.
+- `notify: true` with no `notify_entity` leaves a persistent notification in Home Assistant.
+- `model` lets a nightly digest run on `haiku` while everything else follows the app's setting.
 
-`notify: true` sends a notification when the task completes, and `notify_entity` picks the notify service that gets it — omit it for a persistent notification in the HA UI. A `model` field on both `brain.run_task` and `brain.send_prompt` overrides the model per call (`default`, `sonnet`, `opus`, `haiku`), so a nightly digest can run on Haiku while everything else follows the add-on setting.
+## Get a one-line answer
 
-### How much a task may touch: `tools`
-
-A task runs Claude in `/config`, usually because it's asked to *change* something. That's
-right for "fix the heating schedule" and far more than "which lights were on at 3am" needs,
-so say how much it may touch:
-
-| `tools` | What the task can reach |
-| --- | --- |
-| `full` | The shell, file edits, web access, and every Home Assistant tool — including [Power Tools](/brain/power-tools/), so a task can *fix* what it finds. The default for `brain.run_task`, so nothing you've already written changes. |
-| `house` | Every Home Assistant tool — it can read your house and act on it — with no shell, no file reads or edits, and no web. |
-| `read_only` | The same list brAIn's own scheduled analysis uses: it can look at anything in Home Assistant and change nothing. The default for `brain.ask`. |
-
-**`read_only` and `house` can't read files in `/config`.** Before 2.11 they could open any
-file there, `secrets.yaml` included, because a task runs in `/config` with file reads
-pre-approved; both now refuse file reads outright. The two narrow lists are read from brAIn's
-own analysis setup when the task runs, and if they can't be read the task is **refused**
-rather than falling back to `full`.
-
-## `brain.send_prompt` — one-shot Q&A
-
-A synchronous question → answer call, ideal inside scripts that need Claude's answer immediately:
+`brain.send_prompt` waits for the answer and returns it. Use it inside a script that needs the text straight away.
 
 ```yaml
 - action: brain.send_prompt
@@ -107,58 +97,55 @@ A synchronous question → answer call, ideal inside scripts that need Claude's 
     message: "{{ claude.response }}"
 ```
 
-`send_prompt` runs at the voice-assistant level, which is what Assist already gives any
-signed-in user, so it doesn't need an administrator.
+It runs at the [Voice assistant level](/brain/voice/#what-a-voice-level-agent-sees), which is what Assist already gives any signed-in user.
 
-## Who may call them
+## Choose how much a task may touch
 
-A task runs with Home Assistant's full API behind it and, at `tools: full`, a shell in
-`/config` — so asking for one is an administrator's job. These refuse a signed-in user who is
-**not a Home Assistant administrator**:
+Set `tools` on `brain.run_task` and `brain.ask`.
 
-- `brain.run_task` with `tools: house` or `full` — and with no `tools` at all, which is `full`
-- `brain.ask` with anything wider than `read_only`
-- `brain.add_memory`, `brain.study`, `brain.intent` and `brain.answer_question`, because what
-  they file is handed to every later run
+| `tools` | What the task can reach | Default for |
+| --- | --- | --- |
+| `read_only` | It can look at anything in Home Assistant and change nothing. It cannot read files. | `brain.ask` |
+| `house` | Every Home Assistant tool, so it can read your house and act on it. No shell, no file reads or edits, no web. | |
+| `full` | The shell, file edits, web access and every Home Assistant tool, including [Power Tools](/brain/power-tools/), so a task can fix what it finds. | `brain.run_task` |
 
-**Automations and scripts run as the system and are not affected.** `brain.ask` at
-`read_only` and `brain.send_prompt` stay open to everyone. `brain.add_memory` also refuses the
-sources brAIn keeps for your own answers (`correction`, `confirmed`, `person`). The
-[Power Tools](/brain/power-tools/) were always admin-gated. More on what each part of brAIn
-may touch is on [Safety](/brain/safety/).
+`read_only` and `house` cannot open files in `/config`, `secrets.yaml` included. If brAIn cannot load those two narrower tool lists when the task starts, the task is refused. It never falls back to `full`.
+
+### Who may call them
+
+| Caller | What is allowed |
+| --- | --- |
+| Automations and scripts | Everything. They run as the system. |
+| A Home Assistant administrator | Everything. |
+| A signed-in user who is not an administrator | `brain.ask` at `read_only` and `brain.send_prompt` only. |
+
+A non-administrator is refused on `brain.run_task` at `house` or `full` (and with no `tools`, which is `full`), on `brain.ask` wider than `read_only`, and on `brain.add_memory`, `brain.study`, `brain.intent` and `brain.answer_question`. More on what each part of brAIn may touch: [Safety](/brain/safety/).
 
 ## When a task fails
 
-An expired sign-in, a timeout, a run that produced nothing or a refusal used to come back as
-if Claude had said it. Now a failure **raises an error carrying the reason**, so it shows in
-the automation's trace instead of in your notification:
+A failure raises an error that carries the reason, so it shows in the automation's trace and never arrives as if it were the answer.
 
-- `brain.run_task`, `brain.ask` and `brain.send_prompt` raise a `HomeAssistantError` with the
-  sentence a person should read. When the reason is a sign-in, it names the button that fixes
-  it: **⚙ → Account → Sign in again** in the panel.
-- `brain_task_complete` carries `status: failed` and an `error` code from a short, fixed list
-  — `auth`, `timeout`, `empty`, `refused`, `permission`, `paused`, `budget`, `partial`,
-  `error` and the like — so an automation can branch on *which* failure it was.
-- A successful result looks exactly as it always did.
-
-To keep an automation going past a failure, use Home Assistant's own `continue_on_error: true`
-on the action.
+- `brain.run_task`, `brain.ask` and `brain.send_prompt` raise a `HomeAssistantError` with a sentence a person can read. When the reason is a sign-in, it names the fix: **⚙ → Account → Sign in again**.
+- `brain_task_complete` carries `status: failed` and an `error` code from a fixed list, such as `auth`, `timeout`, `empty`, `refused`, `permission`, `paused`, `budget`, `partial` and `error`. Branch on which failure it was.
+- To keep an automation going past a failure, add `continue_on_error: true` to the action.
 
 ## Insight jobs
 
-Scheduled reports rendered to **sensors** — the dashboard-native sibling of the panel's [insight cards](/brain/insights/).
+An insight job is a scheduled report that lands on a **sensor**, ready for a dashboard tile or a spoken briefing.
 
-Create them from the integration: **Settings → Devices & Services → brAIn → Add service → Insight job**. Pick a shipped template — daily briefing, anomaly watch, battery & maintenance, camera check — or write a custom prompt. Custom prompts can embed HA templating (`{{ states('sensor.outdoor_temp') }}`), rendered just before each run.
+<Steps>
 
-- **Scheduling**: an interval, a daily time (HH:MM), both, or manual-only. Every job also gets a **Run now** button, and `brain.run_insight` triggers by name from automations.
-- **Read-only**: a job looks and changes nothing — no shell, no file edits. The shipped camera-check template is the one that may look at a camera, and only the cameras you've ticked in the panel's ⚙ → Cameras & calendars.
-- **It pauses with the rest of brAIn**: on its schedule, a job waits while **Automatic insights** is off or the usage budget is spent, like every other run nobody pressed. `brain.run_insight` and **Run now** always run.
-- **Reading it**: the report lives in the sensor's attributes — `preview`, full `markdown`, and ready-to-paste `card_yaml`. After the first successful run you get a notification containing the dashboard card.
-- **Continuity**: each run gets what brAIn knows about the house — the same [memory](/brain/memory/) retrieval the panel's own cards use — plus the previous report, so recurring insights note what *changed* instead of rediscovering the house.
-- **Failures stay failures**: a run that fails shows as an `error` on the sensor beside the last good report. It's never delivered as the report, so an expired login isn't pushed to your phone as the morning briefing.
-- **Events**: `brain_insight_complete` fires after every run with `name`, `entity_id`, `success`, and a `preview` — ideal for TTS announcements.
+1. Open **Settings → Devices & Services → brAIn → Add service → Insight job**.
 
-```yaml
+2. Pick a template (daily briefing, anomaly watch, battery & maintenance, camera check) or write your own prompt. A custom prompt can use templates such as `{{ states('sensor.outdoor_temp') }}`, rendered before each run.
+
+3. Set a schedule: an interval, a daily time (HH:MM), both, or manual only.
+
+4. After the first successful run, a notification gives you the dashboard card to paste.
+
+</Steps>
+
+```yaml title="Show the report on a dashboard"
 type: markdown
 title: Morning Briefing
 content: >-
@@ -166,14 +153,21 @@ content: >-
      or 'No insight yet — run brain.run_insight.' }}
 ```
 
-Jobs or [insight cards](/brain/insights/)? Jobs produce glanceable markdown on dashboards and TTS-able events; cards produce interactive visual analysis you click into. Both read the same memory, so most homes use jobs for tiles and briefings, and cards for deep dives.
+| | |
+| --- | --- |
+| **Run it now** | Every job has a **Run now** button. `brain.run_insight` runs one by name, or all of them with no name. |
+| **Read it** | The sensor's attributes hold `preview`, the full `markdown`, and a ready-to-paste `card_yaml`. |
+| **React to it** | `brain_insight_complete` fires after every run with `name`, `entity_id`, `success` and `preview`. Use it for a spoken announcement. |
+| **It knows the house** | Each run gets what brAIn knows from [memory](/brain/memory/), plus the previous report, so it notes what changed. |
+| **It changes nothing** | A job has no shell and no file edits. Only the camera check template may look at a camera, and only at cameras you ticked under ⚙ → Cameras & calendars. |
+| **It pauses with brAIn** | On its schedule, a job waits while **Automatic insights** is off or the usage budget is spent. **Run now** and `brain.run_insight` always run. |
+| **A failure stays a failure** | A failed run shows as an `error` on the sensor beside the last good report. It is never delivered as the report. |
 
-## Home Assistant's AI Task
+Jobs give you markdown for dashboards and events for announcements. [Insight cards](/brain/insights/) give you interactive analysis in the panel. Both read the same memory.
 
-On Home Assistant 2025.7 and later, brAIn is also an **AI Task** entity
-(`ai_task.brain_system_ai_task` on a fresh install). The **Suggest with AI** buttons in Home
-Assistant's own editors and the `ai_task.generate_data` action can be answered by brAIn
-rather than a model that has never seen your house.
+## Answer Home Assistant's AI Task
+
+On Home Assistant 2025.7 and later, brAIn is an **AI Task** entity (`ai_task.brain_system_ai_task` on a fresh install). The **Suggest with AI** buttons and `ai_task.generate_data` can then be answered by an assistant that knows your house.
 
 ```yaml
 - action: ai_task.generate_data
@@ -189,44 +183,25 @@ rather than a model that has never seen your house.
   response_variable: result
 ```
 
-It runs like `brain.ask`: reading tools only, with what brAIn knows about the house in front
-of the instruction. A requested `structure` is checked before it's returned, so a reply of
-the wrong shape is an error with the reason, never data that nearly fits. It needs the
-automation listener (`enable_automation_integration`). Attachments aren't read. On an older
-Home Assistant the entity simply doesn't appear.
+- It runs like `brain.ask`: reading tools only, with what brAIn knows about the house.
+- A requested `structure` is checked before it is returned. A reply of the wrong shape is an error with the reason.
+- It needs the `enable_automation_integration` option on. Attachments are not read.
 
-## brAIn's measurements, for other assistants
+## Give brAIn's measurements to another assistant
 
-Another conversation agent — OpenAI's, Google's, a local model, or the Model Context Protocol
-server integration handing tools to an outside client — can be given **brAIn measurements**
-under that agent's own **Control Home Assistant** setting (Home Assistant 2024.6 and later).
-Three questions, all read-only, answered by the same code brAIn's own runs use:
+Any other conversation agent (OpenAI's, Google's, a local model, or the Model Context Protocol server integration) can use **brAIn measurements**. Tick it under that agent's **Control Home Assistant** setting (Home Assistant 2024.6 and later).
 
 | Tool | Answers |
 | --- | --- |
 | `brain_what_is_normal` | What an entity normally reads at this hour of the week, and how far it is from that now. |
 | `brain_recall` | What brAIn remembers about something, with who taught it and when. |
-| `brain_explain_change` | What changed an entity recently — an automation, a person, a voice command or brAIn. |
+| `brain_explain_change` | What changed an entity recently: an automation, a person, a voice command or brAIn. |
 
-The entity being asked about has to be exposed to that assistant (Settings → Voice assistants →
-**Expose**); facts about entities it can't see are left out of what `brain_recall` returns,
-and an exposure that can't be checked is refused. These are served by the voice worker pool,
-so leave `assist_fast_mode` on.
+All three are read-only. The entity asked about has to be exposed to that assistant under **Settings → Voice assistants → Expose**. Facts about entities it cannot see are left out, and an exposure that cannot be checked is refused. Leave `assist_fast_mode` on, because the voice workers serve these.
 
 ## Events and entities
 
-Every event brAIn fires carries the thing it's about, so an automation can act on it without
-a second lookup:
-
-| Event | When | Carries |
-| --- | --- | --- |
-| **`brain_case`** | A finding opens on [Needs you](/brain/needs-you/) — something waiting on you. (Suggestions and guesses are on the feed too, but aren't announced by an event.) | `case_id`, `kind`, `claim`, `severity`, `status`, `entity_id`, `fixable`, `source` |
-| **`brain_case_ended`** | That finding leaves the feed, whichever ending it got. **Snooze** isn't an ending: a snoozed finding fires nothing when it goes and nothing when it comes back. | `case_id`, `kind`, `claim` |
-| **`brain_change`** | brAIn changed something in the house (a fix landed). A Home Assistant restart doesn't replay old ones. | `case_id`, `claim`, `entity_id` |
-| **`brain_finding`** | The same moment as `brain_case`, in the older shape — kept so nothing written against it breaks. | `ts`, `text`, `severity`, `entity_id`, `fixable` |
-| **`brain_learned`** | A fact was filed into [memory](/brain/memory/). | `fact`, `source` |
-| **`brain_task_complete`** | A `brain.run_task` or `brain.ask` task finished. | `task_id`, `status` (`completed` or `failed`), `error` on a failure |
-| **`brain_insight_complete`** | An insight job ran. | `name`, `entity_id`, `success`, `preview` |
+React when brAIn finds, fixes or learns something.
 
 ```yaml title="Tell the kitchen speaker when brAIn fixes something"
 automation:
@@ -242,60 +217,48 @@ automation:
           message: "brAIn fixed something: {{ trigger.event.data.claim }}"
 ```
 
-The findings list lives in the add-on's `/data`, which Home Assistant can't see, so the add-on
-mirrors it to `/config/.brain/findings_state.json` on every change and the integration builds
-these on it:
+| Event | Fires when | Carries |
+| --- | --- | --- |
+| `brain_case` | A finding opens on [Needs you](/brain/needs-you/). Suggestions and guesses do not fire it. | `case_id`, `kind`, `claim`, `severity`, `status`, `entity_id`, `fixable`, `source` |
+| `brain_case_ended` | That finding leaves the feed, whichever ending it got. A snooze fires nothing, going or coming back. | `case_id`, `kind`, `claim` |
+| `brain_change` | brAIn changed something in the house. A Home Assistant restart does not replay old ones. | `case_id`, `claim`, `entity_id` |
+| `brain_finding` | The same moment as `brain_case`, in the older shape. | `ts`, `text`, `severity`, `entity_id`, `fixable` |
+| `brain_learned` | A fact was filed into [memory](/brain/memory/). | `fact`, `source` |
+| `brain_task_complete` | A `brain.run_task` or `brain.ask` task finished. | `task_id`, `status` (`completed` or `failed`), `error` on a failure |
+| `brain_insight_complete` | An insight job ran. | `name`, `entity_id`, `success`, `preview` |
 
-| Entity | What it's for |
+| Entity | What it is for |
 | --- | --- |
-| **`sensor.brain_findings_open_findings`** | The open count, with the severity split and the texts as attributes — enough to put what's actually broken on a lock screen. |
-| **`todo.brain_system_to_do`** | To Do, in Home Assistant's To-do app (`todo.brain_system_brain` on an older install). Ticking an item off is **Done**; deleting one takes it off the list. `brain.add_todo` adds to it. |
+| `sensor.brain_findings_open_findings` | The open count, with the severity split and the texts as attributes. |
+| `binary_sensor.brain_needs_you` | On while anything waits for a decision. |
+| `todo.brain_system_to_do` | To Do, in Home Assistant's To-do app (`todo.brain_system_brain` on an older install). Ticking an item is **Done**. Deleting one takes it off the list. |
 | **Repairs** | Every finding waiting on you, with its answers, under **Settings → System → Repairs**. |
-| **`binary_sensor.brain_needs_you`** | On while anything waits for a decision. |
-| **`sensor.brain_status`** | The panel's status line: `watching`, `paused`, `needs_restart`, `signed_out` or `degraded`. |
-| **`sensor.brain_system_health`** | Whether brAIn itself is working (`sensor.brain_usage_limits_health` on an older install), so an automation can tell you the add-on is in trouble. |
+| `sensor.brain_status` | `watching`, `paused`, `needs_restart`, `signed_out` or `degraded`. |
+| `sensor.brain_system_health` | Whether brAIn itself is working (`sensor.brain_usage_limits_health` on an older install). |
+| `button.brain_system_run_house_checks` | Runs the house checks now. |
 
-Those ids are what a fresh install gets; if you've renamed anything, find yours under
-Settings → Devices & services → brAIn → entities.
+These ids are what a fresh install gets. If you renamed anything, find yours under **Settings → Devices & services → brAIn**.
 
-**Zero YAML**: set the `findings_notify_service` option to any `notify.*` service and
-findings reach your phone with no automation at all — critical ones pushed at once and asked
-about again, others held through quiet hours, and each notification carrying its answer
-buttons plus **Reply**. `findings_notify_min_severity` (default `critical`) decides what may
-ring.
+### Send findings to your phone with no YAML
 
-## More services
+Set the `findings_notify_service` option to any `notify.*` service. Critical findings are pushed at once and asked about again, others are held through quiet hours, and each notification carries its answer buttons plus **Reply**. `findings_notify_min_severity` (default `critical`) decides what may ring. More: [Notifications](/brain/notifications/).
 
-- **`brain.check`** runs the house checks now instead of waiting for the next scheduled pass
-  (`checks_interval_hours`). It returns immediately — a pass takes a minute or two, and what
-  it finds arrives on Needs you. Two calls close together are one pass, and a call
-  made while a pass is running is noted in the log rather than queued.
-  **`button.brain_system_run_house_checks`** on the *brAIn System* device is the same press with nothing
-  to type.
-- **`brain.answer_question`** answers one of the guesses brAIn is waiting on, exactly as
-  pressing Yes or No on Needs you does: a yes files the guess as something brAIn
-  knows, a no closes it and keeps any reason after the no as a correction. Start the
-  `answer` with yes or no, and name the guess by its id (`ts`) or its wording — the *Questions
-  waiting* sensor lists the open guesses with their ids. An answer that isn't a yes or no, or a
-  guess that isn't open, is refused with the reason. (Before 2.11 this filed your answer as a
-  fact and left the guess open.)
-- **`brain.add_memory`** queues a fact from an automation; its optional `source` field records
-  where the fact came from.
-- **`brain.study`** sends brAIn off to research a topic, and **`brain.intent`** turns one
-  sentence into an automation offered as a [suggestion](/brain/proposals/) on Insights → Needs you.
+## Service reference
 
-## Power Tools from automations
+| Service | What it does | Fields |
+| --- | --- | --- |
+| `brain.ask` | A question in, the answer back as text and, with a `schema`, as a checked object. | `question`\*, `schema`, `tools` (default `read_only`), `timeout` (10 to 600 seconds) |
+| `brain.run_task` | A background job, with an optional notification. | `prompt`\*, `tools` (default `full`), `model`, `notify`, `notify_entity`, `timeout` (default 300, 10 to 600 seconds) |
+| `brain.send_prompt` | One prompt, one answer. | `prompt`\*, `model`, `timeout` (default 120) |
+| `brain.run_insight` | Run an insight job now. | `name` (empty runs every job) |
+| `brain.check` | Run the house checks now. It returns at once, and what it finds arrives on Needs you a minute or two later. Two calls close together are one pass. | none |
+| `brain.add_todo` | Add a line to brAIn's To Do. | `text`\* |
+| `brain.add_memory` | Queue a fact for memory. The sources `correction`, `confirmed` and `person` are refused. | `fact`\*, `source`, `confidence` (`high`, `medium`, `low`) |
+| `brain.answer_question` | Answer a guess brAIn is waiting on, as **Yes** or **No** on Needs you does. Start `answer` with yes or no; anything else, or a guess that is not open, is refused. A reason after a no is kept as a correction. Name the guess by `ts` or by its wording. The *Questions waiting* sensor lists both. | `answer`\*, `ts`, `question`, `source` |
+| `brain.study` | Send brAIn to research a topic and file what it finds in memory. Built-in topics: naming, presence, energy, climate, devices, automations, lighting. | `topic` (empty studies whatever is stalest) |
+| `brain.intent` | Turn one sentence into an automation, offered as a [suggestion](/brain/proposals/) on Insights → Needs you. | `sentence`\* |
+| `brain.clear_conversation` | Reset a voice conversation. | `conversation_id` (empty clears all) |
 
-Every [Power Tools](/brain/power-tools/) service is a normal HA service — automations can call them directly, no Claude in the loop:
+\* required. `model` is `default`, `sonnet`, `opus` or `haiku`. `tools` also accepts `minecraft`, which BRUH Minecraft uses for requests typed in the game's chat.
 
-```yaml
-# Flag it in Repairs when the washer finishes but nobody empties it
-- action: brain.create_repair_issue
-  data:
-    title: "Washing machine done"
-    description: "Cycle finished over 2 hours ago and the door hasn't opened."
-    severity: warning
-    issue_id: washer_forgotten
-```
-
-The full list of services and their fields is in the [Reference](/brain/reference/).
+Every [Power Tools](/brain/power-tools/) service is callable from an automation in the same way. Field details for all services: [Reference](/brain/reference/).

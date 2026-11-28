@@ -1,110 +1,98 @@
 ---
 title: Timeline
-description: Memory → Timeline shows what your house is doing now, what happened, and what caused it. Not a log — every change filed under whether a person, an automation, a script, a voice command or brAIn itself made it, because nothing in a state says who moved it.
+description: Memory → Timeline shows what your house is doing now, what happened and what caused it. Every change is filed under a person, an automation, a script, a scene, a voice command or brAIn itself.
 ---
 
-Nothing in `light.kitchen` being *on* says whether a person pressed a switch, an automation
-fired, a voice command asked, or brAIn did it.
+import { Aside } from '@astrojs/starlight/components';
 
-That is the question behind most of what people actually want to ask their house — *why did
-the hallway light come on at 3am?* — and until Memory → Timeline it was unanswerable from
-every surface brAIn had.
+**Memory → Timeline** tells you what happened in your house and what caused it. It is
+where *"why did the hallway light come on at 3am?"* gets an answer: an automation, a
+person, a voice command, or brAIn.
 
-**Memory → Timeline** opens on what the house is doing right now, in one sentence (*Home,
-settled for the evening — the lounge and kitchen in use, the dishwasher running*), then what
-happened and what caused it. Search by device, narrow it by room, kind of thing, cause and
-window (6 hours to 2 days) with **‹ Earlier** and **Later ›**, and each filter counts what is
-under the others, with **Clear all**. **What does this add up to?** asks brAIn to read a stretch
-of it and say what it means.
+![Memory → Timeline over the last 24 hours: a search box, Filter, Earlier and Later, an "Ask about the last 24 hours" button, the line "Today the house was empty from 04:56 PM to 10:00 PM", then events grouped as Home Assistant, Heating & cooling, People, Doors, windows & blinds, Media, Cameras & motion and Lights & switches. The Kitchen light row reads "Automation: Evening lights when it gets dark" and "a person undid Evening lights"; the Kettle row reads "Voice: Assist"](./images/panel2-timeline.webp)
 
-## The fourth kind of knowledge
+## Read the Timeline
 
-Memory is what is *true*. A finding is what is *broken*. A guess is what brAIn might have
-*wrong*. The Timeline is what **happened**.
+- **The top line** says what the house is doing now: who is home, which rooms are in use,
+  which machines are running.
+- **Events are grouped by kind of thing**: Home Assistant, heating and cooling, people,
+  doors, media, motion, lights and switches. Each row has the device, what changed, when,
+  how long, and the cause.
+- **When the house was empty** is one line a day at the head of the list.
+- **Noise is folded.** A Home Assistant restart and the devices that dropped out around it
+  are one row. A device that kept flipping is one row with a count.
+- **The foot** says how many sensor readings were left out (a reading is not something that
+  happened) and how many changes have no recorded cause.
 
-It is a record rather than a queue, so **it has no badge**. Nothing on it is waiting on you.
+The Timeline is a record, not a queue, so it has no badge. It is fetched fresh every time
+you open it.
 
-## Where the cause comes from
+## Find something
 
-Home Assistant's logbook records a *context* for every state change — a chain saying what
-set it off. The Timeline walks that chain and files each change under one of a closed
-set of causes:
+| To | Use |
+| --- | --- |
+| Find a device | **Search devices**. |
+| Narrow by room, cause or kind of thing | **Filter**. Each choice counts what is under the others, and what is in force shows as tags with **Clear all**. |
+| Change the window | **6 hours**, **12 hours**, **24 hours** or **2 days**. |
+| Go back in time | **‹ Earlier** and **Later ›**. |
+| Have brAIn read it for you | **Ask about the last 24 hours**. One Claude run reads what is on screen and says what it adds up to. Everything else on this tab costs nothing. |
+
+## What each cause means
 
 | Cause | What it means |
 | --- | --- |
-| **Person** | A named user did it, from the app or the UI |
-| **Automation** | A rule fired |
-| **Script** / **Scene** | Something ran |
-| **Voice** | An assistant command — Home Assistant's own Assist, or a brAIn voice agent |
-| **brAIn** | brAIn changed it on its own — a fix you approved, a background run — see below |
-| **Unattributed** | Nothing in the record says |
+| **Person** | A named user did it, from the app or the UI. A change you asked for in brAIn's chat or terminal is yours too, marked *via brAIn*. |
+| **Automation** | A rule fired. |
+| **Script** / **Scene** | Something ran. |
+| **Voice** | An assistant command: Home Assistant's Assist, or a brAIn voice agent. |
+| **brAIn** | brAIn changed it unattended: a fix you approved, a background run. |
+| *Nothing shown* | Unattributed. Nothing in the record says. |
 
-:::note[Unattributed is an answer, in as many words]
-A wall switch and a device's own integration reach Home Assistant identically. Naming either
-would be a guess, and a timeline that guesses is not evidence. So brAIn says *unattributed*
-rather than picking the likeliest.
-:::
+Both the immediate and the root cause are kept. An automation somebody started from the UI
+shows the automation *and* the user.
 
-**Proximate and root cause are both recorded.** An automation somebody started from the UI
-carries an automation *and* a user. Reporting only the user turns every automation into "you
-did this"; reporting only the automation loses the one fact that explains an unexpected run.
+<Aside type="note" title="Unattributed is an honest answer">
+A wall switch and a device's own integration reach Home Assistant the same way. Naming
+either would be a guess, so brAIn shows no cause instead of the likeliest one.
+</Aside>
 
-## How brAIn knows what brAIn did
-
-It wrote it down. The MCP server calls Home Assistant over REST with the Supervisor's token
-exactly like every other integration, so a light brAIn turned on is indistinguishable in the
-context chain from a light anything else turned on — there is no id to match.
-
-So every service call brAIn makes is appended to a ledger at the same chokepoint
-`protected_entities` is enforced at, and the reader joins the logbook against it. An area or
-device target is recorded and **deliberately not resolved**: resolving one needs the
-registries as they were at the time, and a wrong expansion would attribute somebody else's
-change to brAIn — the one mistake the ledger exists to prevent.
-
-**What you ask brAIn to do is still yours.** Each row in that ledger says which face asked —
-voice, the chat, the terminal, or a run nobody was watching — and the conversation it came
-from. A change you asked for through a brAIn voice agent is filed as **Voice**, and one you
-asked for in the chat or the terminal as **Person**, marked as made *via brAIn*. Only what
-brAIn did unattended is filed under **brAIn**. That matters below: *"turn the hall light
-back on"* said to brAIn is you overriding the motion rule, not brAIn and the rule fighting.
-
-The ledger also records the state of each entity **just before** brAIn's call, which is
-what lets a fix's [Restore](/brain/needs-you/#plan-apply-and-undo) set things back the way
-they were.
-
-## Overrides ride above the list
+## Spot an automation you keep undoing
 
 An **override** is a person putting something back within a few minutes of an automation
-moving it. The automation ran, nothing errored, and the light is off — so no check that
-reads Home Assistant can see it, and it is the clearest signal a house gives that an
-automation is wrong for it.
+moving it. The automation ran and nothing errored, so no ordinary check can see it. It is
+the clearest sign that an automation is wrong for your house.
 
-These rules keep it honest:
+The row says so, as in *a person undid Evening lights*, and overrides ride above the list.
 
-- **The state has to actually differ.** Pressing "on" after a rule turned it on is
-  agreement, and counting it would put the best-behaved automation in your house at the top
-  of the list.
-- **One automation move is undone once.** Nudging a dimmer three times is one disagreement.
-- **A person includes voice.** Putting something back by asking Home Assistant's Assist or a
-  brAIn agent counts the same as pressing the switch.
-- **An automation undoing an automation is not an override.** That is a *conflict*, and a
-  different finding — two rules that disagree, where which one wins depends on the order two
-  triggers happened to fire in.
+| Counts as an override | Does not |
+| --- | --- |
+| Turning off a light an automation just turned on. | Pressing "on" after a rule turned it on. That is agreement. |
+| Putting it back by voice, through Assist or a brAIn agent. | An automation undoing an automation. That is a conflict, a different finding. |
+| Nudging a dimmer three times after one automation move. It counts once. | |
 
-Past three in a day, `auto.overridden` files it — with a **denominator**, because three
-undos of a rule that ran three times is a rule that is wrong for your house, and three undos
-of one that ran three hundred is an unusual Tuesday.
+Past three overrides of one automation in a day, brAIn files a card on
+[Needs you](/brain/needs-you/) (the `auto.overridden` check). The card says how often the rule ran, because three undos
+of a rule that ran three times means something different from three in three hundred.
 
-## Nothing is cached
+## Ask about it
 
-The tab is fetched every visit. A timeline showing the house as it was when you last looked
-is the one thing a timeline may not do — and a cache of a stream is a second copy of the
-logbook to keep true.
+Ask *"what turned the porch light on last night?"* in [Ask](/brain/terminal/) or in Morph's
+Ask line. Claude reads the same record through two read-only tools, `explain_change` and
+`get_activity`, and answers with the chain of causes.
 
-## Asking about it
+A voice agent at the default *Voice assistant* level cannot read house-wide activity. It
+only reaches what you expose to Assist.
 
-Claude can read this too. `explain_change` and `get_activity` are read-only tools on the
-analyst's list, so you can ask *"what turned the porch light on last night?"* in the chat or
-in Morph's Ask line and get the chain rather than a guess. A voice agent at the default *Voice
-assistant* level can't read the house-wide activity — it only reaches what you expose to
-Assist.
+## How brAIn knows what it did
+
+Home Assistant records what set off each state change, and the Timeline follows that
+chain. brAIn's own calls look like any other integration's there, so brAIn keeps its own
+ledger of every service call it makes and joins the two.
+
+- Each ledger row says which face asked (voice, the chat, the terminal, or an unattended
+  run) and the conversation it came from. That is how *"turn the hall light back on"*, said
+  to brAIn, counts as you overriding the motion rule.
+- A call aimed at a whole area or device is recorded as that, not expanded into entities.
+  A wrong expansion would blame brAIn for somebody else's change.
+- The ledger records each entity's state just before brAIn's call. A fix's
+  [Restore](/brain/needs-you/#plan-apply-and-undo) uses that to set things back.

@@ -1,13 +1,17 @@
 ---
 title: Morph Settings & Files
-description: Every Morph setting in brAIn's ⚙ › Dashboard, the files in /config/morph, and a full reference for dashboard.yaml — floors, sections, groups, cards and every key.
+description: Every Morph setting in brAIn's ⚙ › Dashboard, the files in /config/morph, and a full reference for dashboard.yaml: floors, sections, groups, cards and every key.
 ---
 
 import { Aside, FileTree } from '@astrojs/starlight/components';
 
+Set up Morph in brAIn's ⚙, and edit its files in `/config/morph` when you want to. This page
+lists every setting and every key of `dashboard.yaml`.
+
 ## The switch: ⚙ › Features
 
-Morph is one of brAIn's four switches. Each takes effect at once; nothing needs a restart.
+Morph is one of brAIn's [four switches](/brain/features/). Each takes effect at once, with no
+restart.
 
 | Switch | What it does for Morph | Default |
 | --- | --- | --- |
@@ -18,31 +22,31 @@ Morph is one of brAIn's four switches. Each takes effect at once; nothing needs 
 
 ## ⚙ › Dashboard
 
-Morph's own settings page is part of brAIn's ⚙, as **Dashboard**, shown while the Morph dashboard
+Morph's settings are the **Dashboard** section of brAIn's ⚙. It shows while the Morph dashboard
 is on.
 
 ![brAIn's Settings, dark theme, on the Dashboard section: the experimental notice, Changes with "Model for changes" set to brAIn's default and "How long a hold takes" set to Normal, Appearance with the theme set to Follow Home Assistant and a Reduce motion switch, and Header tabs with the first tab's name and icon](./images/dashboard-settings.webp)
 
 | Part | Setting | Choices |
 | --- | --- | --- |
-| **Changes** | Model for changes — the model a Tell uses | brAIn's default, Sonnet, Opus, Haiku |
+| **Changes** | Model for changes: the model a Tell uses | brAIn's default, Sonnet, Opus, Haiku |
 | | How long a hold takes | Quick, **Normal**, Slow |
 | **Appearance** | Theme | **Follow Home Assistant**, Dark, Medium, Light |
-| | Reduce motion — things move straight to where they belong instead of springing there | Off |
+| | Reduce motion: things move straight to where they belong | Off |
 | **Header tabs** | Each of brAIn's four tabs: its name and its icon (the first is **Morph UI** with a dashboard icon unless you change it) | |
 | **Learning loop** | How often | Twice a day, **Daily**, Every 3 days, Weekly |
 | | Which model | brAIn's default, Haiku, Sonnet, Opus |
 | | **Learn now**, the scorecard, and the lessons (`LEARNED.md`) to read and edit | |
 | **Changes to the dashboard's own code** | Every change this house made to Morph's code, in use or paused, with **Remove my change** (and **Update** / **Update all** for a paused one) | |
-| **History** | Every change with who made it — You, brAIn, Learning, Outside — and **Undo** or **Restore** for each | |
-| **Rebuild** | **Rebuild from the house** — itself a commit you can undo | |
+| **History** | Every change with who made it (You, brAIn, Learning, Outside), and **Undo** or **Restore** for each | |
+| **Rebuild** | **Rebuild from the house**, itself a commit you can undo | |
 
 Whether the learning loop runs at all is the switch in ⚙ › Features.
 
 ## The files
 
-`/config/morph/` is a **git repository**. You can edit any of these by hand; Morph commits your
-edit as *Edited outside Morph*.
+`/config/morph/` is a git repository. Edit any of these by hand and Morph commits your edit as
+*Edited outside Morph*.
 
 <FileTree>
 - config/
@@ -59,15 +63,13 @@ edit as *Edited outside Morph*.
 
 <Aside type="tip" title="It is safe to back up and restore">
 Everything Morph knows about your dashboard is in `/config/morph`, so a normal Home Assistant
-backup carries it — history and all. Uninstalling the old Morph app never touches it.
+backup carries it, history included. Uninstalling the old Morph app never touches it.
 </Aside>
 
 ## dashboard.yaml
 
-If the file stops parsing, the panel keeps showing the last version that did, with the parser's
-message and line above it, until the file is fixed.
-
-A small, complete example:
+The dashboard is floors, then sections (rooms), then groups, then cards. A small, complete
+example:
 
 ```yaml
 title: Home
@@ -131,9 +133,9 @@ floors:
 | `coming_up` | `true` | The Coming up strip. |
 | `coming_up_lanes` | none | Machines with a lane of their own in Coming up: each with `label`, `entities`, and optionally `running` / `not_running` (the states that mean running), `attribute`, `word`, `color`. Up to 12. |
 | `scenes` | none | The house's scenes line. |
-| `theme` | — | `auto`, `dark`, `medium` or `light`. |
+| `theme` | none | `auto`, `dark`, `medium` or `light`. |
 | `night_dim` | off | `true` dims the page at night. |
-| `floors` | — | The floors, in order. |
+| `floors` | none | The floors, in order. |
 
 ### Floors
 
@@ -147,14 +149,14 @@ floors:
 
 | Key | Default | What it does |
 | --- | --- | --- |
-| `title` | — | The room's name. |
+| `title` | none | The room's name. |
 | `color` | in turn | `amber`, `sand`, `sky`, `violet`, `teal`, `lime`, `rose`, `peach` or `indigo`. |
 | `width` | `2` | Its share of the page, `1`–`4`. |
 | `icon` | none | A faint icon before its name (`mdi:…`). |
 | `area` | none | The Home Assistant area it is about. |
 | `sleep_guard` | off | `true` holds what the page would do to this room while its sleeper is asleep, and asks first. |
 | `hidden` | off | Hides the section. |
-| `groups` | — | Groups of cards. `cards:` directly on the section is one group. |
+| `groups` | none | Groups of cards. `cards:` directly on the section is one group. |
 
 ### Groups
 
@@ -169,7 +171,7 @@ floors:
 
 | Key | What it does |
 | --- | --- |
-| `type` | One of Morph's cards (below). Leave it out and Morph picks one from the entity. Any other type — `tile`, `custom:…` — is hosted as a Lovelace card. |
+| `type` | One of Morph's cards (below). Leave it out and Morph picks one from the entity. Any other type (`tile`, `custom:…`) is hosted as a Lovelace card. |
 | `entity` / `entities` | What it shows. Scenes, Openings (`list`) and Readings take a list. |
 | `name`, `icon`, `unit` | Override what Home Assistant says. |
 | `span` | Its width, `1`–`4`. |
@@ -186,21 +188,10 @@ Your own card kinds in `cards/` are types too, once brAIn has written them.
 
 ## Troubleshooting
 
-**A hand edit to `dashboard.yaml` does not show.** The file has a YAML error. The panel keeps
-showing the last good version, with the parser's message and line above it; fix the file, or **Undo** the last change in
-⚙ › Dashboard › History.
-
-**A bar at the top says to reload, or to restart Home Assistant.** Morph's code on screen is
-older than what Home Assistant would serve. Reload; if brAIn was updated but Home Assistant still
-runs the older integration, restart Home Assistant once.
-
-**A note says one of my changes is paused.** An update changed a module your copy of Morph's code
-builds on. Press **Update** to merge your change into the new version (one change you can undo),
-or **Not now** to keep Morph's own running.
-
-**Tell does nothing.** Check that brAIn is signed in, that you are a Home Assistant
-administrator, and that brAIn's **Automation tasks** option (`enable_automation_integration`) is
-on.
-
-**The brAIn button is not on my dashboard.** It shows for administrators only. A YAML-mode
-dashboard cannot be changed by brAIn at all, because Home Assistant cannot save it.
+| Symptom | Fix |
+| --- | --- |
+| A hand edit to `dashboard.yaml` does not show | The file has a YAML error. The panel keeps showing the last good version, with the parser's message and line above it. Fix the file, or **Undo** the last change in ⚙ › Dashboard › History. |
+| A bar at the top says to reload, or to restart Home Assistant | Morph's code on screen is older than what Home Assistant would serve. Reload. If brAIn was updated but Home Assistant still runs the older integration, restart Home Assistant once. |
+| A note says one of my changes is paused | An update changed a module your copy of Morph's code builds on. Press **Update** to merge your change into the new version (one change you can undo), or **Not now** to keep Morph's own running. |
+| Tell does nothing | Check that brAIn is signed in, that you are a Home Assistant administrator, and that brAIn's **Automation tasks** option (`enable_automation_integration`) is on. |
+| The brAIn button is not on my dashboard | It shows for administrators only. A YAML-mode dashboard cannot be changed by brAIn, because Home Assistant cannot save it. |

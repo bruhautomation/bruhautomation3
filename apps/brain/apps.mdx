@@ -1,31 +1,32 @@
 ---
 title: brAIn and the BRUH apps
-description: The tools brAIn gets when another BRUH app is installed — BRUH Bambu Studio, BRUH Cooking, BRUH Browser, GardenRX, BRight, BRUH Print, BRUH Minecraft and BRUH Task Manager — what each lets you ask for, and what a voice agent may and may not do with it.
+description: What you can ask brAIn to do with each of the other BRUH apps (Bambu Studio, Cooking, Browser, GardenRX, BRight, Print, Minecraft, Task Manager), and what a voice agent may and may not do.
 ---
 
-import { Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-brAIn drives the other BRUH apps by asking. Install one with its Home Assistant integration
-and its tools appear in brAIn's chat, the terminal, automation tasks and voice agents. There is
-nothing to set up and nothing new on brAIn's panel; each app keeps its own.
+Install another BRUH app with its Home Assistant integration and brAIn can drive it. Ask in the chat, the terminal, an automation task or by voice. There is nothing to set up.
 
-## How it works, for every app
+## What you can ask
 
-- **Through the app's own services.** Each tool is a call to the app's Home Assistant
-  integration (BRUH Browser, which has no integration, is reached through its own API with a
-  token the add-on writes). The app holds the one implementation of every action and says no
-  when it should.
-- **Only where the app is.** A house without BRUH Bambu Studio is offered no `bambu_*` tool, on
-  any channel.
-- **The same checks as any other call.** An agent's **Blocked services** list applies, so you
-  can take `bruh_minecraft.teleport` away from the kitchen speaker.
-  [Protected entities](/brain/safety/#protected-entities) are refused as everywhere else, and a
-  speaker or scene named for a voice agent has to be one that agent can see.
-- **Voice may use, and may not administer.** Each app below lists what a voice agent at the
-  default *Voice assistant* level can do. The rest needs an agent set to *Whole house* or
-  *Full admin*, or the chat. [Voice →](/brain/voice/)
-- **Faults come home.** With the [development loop](/brain/development-loop/) on, each app's
-  stopped service, log errors and integration errors are reported with the app's name.
+| App | Ask | Voice may |
+| --- | --- | --- |
+| [BRUH Bambu Studio](#bruh-bambu-studio) | *"Design a 40 mm knob for a 6 mm D-shaft and print two."* | Design, print a file, pause, resume |
+| [BRUH Cooking](#bruh-cooking) | *"Start the Joule at 57 for two hours."* | Start and stop a cook |
+| [BRUH Browser](#bruh-browser) | *"Add my usual order plus oat milk to the cart."* | Start a cart errand, never buy |
+| [GardenRX](#gardenrx) | *"Log two pounds of tomatoes."* | Log a harvest, a spray, a note |
+| [BRight](#bright) | *"Start the Friday party on the den speaker."* | Start and stop shows |
+| [BRUH Print](#bruh-print) | *"Print three freezer-bag labels for bolognese."* | Print up to 10 labels |
+| [BRUH Minecraft](#bruh-minecraft) | *"Teleport Alex to Sam and make it day."* | Play, not administer |
+| [BRUH Task Manager](#bruh-task-manager) | *"Which app is using the most memory?"* | Read its sensors |
+
+## Rules for every app
+
+- **Tools appear only where the app is.** A house without BRUH Bambu Studio is offered no `bambu_*` tool, on any channel.
+- **The app decides.** Each tool calls the app's own Home Assistant services, and the app says no when it should. BRUH Browser has no integration, so brAIn calls its API with a token the app writes.
+- **The usual checks apply.** An agent's **Blocked services** list applies, so you can take `bruh_minecraft.teleport` away from the kitchen speaker. [Protected entities](/brain/safety/#protected-entities) are refused. A speaker or scene named to a voice agent has to be one that agent can see.
+- **Voice may use, and may not administer.** Each section lists what an agent at the default **Voice assistant** level can do. The rest needs **Whole house** or **Full admin**, or the chat. [Voice →](/brain/voice/)
+- **Faults are reported.** With the [development loop](/brain/development-loop/) on, each app's stopped service, log errors and integration errors are reported under the app's name.
 
 ## BRUH Bambu Studio
 
@@ -39,9 +40,9 @@ Bambu Lab printers over LAN, and Bambu Studio in the sidebar. [BRUH Bambu Studio
 | `bambu_slice` | Slice a file with Bambu Studio's own command line. |
 | `bambu_design` | Design a printable part from a sentence (*"a wall hook 4 cm long, two screw holes"*) in the app's Design tab, change it, and print it. |
 
-*"Print the cable clip on the X1"*, *"how long is left on the print?"*, *"design a 40 mm knob for
-a 6 mm D-shaft and print two"*. While a print runs, the app watches its camera and brAIn looks
-for a failure.
+Ask: *"Print the cable clip on the X1"*, *"how long is left on the print?"*, *"design a 40 mm knob for a 6 mm D-shaft and print two"*.
+
+While a print runs, the app watches its camera and brAIn looks for a failure.
 
 **Voice** may design a part and start a print (a file, never a link; at most 4 copies), pause
 and resume, and change speed, light and temperature. It may not stop a print, slice, send
@@ -57,11 +58,11 @@ BRUH Cooking needs brAIn. [BRUH Cooking →](/bruh-cooking/)
 | `cooking_status` | Each appliance's state (preheating, ready and waiting for the food, cooking, done, keeping warm, waiting for Start), current and target temperature, minutes left, the oven's mode and door, and the presets it can cook. Read-only. |
 | `cooking_control` | Start a cook by preset (*steak medium rare*) or temperature and time, with the oven's mode, convection and level; stop it; or say the food is in or out. |
 
-Appliances are named the way you say them: *"start the Joule at 57 for two hours"*, *"preheat the
-oven to 200 on air fry"*. A sous vide must be in water, and the oven waits for Start on its own
-panel; brAIn tells you both. A start over a running cook is refused.
+Ask: *"Start the Joule at 57 for two hours"*, *"preheat the oven to 200 on air fry"*. Name appliances the way you say them.
 
-**Voice** may start and stop a cook and say the food is in or out: the appliances themselves are the last check.
+A sous vide must be in water, and the oven waits for Start on its own panel. brAIn tells you both. A start over a running cook is refused.
+
+**Voice** may start and stop a cook and say the food is in or out. The appliances themselves are the last check.
 
 ## BRUH Browser
 
@@ -77,10 +78,7 @@ cart. BRUH Browser needs brAIn and runs on amd64 only. [BRUH Browser →](/bruh-
 | `browser_purchase` | Buy a cart, only after you heard it and said to buy it. |
 
 <Aside type="caution" title="A purchase is always a second step you approve">
-`browser_purchase` is the one tool that is **always asked**, in the chat and the terminal, with
-*Let brAIn act without asking* on or off, and refused anywhere nobody can be asked. The items
-and the total must match the cart as it stands, the cart must be under 30 minutes old, and it is
-bought once.
+`browser_purchase` is always asked in the chat and the terminal, whether **Let brAIn act without asking** is on or off. It is refused anywhere nobody can be asked. The items and the total must match the cart as it stands, the cart must be under 30 minutes old, and it is bought once.
 </Aside>
 
 **Voice** may start a cart errand and read how it went. It may never buy or stop one.
@@ -100,8 +98,7 @@ The spray decision engine for an orchard and garden. [GardenRX →](/gardenrx/)
 | `garden_adjust_inventory` | Change a product's stock. |
 | `garden_add_crop` | Add a crop, or a variety of one. |
 
-Each pass of the house checks also turns the season's harvest into facts brAIn can recall, so
-*"how many apples did we get this year?"* works in any conversation.
+Ask: *"Log two pounds of tomatoes"*, *"how many apples did we get this year?"*. Each pass of the house checks turns the season's harvest into facts brAIn can recall, so the second question works in any conversation.
 
 **Voice** may log a harvest, a spray and a note. Queueing a spray, changing inventory and adding
 a crop need a wider agent.
@@ -115,7 +112,7 @@ The music-driven light show director. [BRight →](/bright/)
 | `bright_status` | What BRight is doing, the saved sets by name, and the tracks with a show ready. Read-only. |
 | `bright_show` | Start a saved party or party mode, play one track's show, stop and put the room back (or run a scene), or import an edited show file. |
 
-*"Start the Friday party on the den speaker"*, *"stop the lights and put the bedtime scene on"*.
+Ask: *"Start the Friday party on the den speaker"*, *"stop the lights and put the bedtime scene on"*.
 
 **Voice** may start and stop shows. Importing an edited show needs a wider agent.
 
@@ -128,8 +125,7 @@ DYMO LabelWriter labels. [BRUH Print →](/bruh-print/)
 | `label_printer_status` | Which printer is attached, what stock is in each roll, the saved templates and their fields, and the last few labels. Read-only. |
 | `print_label` | Print text, fitted as large as it will go, or a saved template with its fields. |
 
-*"Print a label that says chili"*, *"three freezer-bag labels for bolognese"*. brAIn reads what is
-loaded first, so it names a stock and a template that exist.
+Ask: *"Print a label that says chili"*, *"three freezer-bag labels for bolognese"*. brAIn reads what is loaded first, so it names a stock and a template that exist.
 
 **Voice** prints at most 10 copies at once, because a misheard "two hundred" is a roll.
 
@@ -148,10 +144,11 @@ A Minecraft Java server with Bedrock players through Geyser. [BRUH Minecraft →
 | `minecraft_addons` | Search, install and remove Modrinth plugins, data packs and mods. |
 | `minecraft_job` | A companion job's progress. |
 
-Names are matched the way you say them: case, spaces and a Bedrock player's `.` are ignored and a
-unique partial name counts. A name that could be two people is asked about, never guessed. With
-the integration installed, brAIn can also play in the world as a companion, under the name you
-gave it in ⚙ › Personality; set it up in **⚙ › Minecraft**.
+Ask: *"Who's on?"*, *"teleport Alex to Sam"*, *"put Alex in creative"*, *"make it day"*.
+
+Names are matched the way you say them. Case, spaces and a Bedrock player's `.` are ignored, and a unique partial name counts. A name that could be two people is asked about, never guessed.
+
+brAIn can also play in the world as a companion, under the name you gave it in ⚙ › Personality. Set it up in **⚙ › Minecraft**.
 
 **Voice** may play: teleport, game modes, items, time, weather and chat. Op, ban, kick, the
 whitelist, console commands, backups, restarts and installing add-ons need a wider agent.
@@ -161,12 +158,11 @@ whitelist, console commands, backups, restarts and installing add-ons need a wid
 Per-app CPU, memory, network and disk from the Supervisor, and a runaway-app sensor.
 [BRUH Task Manager →](/bruh-task-manager/)
 
-brAIn has no tools of its own for Task Manager. Its sensors are ordinary Home Assistant entities,
-so brAIn reads them like any other (*"which app is using the most memory?"*), and an automation
-can hand a runaway app to brAIn with `brain.run_task`.
+There are no dedicated tools. Task Manager's sensors are ordinary Home Assistant entities, so brAIn reads them like any other: *"which app is using the most memory?"*. An automation can hand a runaway app to brAIn with [`brain.run_task`](/brain/automations/#run-a-background-job).
 
 ## Not BRUH, also supported
 
-brAIn also manages two non-BRUH add-ons in depth: [ESPHome](/brain/esphome/) (edit, validate,
-compile, flash and stream logs) and [Music Assistant](/brain/music-assistant/) (players, the
-library and the stale speakers Home Assistant cannot delete).
+brAIn also manages two other apps in depth:
+
+- [ESPHome](/brain/esphome/): edit, validate, compile, flash and read logs.
+- [Music Assistant](/brain/music-assistant/): players, the library, and the stale speakers Home Assistant cannot delete.

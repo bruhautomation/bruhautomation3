@@ -1,149 +1,187 @@
 ---
 title: How a Show Is Built
-description: What BRight hears in a song, who writes the show, how it becomes four layers of light on different bulbs, and the visual show editor where you watch, edit, revise and version every show.
+description: Build, play, watch, edit, revise and version one light show per song on BRight's Shows tab, and see what BRight hears in a track and how it turns that into four layers of light.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-One show per track, compiled ahead of time so playback is nothing but a clock and a cue list. This
-page follows a song from the Library to the room.
+Every song gets its own show, compiled ahead of time. The Shows tab is where you build one, watch
+it without lighting the house, change it, and keep every version.
 
-## What it hears
+![A show open in the editor: the room on a floor plan with each light glowing its colour at the scrubbed moment, the song's waveform, chord, melody and drum lanes, four scene blocks named arrive, roll, lift and land, one colour strip per light, a bar per effect, and a play button with a scrub bar](./images/show-editor.webp)
 
-Analysis answers two questions, and a show needs both.
+## Build and play a show
 
-**When it hits** — the beat grid, the sections, the drops, the loudness in low, mid and high bands,
-and the ranked *accents*. This is the skeleton: where to be bright, where to build, where a stab
-lands.
+![The Shows tab: a speaker picker, five songs with Play or Build show, one song's menu open showing Rebuild show, Ask Claude to write it and Test beats and drops, and the mood box with Check Claude](./images/shows.webp)
 
-**What it is playing** — the half that lets a show follow the *song* rather than its structure.
-Chords change every bar or two on their own clock, almost never where the energy changes, so a
-palette that follows them keeps moving through the long stretches where the section map does
-nothing at all.
+Pick a speaker at the top of **Songs**, then use a song's row:
 
-| | What it finds | Why it is reported that way |
-| --- | --- | --- |
-| **Chords** | Triads per beat, reported as **changes only**, and the key | A show acts on the change; an ambiguous beat holds rather than flickering |
-| **Melody** | The tune, as note events | Tracked in the melodic register so it does not follow the bass up whenever the tune rests |
-| **Phrases** | Notes grouped into breaths, with the direction of the line | The gap that ends a phrase is measured in **beats** — half a second is nothing at 90 bpm |
-| **Repeats** | Where the chorus comes back | Deliberately coarse — that is the repetition a show should answer |
-| **Hits** | Each accent, ranked, and **which drum it was** | A kick and a snare can then be on different lights |
-| **Lyrics** | Time-synced lines from LRCLIB, when they exist | So the director can pin a moment to a line |
+| To | Press |
+| --- | --- |
+| Compile a show for a song that has none | **Build show** |
+| Play the song on the speaker with its lights | **▶ Play** |
+| Compile it again, for example after changing the Light Map | **⋯ → Rebuild show** |
+| Have Claude write the show | **⋯ → ✨ Ask Claude to write it** |
+| Pulse every mapped light on the beat and flash on drops, with no choreography | **⋯ → 🧪 Test beats and drops** |
+| Stop and put the room back | **■ Stop & restore lights** |
+| Shift the lights while it plays | **−25ms** / **+25ms** |
 
-Every extractor has a floor below which it says nothing: a confident answer where the audio holds
-none is the one failure that cannot be recovered downstream.
+Playing needs a [calibrated speaker](/bright/light-map/#measure-your-speakers-delay) and an
+[analysed track](#analyse-your-music). A show is built for the lights on the map when it was
+compiled, so rebuild after you change the map.
 
-Tracks are known by their **content**, not their path, so renaming a file does not re-analyse it
-and the same song in two folders is one song. A track analysed by an older BRight says so in the
-Library — press **Analyze** and out-of-date tracks are heard again. A stale track still plays; it
-just answers with less than BRight can now hear.
+## Watch a show on screen
 
-![The Library: Music folders with Scan folders and Analyze new tracks, one analysed track showing 3:07, 124 BPM, 4 sections, 1 drop and 48 chord changes, and Folders to scan with Browse media](./images/library.webp)
+Tap a song's name and its show opens below the list.
 
-## Who writes the show
+| Part | What it shows |
+| --- | --- |
+| **The room** | Your floor plan, each light in its colour at the scrubbed instant |
+| **The song** | The waveform with its sections and drops |
+| **Three lanes** | The chord changes as labelled blocks, the melody as a pitch line, and the drums with the kick low and the rest high |
+| **Scene blocks** | The show's scenes across the song. Press one to jump to it |
+| **The strip** | One row per light, time running left to right |
+| **Effect rows** | One bar per effect, drawn from what the compiler rendered |
+
+Drag the scrub bar and the room shows that instant. **▶ Play** runs the show at real speed on the
+screen, not the bulbs. While a real show plays, the playhead follows it. A line under the strip
+says what is running now and what starts next.
+
+## Edit a show
+
+![The show's scenes as lists: arrive and roll, each with its time range, palette dots, Go to and + Effect, and one row per effect naming its type and lights with Edit, + Library and a remove button](./images/show-scenes.webp)
+
+| To | Press |
+| --- | --- |
+| Change an effect | **Edit** on its row. It opens the same form as the [Effects tab](/bright/effects/) |
+| Add an effect to a scene | **+ Effect** |
+| Remove an effect | **✕** |
+| Jump to a scene | **Go to** |
+| Keep an effect as a saved effect | **＋ Library** |
+| Edit the show as text | **Code**. It is the same document: change either and the other follows |
+| See every cue | **Show the cue list**: when, which light, and which effect asked for it |
+
+The preview follows every change at once. Nothing is written until you press **Save & compile**,
+which validates the show, compiles it and checks each bulb's message budget. A show that would
+flood a bulb is refused with the reason, and the show you had is untouched.
+
+**Worth looking at** lists only effects with a problem: one that selects no lights, one whose
+analysis is too old, or one whose waveform another effect cancels. When the show is fine, it is
+empty.
+
+## Revise a show with Claude
+
+<Steps>
+
+1. Watch the show.
+2. Type what you noticed in the box under the editor, such as *"the chorus needs more
+   movement"* or *"less strobe, warmer verses"*.
+3. Press **✍ Revise with Claude**. The whole show goes back to Claude with your words.
+
+</Steps>
+
+A failed revision costs an error message, never the show. Revising needs [brAIn](/brain/).
+
+## Go back to an earlier version
+
+**Versions of this show** lists every compile, revision and hand edit, newest first, with who
+wrote it.
+
+| To | Press |
+| --- | --- |
+| Make an older version the one that plays | **Play this one** |
+| Keep a version for good | **Name it** |
+
+The version marked *playing* is what a party runs. Unnamed versions are dropped oldest-first once
+there are more than a dozen. Named versions and the playing one are never dropped.
+
+## Choose who writes the show
 
 The `director_mode` option decides:
 
-- **`auto`** (default) — Claude designs the show when [brAIn](/brain/) is installed, and the
-  built-in algorithmic choreographer is the fallback *and* the floor, so a show always compiles.
-- **`algorithmic`** — never call Claude.
-- **`claude`** — Claude only; compiling fails with the reason rather than quietly downgrading.
+| `director_mode` | Who writes |
+| --- | --- |
+| `auto` (default) | Claude, when [brAIn](/brain/) is installed. Otherwise the built-in director, so a show always compiles |
+| `algorithmic` | The built-in director only. Claude is never called |
+| `claude` | Claude only. Compiling fails with the reason instead of falling back |
 
-BRight carries no Claude login of its own: it asks brAIn to run the job, on the model in
-`director_model` (default `opus` — a show is written once and watched many times). **Check Claude**
-on the Shows tab tests that BRight can reach it, and the **mood** box above the song list (*"chill"*)
-steers the next Claude compile.
+BRight has no Claude login of its own. It asks brAIn to run the job on the model in
+`director_model` (default `opus`).
 
-**What Claude is told.** The whole light map — each light's name, role, zone, position and
-whether it is a bulb or a switch — plus the travel orders already worked out (left-to-right,
-front-to-back, and a walk from each light to its nearest neighbour), the song's sections, chords,
-melody, accents and lyrics, your saved effects, and a worked example. Its answer goes through the
-same validator and compiler as everything else, and the brief can be read back from the panel.
+- **Check Claude** tests every link between BRight and Claude.
+- **The mood box** above it (*"chill"*) steers the next show Claude writes.
+- **What Claude is told about this track and your room** shows the exact brief: each light's
+  name, role, zone and position, the travel orders through your room, the song's sections, chords,
+  melody, accents and lyrics, and your saved effects.
 
-## Four layers, on different lights
+Claude's answer goes through the same validation and compile as a show you edit by hand.
 
-A show is four layers with different time constants, and what makes it read as musical rather
-than busy is that they are **separate**:
+## Analyse your music
+
+![The Library tab: Scan folders and Analyze new tracks, five tracks each showing length, BPM, sections, drops and chord changes, and the Folders to scan card with Browse media](./images/library.webp)
+
+<Steps>
+
+1. On **Library**, press **Browse media** and tick the folders to scan. Each is scanned all the
+   way down.
+2. Press **Analyze new tracks**. Tracks are analysed one at a time, and a bad file is reported
+   and skipped.
+
+</Steps>
+
+Analysis runs once per track. Tracks are known by their content, so renaming a file does not
+analyse it again, and the same song in two folders is one song. A track analysed by an older
+BRight says so in the Library. It still plays, and **Analyze** refreshes it.
+
+### What BRight hears
+
+| | What it finds | What a show does with it |
+| --- | --- | --- |
+| **Beat and structure** | The beat grid, sections, drops, and loudness in low, mid and high bands | Where to be bright, where to build, where a stab lands |
+| **Hits** | Each accent, ranked, and which drum it was | Kick and snare on different lights |
+| **Chords** | Each chord change, and the key | A palette that moves with the harmony |
+| **Melody** | The tune as notes, grouped into phrases | Light that climbs when the tune does |
+| **Repeats** | Where the chorus comes back | A repeat the show can answer |
+| **Lyrics** | Time-synced lines from LRCLIB, when they exist | A moment pinned to a line |
+
+When BRight cannot hear something clearly, it reports nothing for it instead of guessing.
+
+## How a show is layered
+
+The automatic director and Claude's brief both build a show from four layers, each on different
+lights:
 
 | Layer | What it does | Typically on |
 | --- | --- | --- |
-| **Ground** | The room's colour, moving with the harmony. Seconds long — the only layer allowed to feel like fading | Candles, strip |
-| **Pulse** | The beat, as a `hit` — felt more than watched | Lamps or downlights doing nothing else |
-| **Hits** | The kick and the snare as different instruments, on the drums the analyser actually heard — so they catch fills a grid knows nothing about | Lamps, downlights |
-| **Voice** | The melody, placed by **pitch** — a run up the scale is a run of light across the room | One kind of light, in the chorus too |
+| **Ground** | The room's colour, moving slowly with the harmony | Candles, strip |
+| **Pulse** | The beat, as a `hit` | Lamps or downlights doing nothing else |
+| **Hits** | The kick and the snare, on the drums the analyser heard, including fills | Lamps, downlights |
+| **Voice** | The melody, placed by pitch. A run up the scale is a run of light across the room | One kind of light |
 
-A bulb runs **one** waveform at a time — physics, not taste — so a fixture belongs to exactly one
-layer. The director claims whole **roles** first (which is what survives you mapping a new bulb)
-and only splits a role by naming individual lights when a layer has nowhere else to go: the left
-lamps are the kick, the right ones the snare.
+Two rules shape it:
 
-The second rule is what makes a chorus land: **a layer arriving is itself an event**. A chorus is
-not just brighter than the verse; it is the strip joining the kick and the lamps switching from
-washing to following the tune. There is always a beat on some light, and a drop takes the whole
-room.
+- **One layer per light.** A bulb runs one waveform at a time, so each fixture belongs to one
+  layer. The director claims whole roles first, and splits a role (left lamps for the kick, right
+  for the snare) only when a layer has nowhere else to go.
+- **A layer arriving is an event.** A chorus is the strip joining the kick and the lamps switching
+  to the tune, not only more brightness. A drop takes the whole room.
 
-<Aside title="Where the light lands">
-A LIFX waveform runs between the bulb's *current* colour and the packet's, so a sine anchored on
-the beat would be dimmest exactly on the kick. BRight sends every rhythmic cue early by that
-shape's own peak phase, so the brightest instant falls on the beat. You never have to think about
-it when writing effects; it is in the compiler.
+BRight sends each rhythmic cue slightly early so the brightest instant falls on the beat. You do
+not need to allow for it when writing effects.
+
+## Write or edit a show as a file
+
+Every compile also writes the script to `/config/.bright/shows/<track>-<hash>.json`, where Home
+Assistant's File editor can open it. A `README.md` and an `EFFECTS.md` (every effect type and its
+parameters) sit beside the scripts.
+
+<Aside type="caution">
+The file is a copy. Editing it changes nothing until you press **Reload from file** on the Shows
+tab or call `bright.import_show`. Broken JSON is refused with the line it broke on, and the show
+you had stays.
 </Aside>
 
-## The show editor
-
-Select a song on the Shows tab and its show opens as what it is: **your room** on the floor plan at
-the top, **the whole song as a strip** beneath it with one row per light, **the scenes** as blocks
-across the top of the strip, and **the effects** as rows you can press.
-
-![The Shows tab: a speaker picker with Calibrate a speaker first, one song with Play and a ⋯ menu, and the Claude mood box with Check Claude, above the show card](./images/shows.webp)
-
-- **Scrub and play on screen.** Drag the scrub bar and the room shows that instant. ▶ plays the
-  show at real speed — on the screen, not the bulbs — so you can read a show at midday without
-  lighting the house up. While a real show is playing, the playhead follows it.
-- **The song is drawn under the same ruler.** Three lanes: the **chord changes** as labelled
-  blocks, the **melody** as a pitch contour against the song's own range, and the **drums** with
-  the kick low and the rest high.
-- **One named row per effect**, drawn from what the compiler actually rendered — so an effect that
-  produced nothing has a visibly empty row saying why (it selects no lights, its analysis is too
-  old, another effect cancels its waveform). When the show is fine, that block is empty.
-- **Edit is the picture, not the file.** **Edit** on any effect row opens the same form the Effects
-  tab builds; **+ Effect** adds one to that scene, **✕** removes one. The preview follows every
-  change immediately, and a change that would flood a bulb is flagged next to the effect you
-  changed.
-- **Save & compile** goes through exactly the same door as the director's own output: validated,
-  compiled and checked against the per-bulb message budget. A script that would flood a bulb is
-  refused with the reason, and the show you had is untouched.
-- **Code** opens the same show as text. The two are one document — type in either and the other
-  follows.
-- **Show the cue list** prints the compiled timeline: when, which light, and which effect asked
-  for it.
-
-### Notes for the director
-
-Under the editor is a box for what you noticed watching it — *"the chorus needs more movement"*,
-*"less strobe, warmer verses"*. **✍ Revise with Claude** sends the whole script back with your
-words. A failed revision costs an error message, never the show.
-
-### Every show is kept
-
-*Versions of this show* lists every compile, revision and hand edit, newest first, with who wrote
-it. The one marked *playing* is what a party runs; **Play this one** makes an older version live
-again. **Name it** keeps a version for good — unnamed versions are dropped oldest-first past a
-dozen, and the live one never is — so asking Claude to try again can never cost you the show you
-spent an evening on.
-
-## The script is the show
-
-Every compile also writes the script to `/config/.bright/shows/<track>-<hash>.json`, where the
-File editor can open it — `/data` is invisible to Home Assistant. A `README.md` and an
-`EFFECTS.md` (every effect type and its parameters) sit beside them.
-
-The mirror is a **copy**: editing it changes nothing until you press **Reload from file** in the
-panel or call `bright.import_show`. A half-typed file being picked up by a party at 11pm is not a
-feature. Broken JSON is reported with the parser's own line number.
-
-A hand-written script is a first-class show. The minimum is a scene with a window, a palette and
-some effects:
+The minimum script is a scene with a window, a palette and some effects:
 
 ```json
 {
@@ -172,12 +210,10 @@ some effects:
 }
 ```
 
-- An effect's **selection** names ids, roles, zones or excludes; everything it does not name is
-  untouched. Roles and zones match regardless of capitals.
-- **Parameters are clamped, never rejected.** Anything left out takes its default; `depth: 1.2`
-  is read as `1`.
-- `"snap": "beat"` on a moment moves it onto the nearest beat, so a stab lands where the ear
-  expects it.
-- `"base": false` on a scene stops it washing every light at its start — how a scene leaves the
-  room where the last one left it.
-- `{"use": "kitchen chase"}` uses a saved effect by name.
+| Field | What it does |
+| --- | --- |
+| `select` | Names ids, roles, zones or excludes. Everything it does not name is untouched. Roles and zones ignore capitals. |
+| `params` | Anything left out takes its default. Out-of-range values are clamped, so `depth: 1.2` is read as `1`. |
+| `"snap": "beat"` | Moves a moment onto the nearest beat. |
+| `"base": false` | On a scene, stops it washing every light at its start, so the room stays as the last scene left it. |
+| `{"use": "kitchen chase"}` | Uses a saved effect by name. |

@@ -1,28 +1,27 @@
 ---
 title: Home Assistant integration
-description: The bruh_bambu integration — a device per Bambu Lab printer with a camera and sensors, failure-detection entities, 23 services that answer with the result, the print alert event, and the printer card for Lovelace and Morph.
+description: A device per Bambu Lab printer with a camera and sensors, 23 services that answer with the result, the print alert event, and the printer card for Lovelace and Morph.
 ---
 
 import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-The add-on deploys a companion integration, **`bruh_bambu`**, and keeps it up to date (the
-`enable_ha_integration` option, on by default). The add-on is the one thing that talks to your
-printers; the integration is Home Assistant's window onto it.
+Each printer becomes a Home Assistant device with a camera and sensors, 23 `bruh_bambu.*`
+services, an alert event, and a dashboard card.
 
-## Setting it up
+## Set it up
 
 ![Settings › Home Assistant before the restart: the integration notice with Restart Home Assistant, and the dashboard card and Morph card, each marked installed with the line to paste](./images/settings-home-assistant.webp)
 
+**Restart Home Assistant once** after installing the app. The **Printers** tab and **Settings ›
+Home Assistant** show a banner with a **Restart Home Assistant** button. After the restart the
+integration sets itself up under **Settings → Devices & services → BRUH Bambu Studio**, with a
+device per printer.
 
-Home Assistant loads an integration only when it starts, so **restart Home Assistant once**
-after installing the add-on. The Printers tab (and **Settings › Home Assistant**) show a banner
-with a **Restart Home Assistant** button, and Home Assistant raises a notification. After the
-restart the add-on sets the integration up by itself; it is under **Settings → Devices &
-services → BRUH Bambu Studio**, with a device per printer.
+An update asks for another restart only when the integration's code changed. A change to the
+dashboard card alone needs a page reload.
 
-An add-on update asks for another restart only when the integration's code changed. The
-dashboard card follows its own file, so a card-only change needs nothing more than a page
-reload.
+The integration is installed and kept up to date by the `enable_ha_integration` option, on by
+default.
 
 ## Entities
 
@@ -57,17 +56,17 @@ device page; the ones above are examples.
 
 ## Services
 
-`printer` can be left out when there is only one printer; with two or more it is the printer's
-name or serial number. **Every service answers with the add-on's reply, and a refusal** (*"Workshop
-X1C is already printing"*) **is raised with its reason**, so it shows in the automation trace
-rather than failing silently.
+- **`printer`** is the printer's name or serial number. Leave it out when there is only one
+  printer.
+- **Every service answers with the result.** A refusal, such as *"Workshop X1C is already
+  printing"*, is raised with its reason, so it shows in the automation trace.
 
 <Tabs>
 <TabItem label="Printing">
 
 | Service | What it does |
 |---|---|
-| `bruh_bambu.print_file` | Print a file from `/share/bambu` — sliced first if needed. `slot` / `material` / `colour` choose the filament for a bare model; `plate`, `use_ams`, `ams_mapping`, `timelapse`, `bed_leveling`, `flow_cali`, `vibration_cali`, `layer_inspect`, `plate_type`, `speed`, `copies` and `settings` are the [print options](/bruh-bambu-studio/printing/#print-options) |
+| `bruh_bambu.print_file` | Print a file from `/share/bambu`, sliced first if needed. `slot` / `material` / `colour` choose the filament for a bare model; `plate`, `use_ams`, `ams_mapping`, `timelapse`, `bed_leveling`, `flow_cali`, `vibration_cali`, `layer_inspect`, `plate_type`, `speed`, `copies` and `settings` are the [print options](/bruh-bambu-studio/printing/#print-options) |
 | `bruh_bambu.slice_file` | Slice a project or model (`plate`, `machine`, `process`, `filaments`, `arrange`, `orient`) |
 | `bruh_bambu.pause_print` | Pause the current print |
 | `bruh_bambu.resume_print` | Resume it |
@@ -102,9 +101,9 @@ rather than failing silently.
 
 | Service | What it does |
 |---|---|
-| `bruh_bambu.design_part` | Describe a part (`description`, optional `name`) and brAIn designs it — or name a `part` and say what to change in `message`. Answers as soon as brAIn has started, with the part's id and name |
+| `bruh_bambu.design_part` | Describe a part (`description`, optional `name`) and brAIn designs it. Or name a `part` and say what to change in `message`. Answers as soon as brAIn has started, with the part's id and name |
 | `bruh_bambu.design_status` | A part's latest version, whether brAIn is still on it, its last reply, whether it built and any print of it; every part when none is named |
-| `bruh_bambu.print_part` | Print a designed part — the Design tab's Slice and print — with `printer`, `version`, `copies`, `slot`, `timelapse` and `settings` |
+| `bruh_bambu.print_part` | Print a designed part, the same as the Design tab's Slice and print, with `printer`, `version`, `copies`, `slot`, `timelapse` and `settings` |
 
 The three design services answer with data only (use `response_variable:`), and a part is named
 by its id or its name.
@@ -123,7 +122,7 @@ by its id or its name.
 
 ## The print alert event
 
-Every warning and failure fires **`bruh_bambu_print_alert`** with:
+Every warning and failure fires `bruh_bambu_print_alert` with:
 
 | Field | |
 |---|---|
@@ -137,10 +136,8 @@ Every warning and failure fires **`bruh_bambu_print_alert`** with:
 
 ## The printer card
 
-The add-on installs one card in two places.
-
-**Lovelace.** Add *BRUH Bambu printers* from the card picker (`install_lovelace_card`, on by
-default):
+Add *BRUH Bambu printers* from the Lovelace card picker (`install_lovelace_card`, on by
+default), or paste:
 
 ```yaml
 type: custom:bruh-bambu-card
@@ -155,15 +152,14 @@ show_detection: false
 
 `entities:` takes a list of status sensors to show several.
 
-**Morph.** With [Morph](/brain/morph/) in use, the same card is put in `/config/morph/cards`
-(`install_morph_card`) and is used as `type: custom:morph-bambu-printer`, in Morph's own look.
-Morph picks it up within two minutes.
+**In Morph**, the same card is `type: custom:morph-bambu-printer`, in Morph's own look
+(`install_morph_card`). [Morph](/brain/morph/) picks it up within two minutes.
 
-Each printer on the card is its name and state on one line, the camera, the progress with the
-time left and the finish time, failure detection's line — or, during an alert, what brAIn saw
-with **Ignore** and **Pause** (or **Resume** and **Stop**) — the temperatures and **Pause** /
-**Resume**. Stop (press twice), the speed, the chamber light, **Refresh**, **Reconnect** and the
-AMS trays are behind the printer's **⋯**, which opens in the card.
+| On the card | |
+|---|---|
+| Always | The printer's name and state, the camera, the progress with the time left and the finish time, the temperatures, and **Pause** / **Resume** |
+| Failure detection | One line with its state. During an alert, what brAIn saw with **Ignore** and **Pause print**, or **Resume** and **Stop** |
+| Behind **⋯** | **Stop** (press twice), the speed, the chamber light, **Refresh**, **Reconnect** and the AMS trays |
 
 ## Automation examples
 
@@ -231,6 +227,7 @@ actions:
 ```
 
 Designing takes minutes, so `design_part` answers as soon as brAIn has started, with the part's
-id and name in the response. Put the print in
-the description, as above, and the design conversation prints the part itself once it has built.
-Or ask `bruh_bambu.design_status` until the version has built, then call `bruh_bambu.print_part`.
+id and name. To print the part, either:
+
+- put the print in the description, as above, and the conversation prints it once it has built, or
+- poll `bruh_bambu.design_status` until the version has built, then call `bruh_bambu.print_part`.

@@ -1,70 +1,62 @@
 ---
 title: How Morph Learns
-description: Morph's learning loop watches how your household actually uses the dashboard, then suggests changes and writes lessons that every later change follows — locally, with nothing leaving your house.
+description: Morph's learning loop watches how your household uses the dashboard, then suggests changes and writes lessons that every later change follows. It runs locally, and nothing leaves your house.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Morph gets better at being *your* dashboard the more it is used. It keeps a log of what you use,
-and on a schedule asks brAIn how the dashboard could fit that better. What comes back are
-**suggestions** you answer, and **lessons** that every later change follows.
+Morph notices how the dashboard is used and suggests changes that fit. You answer each
+suggestion, and the lessons it keeps shape every later change.
 
 <Aside type="tip" title="Nothing leaves your house">
-The usage log never leaves your house, and the learning loop runs on your own brAIn. It is part
-of brAIn's **Learning loop** switch in ⚙ › Features: off, nothing here runs on its own, and brAIn
-still does what you ask.
+The usage log stays in your house and the loop runs on your own brAIn. It is part of brAIn's
+**Learning loop** switch in ⚙ › Features. With the switch off, nothing here runs on its own.
 </Aside>
 
-## What Morph notices
+## How it works
 
-Morph keeps a log of what you use: what you open, toggle and slide, when, and what you ask brAIn
-for.
-
-## The learning pass
-
-On a schedule — **daily by default**, set in ⚙ › Dashboard — Morph asks brAIn how the
-**dashboard** could be better for how it is actually used. The pass is **read-only**: it can look
-at the house but change nothing.
-
-This loop is about the dashboard only. Learning the house is brAIn's own job, so a pass suggests
-no automations or renames, and its lessons are rules about how you want your dashboard.
-
-A pass that fails — brAIn stopped, signed out, out of time — is tried again on the next schedule;
-it does not count as having read what you did. **Learn now** in ⚙ › Dashboard runs one straight
-away.
-
-## What comes back
-
-### Suggestions
-
-Filed as brAIn's cases, so you answer them where you answer everything else. Answer in words or
-with the buttons:
-
-- **Yes** hands the suggestion to brAIn as an ordinary [Tell](/brain/morph/tell-brain/) — with
-  Keep and Undo like any other.
-- **Dismiss** hides it for now.
-- **No** (with a reason, if you like) means it is **never suggested again**.
-
-Suggestions never remove a card that holds a control (a light, a switch, a lock), even one rarely
-tapped, and a No to a reorder is remembered for every section that move would change, however it
-is worded next time.
-
-### Lessons
-
-Revised each pass in `/config/morph/LEARNED.md`. **Every Tell and every pass reads them.** Each
-line ends with who wrote it:
-
-| Mark | Written by |
+| Step | What happens |
 | --- | --- |
-| **(you)** | You. |
-| **(tell)** | brAIn, during a Tell. |
-| **(learned)** | A learning pass. |
+| **1. Morph logs use** | What you open, toggle and slide, when, and what you ask brAIn for. |
+| **2. A learning pass runs** | **Daily** by default (set it in ⚙ › Dashboard). Morph asks brAIn how the dashboard could fit that use better. The pass is read-only: it can look at the house and change nothing. |
+| **3. You get suggestions** | Filed as brAIn's cases, where you answer everything else. |
+| **4. Lessons are revised** | Kept in `/config/morph/LEARNED.md`. Every Tell and every pass reads them. |
 
-**A line you write — or any line with no mark — is never reworded or dropped by Morph.** A pass
-adds a lesson only with two pieces of evidence or a reason you typed; a reason you give for No is
-read as evidence, not written down as a rule. Edit the lessons in **⚙ › Dashboard** or in the file.
+The loop is about the dashboard only. It suggests no automations or renames. Learning the
+house is [brAIn's own job](/brain/learning/).
 
-A lesson file might read:
+A pass that fails (brAIn stopped, signed out, out of time) is tried again on the next
+schedule. **Learn now** in ⚙ › Dashboard runs one straight away.
+
+## Answer a suggestion
+
+Answer in words or with the buttons.
+
+| Answer | What happens |
+| --- | --- |
+| **Yes** | brAIn makes the change as an ordinary [Tell](/brain/morph/tell-brain/), with Keep and Undo. |
+| **Dismiss** | Hides it for now. |
+| **No** (with a reason, if you like) | It is never suggested again. |
+
+- A suggestion never removes a card that holds a control (a light, a switch, a lock), even
+  one rarely tapped.
+- A No to a reorder is remembered for every section that move would change, however it is
+  worded next time.
+
+Two other kinds of suggestion:
+
+| Suggestion | Answers |
+| --- | --- |
+| **Fix the card code …**, when a file in `/config/morph/cards/` will not load | Yes fixes it with a Tell. |
+| A change to Morph's own code | **Do it** (brAIn changes your copy of Morph, then asks whether to open an issue), **Send as issue** (only report it), or **No**. |
+
+Nothing is sent until you press **Send** or **Open an issue**, and only while brAIn's
+**Development loop** switch is on.
+
+## Read and edit the lessons
+
+Edit the lessons in **⚙ › Dashboard** or in `/config/morph/LEARNED.md`. Each line ends with
+who wrote it:
 
 ```markdown
 - Keep the Kitchen first on the ground floor; it is the room used most at breakfast. (learned)
@@ -72,37 +64,28 @@ A lesson file might read:
 - The Office thermostat card shows the humidity under the temperature. (tell)
 ```
 
-### A broken card of your own
+| Mark | Written by |
+| --- | --- |
+| **(you)** | You. |
+| **(tell)** | brAIn, during a Tell. |
+| **(learned)** | A learning pass. |
 
-When a file in `/config/morph/cards/` will not load, Morph offers **Fix the card code …** as a
-suggestion, since that code is this house's and a Tell fixes it.
+- A line you write, or any line with no mark, is never reworded or dropped by Morph.
+- A pass adds a lesson only with two pieces of evidence or a reason you typed.
+- A reason you give for a No is read as evidence. It is not written down as a rule.
 
-### A change to Morph itself
+## Check the scorecard
 
-Something the pass thinks Morph's own code should do differently comes with three answers:
+**⚙ › Dashboard** shows how the loop is doing: how many suggestions were made, done and
+declined, and how many of brAIn's changes were kept or undone.
 
-- **Do it** — brAIn changes your copy of Morph, then asks whether to open an issue.
-- **Send as issue** — only report it.
-- **No**.
+## Examples
 
-Nothing is sent until you press **Send** or **Open an issue**, and only while brAIn's
-**Development loop** switch is on.
-
-## The scorecard
-
-**⚙ › Dashboard** shows how the loop is doing: how many suggestions were made, done and declined,
-and how many of brAIn's changes were kept or undone.
-
-## Use cases
-
-**The evening office.** Every evening Alex opens the Office and adjusts the desk lamp, but the
-Office is the last room on the page. After enough evenings, the pass suggests moving it up. Alex
-says yes; brAIn makes the move as a Tell.
-
-**"No, and here's why."** The pass suggests dropping the Yard's weather card because nobody opens
-it. Sam answers No: *"I glance at it every morning, I just don't tap it"*. That reason becomes evidence,
-and the suggestion never comes back.
-
-**Your own rule, kept.** You add a line to `LEARNED.md`: *"Lights are always one row, never
-two."* It has no mark, so Morph never rewrites or drops it — and every Tell from then on follows
-it.
+- **The evening office.** Alex opens the Office every evening and adjusts the desk lamp, but
+  the Office is the last room on the page. A pass suggests moving it up. Alex says yes, and
+  brAIn makes the move as a Tell.
+- **A no with a reason.** A pass suggests dropping the Yard's weather card because nobody
+  opens it. Sam answers No: *"I glance at it every morning, I just don't tap it."* The
+  suggestion never comes back.
+- **Your own rule.** You add *"Lights are always one row, never two."* to `LEARNED.md`. It
+  has no mark, so Morph never rewrites it, and every Tell follows it.

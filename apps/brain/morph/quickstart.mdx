@@ -1,61 +1,54 @@
 ---
 title: Morph Quick Start
-description: Switch on the Morph dashboard in brAIn, let it build a dashboard from your house, and make your first change by telling brAIn what you want — in about five minutes.
+description: Switch on the Morph dashboard in brAIn, let it build a dashboard from your house, and make your first change by telling brAIn what you want. About five minutes.
 ---
 
 import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
 
-Morph comes with brAIn. There is nothing extra to install: switch it on, and brAIn builds a
-dashboard from your house the first time it opens.
+Switch Morph on and brAIn builds a dashboard from your house. There is nothing extra to
+install.
 
 ## Before you start
 
-- **brAIn is installed and signed in**, and Home Assistant has been restarted once so the
-  brAIn integration is loaded. If not, follow [brAIn's Quick Start](/brain/quickstart/)
-  first.
-- **You are a Home Assistant administrator.** Changing the dashboard, Tell and ⚙ are
-  administrator things; everyone else in the house sees the dashboard alone.
-- **brAIn's Automation tasks option is on** (`enable_automation_integration`, the
-  default). Tell and the learning loop go through it.
+- **brAIn is installed and signed in**, and Home Assistant has been restarted once. If not,
+  follow [brAIn's Quick Start](/brain/quickstart/) first.
+- **You are a Home Assistant administrator.** Everyone else sees the dashboard and cannot
+  change it.
+- **brAIn's Automation tasks option is on** (`enable_automation_integration`, the default).
+  Tell and the learning loop need it.
 
 ## Switch it on
 
 <Steps>
 
-1. **Open brAIn** from Home Assistant's sidebar, and press **⚙** at the right of brAIn's
-   top bar.
+1. Open **brAIn** in the sidebar and press **⚙** at the right of the top bar.
 
-2. **Open Features** and switch on **Morph dashboard**. A switch takes effect at once;
-   nothing needs a restart.
+2. Open **Features** and switch on **Morph dashboard**. It takes effect at once.
 
-3. **Open the first tab.** It is labelled **Morph UI** with a small dashboard icon (you can
-   rename it and change its icon later, in ⚙ › Dashboard › Header tabs). brAIn's own guide
-   calls it the Home tab.
+3. Open the first tab, **Morph UI**. You can rename it later in ⚙ › Dashboard › Header tabs.
 
-4. **Let it build.** On the first start with the dashboard on, brAIn builds it from your
-   house: **one section per area, grouped by floor** (or *Home* and *Outside* when you have
-   no floors), and a **Whole house** floor with climate, weather and security. You can
-   rebuild it any time from ⚙ › Dashboard.
+4. Let it build. brAIn makes **one section per area, grouped by floor** (or *Home* and
+   *Outside* if you have no floors), plus a **Whole house** floor with climate, weather and
+   security. You can rebuild it any time from ⚙ › Dashboard.
 
 </Steps>
 
-![The Morph tab on a phone, dark theme: brAIn's header with the Morph UI, Insights, Ask and Memory tabs along the top, the greeting, the verdict sentence, the Ask line, the Coming up strip, the scenes and the start of the First floor](./images/morph-phone-dark.webp)
+![The Morph tab on a phone, dark theme: brAIn's header with the Morph UI, Insights, Ask and Memory tabs under it, the greeting "Good night.", the verdict sentence, the Ask or tell the house line, and the start of the Coming up strip](./images/morph-phone-dark.webp)
 
 ## Use it
 
 <Steps>
 
-1. **Tap** a light card. It toggles. A garage door, an unlock and a lock ask for a second
-   tap.
+1. **Tap** a light card. It toggles. A garage door, an unlock and a lock ask for a second tap.
 
-2. **Slide** along the same card to set the brightness — or a fan's speed, or a blind's
-   position.
+2. **Slide** along the same card to set the brightness. A fan's speed and a blind's position
+   work the same way.
 
-3. **Hold** the card. It opens in place with its options and its history, and the cards
-   around it make room. **Tap outside** and everything folds back.
+3. **Hold** the card. It opens in place with its options and history. Tap outside to fold it
+   back.
 
 4. **Ask something** in the line under the verdict: *"which windows are open?"* The answer
-   appears right under the line, and you can answer again to carry on the conversation.
+   appears under the line.
 
 </Steps>
 
@@ -63,43 +56,42 @@ dashboard from your house the first time it opens.
 
 <Steps>
 
-1. **Press the pencil** — the quiet **Edit** at the right of the page's first line, under
-   brAIn's header. **Done** and **YAML** appear in the header while you edit.
+1. Press the pencil (**Edit**) at the right of the page's first line.
 
-2. **Hold a card** — say, the Kitchen's countertop light — and the Tell box opens with a
-   picture of exactly what you are holding, under **What brAIn will see**.
+2. **Hold a card**, such as the Kitchen's countertop light. The Tell box opens with a picture
+   of what you are holding.
 
-3. **Say what should change**: *"Make this the full width of the room and call it
-   Counter."* Press **Send**.
+3. Say what should change: *"Make this the full width of the room and call it Counter."*
 
-4. **Watch it work.** brAIn's steps appear in the box as it takes them. You can close the
-   box; a strip at the top of the dashboard says what brAIn is doing, and **Show** opens it
-   again.
+4. Press **Just do it** to make the change straight away. **Send for versions** instead asks
+   brAIn for two or three versions to choose from.
 
-5. **Keep or Undo.** When brAIn answers, you see the card **before and after** and one
-   line for each place the request could reach. Press **Keep**, **Undo** (which reverts
-   exactly that change), or **Tell it more**.
+5. Watch it work. brAIn's steps appear in the box. You can close the box, and a strip at the
+   top of the dashboard says what brAIn is doing.
+
+6. Press **Keep**, **Undo** or **Tell it more**. Undo reverts exactly that change.
 
 </Steps>
 
-<Aside type="tip" title="You don't need Edit to change the page">
-Type the change straight into the Ask line — *"remove the Coming up timeline"*, *"put the
-porch light in Entry"* — and brAIn reads it as a change to the dashboard and makes it as a
-Tell, with Undo.
+![The Tell box open under the Kitchen's Countertop card in Edit, dark theme: "Tell Juniper" (the assistant's name in this house), a picture of the card labelled "How it looks now", the request "Make this the full width of the room and call it Counter.", and Cancel, Just do it and Send for versions](./images/morph-tell-box-dark.webp)
+
+<Aside type="tip" title="You do not need Edit to change the page">
+Type the change into the Ask line: *"remove the Coming up timeline"*, *"put the porch light
+in Entry"*. brAIn reads it as a change to the dashboard and makes it, with Undo.
 </Aside>
 
 ## Upgrading from the Morph app
 
-brAIn 4.0 does the move itself. Update brAIn and restart Home Assistant once when it asks.
-On its first start brAIn **stops the old Morph app and sets it not to start at boot**,
-removes the old `morph` integration and says so in a notification. It never uninstalls the
-app, because uninstalling deletes that app's data — do that yourself from Settings ›
-Add-ons when you are happy.
+Update brAIn and restart Home Assistant once when it asks. brAIn does the rest:
 
-The Morph dashboard switch is already on (brAIn saw your dashboard), and everything that
-lived in `/config/morph` comes with you untouched: the dashboard and **its whole history**,
-your own card code in `cards/`, your changes to Morph's own code, and the household's
-lessons in `LEARNED.md`. Morph's own settings (theme, hold time, the learning schedule and
-model) start from their defaults once; set them again in ⚙ › Dashboard.
+- It **stops the old Morph app and sets it not to start at boot**, removes the old `morph`
+  integration, and says so in a notification.
+- It never uninstalls the app, because that deletes the app's data. Do that yourself from
+  Settings › Add-ons when you are happy.
+- The Morph dashboard switch is already on.
+- Everything in `/config/morph` comes with you: the dashboard and its whole history, your
+  card code in `cards/`, your changes to Morph's own code, and the lessons in `LEARNED.md`.
+- Morph's own settings (theme, hold time, the learning schedule and model) start from their
+  defaults. Set them again in ⚙ › Dashboard.
 
-<LinkCard title="Next: Using Morph" description="Everything on the page — the verdict, rooms, cards in place, Coming up, Ask and the room rail." href="/brain/morph/using/" />
+<LinkCard title="Next: Using Morph" description="The verdict, rooms, cards in place, Coming up, Ask and the room rail." href="/brain/morph/using/" />
