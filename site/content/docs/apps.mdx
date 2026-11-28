@@ -8,34 +8,10 @@ tableOfContents:
 import { Card, CardGrid, LinkCard, Steps, Aside } from '@astrojs/starlight/components';
 
 Everything here installs from **one repository** into Home Assistant's app store, runs on
-your own hardware, and shows up in your sidebar. brAIn is the mind; the rest give it hands —
-each one works on its own, and each one gets better when brAIn is installed beside it.
+your own hardware, and shows up in your sidebar. Each app works on its own. Most get better
+with brAIn installed beside them, because brAIn picks up their tools.
 
 ![brAIn's Home tab — the Morph dashboard, which knows what matters right now and says why](../../assets/images/apps/brain-hero.webp)
-
-## Install the repository
-
-<Steps>
-
-1. In Home Assistant, open **Settings → Apps** (called **Add-ons** on older versions) and
-   then the **App Store** (Add-on Store).
-
-2. Open the **⋮** menu in the top-right corner, choose **Repositories**, and add:
-
-   ```text
-   https://github.com/bruhautomation/BRUH-HA-Apps
-   ```
-
-3. Close the dialog. A **BRUH HA Apps** section appears in the store with every app below.
-   Install the ones you want, then follow each app's Quick Start.
-
-</Steps>
-
-<Aside type="tip">
-Start with **brAIn**. Two apps (BRUH Cooking, BRUH Browser) require it, and most of the others
-give brAIn tools of their own — "what's printing?", "make a shelf label for the
-batteries", "play the party playlist with lights" — once both are installed.
-</Aside>
 
 ## What you can do with each app
 
@@ -72,7 +48,7 @@ Design and print labels on a DYMO LabelWriter from anywhere in the house.
 ![BRUH Print's quick label screen](../../../apps/bruh-print/images/quick.webp)
 
 - Type one word and print. The text is fitted to the label for you.
-- Design a label with text, shapes, barcodes and images in the full designer.
+- Lay out text, barcodes, QR codes, boxes and lines in the full designer.
 - Fill in a template: the same layout, new words each time.
 - Print from a dashboard card or an automation, and pick the roll on a Twin Turbo.
 
@@ -100,7 +76,7 @@ Bambu Studio in your sidebar and Bambu Lab printers over the LAN.
 - Open Bambu Studio in the browser. Nothing to install on your computer.
 - Send a file to a printer. It is sliced if needed, uploaded and started, and you watch it from Home Assistant.
 - Describe a part to brAIn, see it, and print it.
-- Get told when a print looks like it is failing.
+- Turn on failure detection. A print that comes loose is paused and your phone gets the picture.
 
 **Needs:** A Bambu Lab printer in LAN mode; amd64 only. [Open the BRUH Bambu Studio docs →](/bruh-bambu-studio/)
 
@@ -138,7 +114,7 @@ Breville+ and Sage cooking appliances in Home Assistant and brAIn.
 
 - Ask brAIn to start the sous vide or check how the oven is doing.
 - Watch each appliance in a panel drawn for it: Joule, Joule Turbo and the Joule Oven Air Fryer Pro.
-- Automate on a cook finishing or an appliance going offline.
+- Automate on the water reaching temperature, or ten minutes before a cook ends.
 
 **Needs:** **brAIn** and a Breville+ account. [Open the BRUH Cooking docs →](/bruh-cooking/)
 
@@ -148,7 +124,7 @@ brAIn's hands on the web: a real Chrome it drives to run errands.
 
 ![BRUH Browser showing a filled cart waiting for approval](../../../apps/bruh-browser/images/cart.webp)
 
-- Ask brAIn to fill a grocery cart or look something up on a site that has no API.
+- Ask brAIn to fill a grocery cart, or to find and compare something on a website.
 - Watch it work in the sidebar, one errand at a time.
 - Approve the cart yourself. It never buys anything you have not heard and approved.
 
@@ -171,6 +147,30 @@ brAIn's hands on the web: a real Chrome it drives to run errands.
 Every app is listed as *experimental* in Home Assistant's store, which is Home Assistant's
 way of saying it is not an official add-on. The three marked experimental above are also the
 newest: they work, and they are moving fastest.
+
+## Install the repository
+
+<Steps>
+
+1. In Home Assistant, open **Settings → Apps** (called **Add-ons** on older versions) and
+   then the **App Store** (Add-on Store).
+
+2. Open the **⋮** menu in the top-right corner, choose **Repositories**, and add:
+
+   ```text
+   https://github.com/bruhautomation/BRUH-HA-Apps
+   ```
+
+3. Close the dialog. A **BRUH HA Apps** section appears in the store with every app below.
+   Install the ones you want, then follow each app's Quick Start.
+
+</Steps>
+
+<Aside type="tip">
+Start with **brAIn**. Two apps (BRUH Cooking, BRUH Browser) require it, and most of the others
+give brAIn tools of their own — "what's printing?", "make a shelf label for the
+batteries", "play the party playlist with lights" — once both are installed.
+</Aside>
 
 ## How they work together
 

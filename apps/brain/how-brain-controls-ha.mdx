@@ -55,7 +55,7 @@ Each check can only make the answer stricter. In order:
 | 3 | **Protected entities** | Refused on every face. The check follows what a call names: an area or device that contains one, a scene's entity map, a script variable, and what a scene, script or automation reaches when it runs. |
 | 4 | **The agent's limits** | On voice: the entities you exposed to Assist, the services that belong to them, and that agent's **Blocked services**. A call is judged by what it does, so `homeassistant.turn_on` aimed at a garage door is a cover call. |
 | 5 | **The action gate** | In the chat, the terminal, an automation task or a fix, the action is checked against your own words and what it would reach. It never sees text brAIn read on the way, so a planted device name or calendar entry cannot argue it into anything. Your **house rules** apply here. If the gate cannot be reached you are asked, and an unattended run is refused. |
-| 6 | **A fix's contract** | A **Plan** run may make only the service calls and edit only the files its approved plan listed. Any other call is refused, and so is any shell command that does more than read (except `brain own` on the files the plan edits). |
+| 6 | **A fix's contract** | A plan run (the **Go ahead** press) may make only the service calls and edit only the files its approved plan listed. Any other call is refused, and so is any shell command that does more than read (except `brain own` on the files the plan edits). |
 
 Every service call that gets through is recorded with each entity's state just before it, which face asked and which run it was. That record is what **Put them back** on a fix uses.
 
@@ -63,7 +63,7 @@ The homeowner's version, with approval cards, cameras and undo: [Permissions & S
 
 ### Claude runs take turns
 
-Every Claude run the panel starts waits in one queue, three at a time by default. A safety alert goes first, then anything you pressed, then scheduled work. One seat is always kept free of scheduled work, so **Regenerate** or **Plan** never waits behind the overnight cards.
+Every Claude run the panel starts waits in one queue, three at a time by default. A safety alert goes first, then anything you pressed, then scheduled work. One seat is always kept free of scheduled work, so **Regenerate** or **Go ahead** never waits behind the overnight cards.
 
 ## What brAIn can and can't reach
 

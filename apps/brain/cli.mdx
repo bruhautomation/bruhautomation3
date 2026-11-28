@@ -145,7 +145,7 @@ Before a file under `/config` is written, the previous version is snapshotted. R
 | **Not covered** | Files outside `/config`. `secrets.yaml`, which is never snapshotted. Changes a shell command made (a redirect, a script). |
 | **Kept for** | `edit_journal_days` (default 14). |
 
-Service calls a **Plan** made are put back with **Restore** on its card ([Permissions & Safety](/brain/safety/#putting-things-back)). A failed snapshot never blocks an edit.
+Service calls a plan made are put back with **Restore** on its card ([Permissions & Safety](/brain/safety/#putting-things-back)). A failed snapshot never blocks an edit.
 
 This is not a backup. Home Assistant's own backups version your whole configuration; the edit journal covers only the files brAIn touched. See [Reference](/brain/reference/#undo).
 
